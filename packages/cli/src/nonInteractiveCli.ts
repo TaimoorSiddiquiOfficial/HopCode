@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -8,7 +8,7 @@ import type {
   BackgroundTaskStatus,
   Config,
   ToolCallRequestInfo,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { isSlashCommand } from './ui/utils/commandUtils.js';
 import type { LoadedSettings } from './config/settings.js';
 import {
@@ -30,7 +30,8 @@ import {
   TeamEventType,
   ApprovalMode,
   ToolConfirmationOutcome,
-} from '@hoptrendy/hopcode-core';
+  createDuplicateProviderToolCallResponse,
+} from '@hopcode/hopcode-core';
 import type { Content, Part, PartListUnion } from '@google/genai';
 import type { CLIUserMessage, PermissionMode } from './nonInteractive/types.js';
 import type { JsonOutputAdapterInterface } from './nonInteractive/io/BaseJsonOutputAdapter.js';
@@ -345,15 +346,15 @@ export async function runNonInteractive(
     // a new manager is installed (or in `finally`). Without
     // this, a reused stream-json session could leave callbacks
     // attached to a stale TeamManager.
-    let boundManager: import('@hoptrendy/hopcode-core').TeamManager | null =
+    let boundManager: import('@hopcode/hopcode-core').TeamManager | null =
       null;
     let approvalListener:
       | ((
-          event: import('@hoptrendy/hopcode-core').TeammateApprovalRequestEvent,
+          event: import('@hopcode/hopcode-core').TeammateApprovalRequestEvent,
         ) => void)
       | null = null;
     const detachFromManager = (
-      m: import('@hoptrendy/hopcode-core').TeamManager,
+      m: import('@hopcode/hopcode-core').TeamManager,
     ) => {
       m.setLeaderMessageCallback(null);
       if (approvalListener) {
@@ -365,7 +366,7 @@ export async function runNonInteractive(
       }
     };
     const onTeamManagerChangeHandler = (
-      manager: import('@hoptrendy/hopcode-core').TeamManager | null,
+      manager: import('@hopcode/hopcode-core').TeamManager | null,
     ) => {
       // Detach from the previous manager before rebinding.
       if (boundManager && boundManager !== manager) {
@@ -395,12 +396,12 @@ export async function runNonInteractive(
         } else {
           // Headless / non-stream-json mode: there is no UI to
           // surface a prompt, so the only safe options are
-          // IZN (auto-approve) or Cancel. Without this fallback
+          // YOLO (auto-approve) or Cancel. Without this fallback
           // listener, the event has no subscriber and the teammate
           // hangs until its 600s stall timeout fires.
           approvalListener = (event) => {
             const mode = config.getApprovalMode();
-            if (mode === ApprovalMode.IZN) {
+            if (mode === ApprovalMode.YOLO) {
               // `respond` may reject if the teammate terminates between the
               // approval request and our response — catch it so it doesn't
               // become an unhandledRejection that can crash the process.
@@ -420,7 +421,7 @@ export async function runNonInteractive(
               `Auto-cancelling tool ${event.toolName} requested by ` +
               `teammate "${event.teammateName}": current approval mode ` +
               `(${mode}) cannot prompt in non-stream-json mode. ` +
-              `Use --IZN or stream-json to allow teammate tool calls.`;
+              `Use --yolo or stream-json to allow teammate tool calls.`;
             process.stderr.write(`[team] ${reason}\n`);
             // Also surface to the leader's LLM, otherwise it just
             // sees the teammate fail without any signal that an
@@ -755,24 +756,68 @@ export async function runNonInteractive(
        * helper returns (main-turn → emitStructuredSuccess(); drain-turn
        * → return so the post-drain code emits success).
        */
+      const handledProviderToolCallIds =
+        geminiClient.getHistoryFunctionResponseIds();
+
       const processToolCallBatch = async (
         batchRequests: ToolCallRequestInfo[],
         setModelOverride: (override: string | undefined) => void,
       ): Promise<Part[]> => {
         const toolResponseParts: Part[] = [];
+        const structuredOutputActive =
+          config.getJsonSchema() &&
+          batchRequests.some((r) => r.name === ToolNames.STRUCTURED_OUTPUT);
         const seenBatchCallIds = new Set<string>();
+        const duplicateBatchRequests: ToolCallRequestInfo[] = [];
         const uniqueBatchRequests = batchRequests.filter((request) => {
           if (request.callId) {
             if (seenBatchCallIds.has(request.callId)) {
+              if (
+                structuredOutputActive &&
+                request.name === ToolNames.STRUCTURED_OUTPUT
+              ) {
+                return true;
+              }
               debugLogger.debug(
                 `Dropping duplicate non-interactive tool callId=${request.callId} name=${request.name}`,
               );
+              duplicateBatchRequests.push(request);
               return false;
             }
             seenBatchCallIds.add(request.callId);
           }
           return true;
         });
+        const respondedRequests = new Set<ToolCallRequestInfo>();
+        const executableBatchRequests: ToolCallRequestInfo[] = [];
+        const duplicatePendingResponses: Part[] = [];
+
+        for (const requestInfo of uniqueBatchRequests) {
+          if (!requestInfo.providerCallId) {
+            executableBatchRequests.push(requestInfo);
+            continue;
+          }
+
+          if (!handledProviderToolCallIds.has(requestInfo.providerCallId)) {
+            handledProviderToolCallIds.add(requestInfo.providerCallId);
+            executableBatchRequests.push(requestInfo);
+            continue;
+          }
+
+          const toolResponse =
+            createDuplicateProviderToolCallResponse(requestInfo);
+          debugLogger.debug(
+            `[runNonInteractive] Suppressing duplicate provider tool-call id: ${requestInfo.providerCallId} (tool: ${requestInfo.name})`,
+          );
+          respondedRequests.add(requestInfo);
+          adapter.emitToolResult(requestInfo, toolResponse);
+          duplicatePendingResponses.push(...toolResponse.responseParts);
+        }
+
+        // Duplicate responses must always reach the model. They pair with a
+        // tool call the provider already emitted, even when structured_output
+        // is the only executable sibling in this batch.
+        toolResponseParts.push(...duplicatePendingResponses);
 
         // Pre-scan: when --json-schema is active and the model emitted
         // a `structured_output` call alongside other tools in the same
@@ -781,21 +826,18 @@ export async function runNonInteractive(
         // suppress every non-structured sibling. See the multi-shape
         // examples in the main loop's prior comment for the
         // [bad/good/side-effect] permutations.
-        let requestsToExecute = uniqueBatchRequests;
-        if (
-          config.getJsonSchema() &&
-          uniqueBatchRequests.some(
-            (r) => r.name === ToolNames.STRUCTURED_OUTPUT,
-          )
-        ) {
-          requestsToExecute = uniqueBatchRequests.filter(
+        let requestsToExecute = executableBatchRequests;
+        if (structuredOutputActive) {
+          requestsToExecute = executableBatchRequests.filter(
             (r) => r.name === ToolNames.STRUCTURED_OUTPUT,
           );
         }
-        const executedCallIds = new Set<string>();
+        const executedRequests = new Set<ToolCallRequestInfo>(
+          respondedRequests,
+        );
 
         for (const requestInfo of requestsToExecute) {
-          executedCallIds.add(requestInfo.callId);
+          executedRequests.add(requestInfo);
 
           const inputFormat =
             typeof config.getInputFormat === 'function'
@@ -919,8 +961,8 @@ export async function runNonInteractive(
         // emitted event log pairs every tool_use with a tool_result
         // AND the retry-turn payload (when reached) doesn't leave
         // Anthropic / OpenAI staring at unpaired tool_use blocks.
-        const unexecutedCalls = uniqueBatchRequests.filter(
-          (r) => !executedCallIds.has(r.callId),
+        const unexecutedCalls = executableBatchRequests.filter(
+          (r) => !executedRequests.has(r),
         );
         if (unexecutedCalls.length > 0) {
           const skippedOutput = suppressedOutputBody(
@@ -945,6 +987,13 @@ export async function runNonInteractive(
             });
             toolResponseParts.push(...responseParts);
           }
+        }
+
+        for (const requestInfo of duplicateBatchRequests) {
+          const toolResponse =
+            createDuplicateProviderToolCallResponse(requestInfo);
+          adapter.emitToolResult(requestInfo, toolResponse);
+          toolResponseParts.push(...toolResponse.responseParts);
         }
 
         return toolResponseParts;

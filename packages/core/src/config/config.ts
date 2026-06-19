@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -150,11 +150,7 @@ import {
 import { DEFAULT_TOOL_RESULTS_TOTAL_CHARS_THRESHOLD } from './clearContextDefaults.js';
 import { DEFAULT_HOPCODE_EMBEDDING_MODEL } from './models.js';
 import { Storage } from './storage.js';
-import type { WebSearchConfig } from '../tools/web-search/types.js';
-import type { PowerShellSecurityConfig } from '../security/powershell-security.js';
-import { resolvePowerShellConfig } from '../security/powershell-security.js';
 import { ChatRecordingService } from '../services/chatRecordingService.js';
-import { TaskStore } from '../services/task-store.js';
 import { CHARS_PER_TOKEN } from '../services/tokenEstimation.js';
 import {
   clearRuntimeStatus,
@@ -208,6 +204,7 @@ export enum ApprovalMode {
   DEFAULT = 'default',
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
+  YOLO = 'yolo',
   IZN = 'izn',
 }
 
@@ -264,9 +261,9 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     name: 'Auto',
     description: 'LLM classifier auto-approves safe actions, blocks risky ones',
   },
-  [ApprovalMode.IZN]: {
-    id: ApprovalMode.IZN,
-    name: 'IZN',
+  [ApprovalMode.YOLO]: {
+    id: ApprovalMode.YOLO,
+    name: 'YOLO',
     description: 'Automatically approve all tools',
   },
 };
@@ -567,7 +564,7 @@ export const DEFAULT_TOOL_OUTPUT_BATCH_BUDGET = 200_000;
  * Provenance of an MCP server config. Two purposes (see issue #4615):
  *
  * - **Approval gating**: `'project'` (a workspace `.mcp.json`) and `'workspace'`
- *   (a workspace `.hopcode/settings.json`) are checked-in / shareable and therefore
+ *   (a workspace `.hopcode/settings.json`) are checked-in / shareable and therefore  
  *   untrusted — both are held behind the pending-approval gate. See
  *   {@link isGatedMcpScope}.
  * - **Precedence**: `'workspace'` and `'system'` rank ABOVE a `.mcp.json`
@@ -778,6 +775,7 @@ export interface ConfigParameters {
   approvalMode?: ApprovalMode;
   contextFileName?: string | string[];
   accessibility?: AccessibilitySettings;
+  showResponseTokensPerSecond?: boolean;
   telemetry?: TelemetrySettings;
   outboundCorrelation?: OutboundCorrelationSettings;
   gitCoAuthor?: GitCoAuthorParam;
@@ -792,7 +790,7 @@ export interface ConfigParameters {
   fileReadCacheDisabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
-    respectHopCodeIgnore?: boolean;
+    respectHopcodeIgnore?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
   };
@@ -811,7 +809,7 @@ export interface ConfigParameters {
    * Wall-clock budget for an unattended run, in seconds. `-1` (default)
    * means no limit. Enforced by the CLI's non-interactive run loop
    * see `RunBudgetEnforcer` in `packages/cli/src/utils/runBudget.ts`.
-   * Issue: TaimoorSiddiquiOfficial/HopCode#4103.
+   * Issue: hoptrendy/hopcode#4103.
    */
   maxWallTimeSeconds?: number;
   /**
@@ -979,8 +977,8 @@ export interface ConfigParameters {
     ruleType: 'allow' | 'ask' | 'deny',
     rule: string,
   ) => Promise<void>;
-  webSearch?: WebSearchConfig | null;
-  powershellConfig?: Partial<PowerShellSecurityConfig>;
+  /** Lifecycle handle for an external settings file watcher. Stopped during shutdown. */
+  settingsWatcher?: { stopWatching(): void };
 }
 
 function normalizeConfigOutputFormat(
@@ -1100,7 +1098,7 @@ const EMPTY_DISABLED_SKILL_NAMES: ReadonlySet<string> = Object.freeze(
 );
 
 // Tracks whether the first Config in this process has claimed the global
-// HOPCODE_CODE_SESSION_ID env var. Prevents throwaway Config instances from
+// HOPCODE_SESSION_ID env var. Prevents throwaway Config instances from
 // overwriting the real session's ID while still allowing nested hopcode
 // processes to claim their own (they start with a fresh module scope).
 let sessionEnvClaimed = false;
@@ -1131,7 +1129,7 @@ export class Config {
    * `startMcpDiscoveryInBackground` (or legacy blocking discovery)
    * fires the first pass. Pre-fix the acpAgent registered after
    * `initialize()` returned, missing the first pass entirely under
-   * `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` and racing against background
+   * `HOPCODE_LEGACY_MCP_BLOCKING=1` and racing against background
    * discovery completion under the default mode.
    */
   private pendingMcpBudgetCallback?: (event: McpBudgetEvent) => void;
@@ -1226,6 +1224,7 @@ export class Config {
   private planGateEntryCounter = 0;
   private autoModeDenialState: AutoModeDenialState = createDenialState();
   private readonly accessibility: AccessibilitySettings;
+  private readonly showResponseTokensPerSecond: boolean;
   private readonly telemetrySettings: TelemetrySettings;
   private readonly outboundCorrelationSettings: OutboundCorrelationSettings;
   private readonly gitCoAuthor: GitCoAuthorSettings;
@@ -1236,7 +1235,7 @@ export class Config {
   private cronScheduler: CronScheduler | null = null;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectHopCodeIgnore: boolean;
+    respectHopcodeIgnore: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
   };
@@ -1310,10 +1309,6 @@ export class Config {
     ruleType: 'allow' | 'ask' | 'deny',
     rule: string,
   ) => Promise<void>;
-  private readonly webSearch: WebSearchConfig | null;
-  private readonly powershellConfig:
-    | Partial<PowerShellSecurityConfig>
-    | undefined;
   private initialized: boolean = false;
   storage: Storage;
   private runtimeStatusWrite: Promise<void> = Promise.resolve();
@@ -1346,7 +1341,7 @@ export class Config {
   private messageBus?: MessageBus;
   private readonly memoryManager: MemoryManager;
   private readonly modelChangeListeners = new Set<(model: string) => void>();
-  private taskStore?: TaskStore;
+  private readonly settingsWatcher?: { stopWatching(): void };
 
   constructor(params: ConfigParameters) {
     this.sessionId = params.sessionId ?? randomUUID();
@@ -1357,14 +1352,13 @@ export class Config {
     // launched from within a session would inherit the parent's ID and
     // never claim its own.
     if (!sessionEnvClaimed && process.env) {
-      process.env['HOPCODE_CODE_SESSION_ID'] = this.sessionId;
+      process.env['HOPCODE_SESSION_ID'] = this.sessionId;
       sessionEnvClaimed = true;
     }
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel =
-      params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
+    this.embeddingModel = params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);
@@ -1415,6 +1409,8 @@ export class Config {
     this.contextRuleExcludes = params.contextRuleExcludes ?? [];
     this.approvalMode = params.approvalMode ?? ApprovalMode.DEFAULT;
     this.accessibility = params.accessibility ?? {};
+    this.showResponseTokensPerSecond =
+      params.showResponseTokensPerSecond ?? false;
     this.telemetrySettings = {
       enabled: params.telemetry?.enabled ?? false,
       target: params.telemetry?.target ?? DEFAULT_TELEMETRY_TARGET,
@@ -1446,7 +1442,7 @@ export class Config {
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
-      respectHopCodeIgnore: params.fileFiltering?.respectHopCodeIgnore ?? true,
+      respectHopcodeIgnore: params.fileFiltering?.respectHopcodeIgnore ?? true,
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
@@ -1507,8 +1503,6 @@ export class Config {
     this.addLegacyPlanLocationWarning();
     this.allowedHttpHookUrls = params.allowedHttpHookUrls ?? [];
     this.onPersistPermissionRuleCallback = params.onPersistPermissionRule;
-    this.webSearch = params.webSearch ?? null;
-    this.powershellConfig = params.powershellConfig;
 
     // (web search removed)
     this.useRipgrep = params.useRipgrep ?? true;
@@ -1577,7 +1571,6 @@ export class Config {
     this.chatRecordingService = this.chatRecordingEnabled
       ? new ChatRecordingService(this)
       : undefined;
-    this.taskStore = new TaskStore(this.targetDir, this.sessionId);
     this.extensionManager = new ExtensionManager({
       workspaceDir: this.targetDir,
       enabledExtensionOverrides: this.overrideExtensions,
@@ -1597,6 +1590,7 @@ export class Config {
     this.projectHooks = params.projectHooks;
     // Legacy: fall back to merged hooks if new fields are not provided
     this.hooks = params.hooks;
+    this.settingsWatcher = params.settingsWatcher;
     this.memoryManager = new MemoryManager();
   }
 
@@ -1857,10 +1851,10 @@ export class Config {
     // after the registry exists. This lets `Config.initialize()` (and the
     // cli's `input_enabled` checkpoint) resolve without waiting on MCP
     // server response time. Users can opt back into the legacy synchronous
-    // behavior with `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
+    // behavior with `HOPCODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
     // an escape hatch.
     const legacyBlockingMcp =
-      process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'] === '1';
+      process.env['HOPCODE_LEGACY_MCP_BLOCKING'] === '1';
     // Also force the inline-discovery skip when the caller opts
     // out of MCP entirely (ACP bootstrap path) — otherwise the legacy
     // blocking mode would still spawn MCP servers via the tool-registry
@@ -2073,7 +2067,7 @@ export class Config {
    *
    * Resolves immediately when:
    * - bare mode is on (no MCP discovery is started),
-   * - `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
+   * - `HOPCODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
    *   synchronously inside {@link initialize}), or
    * - no MCP servers are configured.
    */
@@ -2396,7 +2390,7 @@ export class Config {
     // instance (the one that already claimed via sessionEnvClaimed), so this
     // correctly updates the env var to reflect the new active session.
     if (process.env) {
-      process.env['HOPCODE_CODE_SESSION_ID'] = this.sessionId;
+      process.env['HOPCODE_SESSION_ID'] = this.sessionId;
     }
     this.sessionData = sessionData;
     setDebugLogSession(this);
@@ -2592,18 +2586,6 @@ export class Config {
       : selector.modelId;
   }
 
-  getFastModelForSideQuery(): string | undefined {
-    const selector = this.resolveFastModelSelector();
-    if (!selector) return undefined;
-    if (selector.authType) {
-      const available = this.getAllConfiguredModels([selector.authType]);
-      return available.some((m) => m.id === selector.modelId)
-        ? `${selector.authType}:${selector.modelId}`
-        : undefined;
-    }
-    return selector.modelId;
-  }
-
   private resolveFastModelSelector() {
     if (!this.fastModel) return undefined;
     try {
@@ -2683,6 +2665,8 @@ export class Config {
       this.contentGeneratorConfig.enableCacheControl =
         config.enableCacheControl;
       this.contentGeneratorConfig.splitToolMedia = config.splitToolMedia;
+      this.contentGeneratorConfig.toolResultContentFormat =
+        config.toolResultContentFormat;
 
       if ('model' in sources) {
         this.contentGeneratorConfigSources['model'] = sources['model'];
@@ -2702,6 +2686,10 @@ export class Config {
       if ('splitToolMedia' in sources) {
         this.contentGeneratorConfigSources['splitToolMedia'] =
           sources['splitToolMedia'];
+      }
+      if ('toolResultContentFormat' in sources) {
+        this.contentGeneratorConfigSources['toolResultContentFormat'] =
+          sources['toolResultContentFormat'];
       }
       return;
     }
@@ -2998,6 +2986,10 @@ export class Config {
    */
   async shutdown(): Promise<void> {
     try {
+      // Stop the settings watcher regardless of initialization state —
+      // it is started before Config.initialize() and would leak otherwise.
+      this.settingsWatcher?.stopWatching();
+
       if (!this.initialized) {
         // Nothing else to clean up if not initialized.
         return;
@@ -3803,6 +3795,10 @@ export class Config {
     return this.accessibility;
   }
 
+  getShowResponseTokensPerSecond(): boolean {
+    return this.showResponseTokensPerSecond;
+  }
+
   getTelemetryEnabled(): boolean {
     return this.telemetrySettings.enabled ?? false;
   }
@@ -3907,21 +3903,21 @@ export class Config {
   }
 
   isCronEnabled(): boolean {
-    if (process.env['HOPCODE_CODE_DISABLE_CRON'] === '1') return false;
+    if (process.env['HOPCODE_DISABLE_CRON'] === '1') return false;
     return this.cronEnabled;
   }
 
   isAgentTeamEnabled(): boolean {
     // Agent team is experimental and opt-in: enabled via settings or env var
-    if (process.env['HOPCODE_CODE_ENABLE_AGENT_TEAM'] === '1') return true;
+    if (process.env['HOPCODE_ENABLE_AGENT_TEAM'] === '1') return true;
     return this.agentTeamEnabled;
   }
 
   isWorkflowsEnabled(): boolean {
     // Workflows are experimental and opt-in: enabled via settings or env var
-    // P1 also honors a kill switch: HOPCODE_CODE_DISABLE_WORKFLOWS=1 forces off
-    if (process.env['HOPCODE_CODE_DISABLE_WORKFLOWS'] === '1') return false;
-    if (process.env['HOPCODE_CODE_ENABLE_WORKFLOWS'] === '1') return true;
+    // P1 also honors a kill switch: HOPCODE_DISABLE_WORKFLOWS=1 forces off
+    if (process.env['HOPCODE_DISABLE_WORKFLOWS'] === '1') return false;
+    if (process.env['HOPCODE_ENABLE_WORKFLOWS'] === '1') return true;
     return this.workflowsEnabled;
   }
 
@@ -3961,11 +3957,11 @@ export class Config {
    * `CLAUDE_CODE_EMIT_TOOL_USE_SUMMARIES` gate, but defaults to on so the
    * compact-mode UI benefits without configuration.
    *
-   * Env overrides (either direction): `HOPCODE_CODE_EMIT_TOOL_USE_SUMMARIES=0`
+   * Env overrides (either direction): `HOPCODE_EMIT_TOOL_USE_SUMMARIES=0`
    * to force off, `=1` to force on.
    */
   getEmitToolUseSummaries(): boolean {
-    const env = process.env['HOPCODE_CODE_EMIT_TOOL_USE_SUMMARIES'];
+    const env = process.env['HOPCODE_EMIT_TOOL_USE_SUMMARIES'];
     if (env === '0' || env === 'false') return false;
     if (env === '1' || env === 'true') return true;
     return this.emitToolUseSummaries;
@@ -3982,14 +3978,14 @@ export class Config {
   getFileFilteringRespectGitIgnore(): boolean {
     return this.fileFiltering.respectGitIgnore;
   }
-  getFileFilteringRespectHopCodeIgnore(): boolean {
-    return this.fileFiltering.respectHopCodeIgnore;
+  getFileFilteringRespectHopcodeIgnore(): boolean {
+    return this.fileFiltering.respectHopcodeIgnore;
   }
 
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectHopCodeIgnore: this.fileFiltering.respectHopCodeIgnore,
+      respectHopcodeIgnore: this.fileFiltering.respectHopcodeIgnore,
     };
   }
 
@@ -4476,18 +4472,6 @@ export class Config {
       this.chatRecordingService = new ChatRecordingService(this);
     }
     return this.chatRecordingService;
-  }
-
-  getTaskStore(): TaskStore | undefined {
-    return this.taskStore;
-  }
-
-  getWebSearchConfig(): WebSearchConfig | null {
-    return this.webSearch ?? null;
-  }
-
-  getPowerShellConfig(): PowerShellSecurityConfig {
-    return resolvePowerShellConfig(this.powershellConfig);
   }
 
   /**
@@ -5094,20 +5078,4 @@ export class Config {
     // Pre-init path: stash for `createToolRegistry` to consume.
     this.pendingMcpBudgetCallback = cb;
   }
-}
-
-/**
- * Creates a shallow override of a Config by prototype delegation.
- * The returned object delegates to `base` for all properties not
- * explicitly overridden in `overrides`.
- */
-export function createConfigOverride<T extends Config>(
-  base: T,
-  overrides: Partial<Record<keyof T, () => unknown>>,
-): T {
-  const override = Object.create(base) as T;
-  for (const [key, getter] of Object.entries(overrides)) {
-    (override as Record<string, unknown>)[key] = getter;
-  }
-  return override;
 }

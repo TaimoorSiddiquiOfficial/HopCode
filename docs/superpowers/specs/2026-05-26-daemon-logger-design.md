@@ -1,6 +1,6 @@
-# `hopcode serve` Daemon File Logger — Design
+﻿# `hopcode serve` Daemon File Logger — Design
 
-- **Issue**: [QwenLM/hopcode#4548](https://github.com/QwenLM/hopcode/issues/4548)
+- **Issue**: [hoptrendy/hopcode#4548](https://github.com/hoptrendy/hopcode/issues/4548)
 - **Branch**: `feat/support_daemon_logger`
 - **Status**: design approved, awaiting implementation plan
 - **Date**: 2026-05-26

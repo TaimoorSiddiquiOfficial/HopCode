@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -20,7 +20,7 @@ describe('workspace helpers', () => {
   });
 
   it('honors negated workspace patterns', () => {
-    const root = mkdtempSync(path.join(tmpdir(), 'qwen-workspaces-'));
+    const root = mkdtempSync(path.join(tmpdir(), 'hopcode-workspaces-'));
     tempDirs.push(root);
 
     for (const packagePath of [
@@ -46,7 +46,7 @@ describe('workspace helpers', () => {
   });
 
   it('normalizes Windows-style workspace patterns', () => {
-    const root = mkdtempSync(path.join(tmpdir(), 'qwen-workspaces-'));
+    const root = mkdtempSync(path.join(tmpdir(), 'hopcode-workspaces-'));
     tempDirs.push(root);
 
     for (const packagePath of [

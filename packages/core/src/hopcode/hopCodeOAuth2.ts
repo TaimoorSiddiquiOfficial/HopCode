@@ -1202,14 +1202,14 @@ export async function cacheHopCodeCredentials(
 }
 
 /**
- * Clear cached Qwen credentials from disk
+ * Clear cached HopCode credentials from disk
  * This is useful when credentials have expired or need to be reset
  */
 export async function clearHopCodeCredentials(): Promise<void> {
   try {
     const filePath = getHopCodeCachedCredentialPath();
     await fs.unlink(filePath);
-    debugLogger.debug('Cached Qwen credentials cleared successfully.');
+    debugLogger.debug('Cached HopCode credentials cleared successfully.');
   } catch (error: unknown) {
     // If file doesn't exist or can't be deleted, we consider it cleared
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
@@ -1218,7 +1218,7 @@ export async function clearHopCodeCredentials(): Promise<void> {
     }
     // Log other errors but don't throw - clearing credentials should be non-critical
     debugLogger.warn(
-      'Warning: Failed to clear cached Qwen credentials:',
+      'Warning: Failed to clear cached HopCode credentials:',
       error,
     );
   } finally {

@@ -1,4 +1,4 @@
-# Migrating to `@hoptrendy/sdk/daemon` v2
+﻿# Migrating to `@hoptrendy/sdk/daemon` v2
 
 PR #4328 shipped the v1 daemon UI layer. PR #4353 (this PR) ships v2 with
 seven additive feature commits. This guide walks through the changes for web
@@ -332,6 +332,6 @@ SDK's `daemonToolPreviewToMarkdown` for any unhandled kind.
 
 ## Cross-references
 
-- [PR #4353 SUMMARY](https://github.com/QwenLM/hopcode/pull/4353)
+- [PR #4353 SUMMARY](https://github.com/hoptrendy/hopcode/pull/4353)
 - [Daemon UI README](./README.md) — full API reference
-- [PR #4328](https://github.com/QwenLM/hopcode/pull/4328) — base PR with shared UI transcript layer
+- [PR #4328](https://github.com/hoptrendy/hopcode/pull/4328) — base PR with shared UI transcript layer

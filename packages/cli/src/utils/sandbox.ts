@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,10 +15,17 @@ import {
   SETTINGS_DIRECTORY_NAME,
 } from '../config/settings.js';
 import { promisify } from 'node:util';
-import type { Config, SandboxConfig } from '@hoptrendy/hopcode-core';
-import { FatalSandboxError, Storage, isSubpath } from '@hoptrendy/hopcode-core';
+import type { Config, SandboxConfig } from '@hopcode/hopcode-core';
+import {
+  FatalSandboxError,
+  Storage,
+  isSubpath,
+} from '@hopcode/hopcode-core';
 import { randomBytes } from 'node:crypto';
 import { writeStderrLine } from './stdioHelpers.js';
+import { parseSandboxImageName } from './sandboxImageName.js';
+import { isContainerPathWithinWorkdir } from './sandbox-path.js';
+import { parseSandboxMountSpec } from './sandboxMounts.js';
 
 const execAsync = promisify(exec);
 
@@ -98,14 +105,6 @@ async function shouldUseCurrentUserInSandbox(): Promise<boolean> {
   return false;
 }
 
-// docker does not allow container names to contain ':' or '/', so we
-// parse those out to shorten the name
-function parseImageName(image: string): string {
-  const [fullName, tag] = image.split(':');
-  const name = fullName.split('/').at(-1) ?? 'unknown-image';
-  return tag ? `${name}-${tag}` : name;
-}
-
 function ports(): string[] {
   return (process.env['SANDBOX_PORTS'] ?? '')
     .split(',')
@@ -124,9 +123,7 @@ function entrypoint(workdir: string, cliArgs: string[]): string[] {
     const paths = process.env['PATH'].split(pathSeparator);
     for (const p of paths) {
       const containerPath = getContainerPath(p);
-      if (
-        containerPath.toLowerCase().startsWith(containerWorkdir.toLowerCase())
-      ) {
+      if (isContainerPathWithinWorkdir(containerWorkdir, containerPath)) {
         pathSuffix += `:${containerPath}`;
       }
     }
@@ -140,9 +137,7 @@ function entrypoint(workdir: string, cliArgs: string[]): string[] {
     const paths = process.env['PYTHONPATH'].split(pathSeparator);
     for (const p of paths) {
       const containerPath = getContainerPath(p);
-      if (
-        containerPath.toLowerCase().startsWith(containerWorkdir.toLowerCase())
-      ) {
+      if (isContainerPathWithinWorkdir(containerWorkdir, containerPath)) {
         pythonPathSuffix += `:${containerPath}`;
       }
     }
@@ -172,8 +167,8 @@ function entrypoint(workdir: string, cliArgs: string[]): string[] {
         ? 'npm run debug --'
         : 'npm rebuild && npm run start --'
       : process.env['DEBUG']
-        ? `node --inspect-brk=0.0.0.0:${process.env['DEBUG_PORT'] || '9229'} $(which hopcode)`
-        : 'hopcode';
+        ? `node --inspect-brk=0.0.0.0:${process.env['DEBUG_PORT'] || '9229'} $(which qwen)`
+        : 'qwen';
 
   const args = [...shellCmds, cliCmd, ...quotedCliArgs];
   return ['bash', '-c', args.join(' ')];
@@ -221,9 +216,9 @@ export async function start_sandbox(
     // same path the kernel will. mkdirSync first because realpathSync throws
     // on missing dirs and a custom HOPCODE_HOME / HOPCODE_RUNTIME_DIR may not exist
     // yet on first run.
-    const hopcodeDir = Storage.getGlobalHopCodeDir();
+    const qwenDir = Storage.getGlobalHopcodeDir();
     const runtimeDir = Storage.getRuntimeBaseDir();
-    fs.mkdirSync(hopcodeDir, { recursive: true });
+    fs.mkdirSync(qwenDir, { recursive: true });
     fs.mkdirSync(runtimeDir, { recursive: true });
 
     const args = [
@@ -236,7 +231,7 @@ export async function start_sandbox(
       '-D',
       `CACHE_DIR=${fs.realpathSync(execSync(`getconf DARWIN_USER_CACHE_DIR`).toString().trim())}`,
       '-D',
-      `HOPCODE_DIR=${fs.realpathSync(hopcodeDir)}`,
+      `QWEN_DIR=${fs.realpathSync(qwenDir)}`,
       '-D',
       `RUNTIME_DIR=${fs.realpathSync(runtimeDir)}`,
     ];
@@ -407,7 +402,7 @@ export async function start_sandbox(
     const remedy =
       image === LOCAL_DEV_SANDBOX_IMAGE_NAME
         ? 'Try running `npm run build:all` or `npm run build:sandbox` under the hopcode repo to build it locally, or check the image name and your network connection.'
-        : 'Please check the image name, your network connection, or notify hopcode-dev@service.alibaba.com if the issue persists.';
+        : 'Please check the image name, your network connection, or notify support@hoptrendy.com if the issue persists.';
     throw new FatalSandboxError(
       `Sandbox image '${image}' is missing or could not be pulled. ${remedy}`,
     );
@@ -484,7 +479,7 @@ export async function start_sandbox(
   args.push('--env', `HOPCODE_HOME=${userSettingsDirContainerPath}`);
 
   // Mount the runtime base dir and pass HOPCODE_RUNTIME_DIR when it diverges
-  // from the global hopcode dir; otherwise the existing user-settings mount
+  // from the global qwen dir; otherwise the existing user-settings mount
   // already covers it.
   if (!runtimeCoveredByUserSettings) {
     args.push(
@@ -525,9 +520,7 @@ export async function start_sandbox(
     for (let mount of process.env['SANDBOX_MOUNTS'].split(',')) {
       if (mount.trim()) {
         // parse mount as from:to:opts
-        let [from, to, opts] = mount.trim().split(':');
-        to = to || from; // default to mount at same path inside container
-        opts = opts || 'ro'; // default to read-only
+        const { from, to, opts } = parseSandboxMountSpec(mount);
         mount = `${from}:${to}:${opts}`;
         // check that from path is absolute
         if (!path.isAbsolute(from)) {
@@ -599,8 +592,9 @@ export async function start_sandbox(
   }
 
   // name container after image, plus random suffix to avoid conflicts
-  const imageName = parseImageName(image);
-  const isIntegrationTest = process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
+  const imageName = parseSandboxImageName(image);
+  const isIntegrationTest =
+    process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
   let containerName;
   if (isIntegrationTest) {
     containerName = `hopcode-integration-test-${randomBytes(4).toString(
@@ -624,21 +618,24 @@ export async function start_sandbox(
 
   // copy HOPCODE_TEST_VAR for integration tests
   if (process.env['HOPCODE_TEST_VAR']) {
-    args.push('--env', `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`);
+    args.push(
+      '--env',
+      `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`,
+    );
   }
   for (const envVar of [
-    'HOPCODE_DEBUG_LOG_FILE',
-    'HOPCODE_CODE_LEGACY_MCP_BLOCKING',
+    'QWEN_DEBUG_LOG_FILE',
+    'HOPCODE_LEGACY_MCP_BLOCKING',
   ] as const) {
     if (process.env[envVar]) {
       args.push('--env', `${envVar}=${process.env[envVar]}`);
     }
   }
-  if (process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']) {
+  if (process.env['HOPCODE_MCP_APPROVALS_PATH']) {
     args.push(
       '--env',
-      `HOPCODE_CODE_MCP_APPROVALS_PATH=${getContainerPath(
-        process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'],
+      `HOPCODE_MCP_APPROVALS_PATH=${getContainerPath(
+        process.env['HOPCODE_MCP_APPROVALS_PATH'],
       )}`,
     );
   }
@@ -651,7 +648,7 @@ export async function start_sandbox(
     args.push('--env', `GOOGLE_API_KEY=${process.env['GOOGLE_API_KEY']}`);
   }
 
-  // copy OPENAI_API_KEY and related env vars for HopCode
+  // copy OPENAI_API_KEY and related env vars for Qwen
   if (process.env['OPENAI_API_KEY']) {
     args.push('--env', `OPENAI_API_KEY=${process.env['OPENAI_API_KEY']}`);
   }
@@ -722,8 +719,13 @@ export async function start_sandbox(
   // also mount-replace VIRTUAL_ENV directory with <project_settings>/sandbox.venv
   // sandbox can then set up this new VIRTUAL_ENV directory using sandbox.bashrc (see below)
   // directory will be empty if not set up, which is still preferable to having host binaries
+  const virtualEnv = process.env['VIRTUAL_ENV'];
   if (
-    process.env['VIRTUAL_ENV']?.toLowerCase().startsWith(workdir.toLowerCase())
+    virtualEnv &&
+    isContainerPathWithinWorkdir(
+      getContainerPath(workdir),
+      getContainerPath(virtualEnv),
+    )
   ) {
     const sandboxVenvPath = path.resolve(
       SETTINGS_DIRECTORY_NAME,
@@ -732,14 +734,8 @@ export async function start_sandbox(
     if (!fs.existsSync(sandboxVenvPath)) {
       fs.mkdirSync(sandboxVenvPath, { recursive: true });
     }
-    args.push(
-      '--volume',
-      `${sandboxVenvPath}:${getContainerPath(process.env['VIRTUAL_ENV'])}`,
-    );
-    args.push(
-      '--env',
-      `VIRTUAL_ENV=${getContainerPath(process.env['VIRTUAL_ENV'])}`,
-    );
+    args.push('--volume', `${sandboxVenvPath}:${getContainerPath(virtualEnv)}`);
+    args.push('--env', `VIRTUAL_ENV=${getContainerPath(virtualEnv)}`);
   }
 
   // copy additional environment variables from SANDBOX_ENV
@@ -802,10 +798,10 @@ export async function start_sandbox(
 
     // Instead of passing --user to the main sandbox container, we let it
     // start as root, then create a user with the host's UID/GID, and
-    // finally switch to that user to run the HopCode process. This is
+    // finally switch to that user to run the qwen process. This is
     // necessary on Linux to ensure the user exists within the
     // container's /etc/passwd file, which is required by os.userInfo().
-    const username = 'HopCode';
+    const username = 'qwen';
     const homeDir = getContainerPath(os.homedir());
 
     const setupUserCommands = [

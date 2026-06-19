@@ -1,4 +1,4 @@
-import type { ChannelPlugin } from '@hoptrendy/channel-base';
+﻿import type { ChannelPlugin } from '@hopcode/channel-base';
 
 const registry = new Map<string, ChannelPlugin>();
 let builtinsPromise: Promise<void> | null = null;
@@ -6,15 +6,25 @@ let builtinsPromise: Promise<void> | null = null;
 function ensureBuiltins(): Promise<void> {
   if (!builtinsPromise) {
     builtinsPromise = (async () => {
-      const [telegram, weixin, dingtalk, feishu] = await Promise.all([
-        import('@hoptrendy/channel-telegram'),
-        import('@hoptrendy/channel-weixin'),
-        import('@hoptrendy/channel-dingtalk'),
-        import('@hoptrendy/channel-feishu'),
-      ]);
+      const labelled = [
+        { name: 'telegram', promise: import('@hopcode/channel-telegram') },
+        { name: 'weixin', promise: import('@hopcode/channel-weixin') },
+        { name: 'dingtalk', promise: import('@hopcode/channel-dingtalk') },
+        { name: 'feishu', promise: import('@hopcode/channel-feishu') },
+        { name: 'qqbot', promise: import('@hopcode/channel-qqbot') },
+      ];
 
-      for (const mod of [telegram, weixin, dingtalk, feishu]) {
-        registry.set(mod.plugin.channelType, mod.plugin);
+      const results = await Promise.allSettled(labelled.map((l) => l.promise));
+
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i]!;
+        if (result.status === 'fulfilled') {
+          registry.set(result.value.plugin.channelType, result.value.plugin);
+        } else {
+          process.stderr.write(
+            `[channel-registry] Failed to load "${labelled[i]!.name}" channel: ${result.reason}\n`,
+          );
+        }
       }
     })();
   }

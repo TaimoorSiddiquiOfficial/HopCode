@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -69,7 +69,7 @@ describe('package asset scripts', () => {
   });
 
   function createFixtureRoot() {
-    const rootDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-assets-'));
+    const rootDir = mkdtempSync(path.join(tmpdir(), 'hopcode-package-assets-'));
     tempDirs.push(rootDir);
 
     writeFile(rootDir, 'README.md', '# HopCode\n');

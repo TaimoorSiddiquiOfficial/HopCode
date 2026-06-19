@@ -84,10 +84,10 @@ Add the channel to `~/.hopcode/settings.json`:
 
 ```bash
 # Start only the Feishu channel
-qwen channel start my-feishu
+hopcode channel start my-feishu
 
 # Or start all configured channels together
-qwen channel start
+hopcode channel start
 ```
 
 Open Feishu and send a message to the bot. You should see a streaming interactive card with the response.

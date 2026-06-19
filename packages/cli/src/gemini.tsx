@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -19,7 +19,7 @@ import {
   writeRuntimeStatus,
   persistSessionUsage,
   uiTelemetryService,
-} from '@hoptrendy/hopcode-core';
+} from '@hopcode/hopcode-core';
 import { render } from 'ink';
 import dns from 'node:dns';
 import os from 'node:os';
@@ -42,12 +42,16 @@ import {
   loadSettings,
   preResolveHomeEnvOverrides,
 } from './config/settings.js';
+import { SettingsWatcher } from './config/settingsWatcher.js';
 import {
   initializeApp,
   type InitializationResult,
 } from './core/initializer.js';
 import { handleList as handleListExtensions } from './commands/extensions/list.js';
-import { initializeI18n, resolveLanguageSetting } from './i18n/index.js';
+import {
+  initializeI18n,
+  resolveLanguageSetting,
+} from './i18n/index.js';
 import { runNonInteractive } from './nonInteractiveCli.js';
 import {
   setupStartupWorktree,
@@ -96,8 +100,8 @@ import { getUserStartupWarnings } from './utils/userStartupWarnings.js';
 import { getCliVersion } from './utils/version.js';
 import { initializeWarningHandler } from './utils/warningHandler.js';
 import { writeStderrLine } from './utils/stdioHelpers.js';
-import { getHeadlessIznSafetyWarning } from './utils/headlessSafetyWarnings.js';
-import { computeWindowTitle } from './utils/windowTitle.js';
+import { getHeadlessYoloSafetyWarning } from './utils/headlessSafetyWarnings.js';
+import { computeWindowTitle, writeTerminalTitle } from './utils/windowTitle.js';
 import {
   startEarlyInputCapture,
   stopAndGetCapturedInput,
@@ -152,7 +156,7 @@ function getNodeMemoryArgs(isDebugMode: boolean): string[] {
     );
   }
 
-  if (process.env['HOPCODE_CODE_NO_RELAUNCH']) {
+  if (process.env['HOPCODE_NO_RELAUNCH']) {
     return [];
   }
 
@@ -243,7 +247,7 @@ export async function startInteractiveUI(
   initializationResult: InitializationResult,
 ) {
   const version = await getCliVersion();
-  setWindowTitle(basename(workspaceRoot), settings);
+  setWindowTitle(settings, basename(workspaceRoot));
 
   // Write a small runtime.json sidecar next to the chat log so external
   // tools (terminal multiplexers, IDE integrations, status daemons) can
@@ -416,7 +420,7 @@ export async function main() {
   profileCheckpoint('main_entry');
   // Bridge core-package startup events (Config.initialize, MCP discovery,
   // GeminiClient.setTools) into the cli's startup profiler. Gated on
-  // `isStartupProfilerEnabled()` so that when HOPCODE_CODE_PROFILE_STARTUP is
+  // `isStartupProfilerEnabled()` so that when HOPCODE_PROFILE_STARTUP is
   // unset (the common case) every core-side `recordStartupEvent()` call
   // sees a null sink and short-circuits at the first comparison, instead
   // of going through this arrow wrapper and the profiler's own enabled
@@ -781,6 +785,12 @@ export async function main() {
   }
 
   {
+    // Start settings file watcher (skip in bare mode)
+    const settingsWatcher = isBareMode(argv.bare)
+      ? undefined
+      : new SettingsWatcher(settings);
+    settingsWatcher?.startWatching();
+
     const config = await loadCliConfig(
       settings.merged,
       argv,
@@ -792,6 +802,8 @@ export async function main() {
         projectHooks: settings.getProjectHooks(),
       },
       buildDisabledSkillNamesProvider(settings),
+      undefined,
+      settingsWatcher,
     );
     profileCheckpoint('after_load_cli_config');
 
@@ -1061,15 +1073,15 @@ export async function main() {
       }
     }
 
-    // Headless + IZN without a sandbox lets the model auto-approve and
+    // Headless + YOLO without a sandbox lets the model auto-approve and
     // execute shell / write / edit tools at the current process's
     // privilege level. Emit a one-line stderr warning so unattended runs
     // have at least an observable signal. Interactive runs are excluded
     // because the user is at the keyboard and the TUI shows approval
     // state directly. See issue #4103.
     if (!config.isInteractive()) {
-      const iznWarning = getHeadlessIznSafetyWarning(config);
-      if (iznWarning) writeStderrLine(iznWarning);
+      const yoloWarning = getHeadlessYoloSafetyWarning(config);
+      if (yoloWarning) writeStderrLine(yoloWarning);
     }
 
     // For non-stream-json mode, initialize config here. Stream-json defers
@@ -1114,7 +1126,7 @@ export async function main() {
         writeStderrLine(
           `Warning: MCP server(s) failed to start: ${failedMcpServers.join(', ')}. ` +
             `Continuing with built-in tools and any servers that did connect. ` +
-            `Re-run with HOPCODE_CODE_DEBUG=1 to see per-server reasons.`,
+            `Re-run with HOPCODE_DEBUG=1 to see per-server reasons.`,
         );
       }
       // Finalize the non-interactive startup profile here so MCP events
@@ -1208,13 +1220,22 @@ export function createNonInteractivePromptId(sessionId: string): string {
   return `${sessionId}########0`;
 }
 
-function setWindowTitle(title: string, settings: LoadedSettings) {
-  if (!settings.merged.ui?.hideWindowTitle) {
-    const windowTitle = computeWindowTitle(title);
-    process.stdout.write(`\x1b]2;${windowTitle}\x07`);
-
-    process.on('exit', () => {
-      process.stdout.write(`\x1b]2;\x07`);
-    });
+function setWindowTitle(settings: LoadedSettings, folderName?: string) {
+  if (
+    settings.merged.ui?.hideWindowTitle ||
+    settings.merged.ui?.showStatusInTitle === false
+  ) {
+    return;
   }
+  const windowTitle = computeWindowTitle(folderName);
+  writeTerminalTitle((value) => process.stdout.write(value), windowTitle);
+
+  process.on('exit', () => {
+    try {
+      writeTerminalTitle((value) => process.stdout.write(value), '');
+    } catch {
+      // Best-effort: clearing the title during exit must not produce
+      // a visible error (e.g. EPIPE if stdout is already closed).
+    }
+  });
 }

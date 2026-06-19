@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,6 +9,7 @@ import type { Content, Part } from '@google/genai';
 import {
   collectToolCallIdsFromHistory,
   dedupeToolCallsById,
+  getProviderToolCallId,
   normalizeModelToolCallIds,
 } from './toolCallIdUtils.js';
 
@@ -65,18 +66,21 @@ describe('toolCallIdUtils', () => {
     expect(normalized).toEqual([
       {
         functionCall: {
-          id: 'dup_id_0001__hopcode_dup_2',
+          id: 'dup_id_0001__qwen_dup_2',
           name: 'read_file',
           args: { file_path: 'b.ts' },
         },
       },
       { text: 'done' },
     ]);
-    expect(seenIds.has('dup_id_0001__hopcode_dup_2')).toBe(true);
+    expect(getProviderToolCallId(normalized[0]!.functionCall!)).toBe(
+      'dup_id_0001',
+    );
+    expect(seenIds.has('dup_id_0001__qwen_dup_2')).toBe(true);
   });
 
   it('generates stable non-empty ids for missing functionCall ids', () => {
-    const seenIds = new Set<string>(['call_hopcode_1']);
+    const seenIds = new Set<string>(['call_qwen_1']);
 
     const normalized = normalizeModelToolCallIds(
       [
@@ -88,9 +92,12 @@ describe('toolCallIdUtils', () => {
     );
 
     expect(normalized.map((part) => part.functionCall?.id)).toEqual([
-      'call_hopcode_2',
-      'call_hopcode_3',
+      'call_qwen_2',
+      'call_qwen_3',
     ]);
+    expect(
+      normalized.map((part) => getProviderToolCallId(part.functionCall!)),
+    ).toEqual([undefined, undefined]);
   });
 
   it('deduplicates direct function call batches by id', () => {

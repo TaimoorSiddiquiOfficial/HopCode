@@ -1402,6 +1402,13 @@ export async function loadCliConfig(
    * demoted below a project `.mcp.json` by `assembleMcpServers`. See issue #4615.
    */
   sessionMcpServers?: Record<string, MCPServerConfig>,
+  /**
+   * Lifecycle handle for the settings file watcher started in `gemini.tsx`
+   * before `Config.initialize()`. Passed through to `Config` so it can be
+   * stopped during shutdown — only `stopWatching()` is exposed here to keep
+   * core decoupled from the CLI-owned `SettingsWatcher` implementation.
+   */
+  settingsWatcher?: { stopWatching(): void },
 ): Promise<Config> {
   const debugMode = isDebugMode(argv);
   const bareMode = isBareMode(argv.bare);
@@ -1902,6 +1909,8 @@ export async function loadCliConfig(
       ...settings.ui?.accessibility,
       screenReader,
     },
+    showResponseTokensPerSecond:
+      settings.ui?.showResponseTokensPerSecond === true,
     telemetry: telemetrySettings,
     outboundCorrelation: settings.outboundCorrelation,
     usageStatisticsEnabled: settings.privacy?.usageStatisticsEnabled ?? true,
@@ -2023,6 +2032,7 @@ export async function loadCliConfig(
           symlinkDirectories: settings.worktree.symlinkDirectories,
         }
       : undefined,
+    settingsWatcher,
   };
 
   const config = new Config(configParams);

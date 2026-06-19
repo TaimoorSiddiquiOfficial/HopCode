@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -26,12 +26,15 @@ import type {
   AutoModeDecision,
   AutoModeOutcome,
   GoalTerminalEvent,
-} from '@hoptrendy/hopcode-core';
+  ToolCallRequestInfo,
+  ToolCallResponseInfo,
+} from '@hopcode/hopcode-core';
 import {
   AuthType,
   ApprovalMode,
   CompressionStatus,
   convertToFunctionResponse,
+  createDuplicateProviderToolCallResponse,
   createDebugLogger,
   DiscoveredMCPTool,
   StreamEventType,
@@ -95,11 +98,12 @@ import {
   setGoalTerminalObserver,
   sessionIdContext,
   dedupeToolCallsById,
-} from '@hoptrendy/hopcode-core';
-import { NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE } from '@hoptrendy/acp-bridge/bridgeErrors';
+  getProviderToolCallId,
+} from '@hopcode/hopcode-core';
+import { NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE } from '@hopcode/acp-bridge/bridgeErrors';
 // Single source of truth shared with the daemon-side answerer (BridgeClient),
 // so a rename can't desync caller and answerer into a silent -32601 latch.
-import { MID_TURN_QUEUE_DRAIN_METHOD } from '@hoptrendy/acp-bridge/bridgeTypes';
+import { MID_TURN_QUEUE_DRAIN_METHOD } from '@hopcode/acp-bridge/bridgeTypes';
 import { getCommandSubcommandNames } from '../../services/commandMetadata.js';
 import { getEffectiveSupportedModes } from '../../services/commandUtils.js';
 
@@ -174,11 +178,11 @@ type AutoCompressionSendResult =
 
 type RunToolResult = {
   parts: Part[];
-  stopAfterUserQuestionCancel: boolean;
+  stopAfterPermissionCancel: boolean;
 };
 
-const ASK_USER_QUESTION_CANCEL_SKIP_MESSAGE =
-  'Skipped because ask_user_question was cancelled before the user answered; user input is required before continuing.';
+const PERMISSION_CANCEL_SKIP_MESSAGE =
+  'Skipped because a permission request was cancelled before the user answered; user input is required before continuing.';
 
 // The drain is served from an in-memory queue, so a conforming client answers
 // near-instantly (or rejects with -32601). No response within this window
@@ -1110,7 +1114,7 @@ export class Session implements SessionContext {
   /**
    * Generate a server-side follow-up suggestion for the just-completed
    * turn and push it to attached clients via the daemon's
-   * `hopcode/notify/session/prompt-suggestion` extNotification. Mirrors
+   * `qwen/notify/session/prompt-suggestion` extNotification. Mirrors
    * the CLI's `AppContainer.tsx` integration: same `generatePromptSuggestion`
    * call, same `enableCacheSharing` flag forwarding, same curated
    * history slice (`getHistory(true).slice(-40)`).
@@ -1131,7 +1135,10 @@ export class Session implements SessionContext {
    */
   #maybeEmitFollowupSuggestion(result: PromptResponse): void {
     if (result.stopReason !== 'end_turn') return;
-    if (this.settings.merged.ui?.enableFollowupSuggestions !== true) return;
+    // Enabled by default — only an explicit `false` opts out. The schema
+    // `default: true` isn't applied at runtime by `mergeSettings`, so an unset
+    // value must be treated as enabled here.
+    if (this.settings.merged.ui?.enableFollowupSuggestions === false) return;
     if (this.config.getApprovalMode() === ApprovalMode.PLAN) return;
 
     const chat = this.config.getGeminiClient()?.getChat();
@@ -1167,7 +1174,7 @@ export class Session implements SessionContext {
         if (ac.signal.aborted) return;
         if (r.suggestion) {
           await this.client.extNotification(
-            'hopcode/notify/session/prompt-suggestion',
+            'qwen/notify/session/prompt-suggestion',
             {
               v: 1,
               sessionId: this.sessionId,
@@ -1407,7 +1414,7 @@ export class Session implements SessionContext {
             // wraps the whole turn, not just the stop-hook loop. Daemon turns
             // run autonomously in all approval modes (approvals are mediated by
             // the ACP client rather than by gating this loop), so unlike the
-            // CLI reference (useGeminiStream.ts, which only emits in IZN) this
+            // CLI reference (useGeminiStream.ts, which only emits in YOLO) this
             // is intentionally emitted for every mode.
             try {
               while (nextMessage !== null) {
@@ -1546,8 +1553,8 @@ export class Session implements SessionContext {
                     promptId,
                     functionCalls,
                   );
-                  if (toolRun.stopAfterUserQuestionCancel) {
-                    await this.#preserveCancelledAskUserQuestionToolRun(
+                  if (toolRun.stopAfterPermissionCancel) {
+                    await this.#preserveCancelledPermissionToolRun(
                       toolRun,
                       pendingSend.signal,
                     );
@@ -1820,8 +1827,8 @@ export class Session implements SessionContext {
               promptId,
               functionCalls,
             );
-            if (toolRun.stopAfterUserQuestionCancel) {
-              await this.#preserveCancelledAskUserQuestionToolRun(
+            if (toolRun.stopAfterPermissionCancel) {
+              await this.#preserveCancelledPermissionToolRun(
                 toolRun,
                 pendingSend.signal,
               );
@@ -1994,7 +2001,7 @@ export class Session implements SessionContext {
     }
   }
 
-  async #preserveCancelledAskUserQuestionToolRun(
+  async #preserveCancelledPermissionToolRun(
     toolRun: RunToolResult,
     abortSignal: AbortSignal,
   ): Promise<void> {
@@ -2518,8 +2525,8 @@ export class Session implements SessionContext {
                     promptId,
                     functionCalls,
                   );
-                  if (toolRun.stopAfterUserQuestionCancel) {
-                    await this.#preserveCancelledAskUserQuestionToolRun(
+                  if (toolRun.stopAfterPermissionCancel) {
+                    await this.#preserveCancelledPermissionToolRun(
                       toolRun,
                       ac.signal,
                     );
@@ -2635,7 +2642,7 @@ export class Session implements SessionContext {
       .getChatRecordingService()
       ?.setTitleRecordedCallback((customTitle, titleSource) => {
         void this.client
-          .extNotification('hopcode/notify/session/title-update', {
+          .extNotification('qwen/notify/session/title-update', {
             v: 1,
             sessionId: this.sessionId,
             title: customTitle,
@@ -2836,8 +2843,8 @@ export class Session implements SessionContext {
                 promptId,
                 functionCalls,
               );
-              if (toolRun.stopAfterUserQuestionCancel) {
-                await this.#preserveCancelledAskUserQuestionToolRun(
+              if (toolRun.stopAfterPermissionCancel) {
+                await this.#preserveCancelledPermissionToolRun(
                   toolRun,
                   ac.signal,
                 );
@@ -2895,7 +2902,7 @@ export class Session implements SessionContext {
       content: { type: 'text', text: item.displayText },
       _meta: {
         source: 'background_notification',
-        hopcodeDiscreteMessage: true,
+        qwenDiscreteMessage: true,
         backgroundTask: {
           taskId: item.taskId,
           status: item.status,
@@ -2916,7 +2923,7 @@ export class Session implements SessionContext {
       content: { type: 'text', text },
       _meta: {
         source: 'background_notification_response',
-        hopcodeDiscreteMessage: true,
+        qwenDiscreteMessage: true,
         backgroundTask: {
           taskId: item.taskId,
           status: item.status,
@@ -2938,7 +2945,7 @@ export class Session implements SessionContext {
     reason: PromptResponse['stopReason'],
   ): Promise<void> {
     try {
-      await this.client.extNotification('_hopcode/end_turn', {
+      await this.client.extNotification('_qwencode/end_turn', {
         sessionId: this.sessionId,
         reason,
         source: 'background_notification',
@@ -2997,7 +3004,7 @@ export class Session implements SessionContext {
       default: ApprovalMode.DEFAULT,
       'auto-edit': ApprovalMode.AUTO_EDIT,
       auto: ApprovalMode.AUTO,
-      izn: ApprovalMode.IZN,
+      yolo: ApprovalMode.YOLO,
     };
 
     // `modeId` arrives over the wire (ACP `session/set_mode`, or
@@ -3018,7 +3025,7 @@ export class Session implements SessionContext {
     // A2 (#4511): notify attached clients of an in-session mode switch.
     // Mirrors the model-update extNotification in `setModel`.
     void this.client
-      .extNotification('hopcode/notify/session/mode-update', {
+      .extNotification('qwen/notify/session/mode-update', {
         v: 1,
         sessionId: this.sessionId,
         currentModeId: params.modeId,
@@ -3059,7 +3066,7 @@ export class Session implements SessionContext {
       selectedAuthType,
       parsed.modelId,
       selectedAuthType !== previousAuthType &&
-        selectedAuthType === AuthType.HOPCODE_OAUTH
+        selectedAuthType === AuthType.QWEN_OAUTH
         ? { requireCachedCredentials: true }
         : undefined,
     );
@@ -3079,7 +3086,7 @@ export class Session implements SessionContext {
     // the change (the HTTP path also flows through this method), avoiding a
     // double publish. Fire-and-forget, matching the MCP-budget extNotification.
     void this.client
-      .extNotification('hopcode/notify/session/model-update', {
+      .extNotification('qwen/notify/session/model-update', {
         v: 1,
         sessionId: this.sessionId,
         currentModelId: effectiveModelId,
@@ -3107,7 +3114,7 @@ export class Session implements SessionContext {
 
     return {
       _meta: {
-        hopcodeModelSwitch: {
+        qwenModelSwitch: {
           authType: effectiveAuthType,
           modelId: effectiveModelId,
           baseUrl: after?.baseUrl ?? '(default)',
@@ -3160,7 +3167,7 @@ export class Session implements SessionContext {
     // legacy frame for this change, not two. `setMode` omits the flag, so
     // its dual-emit still fires (it has no `sendUpdate`).
     void this.client
-      .extNotification('hopcode/notify/session/mode-update', {
+      .extNotification('qwen/notify/session/mode-update', {
         v: 1,
         sessionId: this.sessionId,
         currentModeId: newModeId,
@@ -3189,15 +3196,101 @@ export class Session implements SessionContext {
     functionCalls: FunctionCall[],
   ): Promise<RunToolResult> {
     const dedupedFunctionCalls = dedupeToolCallsById(functionCalls);
-    type Batch = { concurrent: boolean; calls: FunctionCall[] };
+    type ExecutableBatch = {
+      kind: 'execute';
+      concurrent: boolean;
+      calls: FunctionCall[];
+    };
+    type DuplicateBatch = {
+      kind: 'duplicate';
+      request: ToolCallRequestInfo;
+      response: ToolCallResponseInfo;
+    };
+    type Batch = ExecutableBatch | DuplicateBatch;
     const batches: Batch[] = [];
+    const handledProviderToolCallIds = new Set(
+      this.#getCurrentChat().getHistoryFunctionResponseIds(),
+    );
+
+    const pushDuplicateBatch = (request: ToolCallRequestInfo): void => {
+      const response = createDuplicateProviderToolCallResponse(request);
+      debugLogger.debug(
+        `[Session.runToolCalls] Suppressing duplicate provider tool-call id: ` +
+          `${request.providerCallId} (tool: ${request.name})`,
+      );
+      batches.push({ kind: 'duplicate', request, response });
+    };
+
+    const emitDuplicateBatch = async (batch: DuplicateBatch): Promise<void> => {
+      const { request, response } = batch;
+      if (request.name === ToolNames.TODO_WRITE) {
+        const provenance = ToolCallEmitter.resolveToolProvenance(request.name);
+        await this.sendUpdate({
+          sessionUpdate: 'tool_call_update',
+          toolCallId: response.callId,
+          status: 'failed',
+          content: [
+            {
+              type: 'content',
+              content: {
+                type: 'text',
+                text: response.error?.message ?? String(response.resultDisplay),
+              },
+            },
+          ],
+          rawOutput: response.resultDisplay,
+          _meta: {
+            toolName: request.name,
+            provenance: provenance.provenance,
+            ...(provenance.serverId ? { serverId: provenance.serverId } : {}),
+          },
+        });
+      } else {
+        await this.toolCallEmitter.emitResult({
+          callId: response.callId,
+          toolName: request.name,
+          args: request.args,
+          message: response.responseParts,
+          resultDisplay: response.resultDisplay,
+          error: response.error,
+          success: false,
+        });
+      }
+      this.config
+        .getChatRecordingService()
+        ?.recordToolResult(response.responseParts, {
+          callId: response.callId,
+          status: 'error',
+          resultDisplay: response.resultDisplay,
+          error: response.error,
+          errorType: response.errorType,
+        });
+    };
+
     for (const fc of dedupedFunctionCalls) {
+      const providerCallId = getProviderToolCallId(fc) ?? fc.id;
+      if (providerCallId) {
+        if (handledProviderToolCallIds.has(providerCallId)) {
+          const callId = fc.id ?? `${fc.name}-${Date.now()}`;
+          pushDuplicateBatch({
+            callId,
+            providerCallId,
+            name: fc.name ?? 'unknown_tool',
+            args: (fc.args ?? {}) as Record<string, unknown>,
+            isClientInitiated: false,
+            prompt_id: promptId,
+          });
+          continue;
+        }
+        handledProviderToolCallIds.add(providerCallId);
+      }
+
       const isAgent = fc.name === ToolNames.AGENT;
       const last = batches[batches.length - 1];
-      if (isAgent && last?.concurrent) {
+      if (isAgent && last?.kind === 'execute' && last.concurrent) {
         last.calls.push(fc);
       } else {
-        batches.push({ concurrent: isAgent, calls: [fc] });
+        batches.push({ kind: 'execute', concurrent: isAgent, calls: [fc] });
       }
     }
 
@@ -3209,10 +3302,10 @@ export class Session implements SessionContext {
         functionResponse: {
           id: callId,
           name: toolName,
-          response: { error: ASK_USER_QUESTION_CANCEL_SKIP_MESSAGE },
+          response: { error: PERMISSION_CANCEL_SKIP_MESSAGE },
         },
       };
-      const error = new Error(ASK_USER_QUESTION_CANCEL_SKIP_MESSAGE);
+      const error = new Error(PERMISSION_CANCEL_SKIP_MESSAGE);
       try {
         this.config.getChatRecordingService()?.recordToolResult([part], {
           callId,
@@ -3243,16 +3336,16 @@ export class Session implements SessionContext {
 
     // Bounded-concurrency runner: matches core's `runConcurrently`
     // behaviour (`coreToolScheduler.ts:1506`), capped by
-    // `HOPCODE_CODE_MAX_TOOL_CONCURRENCY` (default 10). Results are returned
+    // `HOPCODE_MAX_TOOL_CONCURRENCY` (default 10). Results are returned
     // in input order regardless of resolution order.
     const runBounded = async (
       calls: FunctionCall[],
       runAbortSignal: AbortSignal,
-      onStopAfterUserQuestionCancel?: () => void,
+      onStopAfterPermissionCancel?: () => void,
       shouldSkipUnstarted?: () => boolean,
     ): Promise<RunToolResult[]> => {
       const parsed = parseInt(
-        process.env['HOPCODE_CODE_MAX_TOOL_CONCURRENCY'] || '',
+        process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] || '',
         10,
       );
       const maxConcurrency =
@@ -3264,7 +3357,7 @@ export class Session implements SessionContext {
         if (runAbortSignal.aborted && shouldSkipUnstarted?.()) {
           results[idx] = {
             parts: [await recordSkippedToolCall(calls[idx])],
-            stopAfterUserQuestionCancel: false,
+            stopAfterPermissionCancel: false,
           };
           continue;
         }
@@ -3272,7 +3365,7 @@ export class Session implements SessionContext {
           runAbortSignal,
           promptId,
           calls[idx],
-          onStopAfterUserQuestionCancel,
+          onStopAfterPermissionCancel,
         )
           .then((r) => {
             results[idx] = r;
@@ -3291,9 +3384,14 @@ export class Session implements SessionContext {
 
     const parts: Part[] = [];
     for (const batch of batches) {
+      if (batch.kind === 'duplicate') {
+        await emitDuplicateBatch(batch);
+        parts.push(...batch.response.responseParts);
+        continue;
+      }
       if (batch.concurrent && batch.calls.length > 1) {
         const batchAbortController = new AbortController();
-        let batchStopAfterUserQuestionCancel = false;
+        let batchStopAfterPermissionCancel = false;
         const propagateAbort = () => {
           batchAbortController.abort(abortSignal.reason);
         };
@@ -3304,8 +3402,8 @@ export class Session implements SessionContext {
             once: true,
           });
         }
-        const stopBatchAfterUserQuestionCancel = () => {
-          batchStopAfterUserQuestionCancel = true;
+        const stopBatchAfterPermissionCancel = () => {
+          batchStopAfterPermissionCancel = true;
           batchAbortController.abort(USER_CANCEL_ABORT_REASON);
         };
         let results: RunToolResult[];
@@ -3313,8 +3411,8 @@ export class Session implements SessionContext {
           results = await runBounded(
             batch.calls,
             batchAbortController.signal,
-            stopBatchAfterUserQuestionCancel,
-            () => batchStopAfterUserQuestionCancel,
+            stopBatchAfterPermissionCancel,
+            () => batchStopAfterPermissionCancel,
           );
         } finally {
           abortSignal.removeEventListener('abort', propagateAbort);
@@ -3322,24 +3420,24 @@ export class Session implements SessionContext {
         let shouldStop = false;
         for (const r of results) {
           parts.push(...r.parts);
-          shouldStop ||= r.stopAfterUserQuestionCancel;
+          shouldStop ||= r.stopAfterPermissionCancel;
         }
         if (shouldStop) {
           await appendSkippedAfter(parts, batch.calls[batch.calls.length - 1]);
-          return { parts, stopAfterUserQuestionCancel: true };
+          return { parts, stopAfterPermissionCancel: true };
         }
       } else {
         for (const fc of batch.calls) {
           const r = await this.runTool(abortSignal, promptId, fc);
           parts.push(...r.parts);
-          if (r.stopAfterUserQuestionCancel) {
+          if (r.stopAfterPermissionCancel) {
             await appendSkippedAfter(parts, fc);
-            return { parts, stopAfterUserQuestionCancel: true };
+            return { parts, stopAfterPermissionCancel: true };
           }
         }
       }
     }
-    return { parts, stopAfterUserQuestionCancel: false };
+    return { parts, stopAfterPermissionCancel: false };
   }
 
   /**
@@ -3381,7 +3479,7 @@ export class Session implements SessionContext {
     abortSignal: AbortSignal,
     promptId: string,
     fc: FunctionCall,
-    onStopAfterUserQuestionCancel?: () => void,
+    onStopAfterPermissionCancel?: () => void,
   ): Promise<RunToolResult> {
     const callId = fc.id ?? `${fc.name}-${Date.now()}`;
     let args = (fc.args ?? {}) as Record<string, unknown>;
@@ -3389,9 +3487,17 @@ export class Session implements SessionContext {
     const startTime = Date.now();
     let spanError: string | undefined;
     let activeToolAbortSignal = abortSignal;
-    let nestedAskUserQuestionCancelled = false;
+    let nestedPermissionCancelled = false;
     let agentToolAbortController: AbortController | undefined;
     let removeAgentToolAbortPropagation: (() => void) | undefined;
+    let subAgentCleanupFunctions: Array<() => void> = [];
+
+    const cleanupAgentToolResources = () => {
+      subAgentCleanupFunctions.forEach((cleanup) => cleanup());
+      subAgentCleanupFunctions = [];
+      removeAgentToolAbortPropagation?.();
+      removeAgentToolAbortPropagation = undefined;
+    };
 
     const errorResponse = (error: Error) => {
       const durationMs = Date.now() - startTime;
@@ -3426,10 +3532,10 @@ export class Session implements SessionContext {
     const earlyErrorResponse = async (
       error: Error,
       toolName = fc.name ?? 'unknown_tool',
-      opts?: { stopAfterUserQuestionCancel?: boolean },
+      opts?: { stopAfterPermissionCancel?: boolean },
     ) => {
       spanError = error.message;
-      removeAgentToolAbortPropagation?.();
+      cleanupAgentToolResources();
       if (toolName !== ToolNames.TODO_WRITE) {
         await this.toolCallEmitter.emitError(callId, toolName, error);
       }
@@ -3444,7 +3550,7 @@ export class Session implements SessionContext {
       });
       return {
         parts: errorParts,
-        stopAfterUserQuestionCancel: opts?.stopAfterUserQuestionCancel ?? false,
+        stopAfterPermissionCancel: opts?.stopAfterPermissionCancel ?? false,
       };
     };
 
@@ -3506,9 +3612,6 @@ export class Session implements SessionContext {
           }
         }
 
-        // Track cleanup functions for sub-agent event listeners
-        let subAgentCleanupFunctions: Array<() => void> = [];
-
         // Generate tool_use_id for hook tracking (aligned with core path)
         const toolUseId = generateToolUseId();
 
@@ -3542,9 +3645,9 @@ export class Session implements SessionContext {
               parentToolCallId,
               subagentType,
               () => {
-                nestedAskUserQuestionCancelled = true;
+                nestedPermissionCancelled = true;
                 agentToolAbortController?.abort(USER_CANCEL_ABORT_REASON);
-                onStopAfterUserQuestionCancel?.();
+                onStopAfterPermissionCancel?.();
               },
             );
 
@@ -3559,7 +3662,7 @@ export class Session implements SessionContext {
           //
           // L3: Tool's intrinsic default permission
           // L4: PermissionManager rule override
-          // L5: ApprovalMode override (IZN / AUTO_EDIT / PLAN)
+          // L5: ApprovalMode override (YOLO / AUTO_EDIT / PLAN)
           //
           // AUTO_EDIT auto-approval is handled HERE, same as coreToolScheduler.
           // The VS Code extension is just a UI layer for requestPermission.
@@ -3843,24 +3946,74 @@ export class Session implements SessionContext {
                   _meta: { toolName },
                 },
               };
+              const stopAfterPermissionCancel = () => {
+                onStopAfterPermissionCancel?.();
+                return earlyErrorResponse(
+                  new Error(`Tool "${toolName}" was canceled by the user.`),
+                  toolName,
+                  { stopAfterPermissionCancel: true },
+                );
+              };
 
-              const output = (await this.client.requestPermission(
-                params,
-              )) as RequestPermissionResponse & {
+              let output: RequestPermissionResponse & {
                 answers?: Record<string, string>;
               };
-              const outcome =
-                output.outcome.outcome === 'cancelled'
-                  ? ToolConfirmationOutcome.Cancel
-                  : z
-                      .nativeEnum(ToolConfirmationOutcome)
-                      .parse(output.outcome.optionId);
+              let outcome: ToolConfirmationOutcome;
+              try {
+                output = (await this.client.requestPermission(
+                  params,
+                )) as RequestPermissionResponse & {
+                  answers?: Record<string, string>;
+                };
+                outcome =
+                  output.outcome.outcome === 'cancelled'
+                    ? ToolConfirmationOutcome.Cancel
+                    : z
+                        .nativeEnum(ToolConfirmationOutcome)
+                        .parse(output.outcome.optionId);
+              } catch (error) {
+                debugLogger.error(
+                  `Permission request failed for tool ${toolName}:`,
+                  error,
+                );
+                try {
+                  await confirmationDetails.onConfirm(
+                    ToolConfirmationOutcome.Cancel,
+                  );
+                } catch (confirmError) {
+                  debugLogger.error(
+                    `Failed to cancel tool ${toolName} after permission request failure:`,
+                    confirmError,
+                  );
+                }
+                onStopAfterPermissionCancel?.();
+                return earlyErrorResponse(
+                  new Error(
+                    `Permission request failed for "${toolName}": ${this.#formatError(
+                      error,
+                    )}`,
+                  ),
+                  toolName,
+                  { stopAfterPermissionCancel: true },
+                );
+              }
 
               recordAutoModeFallbackResolution(outcome);
 
-              await confirmationDetails.onConfirm(outcome, {
-                answers: output.answers,
-              });
+              try {
+                await confirmationDetails.onConfirm(outcome, {
+                  answers: output.answers,
+                });
+              } catch (error) {
+                if (outcome !== ToolConfirmationOutcome.Cancel) {
+                  throw error;
+                }
+                debugLogger.error(
+                  `Failed to confirm cancellation for tool ${toolName}:`,
+                  error,
+                );
+                return stopAfterPermissionCancel();
+              }
 
               // Persist permission rules when user explicitly chose "Always Allow".
               // This branch is only reached for tools that went through
@@ -3898,21 +4051,11 @@ export class Session implements SessionContext {
 
               switch (outcome) {
                 case ToolConfirmationOutcome.Cancel:
-                  if (toolName === ToolNames.ASK_USER_QUESTION) {
-                    onStopAfterUserQuestionCancel?.();
-                  }
                   // Route through earlyErrorResponse so spanError carries the
                   // cancellation reason (plain errorResponse leaves it unset,
                   // which makes endToolSpan fall back to the generic 'tool
                   // error' message) and the declined call is still recorded.
-                  return earlyErrorResponse(
-                    new Error(`Tool "${toolName}" was canceled by the user.`),
-                    toolName,
-                    {
-                      stopAfterUserQuestionCancel:
-                        toolName === ToolNames.ASK_USER_QUESTION,
-                    },
-                  );
+                  return stopAfterPermissionCancel();
                 case ToolConfirmationOutcome.ProceedOnce:
                 case ToolConfirmationOutcome.ProceedAlways:
                 case ToolConfirmationOutcome.ProceedAlwaysProject:
@@ -3931,7 +4074,7 @@ export class Session implements SessionContext {
           }
 
           if (!didRequestPermission && !isTodoWriteTool) {
-            // Auto-approved (L3 allow / L4 PM allow / L5 IZN|AUTO_EDIT)
+            // Auto-approved (L3 allow / L4 PM allow / L5 YOLO|AUTO_EDIT)
             // → emit tool_call start notification
             const startParams: ToolCallStartParams = {
               callId,
@@ -4012,10 +4155,9 @@ export class Session implements SessionContext {
           }
 
           // Clean up event listeners
-          subAgentCleanupFunctions.forEach((cleanup) => cleanup());
-          removeAgentToolAbortPropagation?.();
+          cleanupAgentToolResources();
 
-          // enter_plan_mode and the AUTO/IZN gate path of exit_plan_mode change the
+          // enter_plan_mode and the AUTO/YOLO gate path of exit_plan_mode change the
           // approval mode inside execute() without going through the user-confirmation
           // branch above, so notify the client of the current mode explicitly.
           // Only send when the mode actually changed (a gate "blocked" result keeps
@@ -4060,7 +4202,7 @@ export class Session implements SessionContext {
             messageBusForTool &&
             !toolResult.error &&
             !aborted &&
-            !nestedAskUserQuestionCancelled
+            !nestedPermissionCancelled
           ) {
             // Use the same response shape as core (llmContent/returnDisplay)
             const toolResponse = {
@@ -4194,12 +4336,11 @@ export class Session implements SessionContext {
           }
           return {
             parts: responseParts,
-            stopAfterUserQuestionCancel: nestedAskUserQuestionCancelled,
+            stopAfterPermissionCancel: nestedPermissionCancelled,
           };
         } catch (e) {
           // Ensure cleanup on error
-          subAgentCleanupFunctions.forEach((cleanup) => cleanup());
-          removeAgentToolAbortPropagation?.();
+          cleanupAgentToolResources();
 
           const error = e instanceof Error ? e : new Error(String(e));
           spanError = error.message;
@@ -4255,7 +4396,7 @@ export class Session implements SessionContext {
 
           return {
             parts: errorResponse(error),
-            stopAfterUserQuestionCancel: nestedAskUserQuestionCancelled,
+            stopAfterPermissionCancel: nestedPermissionCancelled,
           };
         }
       }); // end runInToolSpanContext
@@ -4547,7 +4688,7 @@ export class Session implements SessionContext {
       .then((hookResult) => {
         if (!hookResult.terminalSequence) return;
         return this.client.extNotification(
-          'hopcode/notify/session/terminal-sequence',
+          'qwen/notify/session/terminal-sequence',
           {
             v: 1,
             sessionId: this.sessionId,

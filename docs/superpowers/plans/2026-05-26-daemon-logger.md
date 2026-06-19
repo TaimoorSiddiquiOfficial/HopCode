@@ -1,4 +1,4 @@
-# `hopcode serve` Daemon File Logger — Implementation Plan
+﻿# `hopcode serve` Daemon File Logger — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -1481,7 +1481,7 @@ Closes #4548.
 - [x] `packages/cli/src/serve/runHopCodeServe.test.ts` covers boot banner + flush on shutdown.
 - [x] Manual smoke: log file created at boot, contains shutdown line on SIGTERM.
 
-🤖 Generated with [HopCode](https://github.com/QwenLM/hopcode)
+🤖 Generated with [HopCode](https://github.com/hoptrendy/hopcode)
 EOF
 )"
 ```

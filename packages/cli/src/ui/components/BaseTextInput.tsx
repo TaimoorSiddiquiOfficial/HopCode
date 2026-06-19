@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview BaseTextInput � shared text input component with rendering
+ * @fileoverview BaseTextInput — shared text input component with rendering
  * and common readline keyboard handling.
  *
  * Provides:
@@ -19,9 +19,11 @@
  * and AgentComposer (with minimal customization).
  */
 
-import type React from 'react';
-import { useCallback } from 'react';
+import type { ReactNode } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { Box, Text } from 'ink';
+import { addLayoutListener, type DOMElement } from 'ink/dom';
+import CursorContext from 'ink/components/CursorContext';
 import chalk from 'chalk';
 import type { TextBuffer } from './shared/text-buffer.js';
 import type { Key } from '../hooks/useKeypress.js';
@@ -31,7 +33,7 @@ import stringWidth from 'string-width';
 import { cpSlice, cpLen } from '../utils/textUtils.js';
 import { theme } from '../semantic-colors.js';
 
-// --- Types --------------------------------------------------
+// ─── Types ──────────────────────────────────────────────────
 
 export interface RenderLineOptions {
   /** The text content of this visual line. */
@@ -67,7 +69,9 @@ export interface BaseTextInputProps {
   /** Placeholder text shown when the buffer is empty. */
   placeholder?: string;
   /** Custom prefix node (defaults to `> `). */
-  prefix?: React.ReactNode;
+  prefix?: ReactNode;
+  /** Width of the prefix in terminal columns. Defaults to 2 (for "> "). */
+  prefixWidth?: number;
   /** Border color for the input box. */
   borderColor?: string;
   /** Label rendered on the top border line (right-aligned). Plain string for width calculation. */
@@ -78,10 +82,10 @@ export interface BaseTextInputProps {
    * Custom line renderer for advanced rendering (e.g. syntax highlighting).
    * When not provided, lines are rendered as plain text with cursor overlay.
    */
-  renderLine?: (opts: RenderLineOptions) => React.ReactNode;
+  renderLine?: (opts: RenderLineOptions) => ReactNode;
 }
 
-// --- Default line renderer ----------------------------------
+// ─── Default line renderer ──────────────────────────────────
 
 /**
  * Renders a single visual line with an inverse-video block cursor.
@@ -92,14 +96,14 @@ export function defaultRenderLine({
   isOnCursorLine,
   cursorCol,
   showCursor,
-}: RenderLineOptions): React.ReactNode {
+}: RenderLineOptions): ReactNode {
   if (!isOnCursorLine || !showCursor) {
     return <Text>{lineText || ' '}</Text>;
   }
 
   const len = cpLen(lineText);
 
-  // Cursor past end of line � append inverse space
+  // Cursor past end of line — append inverse space
   if (cursorCol >= len) {
     return (
       <Text>
@@ -122,21 +126,35 @@ export function defaultRenderLine({
   );
 }
 
-// --- Component ----------------------------------------------
+// ─── Helpers ────────────────────────────────────────────────
 
-export const BaseTextInput: React.FC<BaseTextInputProps> = ({
+// Walk up Ink's internal DOM tree to find the root node (ink-root).
+// addLayoutListener requires the root node specifically.
+function findRootNode(
+  node: (Record<string, unknown> & { parentNode?: unknown }) | null,
+): DOMElement | undefined {
+  if (!node) return undefined;
+  if (!node.parentNode)
+    return node['nodeName'] === 'ink-root' ? (node as DOMElement) : undefined;
+  return findRootNode(node.parentNode as Record<string, unknown>);
+}
+
+// ─── Component ──────────────────────────────────────────────
+
+export const BaseTextInput = ({
   buffer,
   onSubmit,
   onKeypress,
   showCursor = true,
   placeholder,
   prefix,
+  prefixWidth = 2,
   borderColor,
   topRightLabel,
   isActive = true,
   renderLine = defaultRenderLine,
-}) => {
-  // -- Keyboard handling --
+}: BaseTextInputProps): ReactNode => {
+  // ── Keyboard handling ──
 
   const handleKey = useCallback(
     (key: Key) => {
@@ -167,7 +185,7 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
         return;
       }
 
-      // Escape ? clear input
+      // Escape → clear input
       if (keyMatchers[Command.ESCAPE](key)) {
         if (buffer.text.length > 0) {
           buffer.setText('');
@@ -175,7 +193,7 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
         return;
       }
 
-      // Ctrl+C ? clear input
+      // Ctrl+C → clear input
       if (keyMatchers[Command.CLEAR_INPUT](key)) {
         if (buffer.text.length > 0) {
           buffer.setText('');
@@ -183,43 +201,43 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
         return;
       }
 
-      // Ctrl+A ? home
+      // Ctrl+A → home
       if (keyMatchers[Command.HOME](key)) {
         buffer.move('home');
         return;
       }
 
-      // Ctrl+E ? end
+      // Ctrl+E → end
       if (keyMatchers[Command.END](key)) {
         buffer.move('end');
         return;
       }
 
-      // Ctrl+K ? kill to end of line
+      // Ctrl+K → kill to end of line
       if (keyMatchers[Command.KILL_LINE_RIGHT](key)) {
         buffer.killLineRight();
         return;
       }
 
-      // Ctrl+U ? kill to start of line
+      // Ctrl+U → kill to start of line
       if (keyMatchers[Command.KILL_LINE_LEFT](key)) {
         buffer.killLineLeft();
         return;
       }
 
-      // Ctrl+W / Alt+Backspace ? delete word backward
+      // Ctrl+W / Alt+Backspace → delete word backward
       if (keyMatchers[Command.DELETE_WORD_BACKWARD](key)) {
         buffer.deleteWordLeft();
         return;
       }
 
-      // Ctrl+X Ctrl+E ? open in external editor
+      // Ctrl+X Ctrl+E → open in external editor
       if (keyMatchers[Command.OPEN_EXTERNAL_EDITOR](key)) {
         buffer.openInExternalEditor();
         return;
       }
 
-      // Tab � never insert literal tab characters into the buffer;
+      // Tab — never insert literal tab characters into the buffer;
       // consumers that need Tab behaviour should intercept it via onKeypress.
       if ((key.name === 'tab' || key.sequence === '\t') && !key.paste) {
         return;
@@ -235,7 +253,7 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
         return;
       }
 
-      // Fallthrough � delegate to buffer's built-in input handler
+      // Fallthrough — delegate to buffer's built-in input handler
       buffer.handleInput(key);
     },
     [buffer, onSubmit, onKeypress],
@@ -243,11 +261,86 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
 
   useKeypress(handleKey, { isActive });
 
-  // -- Rendering --
+  // ── Rendering ──
 
   const linesToRender = buffer.viewportVisualLines;
   const [cursorVisualRow, cursorVisualCol] = buffer.visualCursor;
   const scrollVisualRow = buffer.visualScrollRow;
+
+  // ── Physical cursor positioning for IME ──
+  // addLayoutListener fires in resetAfterCommit AFTER calculateLayout()
+  // but BEFORE onRender() — yoga layout is fresh, terminal not yet written.
+  // addLayoutListener requires the root node (ink-root), not the component
+  // node. We find it by walking up the Ink DOM parent chain.
+  const rootRef = useRef(null);
+  const cursorCtx = useContext(CursorContext);
+
+  // Use a ref to hold mutable state so the layout listener callback
+  // always reads the latest values without needing to resubscribe.
+  const stateRef = useRef({
+    showCursor,
+    cursorVisualRow,
+    cursorVisualCol,
+    scrollVisualRow,
+    linesToRender,
+    prefixWidth,
+  });
+  stateRef.current = {
+    showCursor,
+    cursorVisualRow,
+    cursorVisualCol,
+    scrollVisualRow,
+    linesToRender,
+    prefixWidth,
+  };
+
+  useEffect(() => {
+    const rootNode = findRootNode(rootRef.current);
+    if (!rootNode) return;
+    const unsub = addLayoutListener(rootNode, () => {
+      const {
+        showCursor: sc,
+        cursorVisualRow: vr,
+        cursorVisualCol: vc,
+        scrollVisualRow: sr,
+        linesToRender: lt,
+        prefixWidth: pw,
+      } = stateRef.current;
+      if (!sc) {
+        cursorCtx.setCursorPosition(undefined);
+        return;
+      }
+      const node = rootRef.current;
+      if (!node) return;
+      let absTop = 0;
+      let absLeft = 0;
+      let n: unknown = node;
+      while (n) {
+        const nd = n as {
+          yogaNode?: { getComputedLayout(): { top: number; left: number } };
+          parentNode?: unknown;
+        };
+        const layout = nd.yogaNode?.getComputedLayout();
+        if (layout) {
+          absTop += layout.top;
+          absLeft += layout.left;
+        }
+        n = nd.parentNode;
+      }
+      const relativeRow = vr - sr;
+      const lineText = lt[relativeRow] || '';
+      const textBeforeCursor = cpSlice(lineText, 0, vc);
+      const physicalCol = stringWidth(textBeforeCursor);
+      cursorCtx.setCursorPosition({
+        x: absLeft + pw + physicalCol,
+        y: absTop + relativeRow + 1,
+      });
+    });
+    return () => {
+      unsub();
+      cursorCtx.setCursorPosition(undefined);
+    };
+  }, [cursorCtx]);
 
   const resolvedBorderColor = borderColor ?? theme.border.focused;
   const resolvedPrefix = prefix ?? (
@@ -255,16 +348,16 @@ export const BaseTextInput: React.FC<BaseTextInputProps> = ({
   );
 
   const columns = process.stdout.columns || 80;
-  // Build the top border line: ------- label --
+  // Build the top border line: ─────── label ──
   // Label takes: 1 space + text + 1 space + 2 trailing dashes = label.length + 4
   const labelWidth = topRightLabel ? stringWidth(topRightLabel) + 4 : 0;
   const dashCount = Math.max(1, columns - labelWidth);
   const topBorderLine = topRightLabel
-    ? `${'-'.repeat(dashCount)} ${topRightLabel} ${'-'.repeat(2)}`
-    : '-'.repeat(columns);
+    ? `${'─'.repeat(dashCount)} ${topRightLabel} ${'─'.repeat(2)}`
+    : '─'.repeat(columns);
 
   return (
-    <Box flexDirection="column">
+    <Box ref={rootRef} flexDirection="column">
       <Text color={resolvedBorderColor} wrap="truncate-end">
         {topBorderLine}
       </Text>

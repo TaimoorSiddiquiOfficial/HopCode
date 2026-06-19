@@ -1,6 +1,6 @@
-{
-  "name": "@hoptrendy/hopcode",
-  "version": "0.30.4",
+﻿{
+  "name": "@hopcode/hopcode",
+  "version": "0.18.3",
   "engines": {
     "node": ">=22.0.0"
   },
@@ -12,6 +12,7 @@
     "packages/channels/weixin",
     "packages/channels/dingtalk",
     "packages/channels/feishu",
+    "packages/channels/qqbot",
     "packages/channels/plugin-example",
     "!packages/desktop"
   ],
@@ -20,7 +21,7 @@
     "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
   "config": {
-    "sandboxImageUri": "ghcr.io/hopcode/hopcode:0.30.4"
+    "sandboxImageUri": "ghcr.io/hopcode/hopcode:0.18.3"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -66,7 +67,8 @@
     "build:sdk:python": "python3 -m build packages/sdk-python",
     "check-i18n": "npm run check-i18n --workspace=packages/cli",
     "preflight": "npm run clean && npm ci && npm run format && npm run lint:ci && npm run build && npm run typecheck && npm run test:ci",
-    "prepare": "node scripts/prepare.js",
+    "postinstall": "patch-package",
+    "prepare": "husky && npm run build && npm run bundle",
     "prepare:package": "node scripts/prepare-package.js",
     "package:hosted-installation": "node scripts/build-hosted-installation-assets.js",
     "package:standalone": "node scripts/create-standalone-package.js",
@@ -94,7 +96,7 @@
     "@types/react-dom": "^19.2.0"
   },
   "bin": {
-    "hopcode": "scripts/cli-entry.js"
+    "qwen": "scripts/cli-entry.js"
   },
   "files": [
     "dist/",
@@ -133,6 +135,7 @@
     "mock-fs": "^5.5.0",
     "msw": "^2.10.4",
     "npm-run-all": "^4.1.5",
+    "patch-package": "^8.0.1",
     "prettier": "^3.5.3",
     "react-devtools-core": "^6.1.5",
     "semver": "^7.7.2",

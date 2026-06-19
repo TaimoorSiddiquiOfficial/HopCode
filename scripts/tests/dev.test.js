@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -29,7 +29,7 @@ vi.mock('node:os', async (importOriginal) => {
 
 vi.mock('node:fs', () => ({
   writeFileSync: vi.fn(),
-  mkdtempSync: vi.fn(() => '/tmp/qwen-dev-test'),
+  mkdtempSync: vi.fn(() => '/tmp/hopcode-dev-test'),
   rmSync: vi.fn(),
   existsSync: existsSyncMock,
   symlinkSync: vi.fn(),
