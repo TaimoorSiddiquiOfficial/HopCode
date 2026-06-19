@@ -151,7 +151,7 @@ Display:     'Inter', SemiBold (600)
 {
   "name": "@hoptrendy/hopcode",  ✅
   "repository": "TaimoorSiddiquiOfficial/HopCode",  ✅
-  "sandboxImageUri": "ghcr.io/TaimoorSiddiquiOfficial/HopCode:0.14.5"  ✅
+  "sandboxImageUri": "ghcr.io/hoptrendy/hopcode:0.14.5"  ✅
 }
 ```
 

@@ -103,14 +103,14 @@ hopcode -p "run the test suite"
 
 - **CLI flag**: `--sandbox-image <image>`
 - **Environment variable**: `HOPCODE_SANDBOX_IMAGE=<image>`
-- **Settings file**: `tools.sandboxImage` in your `settings.json` (e.g., `{"tools": {"sandboxImage": "ghcr.io/taimoorsiddiquiofficial/hopcode:0.18.9"}}`) 4. Built-in default image from the CLI package (for example `ghcr.io/taimoorsiddiquiofficial/hopcode:<version>`)
+- **Settings file**: `tools.sandboxImage` in your `settings.json` (e.g., `{"tools": {"sandboxImage": "ghcr.io/hoptrendy/hopcode:0.18.9"}}`) 4. Built-in default image from the CLI package (for example `ghcr.io/hoptrendy/hopcode:<version>`)
 
   ## Building custom sandbox images
 
   For a custom image, build it using the canonical image as a base:
 
   ```dockerfile
-  FROM ghcr.io/taimoorsiddiquiofficial/hopcode:latest
+  FROM ghcr.io/hoptrendy/hopcode:latest
   ```
 
 Multiple flags can be provided as a space-separated string:
@@ -161,7 +161,7 @@ The official HopCode Docker image is intentionally minimal to keep the image sma
 If your workflow requires Java, you can extend the base image by creating a `.hopcode/sandbox.Dockerfile` in your project:
 
 ```dockerfile
-FROM ghcr.io/taimoorsiddiquiofficial/hopcode:latest
+FROM ghcr.io/hoptrendy/hopcode:latest
 
 RUN apt-get update && \
     apt-get install -y openjdk-17-jre && \

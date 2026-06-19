@@ -3,7 +3,7 @@ version: '3.8'
 services:
   hopcode-agent:
     # Note: Update version tag to match current release
-    image: 'ghcr.io/taimoorsiddiquiofficial/hopcode:0.18.9'
+    image: 'ghcr.io/hoptrendy/hopcode:0.18.9'
     container_name: 'hopcode-agent'
     restart: 'unless-stopped'
     ports:
@@ -30,7 +30,7 @@ services:
 
   hopcode-dashboard:
     # Note: Update version tag to match current release
-    image: 'ghcr.io/taimoorsiddiquiofficial/hopcode:0.18.9'
+    image: 'ghcr.io/hoptrendy/hopcode:0.18.9'
     container_name: 'hopcode-dashboard'
     restart: 'unless-stopped'
     ports:

@@ -215,8 +215,8 @@ $allFiles = Get-SourceFiles -Extensions @("*.ts", "*.tsx", "*.js", "*.mjs", "*.c
 # Order matters - longest patterns first to avoid partial matches
 $stringReplacements = [ordered]@{
     # Docker image references
-    "ghcr.io/qwenlm/hopcode" = "ghcr.io/taimoorsiddiquiofficial/hopcode"
-    "ghcr.io/hopcodelm/hopcode" = "ghcr.io/taimoorsiddiquiofficial/hopcode"
+    "ghcr.io/qwenlm/hopcode" = "ghcr.io/hoptrendy/hopcode"
+    "ghcr.io/hopcodelm/hopcode" = "ghcr.io/hoptrendy/hopcode"
     "HopCodeLM/HopCode-code" = "TaimoorSiddiquiOfficial/HopCode"
     "HopCodeLM/hopcode" = "TaimoorSiddiquiOfficial/HopCode"
     "qwenlm.hopcode-vscode-ide-companion" = "hopcode.hopcode-vscode-ide-companion"
