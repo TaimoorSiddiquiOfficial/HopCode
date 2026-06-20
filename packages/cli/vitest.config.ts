@@ -69,6 +69,14 @@ export default defineConfig({
         __dirname,
         '../channels/telegram/src/index.ts',
       ),
+      '@hoptrendy/channel-weixin/accounts': path.resolve(
+        __dirname,
+        '../channels/weixin/src/accounts.ts',
+      ),
+      '@hoptrendy/channel-weixin/login': path.resolve(
+        __dirname,
+        '../channels/weixin/src/login.ts',
+      ),
       '@hoptrendy/channel-weixin': path.resolve(
         __dirname,
         '../channels/weixin/src/index.ts',

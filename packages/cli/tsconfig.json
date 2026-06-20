@@ -16,6 +16,7 @@
       "@hoptrendy/channel-base": ["../channels/base/src/index.ts"],
       "@hoptrendy/channel-telegram": ["../channels/telegram/src/index.ts"],
       "@hoptrendy/channel-weixin": ["../channels/weixin/src/index.ts"],
+      "@hoptrendy/channel-weixin/*": ["../channels/weixin/src/*"],
       "@hoptrendy/channel-dingtalk": ["../channels/dingtalk/src/index.ts"],
       "@hoptrendy/channel-feishu": ["../channels/feishu/src/index.ts"],
       "@hoptrendy/channel-qqbot": ["../channels/qqbot/src/index.ts"],
