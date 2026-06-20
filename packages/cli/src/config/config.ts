@@ -55,6 +55,7 @@ import stripJsonComments from 'strip-json-comments';
 import { resolvePath } from '../utils/resolvePath.js';
 import { getCliVersion } from '../utils/version.js';
 import { loadSandboxConfig } from './sandboxConfig.js';
+import { buildWebSearchConfig } from './webSearch.js';
 import { appEvents } from '../utils/events.js';
 import { mcpCommand } from '../commands/mcp.js';
 import { channelCommand } from '../commands/channel.js';
@@ -1402,6 +1403,13 @@ export async function loadCliConfig(
    * demoted below a project `.mcp.json` by `assembleMcpServers`. See issue #4615.
    */
   sessionMcpServers?: Record<string, MCPServerConfig>,
+  /**
+   * Lifecycle handle for the settings file watcher started in `gemini.tsx`
+   * before `Config.initialize()`. Passed through to `Config` so it can be
+   * stopped during shutdown — only `stopWatching()` is exposed here to keep
+   * core decoupled from the CLI-owned `SettingsWatcher` implementation.
+   */
+  settingsWatcher?: { stopWatching(): void },
 ): Promise<Config> {
   const debugMode = isDebugMode(argv);
   const bareMode = isBareMode(argv.bare);
@@ -1836,6 +1844,12 @@ export async function loadCliConfig(
     ? undefined
     : getPendingGatedMcpServers(mcpServers, cwd);
 
+  const webSearchConfig = buildWebSearchConfig(
+    argv,
+    settings,
+    selectedAuthType,
+  );
+
   const configParams: ConfigParameters = {
     sessionId,
     sessionData,
@@ -1902,6 +1916,8 @@ export async function loadCliConfig(
       ...settings.ui?.accessibility,
       screenReader,
     },
+    showResponseTokensPerSecond:
+      settings.ui?.showResponseTokensPerSecond === true,
     telemetry: telemetrySettings,
     outboundCorrelation: settings.outboundCorrelation,
     usageStatisticsEnabled: settings.privacy?.usageStatisticsEnabled ?? true,
@@ -2021,6 +2037,18 @@ export async function loadCliConfig(
     worktree: settings.worktree
       ? {
           symlinkDirectories: settings.worktree.symlinkDirectories,
+        }
+      : undefined,
+    settingsWatcher,
+    webSearchConfig,
+    powerShellConfig: settings.security?.powershell
+      ? {
+          enabled: settings.security.powershell.enabled ?? false,
+          mode:
+            (settings.security.powershell.mode as 'allow' | 'ask' | 'deny') ??
+            'ask',
+          allowlist: settings.security.powershell.allowlist ?? [],
+          blocklist: settings.security.powershell.blocklist ?? [],
         }
       : undefined,
   };

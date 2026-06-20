@@ -210,9 +210,9 @@
           "default": false
         },
         "showStatusInTitle": {
-          "description": "Show HopCode status and thoughts in the terminal window title",
+          "description": "Show HopCode session name and status in the terminal window title",
           "type": "boolean",
-          "default": false
+          "default": true
         },
         "hideTips": {
           "description": "Hide helpful tips in the UI",
@@ -244,6 +244,11 @@
             "type": "string"
           }
         },
+        "showResponseTokensPerSecond": {
+          "description": "Show a live tokens/sec estimate next to the response token counter while the model is streaming. Takes effect in the next session.",
+          "type": "boolean",
+          "default": false
+        },
         "enableWelcomeBack": {
           "description": "Show welcome back dialog when returning to a project with conversation history. Choosing \"Start new chat session\" suppresses the dialog for that project until the project summary changes.",
           "type": "boolean",
@@ -255,9 +260,9 @@
           "default": true
         },
         "enableFollowupSuggestions": {
-          "description": "Show context-aware follow-up suggestions after task completion. Press Tab or Right Arrow to accept, Enter to accept and submit.",
+          "description": "Show context-aware follow-up suggestions after task completion. Press Tab, Right Arrow, or Enter to accept into the input buffer.",
           "type": "boolean",
-          "default": false
+          "default": true
         },
         "enableCacheSharing": {
           "description": "Use cache-aware forked queries for suggestion generation. Reduces cost on providers that support prefix caching (experimental).",
@@ -549,9 +554,17 @@
               "default": true
             },
             "splitToolMedia": {
-              "description": "When true, media (images / audio / video / files) returned by tool calls — including the built-in read_file and MCP tools — is split into a follow-up user message instead of being embedded in the `role: \"tool\"` message. The OpenAI Chat Completions spec only permits text on tool messages, so strict OpenAI-compatible servers (e.g., doubao / new-api / LM Studio) silently drop or reject embedded media and the model never sees an image read via read_file (TaimoorSiddiquiOfficial/HopCode#4876, #3616). Default true is spec-compliant and safe for permissive providers; set false only to restore the legacy embed-in-tool-message behavior.",
+              "description": "When true, media (images / audio / video / files) returned by tool calls — including the built-in read_file and MCP tools — is split into a follow-up user message instead of being embedded in the `role: \"tool\"` message. The OpenAI Chat Completions spec only permits text on tool messages, so strict OpenAI-compatible servers (e.g., doubao / new-api / LM Studio) silently drop or reject embedded media and the model never sees an image read via read_file (hoptrendy/hopcode#4876, #3616). Default true is spec-compliant and safe for permissive providers; set false only to restore the legacy embed-in-tool-message behavior.",
               "type": "boolean",
               "default": true
+            },
+            "toolResultContentFormat": {
+              "description": "Controls how text-only tool results are serialized in OpenAI-compatible requests. Use \"parts\" for the default content-part array shape. Use \"string\" only for legacy OpenAI-compatible runtimes whose tool templates ignore text content parts (for example older GLM-5.1 vLLM/SGLang templates; hoptrendy/hopcode#3361). Tool-returned media is still handled by splitToolMedia. Options: parts, string",
+              "enum": [
+                "parts",
+                "string"
+              ],
+              "default": "parts"
             },
             "schemaCompliance": {
               "description": "The compliance mode for tool schemas sent to the model. Use \"openapi_30\" for strict OpenAPI 3.0 compatibility (e.g., for Gemini). Options: auto, openapi_30",
@@ -1048,6 +1061,38 @@
             "description": "URL pattern (supports * wildcard)",
             "type": "string"
           }
+        },
+        "powershell": {
+          "description": "PowerShell security policy settings.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Master switch for PowerShell execution. When false, all PowerShell commands are blocked.",
+              "type": "boolean",
+              "default": false
+            },
+            "mode": {
+              "description": "Default behavior when a PowerShell command does not match the allowlist or blocklist.",
+              "type": "string",
+              "default": "ask"
+            },
+            "allowlist": {
+              "description": "Command patterns that are automatically allowed. Supports * wildcard matching.",
+              "type": "array",
+              "items": {
+                "description": "Command pattern (supports * wildcard)",
+                "type": "string"
+              }
+            },
+            "blocklist": {
+              "description": "Command patterns that are always blocked. Supports * wildcard matching.",
+              "type": "array",
+              "items": {
+                "description": "Command pattern (supports * wildcard)",
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
@@ -1055,6 +1100,29 @@
       "description": "Advanced settings for power users.",
       "type": "object",
       "properties": {
+        "webSearch": {
+          "description": "Configuration for the web_search tool.",
+          "type": "object",
+          "properties": {
+            "default": {
+              "description": "The default web search provider to use (e.g., \"duckduckgo\", \"tavily\", \"google\").",
+              "type": "string"
+            },
+            "mode": {
+              "description": "Provider selection mode: \"auto\" tries providers in priority order with failover, \"manual\" uses only the default provider.",
+              "type": "string",
+              "default": "auto"
+            },
+            "provider": {
+              "description": "List of configured web search providers with their credentials and options.",
+              "type": "array",
+              "items": {
+                "description": "Provider configuration object",
+                "type": "object"
+              }
+            }
+          }
+        },
         "autoConfigureMemory": {
           "description": "Automatically configure Node.js memory limits",
           "type": "boolean",
@@ -1128,10 +1196,6 @@
           "description": "Settings for Agent Swarm (parallel sub-agent execution). Reserved for future use.",
           "type": "object",
           "additionalProperties": true
-        },
-        "tavilyApiKey": {
-          "description": "Tavily API key for web search. Prefer setting TAVILY_API_KEY environment variable instead.",
-          "type": "string"
         }
       }
     },
@@ -1141,26 +1205,9 @@
       "default": false
     },
     "stopHookBlockingCap": {
-      "description": "Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_CODE_STOP_HOOK_BLOCK_CAP.",
+      "description": "Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_STOP_HOOK_BLOCK_CAP.",
       "type": "number",
       "default": 8
-    },
-    "webSearch": {
-      "description": "Web search provider configuration.",
-      "type": "object",
-      "properties": {
-        "provider": {
-          "description": "List of web search provider configurations.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "default": {
-          "description": "Default web search provider.",
-          "type": "string"
-        }
-      }
     },
     "hooks": {
       "description": "Hook event configurations for extending CLI behavior at various lifecycle points.",
@@ -2615,17 +2662,17 @@
       "type": "object",
       "properties": {
         "cron": {
-          "description": "Enable in-session cron/loop tools. When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can be disabled via HOPCODE_CODE_DISABLE_CRON=1 environment variable.",
+          "description": "Enable in-session cron/loop tools. When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can be disabled via HOPCODE_DISABLE_CRON=1 environment variable.",
           "type": "boolean",
           "default": true
         },
         "agentTeam": {
-          "description": "Enable agent team collaboration tools (experimental). When enabled, the model can create agent teams and coordinate work using team_create, team_delete, send_message, task_create, task_update, and task_list tools. Can also be enabled via HOPCODE_CODE_ENABLE_AGENT_TEAM=1 environment variable.",
+          "description": "Enable agent team collaboration tools (experimental). When enabled, the model can create agent teams and coordinate work using team_create, team_delete, send_message, task_create, task_update, and task_list tools. Can also be enabled via HOPCODE_ENABLE_AGENT_TEAM=1 environment variable.",
           "type": "boolean",
           "default": false
         },
         "emitToolUseSummaries": {
-          "description": "Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with HOPCODE_CODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.",
+          "description": "Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with HOPCODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.",
           "type": "boolean",
           "default": true
         }

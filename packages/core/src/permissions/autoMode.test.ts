@@ -139,7 +139,7 @@ function ctx(over: Partial<PermissionCheckContext>): PermissionCheckContext {
 }
 
 describe('isAutoModeProtectedWritePath', () => {
-  it('matches Qwen self-modification files and directories', () => {
+  it('matches HopCode self-modification files and directories', () => {
     const protectedPaths = [
       '/repo/.hopcode/settings.json',
       '/repo/.hopcode/settings.local.json',
@@ -348,7 +348,7 @@ describe('passesAcceptEditsFastPath', () => {
     ).toBe(true);
   });
 
-  it('rejects Qwen self-modification paths even inside cwd', () => {
+  it('rejects HopCode self-modification paths even inside cwd', () => {
     const protectedPaths = [
       `${cwd}/.hopcode/settings.json`,
       `${cwd}/.hopcode/settings.local.json`,

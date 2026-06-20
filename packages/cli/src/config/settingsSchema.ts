@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -698,10 +698,10 @@ const SETTINGS_SCHEMA = {
         label: 'Show Status in Title',
         category: 'UI',
         requiresRestart: false,
-        default: false,
+        default: true,
         description:
-          'Show HopCode status and thoughts in the terminal window title',
-        showInDialog: false,
+          'Show HopCode session name and status in the terminal window title',
+        showInDialog: true,
       },
       hideTips: {
         type: 'boolean',
@@ -753,6 +753,16 @@ const SETTINGS_SCHEMA = {
         description: 'Custom witty phrases to display during loading.',
         showInDialog: false,
       },
+      showResponseTokensPerSecond: {
+        type: 'boolean',
+        label: 'Show Response Tokens Per Second',
+        category: 'UI',
+        requiresRestart: true,
+        default: false,
+        description:
+          'Show a live tokens/sec estimate next to the response token counter while the model is streaming. Takes effect in the next session.',
+        showInDialog: true,
+      },
       enableWelcomeBack: {
         type: 'boolean',
         label: 'Show Welcome Back Dialog',
@@ -778,9 +788,9 @@ const SETTINGS_SCHEMA = {
         label: 'Enable Follow-up Suggestions',
         category: 'UI',
         requiresRestart: false,
-        default: false,
+        default: true,
         description:
-          'Show context-aware follow-up suggestions after task completion. Press Tab or Right Arrow to accept, Enter to accept and submit.',
+          'Show context-aware follow-up suggestions after task completion. Press Tab, Right Arrow, or Enter to accept into the input buffer.',
         showInDialog: true,
       },
       enableCacheSharing: {
@@ -1283,9 +1293,24 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: true,
             description:
-              'When true, media (images / audio / video / files) returned by tool calls — including the built-in read_file and MCP tools — is split into a follow-up user message instead of being embedded in the `role: "tool"` message. The OpenAI Chat Completions spec only permits text on tool messages, so strict OpenAI-compatible servers (e.g., doubao / new-api / LM Studio) silently drop or reject embedded media and the model never sees an image read via read_file (TaimoorSiddiquiOfficial/HopCode#4876, #3616). Default true is spec-compliant and safe for permissive providers; set false only to restore the legacy embed-in-tool-message behavior.',
+              'When true, media (images / audio / video / files) returned by tool calls — including the built-in read_file and MCP tools — is split into a follow-up user message instead of being embedded in the `role: "tool"` message. The OpenAI Chat Completions spec only permits text on tool messages, so strict OpenAI-compatible servers (e.g., doubao / new-api / LM Studio) silently drop or reject embedded media and the model never sees an image read via read_file (hoptrendy/hopcode#4876, #3616). Default true is spec-compliant and safe for permissive providers; set false only to restore the legacy embed-in-tool-message behavior.',
             parentKey: 'generationConfig',
             showInDialog: false,
+          },
+          toolResultContentFormat: {
+            type: 'enum',
+            label: 'Tool Result Content Format',
+            category: 'Generation Configuration',
+            requiresRestart: false,
+            default: 'parts',
+            description:
+              'Controls how text-only tool results are serialized in OpenAI-compatible requests. Use "parts" for the default content-part array shape. Use "string" only for legacy OpenAI-compatible runtimes whose tool templates ignore text content parts (for example older GLM-5.1 vLLM/SGLang templates; hoptrendy/hopcode#3361). Tool-returned media is still handled by splitToolMedia.',
+            parentKey: 'generationConfig',
+            showInDialog: false,
+            options: [
+              { value: 'parts', label: 'Content Parts (Default)' },
+              { value: 'string', label: 'String' },
+            ],
           },
           schemaCompliance: {
             type: 'enum',
@@ -1933,7 +1958,7 @@ const SETTINGS_SCHEMA = {
           { value: ApprovalMode.DEFAULT, label: 'Ask permissions' },
           { value: ApprovalMode.AUTO_EDIT, label: 'Auto Edit' },
           { value: ApprovalMode.AUTO, label: 'Auto' },
-          { value: ApprovalMode.IZN, label: 'izn' },
+          { value: ApprovalMode.IZN, label: 'IZN' },
         ],
       },
       autoAccept: {
@@ -2263,6 +2288,65 @@ const SETTINGS_SCHEMA = {
           description: 'URL pattern (supports * wildcard)',
         },
       },
+      powershell: {
+        type: 'object',
+        label: 'PowerShell Security',
+        category: 'Security',
+        requiresRestart: true,
+        default: {},
+        description: 'PowerShell security policy settings.',
+        showInDialog: false,
+        properties: {
+          enabled: {
+            type: 'boolean',
+            label: 'Enable PowerShell',
+            category: 'Security',
+            requiresRestart: true,
+            default: false,
+            description:
+              'Master switch for PowerShell execution. When false, all PowerShell commands are blocked.',
+            showInDialog: false,
+          },
+          mode: {
+            type: 'string',
+            label: 'PowerShell Mode',
+            category: 'Security',
+            requiresRestart: true,
+            default: 'ask',
+            description:
+              'Default behavior when a PowerShell command does not match the allowlist or blocklist.',
+            showInDialog: false,
+          },
+          allowlist: {
+            type: 'array',
+            label: 'PowerShell Allowlist',
+            category: 'Security',
+            requiresRestart: true,
+            default: [] as string[],
+            description:
+              'Command patterns that are automatically allowed. Supports * wildcard matching.',
+            showInDialog: false,
+            items: {
+              type: 'string',
+              description: 'Command pattern (supports * wildcard)',
+            },
+          },
+          blocklist: {
+            type: 'array',
+            label: 'PowerShell Blocklist',
+            category: 'Security',
+            requiresRestart: true,
+            default: [] as string[],
+            description:
+              'Command patterns that are always blocked. Supports * wildcard matching.',
+            showInDialog: false,
+            items: {
+              type: 'string',
+              description: 'Command pattern (supports * wildcard)',
+            },
+          },
+        },
+      },
     },
   },
 
@@ -2275,6 +2359,51 @@ const SETTINGS_SCHEMA = {
     description: 'Advanced settings for power users.',
     showInDialog: false,
     properties: {
+      webSearch: {
+        type: 'object',
+        label: 'Web Search',
+        category: 'Advanced',
+        requiresRestart: true,
+        default: {},
+        description: 'Configuration for the web_search tool.',
+        showInDialog: false,
+        properties: {
+          default: {
+            type: 'string',
+            label: 'Default Provider',
+            category: 'Advanced',
+            requiresRestart: true,
+            default: undefined as string | undefined,
+            description:
+              'The default web search provider to use (e.g., "duckduckgo", "tavily", "google").',
+            showInDialog: false,
+          },
+          mode: {
+            type: 'string',
+            label: 'Search Mode',
+            category: 'Advanced',
+            requiresRestart: true,
+            default: 'auto',
+            description:
+              'Provider selection mode: "auto" tries providers in priority order with failover, "manual" uses only the default provider.',
+            showInDialog: false,
+          },
+          provider: {
+            type: 'array',
+            label: 'Providers',
+            category: 'Advanced',
+            requiresRestart: true,
+            default: [] as unknown[],
+            description:
+              'List of configured web search providers with their credentials and options.',
+            showInDialog: false,
+            items: {
+              type: 'object',
+              description: 'Provider configuration object',
+            },
+          },
+        },
+      },
       autoConfigureMemory: {
         type: 'boolean',
         label: 'Auto Configure Max Old Space Size',
@@ -2422,16 +2551,6 @@ const SETTINGS_SCHEMA = {
           'Settings for Agent Swarm (parallel sub-agent execution). Reserved for future use.',
         showInDialog: false,
       },
-      tavilyApiKey: {
-        type: 'string',
-        label: 'Tavily API Key',
-        category: 'Advanced',
-        requiresRestart: false,
-        default: undefined as string | undefined,
-        description:
-          'Tavily API key for web search. Prefer setting TAVILY_API_KEY environment variable instead.',
-        showInDialog: false,
-      },
     },
   },
 
@@ -2453,40 +2572,10 @@ const SETTINGS_SCHEMA = {
     requiresRestart: true,
     default: DEFAULT_STOP_HOOK_BLOCK_CAP,
     description:
-      'Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_CODE_STOP_HOOK_BLOCK_CAP.',
+      'Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_STOP_HOOK_BLOCK_CAP.',
     // This is an advanced safety valve for runaway hook loops, not a common
     // interactive preference.
     showInDialog: false,
-  },
-
-  webSearch: {
-    type: 'object',
-    label: 'Web Search',
-    category: 'Advanced',
-    requiresRestart: true,
-    default: {},
-    description: 'Web search provider configuration.',
-    showInDialog: false,
-    properties: {
-      provider: {
-        type: 'array',
-        label: 'Providers',
-        category: 'Advanced',
-        requiresRestart: true,
-        default: [],
-        description: 'List of web search provider configurations.',
-        showInDialog: false,
-      },
-      default: {
-        type: 'string',
-        label: 'Default Provider',
-        category: 'Advanced',
-        requiresRestart: true,
-        default: undefined as string | undefined,
-        description: 'Default web search provider.',
-        showInDialog: false,
-      },
-    },
   },
 
   hooks: {
@@ -2679,7 +2768,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: true,
         description:
-          'Enable in-session cron/loop tools. When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can be disabled via HOPCODE_CODE_DISABLE_CRON=1 environment variable.',
+          'Enable in-session cron/loop tools. When enabled, the model can create recurring prompts using cron_create, cron_list, and cron_delete tools. Can be disabled via HOPCODE_DISABLE_CRON=1 environment variable.',
         showInDialog: true,
       },
       agentTeam: {
@@ -2689,7 +2778,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: false,
         description:
-          'Enable agent team collaboration tools (experimental). When enabled, the model can create agent teams and coordinate work using team_create, team_delete, send_message, task_create, task_update, and task_list tools. Can also be enabled via HOPCODE_CODE_ENABLE_AGENT_TEAM=1 environment variable.',
+          'Enable agent team collaboration tools (experimental). When enabled, the model can create agent teams and coordinate work using team_create, team_delete, send_message, task_create, task_update, and task_list tools. Can also be enabled via HOPCODE_ENABLE_AGENT_TEAM=1 environment variable.',
         showInDialog: true,
       },
       emitToolUseSummaries: {
@@ -2699,7 +2788,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: true,
         description:
-          'Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with HOPCODE_CODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.',
+          'Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with HOPCODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.',
         showInDialog: true,
       },
     },

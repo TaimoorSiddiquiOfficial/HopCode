@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 hopcode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -101,7 +101,7 @@ export interface SpawnChannelFactoryOptions {
 }
 
 /**
- * Creates a `ChannelFactory` that spawns `hopcode --acp` child processes.
+ * Creates a `ChannelFactory` that spawns `qwen --acp` child processes.
  * Accepts an optional `onDiagnosticLine` callback that receives every
  * child-stderr line (already prefixed) so callers can tee to a log file
  * or structured logger without intercepting process.stderr globally.
@@ -113,7 +113,7 @@ export function createSpawnChannelFactory(
   options: SpawnChannelFactoryOptions = {},
 ): ChannelFactory {
   return async (workspaceCwd, childEnvOverrides) => {
-    const cliEntry = process.env['HOPCODE_CLI_ENTRY'] || process.argv[1];
+    const cliEntry = process.env['QWEN_CLI_ENTRY'] || process.argv[1];
     if (!cliEntry) {
       throw new MissingCliEntryError();
     }
@@ -122,7 +122,7 @@ export function createSpawnChannelFactory(
       SCRUBBED_CHILD_ENV_KEYS,
       childEnvOverrides,
     );
-    childEnv['HOPCODE_CODE_NO_RELAUNCH'] = 'true';
+    childEnv['HOPCODE_NO_RELAUNCH'] = 'true';
 
     const memoryArgs = getAcpMemoryArgs();
     const execArgs = process.execArgv.filter(
@@ -199,8 +199,8 @@ export function createSpawnChannelFactory(
 
 /**
  * Default channel factory: spawn the current Node executable running this
- * CLI's entry script in `--acp` mode. `process.argv[1]` resolves to the hopcode
- * entry script when launched via the `hopcode` bin shim.
+ * CLI's entry script in `--acp` mode. `process.argv[1]` resolves to the qwen
+ * entry script when launched via the `qwen` bin shim.
  *
  * Note on `cwd`: CodeQL flags the `workspaceCwd` flow into `spawn({cwd})`
  * as an "uncontrolled data used in path expression" finding. That's the
@@ -210,7 +210,7 @@ export function createSpawnChannelFactory(
  * cwd to a sandbox here would be theatre. Stage 4+ remote-sandbox swaps
  * this factory for a sandbox-aware variant; see the remote-sandbox plan.
  *
- * Lifted from `cli/src/serve/httpAcpBridge.ts` to `@hoptrendy/acp-bridge`
+ * Lifted from `cli/src/serve/httpAcpBridge.ts` to `@hopcode/acp-bridge`
  * so `channels/base/AcpBridge.ts` and the VSCode IDE
  * companion can share one spawn implementation instead of each
  * reimplementing the child lifecycle (the current divergence noted in
@@ -226,15 +226,19 @@ export const defaultSpawnChannelFactory: ChannelFactory =
 const KILL_HARD_DEADLINE_MS = 10_000;
 
 /**
- * Environment variables stripped from the spawned `hopcode --acp` child's
+ * Environment variables stripped from the spawned `qwen --acp` child's
  * environment. Everything else is passed through — see the
  * threat-model rationale at the call site in `defaultSpawnChannelFactory`.
  *
- * Currently just `HOPCODE_SERVER_TOKEN`: the daemon's own bearer token,
- * which the agent doesn't need (it speaks to the daemon over stdio,
- * not HTTP). Leaving it in the child's env would let prompt injection
- * turn the agent into an authenticated client of its own daemon — an
- * escalation the agent doesn't otherwise have.
+ * `HOPCODE_SERVER_TOKEN`: the daemon's own bearer token, which the agent
+ * doesn't need (it speaks to the daemon over stdio, not HTTP). Leaving
+ * it in the child's env would let prompt injection turn the agent into
+ * an authenticated client of its own daemon — an escalation the agent
+ * doesn't otherwise have.
+ *
+ * `HOPCODE_SIMPLE`: an invocation-level bare-mode override. Letting a
+ * daemon or IDE environment leak it into per-session `qwen --acp`
+ * children silently disables skills in those children.
  *
  * **WARNING**: this denylist is correct *only because the agent
  * already has unrestricted shell-tool access* — anything in the env
@@ -250,18 +254,18 @@ const KILL_HARD_DEADLINE_MS = 10_000;
  */
 const SCRUBBED_CHILD_ENV_KEYS: ReadonlySet<string> = new Set([
   'HOPCODE_SERVER_TOKEN',
+  'HOPCODE_SIMPLE',
 ]);
 
 /**
- * Build the env passed to the `hopcode --acp` child. Pure function, exported
+ * Build the env passed to the `qwen --acp` child. Pure function, exported
  * for unit-test access (the surrounding `defaultSpawnChannelFactory` is
  * unit-test-hostile because it actually spawns Node). Behavior:
  *
  *   1. Start from a shallow clone of `source` (no aliasing into the
  *      daemon's `process.env`).
- *   2. Delete every key listed in `scrubbed` (the daemon-internal secret
- *      denylist — currently just `HOPCODE_SERVER_TOKEN`, see security
- *      rationale on the constant).
+ *   2. Delete every key listed in `scrubbed` (the daemon-internal
+ *      child-env denylist; see the rationale on the constant).
  *   3. Apply `overrides` per-handle. `undefined` value deletes the key
  *      (lets an embedded caller scrub a stale inherited var without
  *      mutating the daemon's global `process.env`). Anything else
@@ -329,7 +333,7 @@ function killChild(child: ChildProcess): Promise<void> {
     // sleep (D-state, e.g. NFS read blocked on a dead server). Without
     // this hard deadline, `bridge.shutdown()`'s `Promise.all` waits
     // forever on that one wedged child and SHUTDOWN_FORCE_CLOSE_MS in
-    // `runHopCodeServe` only covers `server.close()`, not the bridge.
+    // `runQwenServe` only covers `server.close()`, not the bridge.
     // After the deadline give up: the child is probably stuck in a
     // kernel call we can't cancel, and `process.exit(0)` will reap it
     // when the daemon returns to its caller.
@@ -337,7 +341,7 @@ function killChild(child: ChildProcess): Promise<void> {
     // Emit a stderr line BEFORE we
     // abandon the child so operators see a signal that a zombie
     // exists. Without this, `shutdown()` returns "graceful" while a
-    // wedged `hopcode --acp` process keeps holding FDs / memory / locks;
+    // wedged `qwen --acp` process keeps holding FDs / memory / locks;
     // under systemd/k8s supervision, the daemon respawn would then
     // race the orphan for the same workspace. Single-line warning is
     // intentionally noisy on the daemon's stderr so monitoring/log
@@ -345,9 +349,9 @@ function killChild(child: ChildProcess): Promise<void> {
     setTimeout(() => {
       if (!resolved) {
         process.stderr.write(
-          `hopcode serve: killChild hard deadline (${KILL_HARD_DEADLINE_MS}ms) ` +
+          `qwen serve: killChild hard deadline (${KILL_HARD_DEADLINE_MS}ms) ` +
             `reached; child pid=${child.pid} still alive (uninterruptible sleep?) — ` +
-            `abandoning. Operator should check for zombie hopcode --acp processes ` +
+            `abandoning. Operator should check for zombie qwen --acp processes ` +
             `holding workspace resources.\n`,
         );
         finish();

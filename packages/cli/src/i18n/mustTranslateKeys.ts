@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -95,6 +95,16 @@ export const MUST_TRANSLATE_KEYS = [
   'Invalid approval mode "{{arg}}". Valid modes: {{modes}}',
   'Approval mode set to "{{mode}}"',
   "Set up HopCode's status line UI",
+  'Cached (included in Input): {{tokens}}',
+  'By source:',
+  'Unclosed quote in arguments.',
+  'Token usage export path must be within the project working directory.',
+  'Failed to load token usage stats: {{error}}',
+  'Failed to export token usage stats: {{error}}',
+  'Note: generation timing (TTFT/TPS) belongs to generation metrics.',
+  'Cannot resolve export path within the working directory.',
+  'Export target does not exist: {{path}}',
+  'Could not create a temporary export file.',
   'Activity',
   'Efficiency',
   'Today',

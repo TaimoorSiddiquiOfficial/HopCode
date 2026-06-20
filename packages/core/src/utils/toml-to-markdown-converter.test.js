@@ -52,7 +52,7 @@ description = "Multi-line test"`;
     const tomlContent = `prompt = "Test prompt"
 description = "Command with: special, characters!"`;
     const result = convertTomlToMarkdown(tomlContent);
-    expect(result).toContain('description: Command with: special, characters!');
+    expect(result).toContain('description: "Command with: special, characters!"');
   });
 });
 describe('isTomlFormat', () => {

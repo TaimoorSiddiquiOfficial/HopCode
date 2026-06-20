@@ -17,6 +17,7 @@ import type {
   CLIControlRequest,
   CLIControlResponse,
   ControlCancelRequest,
+  PermissionMode,
 } from './types.js';
 import {
   isCLIUserMessage,
@@ -275,7 +276,7 @@ class Session {
       sessionId: this.sessionId,
       abortSignal: this.abortController.signal,
       settings: this.settings,
-      permissionMode: this.config.getApprovalMode(),
+      permissionMode: this.config.getApprovalMode() as PermissionMode,
       onInterrupt: () => this.handleInterrupt(),
     });
     this.dispatcher = new ControlDispatcher(this.controlContext);

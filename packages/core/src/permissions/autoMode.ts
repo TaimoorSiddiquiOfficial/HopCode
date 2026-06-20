@@ -142,8 +142,8 @@ const PERSISTENCE_PATH_PATTERNS: readonly RegExp[] = Object.freeze([
 
 const SELF_MODIFICATION_PATH_PATTERNS: readonly RegExp[] = Object.freeze([
   /(^|\/)\.hopcode\/settings(?:\.[^/]*)?\.json$/,
-  /(^|\/)(qwen|agents)\.md$/,
-  /(^|\/)\.hopcode\/qwen\.local\.md$/,
+  /(^|\/)(hopcode|agents)\.md$/,
+  /(^|\/)\.hopcode\/hopcode\.local\.md$/,
   /(^|\/)\.hopcode\/rules(?:\/|$)/,
   /(^|\/)\.hopcode\/commands(?:\/|$)/,
   /(^|\/)\.hopcode\/agents(?:\/|$)/,
@@ -218,7 +218,7 @@ function matcheshopcodeHomeSurface(normalizedPath: string): boolean {
     const relativePath = normalizedPath.slice(hopcodeHomePrefix.length);
     if (
       /^settings(?:\.[^/]*)?\.json$/.test(relativePath) ||
-      /^qwen\.local\.md$/.test(relativePath) ||
+      /^hopcode\.local\.md$/.test(relativePath) ||
       /^\.mcp\.json$/.test(relativePath) ||
       /^(rules|commands|agents|skills|hooks)(?:\/|$)/.test(relativePath)
     ) {
@@ -428,7 +428,7 @@ function stripRawRedirectTargetToken(token: string): string {
  * Returns true when the pending action is a file edit / write targeting a
  * path that lies within the current workspace (cwd + additional directories)
  * AND is not rejected by {@link isAutoModeProtectedWritePath} (covers
- * persistence paths and Qwen self-modification surfaces, including symlinks
+ * persistence paths and HopCode self-modification surfaces, including symlinks
  * whose realpath resolves to a protected target).
  *
  * Symlinks ARE resolved via `WorkspaceContext.isPathWithinWorkspace`, which
@@ -445,7 +445,7 @@ export function passesAcceptEditsFastPath(
   if (!EDIT_TOOL_NAMES.has(ctx.toolName)) return false;
   if (!ctx.filePath) return false;
   // Persistence paths (hooks, package.json scripts, CI definitions) and
-  // Qwen self-modification surfaces (.hopcode/settings*.json, configured context
+  // HopCode self-modification surfaces (.hopcode/settings*.json, configured context
   // files, .hopcode/rules|commands|agents|skills|hooks/, .mcp.json) must never
   // auto-approve via fast-path — the former execute code on subsequent tooling
   // operations, the latter let an agent rewrite its own permissions or

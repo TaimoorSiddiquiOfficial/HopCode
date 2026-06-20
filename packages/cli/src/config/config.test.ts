@@ -3126,13 +3126,13 @@ describe('loadCliConfig fileFiltering', () => {
       value: false,
     },
     {
-      property: 'respectHopCodeIgnore',
-      getter: (c) => c.getFileFilteringRespectHopCodeIgnore(),
+      property: 'respectHopcodeIgnore',
+      getter: (c) => c.getFileFilteringRespectHopcodeIgnore(),
       value: true,
     },
     {
-      property: 'respectHopCodeIgnore',
-      getter: (c) => c.getFileFilteringRespectHopCodeIgnore(),
+      property: 'respectHopcodeIgnore',
+      getter: (c) => c.getFileFilteringRespectHopcodeIgnore(),
       value: false,
     },
     {

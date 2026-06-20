@@ -6,6 +6,7 @@
     "composite": true,
     "types": ["node", "vitest/globals"],
     "paths": {
+      "@hoptrendy/quran-guidance": ["../quran-guidance/src/index.ts"],
       "@lydell/node-pty": ["../../node_modules/@lydell/node-pty/node-pty.d.ts"]
     },
     "skipLibCheck": true,
@@ -14,5 +15,6 @@
     "allowSyntheticDefaultImports": true
   },
   "include": ["index.ts", "src/**/*.ts", "src/**/*.json"],
-  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts", "src/provider/**"]
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts", "src/provider/**"],
+  "references": [{ "path": "../quran-guidance" }]
 }

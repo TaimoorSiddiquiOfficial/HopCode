@@ -59,7 +59,7 @@ describe('WebSearchTool', () => {
         }),
       });
 
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(webSearchConfig, undefined);
       const invocation = tool.build({ query: 'test query' });
       const result = await invocation.execute(new AbortController().signal);
 
@@ -110,7 +110,7 @@ describe('WebSearchTool', () => {
         }),
       });
 
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(webSearchConfig, undefined);
       const invocation = tool.build({ query: 'test query' });
       const result = await invocation.execute(new AbortController().signal);
 
@@ -162,7 +162,7 @@ describe('WebSearchTool', () => {
         }),
       });
 
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(webSearchConfig, undefined);
       const invocation = tool.build({ query: 'test query' });
       const result = await invocation.execute(new AbortController().signal);
 
@@ -196,7 +196,7 @@ describe('WebSearchTool', () => {
         }),
       });
 
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(webSearchConfig, undefined);
       const invocation = tool.build({ query: 'test query' });
       const result = await invocation.execute(new AbortController().signal);
 
@@ -231,7 +231,7 @@ describe('WebSearchTool', () => {
         json: async () => ({ items }),
       });
 
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(webSearchConfig, undefined);
       const invocation = tool.build({ query: 'test query' });
       const result = await invocation.execute(new AbortController().signal);
 
@@ -245,14 +245,14 @@ describe('WebSearchTool', () => {
 
   describe('validation', () => {
     it('should throw validation error when query is empty', () => {
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(undefined, undefined);
       expect(() => tool.build({ query: '' })).toThrow(
         "The 'query' parameter cannot be empty",
       );
     });
 
     it('should throw validation error when provider is empty string', () => {
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(undefined, undefined);
       expect(() => tool.build({ query: 'test', provider: '' })).toThrow(
         "The 'provider' parameter cannot be empty",
       );
@@ -261,11 +261,7 @@ describe('WebSearchTool', () => {
 
   describe('configuration', () => {
     it('should return error when web search is not configured', async () => {
-      (
-        mockConfig.getWebSearchConfig as ReturnType<typeof vi.fn>
-      ).mockReturnValue(null);
-
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(undefined, undefined);
       const invocation = tool.build({ query: 'test query' });
       const result = await invocation.execute(new AbortController().signal);
 
@@ -274,11 +270,7 @@ describe('WebSearchTool', () => {
     });
 
     it('should return descriptive message in getDescription when web search is not configured', () => {
-      (
-        mockConfig.getWebSearchConfig as ReturnType<typeof vi.fn>
-      ).mockReturnValue(null);
-
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(undefined, undefined);
       const invocation = tool.build({ query: 'test query' });
       const description = invocation.getDescription();
 
@@ -302,7 +294,7 @@ describe('WebSearchTool', () => {
         mockConfig.getWebSearchConfig as ReturnType<typeof vi.fn>
       ).mockReturnValue(webSearchConfig);
 
-      const tool = new WebSearchTool(mockConfig);
+      const tool = new WebSearchTool(webSearchConfig, undefined);
       const invocation = tool.build({ query: 'test query' });
       const description = invocation.getDescription();
 

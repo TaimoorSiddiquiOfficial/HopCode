@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const mockLoadSettings = vi.hoisted(() => vi.fn());
 const mockGetExtensionManager = vi.hoisted(() => vi.fn());
@@ -75,7 +77,11 @@ vi.mock('@hoptrendy/channel-base', () => ({
   SessionRouter: mockSessionRouter,
 }));
 
-import { resolveProxy, startCommand } from './start.js';
+import {
+  resolveExtensionChannelEntrySpecifier,
+  resolveProxy,
+  startCommand,
+} from './start.js';
 
 type StartCommandArgs = Parameters<NonNullable<typeof startCommand.handler>>[0];
 
@@ -148,6 +154,17 @@ describe('resolveProxy', () => {
     const proxy = resolveProxy();
 
     expect(proxy).toBe('http://env.example.com:8080');
+  });
+});
+
+describe('resolveExtensionChannelEntrySpecifier', () => {
+  it('returns a file URL for extension channel entry paths', () => {
+    const extensionPath = join('/tmp', 'qwen extension');
+    const entry = join('dist', 'channel.js');
+
+    expect(resolveExtensionChannelEntrySpecifier(extensionPath, entry)).toBe(
+      pathToFileURL(join(extensionPath, entry)).href,
+    );
   });
 });
 

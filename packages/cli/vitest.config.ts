@@ -61,6 +61,42 @@ export default defineConfig({
         __dirname,
         '../acp-bridge/src/workspacePaths.ts',
       ),
+      '@hoptrendy/channel-base': path.resolve(
+        __dirname,
+        '../channels/base/src/index.ts',
+      ),
+      '@hoptrendy/channel-telegram': path.resolve(
+        __dirname,
+        '../channels/telegram/src/index.ts',
+      ),
+      '@hoptrendy/channel-weixin/accounts': path.resolve(
+        __dirname,
+        '../channels/weixin/src/accounts.ts',
+      ),
+      '@hoptrendy/channel-weixin/login': path.resolve(
+        __dirname,
+        '../channels/weixin/src/login.ts',
+      ),
+      '@hoptrendy/channel-weixin': path.resolve(
+        __dirname,
+        '../channels/weixin/src/index.ts',
+      ),
+      '@hoptrendy/channel-dingtalk': path.resolve(
+        __dirname,
+        '../channels/dingtalk/src/index.ts',
+      ),
+      '@hoptrendy/channel-feishu': path.resolve(
+        __dirname,
+        '../channels/feishu/src/index.ts',
+      ),
+      '@hoptrendy/channel-qqbot': path.resolve(
+        __dirname,
+        '../channels/qqbot/src/index.ts',
+      ),
+      '@hoptrendy/quran-guidance': path.resolve(
+        __dirname,
+        '../quran-guidance/src/index.ts',
+      ),
     },
   },
   test: {

@@ -1,4 +1,4 @@
-# HopCode Rebranding Plan
+﻿# HopCode Rebranding Plan
 
 ## From "HopCode" → "HopCode"
 
@@ -311,7 +311,7 @@ repository = "https://github.com/TaimoorSiddiquiOfficial/HopCode"
 
 | Old                              | New                       |
 | -------------------------------- | ------------------------- |
-| `ghcr.io/qwenlm/hopcode`         | `ghcr.io/hopcode/hopcode` |
+| `ghcr.io/hoptrendy/hopcode`         | `ghcr.io/hopcode/hopcode` |
 | `qwenlm.github.io/hopcode-docs/` | New docs URL              |
 
 ### 5.2 Asset Hosting

@@ -1,12 +1,12 @@
-# Declarative Agent Definitions — Port from Claude Code 2.1.168
+﻿# Declarative Agent Definitions — Port from Claude Code 2.1.168
 
 Internal design document for porting Claude Code's declarative agent (markdown +
 YAML frontmatter) schema to hopcode, addressing issue [#4821][i4821] and
 coordinating with the workflow port in issue [#4721][i4721] / PR [#4732][p4732].
 
-[i4821]: https://github.com/QwenLM/hopcode/issues/4821
-[i4721]: https://github.com/QwenLM/hopcode/issues/4721
-[p4732]: https://github.com/QwenLM/hopcode/pull/4732
+[i4821]: https://github.com/hoptrendy/hopcode/issues/4821
+[i4721]: https://github.com/hoptrendy/hopcode/issues/4721
+[p4732]: https://github.com/hoptrendy/hopcode/pull/4732
 
 ## Implementation status (vertical-sliced)
 

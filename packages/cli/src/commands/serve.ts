@@ -12,10 +12,7 @@ import type { Argv, CommandModule } from 'yargs';
 // handler below so it only loads when the user actually runs `hopcode serve`.
 import { writeStderrLine } from '../utils/stdioHelpers.js';
 import { DEFAULT_RING_SIZE } from '../serve/eventBus.js';
-import {
-  ApprovalMode,
-  MCP_BUDGET_WARN_FRACTION,
-} from '@hoptrendy/hopcode-core';
+import { MCP_BUDGET_WARN_FRACTION } from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../config/settings.js';
 import { HEADLESS_IZN_NO_SANDBOX_WARNING } from '../utils/headlessSafetyWarnings.js';
 
@@ -338,17 +335,12 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
     try {
       const loaded = loadSettings(argv.workspace ?? process.cwd());
       const merged = loaded.merged;
-      const approvalMode = merged.tools?.approvalMode;
+      const approvalMode = merged.tools?.approvalMode as string | undefined;
       const sandbox = merged.tools?.sandbox;
       const sandboxEnv = process.env['SANDBOX'];
       const suppress = process.env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'];
       const suppressed = suppress === '1' || suppress === 'true';
-      if (
-        approvalMode === ApprovalMode.IZN &&
-        !sandbox &&
-        !sandboxEnv &&
-        !suppressed
-      ) {
+      if (approvalMode === 'izn' && !sandbox && !sandboxEnv && !suppressed) {
         writeStderrLine(HEADLESS_IZN_NO_SANDBOX_WARNING);
       }
     } catch {

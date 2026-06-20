@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,6 +9,7 @@ import type { Content, Part } from '@google/genai';
 import {
   collectToolCallIdsFromHistory,
   dedupeToolCallsById,
+  getProviderToolCallId,
   normalizeModelToolCallIds,
 } from './toolCallIdUtils.js';
 
@@ -72,6 +73,9 @@ describe('toolCallIdUtils', () => {
       },
       { text: 'done' },
     ]);
+    expect(getProviderToolCallId(normalized[0]!.functionCall!)).toBe(
+      'dup_id_0001',
+    );
     expect(seenIds.has('dup_id_0001__hopcode_dup_2')).toBe(true);
   });
 
@@ -91,6 +95,9 @@ describe('toolCallIdUtils', () => {
       'call_hopcode_2',
       'call_hopcode_3',
     ]);
+    expect(
+      normalized.map((part) => getProviderToolCallId(part.functionCall!)),
+    ).toEqual([undefined, undefined]);
   });
 
   it('deduplicates direct function call batches by id', () => {

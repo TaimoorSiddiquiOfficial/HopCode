@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -465,6 +465,22 @@ describe('extractShellOperations', () => {
     expect(ops).toContainEqual({
       virtualTool: 'write_file',
       filePath: '/tmp/foo',
+    });
+  });
+
+  it('combined stdout fd redirect 1>file without space', () => {
+    const ops = extractShellOperations('echo hi 1>.hopcode/settings.json', CWD);
+    expect(ops).toContainEqual({
+      virtualTool: 'write_file',
+      filePath: `${CWD}/.hopcode/settings.json`,
+    });
+  });
+
+  it('combined stdout fd append redirect 1>>file without space', () => {
+    const ops = extractShellOperations('echo hi 1>>.hopcode/settings.json', CWD);
+    expect(ops).toContainEqual({
+      virtualTool: 'write_file',
+      filePath: `${CWD}/.hopcode/settings.json`,
     });
   });
 
@@ -962,6 +978,20 @@ describe('extractShellOperationsAcrossCommand', () => {
     expect(
       extractShellOperationsAcrossCommand(
         'cd "$HOPCODE_HOME" && echo hi > /tmp/out.txt',
+        '/repo',
+      ),
+    ).toEqual([
+      {
+        virtualTool: 'write_file',
+        filePath: '/tmp/out.txt',
+        cwdUnknown: true,
+        pathMayDependOnCwd: false,
+      },
+    ]);
+
+    expect(
+      extractShellOperationsAcrossCommand(
+        'cd "$HOPCODE_HOME" && echo hi 1>/tmp/out.txt',
         '/repo',
       ),
     ).toEqual([

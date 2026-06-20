@@ -109,11 +109,26 @@ vi.mock('./core/initializer.js', () => ({
     themeError: null,
     shouldOpenAuthDialog: false,
     contextMdFileCount: 0,
+    geminiMdFileCount: 0,
   }),
 }));
 
 vi.mock('./commands/extensions/list.js', () => ({
   handleList: mockHandleListExtensions,
+}));
+
+// Stub the settings watcher: main() constructs one and calls startWatching()
+// in non-bare mode. The real implementation reads settings.user/.workspace
+// paths and arms chokidar file watchers, neither of which these main()-flow
+// tests supply or want as a side effect.
+vi.mock('./config/settingsWatcher.js', () => ({
+  SettingsWatcher: class {
+    startWatching() {}
+    stopWatching() {}
+    addChangeListener() {
+      return () => {};
+    }
+  },
 }));
 
 describe('gemini.tsx main function', () => {
@@ -362,6 +377,9 @@ describe('gemini.tsx main function', () => {
         projectHooks: undefined,
       },
       expect.any(Function),
+      undefined,
+      // settingsWatcher: not started in bare mode
+      undefined,
     );
   });
 
@@ -402,6 +420,7 @@ describe('gemini.tsx main function', () => {
       themeError: null,
       shouldOpenAuthDialog: false,
       contextMdFileCount: 0,
+      geminiMdFileCount: 0,
     });
     vi.spyOn(startupWarningsModule, 'getStartupWarnings').mockResolvedValue([]);
     vi.spyOn(
@@ -704,6 +723,7 @@ describe('gemini.tsx main function', () => {
       themeError: null,
       shouldOpenAuthDialog: false,
       contextMdFileCount: 0,
+      geminiMdFileCount: 0,
     });
     vi.spyOn(startupWarningsModule, 'getStartupWarnings').mockResolvedValue([]);
     vi.spyOn(
@@ -1218,6 +1238,7 @@ describe('startInteractiveUI', () => {
       themeError: null,
       shouldOpenAuthDialog: false,
       contextMdFileCount: 0,
+      geminiMdFileCount: 0,
     };
 
     await startInteractiveUI(
@@ -1252,6 +1273,7 @@ describe('startInteractiveUI', () => {
       themeError: null,
       shouldOpenAuthDialog: false,
       contextMdFileCount: 0,
+      geminiMdFileCount: 0,
     };
 
     await startInteractiveUI(
@@ -1295,6 +1317,7 @@ describe('startInteractiveUI', () => {
       themeError: null,
       shouldOpenAuthDialog: false,
       contextMdFileCount: 0,
+      geminiMdFileCount: 0,
     };
 
     await startInteractiveUI(

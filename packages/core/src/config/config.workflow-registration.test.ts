@@ -112,8 +112,8 @@ describe('WorkflowTool registration', () => {
 
   afterEach(() => {
     for (const key of [
-      'HOPCODE_CODE_ENABLE_WORKFLOWS',
-      'HOPCODE_CODE_DISABLE_WORKFLOWS',
+      'HOPCODE_ENABLE_WORKFLOWS',
+      'HOPCODE_DISABLE_WORKFLOWS',
     ]) {
       if (originalEnv[key] === undefined) {
         delete process.env[key];
@@ -124,8 +124,8 @@ describe('WorkflowTool registration', () => {
   });
 
   it('is NOT registered when isWorkflowsEnabled() is false', async () => {
-    delete process.env['HOPCODE_CODE_ENABLE_WORKFLOWS'];
-    delete process.env['HOPCODE_CODE_DISABLE_WORKFLOWS'];
+    delete process.env['HOPCODE_ENABLE_WORKFLOWS'];
+    delete process.env['HOPCODE_DISABLE_WORKFLOWS'];
     const cfg = new Config({ ...baseParams });
     const registry = await cfg.createToolRegistry(undefined, {
       skipDiscovery: true,
@@ -134,8 +134,8 @@ describe('WorkflowTool registration', () => {
   });
 
   it('is registered when isWorkflowsEnabled() is true', async () => {
-    delete process.env['HOPCODE_CODE_DISABLE_WORKFLOWS'];
-    process.env['HOPCODE_CODE_ENABLE_WORKFLOWS'] = '1';
+    delete process.env['HOPCODE_DISABLE_WORKFLOWS'];
+    process.env['HOPCODE_ENABLE_WORKFLOWS'] = '1';
     const cfg = new Config({ ...baseParams });
     const registry = await cfg.createToolRegistry(undefined, {
       skipDiscovery: true,
@@ -143,9 +143,9 @@ describe('WorkflowTool registration', () => {
     expect(registry.getAllToolNames()).toContain(ToolNames.WORKFLOW);
   });
 
-  it('HOPCODE_CODE_DISABLE_WORKFLOWS=1 overrides enable-via-settings', async () => {
-    process.env['HOPCODE_CODE_DISABLE_WORKFLOWS'] = '1';
-    delete process.env['HOPCODE_CODE_ENABLE_WORKFLOWS'];
+  it('HOPCODE_DISABLE_WORKFLOWS=1 overrides enable-via-settings', async () => {
+    process.env['HOPCODE_DISABLE_WORKFLOWS'] = '1';
+    delete process.env['HOPCODE_ENABLE_WORKFLOWS'];
     const cfg = new Config({ ...baseParams });
     cfg.setWorkflowsEnabled(true);
     const registry = await cfg.createToolRegistry(undefined, {

@@ -49,7 +49,7 @@ hopcode -v
 
 ```bash
 # Based on the official HopCode sandbox image (It is recommended to explicitly specify the version)
-FROM ghcr.io/taimoorsiddiquiofficial/hopcode:sha-570ec43
+FROM ghcr.io/hoptrendy/hopcode:sha-570ec43
 # Add your extra tools here
 RUN apt-get update && apt-get install -y \
     git \

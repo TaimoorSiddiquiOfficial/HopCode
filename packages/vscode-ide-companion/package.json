@@ -83,7 +83,7 @@
     },
     "languages": [
       {
-        "id": "qwen-diff-editable"
+        "id": "hopcode-diff-editable"
       }
     ],
     "commands": [

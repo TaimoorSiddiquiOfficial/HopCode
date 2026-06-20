@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 [![npm version](https://img.shields.io/npm/v/@hoptrendy/hopcode.svg)](https://www.npmjs.com/package/@hoptrendy/hopcode)
 [![License](https://img.shields.io/github/license/TaimoorSiddiquiOfficial/HopCode.svg)](./LICENSE)
@@ -115,7 +115,7 @@ asyncio.run(main())
 
 ## Capabilities
 
-If you know Claude Code, you already know HopCode — and then some. We've put significant effort into [bringing HopCode to feature parity with Claude Code](https://github.com/wenshao/codeagents/blob/main/docs/comparison/qwen-code-improvement-report.md), improving both breadth and reliability across the board.
+If you know Claude Code, you already know HopCode — and then some. We've put significant effort into [bringing HopCode to feature parity with Claude Code](https://github.com/wenshao/codeagents/blob/main/docs/comparison/hopcode-improvement-report.md), improving both breadth and reliability across the board.
 
 | Feature                                                            | HopCode | Claude Code |
 | ------------------------------------------------------------------ | :-----: | :---------: |

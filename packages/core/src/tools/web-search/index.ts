@@ -17,7 +17,6 @@ import {
 import type { PermissionDecision } from '../../permissions/types.js';
 import { ToolErrorType } from '../tool-error.js';
 
-import type { Config } from '../../config/config.js';
 import { getErrorMessage } from '../../utils/errors.js';
 import { createDebugLogger } from '../../utils/debugLogger.js';
 import { buildContentWithSources } from './utils.js';
@@ -37,6 +36,7 @@ import type {
   WebSearchResultItem,
   WebSearchProviderConfig,
   DashScopeProviderConfig,
+  WebSearchConfig,
 } from './types.js';
 import { ToolNames, ToolDisplayNames } from '../tool-names.js';
 
@@ -47,18 +47,18 @@ class WebSearchToolInvocation extends BaseToolInvocation<
   WebSearchToolResult
 > {
   constructor(
-    private readonly config: Config,
+    private readonly webSearchConfig: WebSearchConfig | undefined,
+    private readonly authType: string | undefined,
     params: WebSearchToolParams,
   ) {
     super(params);
   }
 
   override getDescription(): string {
-    const webSearchConfig = this.config.getWebSearchConfig();
-    if (!webSearchConfig) {
+    if (!this.webSearchConfig) {
       return ' (Web search is disabled - configure a provider in settings.json)';
     }
-    const provider = this.params.provider || webSearchConfig.default;
+    const provider = this.params.provider || this.webSearchConfig.default;
     return ` (Searching the web via ${provider})`;
   }
 
@@ -104,10 +104,9 @@ class WebSearchToolInvocation extends BaseToolInvocation<
         return new GoogleProvider(config);
       case 'dashscope': {
         // Pass auth type to DashScope provider for availability check
-        const authType = this.config.getAuthType();
         const dashscopeConfig: DashScopeProviderConfig = {
           ...config,
-          authType: authType as string | undefined,
+          authType: this.authType,
         };
         return new DashScopeProvider(dashscopeConfig);
       }
@@ -292,8 +291,7 @@ class WebSearchToolInvocation extends BaseToolInvocation<
 
   async execute(signal: AbortSignal): Promise<WebSearchToolResult> {
     // Check if web search is configured
-    const webSearchConfig = this.config.getWebSearchConfig();
-    if (!webSearchConfig) {
+    if (!this.webSearchConfig) {
       return {
         llmContent:
           'Web search is disabled. Please configure a web search provider in your settings.',
@@ -307,7 +305,7 @@ class WebSearchToolInvocation extends BaseToolInvocation<
 
     try {
       // Create all available providers
-      const providers = this.createProviders(webSearchConfig.provider);
+      const providers = this.createProviders(this.webSearchConfig.provider);
 
       if (providers.size === 0) {
         return {
@@ -323,8 +321,8 @@ class WebSearchToolInvocation extends BaseToolInvocation<
       const selected = this.selectProvider(
         providers,
         this.params.provider,
-        webSearchConfig.default,
-        webSearchConfig.mode,
+        this.webSearchConfig.default,
+        this.webSearchConfig.mode,
       );
 
       // Auto-chain failover mode
@@ -408,7 +406,10 @@ export class WebSearchTool extends BaseDeclarativeTool<
 > {
   static readonly Name: string = ToolNames.WEB_SEARCH;
 
-  constructor(private readonly config: Config) {
+  constructor(
+    private readonly webSearchConfig: WebSearchConfig | undefined,
+    private readonly authType: string | undefined,
+  ) {
     super(
       WebSearchTool.Name,
       ToolDisplayNames.WEB_SEARCH,
@@ -455,7 +456,11 @@ export class WebSearchTool extends BaseDeclarativeTool<
   protected createInvocation(
     params: WebSearchToolParams,
   ): ToolInvocation<WebSearchToolParams, WebSearchToolResult> {
-    return new WebSearchToolInvocation(this.config, params);
+    return new WebSearchToolInvocation(
+      this.webSearchConfig,
+      this.authType,
+      params,
+    );
   }
 }
 

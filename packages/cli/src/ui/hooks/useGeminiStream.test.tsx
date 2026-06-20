@@ -1805,6 +1805,239 @@ describe('useGeminiStream', () => {
     });
   });
 
+  it('suppresses duplicate provider tool-call ids before TUI scheduling', async () => {
+    let capturedOnComplete:
+      | ((completedTools: TrackedToolCall[]) => Promise<void>)
+      | null = null;
+    mockUseReactToolScheduler.mockImplementation((onComplete) => {
+      capturedOnComplete ??= onComplete;
+      return [[], mockScheduleToolCalls, mockMarkToolsAsSubmitted];
+    });
+
+    mockSendMessageStream
+      .mockReturnValueOnce(
+        (async function* () {
+          yield {
+            type: ServerGeminiEventType.ToolCallRequest,
+            value: {
+              callId: 'tool-dup',
+              providerCallId: 'tool-dup',
+              name: 'shell',
+              args: { command: 'echo first' },
+              isClientInitiated: false,
+              prompt_id: 'prompt-tui-dup',
+            },
+          };
+          yield {
+            type: ServerGeminiEventType.ToolCallRequest,
+            value: {
+              callId: 'tool-dup',
+              providerCallId: 'tool-dup',
+              name: 'shell',
+              args: { command: 'echo second' },
+              isClientInitiated: false,
+              prompt_id: 'prompt-tui-dup',
+            },
+          };
+        })(),
+      )
+      .mockReturnValueOnce(
+        (async function* () {
+          yield {
+            type: ServerGeminiEventType.Content,
+            value: 'done',
+          };
+          yield {
+            type: ServerGeminiEventType.Finished,
+            value: { reason: undefined, usageMetadata: { totalTokenCount: 1 } },
+          };
+        })(),
+      );
+
+    const client = new MockedGeminiClientClass(mockConfig);
+    const { result } = renderHook(() =>
+      useGeminiStream(
+        client,
+        [],
+        mockAddItem,
+        mockConfig,
+        mockLoadedSettings,
+        mockOnDebugMessage,
+        mockHandleSlashCommand,
+        false,
+        () => 'vscode' as EditorType,
+        () => {},
+        () => Promise.resolve(),
+        false,
+        () => {},
+        () => {},
+        () => {},
+        () => {},
+        80,
+        24,
+      ),
+    );
+
+    await act(async () => {
+      await result.current.submitQuery('run shell');
+    });
+
+    await waitFor(() => {
+      expect(result.current.streamingState).toBe(StreamingState.Idle);
+    });
+
+    expect(mockScheduleToolCalls).toHaveBeenCalledTimes(1);
+    expect(mockScheduleToolCalls.mock.calls[0][0]).toEqual([
+      expect.objectContaining({
+        callId: 'tool-dup',
+        providerCallId: 'tool-dup',
+        args: { command: 'echo first' },
+      }),
+    ]);
+
+    const completedToolCall = {
+      request: {
+        callId: 'tool-dup',
+        providerCallId: 'tool-dup',
+        name: 'shell',
+        args: { command: 'echo first' },
+        isClientInitiated: false,
+        prompt_id: 'prompt-tui-dup',
+      },
+      status: 'success',
+      responseSubmittedToGemini: false,
+      response: {
+        callId: 'tool-dup',
+        responseParts: [
+          {
+            functionResponse: {
+              id: 'tool-dup',
+              name: 'shell',
+              response: { output: 'first' },
+            },
+          },
+        ],
+        resultDisplay: 'first',
+        error: undefined,
+        errorType: undefined,
+      },
+      tool: {
+        name: 'shell',
+        displayName: 'Shell',
+        description: 'Run a command',
+        build: vi.fn(),
+      } as any,
+      invocation: {
+        getDescription: () => 'echo first',
+      } as unknown as AnyToolInvocation,
+    } as unknown as TrackedCompletedToolCall;
+
+    await act(async () => {
+      if (capturedOnComplete) {
+        await capturedOnComplete([completedToolCall]);
+      }
+    });
+
+    await waitFor(() => {
+      expect(mockSendMessageStream).toHaveBeenCalledTimes(2);
+    });
+    const toolResultParts = mockSendMessageStream.mock.calls[1][0] as Part[];
+    expect(toolResultParts).toHaveLength(2);
+    expect(toolResultParts[0].functionResponse?.response?.['output']).toBe(
+      'first',
+    );
+    expect(toolResultParts[1].functionResponse?.response?.['error']).toContain(
+      'Duplicate provider tool call id "tool-dup"',
+    );
+    expect(client.recordCompletedToolCall).toHaveBeenCalledTimes(1);
+  });
+
+  it('submits a synthetic response for history-paired duplicate provider ids without scheduling', async () => {
+    const client = new MockedGeminiClientClass(mockConfig);
+    client.getHistoryFunctionResponseIds = vi
+      .fn()
+      .mockReturnValue(new Set(['tool-history']));
+
+    mockSendMessageStream
+      .mockReturnValueOnce(
+        (async function* () {
+          yield {
+            type: ServerGeminiEventType.ToolCallRequest,
+            value: {
+              callId: 'tool-history',
+              providerCallId: 'tool-history',
+              name: 'shell',
+              args: { command: 'echo duplicate' },
+              isClientInitiated: false,
+              prompt_id: 'prompt-tui-history',
+            },
+          };
+        })(),
+      )
+      .mockReturnValueOnce(
+        (async function* () {
+          yield {
+            type: ServerGeminiEventType.Finished,
+            value: { reason: undefined, usageMetadata: { totalTokenCount: 1 } },
+          };
+        })(),
+      );
+
+    const { result } = renderTestHook([], client);
+
+    await act(async () => {
+      await result.current.submitQuery('run shell');
+    });
+
+    expect(mockScheduleToolCalls).not.toHaveBeenCalled();
+    expect(mockSendMessageStream).toHaveBeenCalledTimes(2);
+    const toolResultParts = mockSendMessageStream.mock.calls[1][0] as Part[];
+    expect(toolResultParts[0].functionResponse?.id).toBe('tool-history');
+    expect(toolResultParts[0].functionResponse?.response?.['error']).toContain(
+      'Duplicate provider tool call id "tool-history"',
+    );
+    expect(client.recordCompletedToolCall).not.toHaveBeenCalled();
+  });
+
+  it('does not deduplicate tool calls without provider ids in the TUI stream', async () => {
+    mockSendMessageStream.mockReturnValueOnce(
+      (async function* () {
+        yield {
+          type: ServerGeminiEventType.ToolCallRequest,
+          value: {
+            callId: 'generated-1',
+            name: 'shell',
+            args: { command: 'pwd' },
+            isClientInitiated: false,
+            prompt_id: 'prompt-tui-no-provider',
+          },
+        };
+        yield {
+          type: ServerGeminiEventType.ToolCallRequest,
+          value: {
+            callId: 'generated-2',
+            name: 'shell',
+            args: { command: 'pwd' },
+            isClientInitiated: false,
+            prompt_id: 'prompt-tui-no-provider',
+          },
+        };
+      })(),
+    );
+
+    const { result } = renderTestHook();
+
+    await act(async () => {
+      await result.current.submitQuery('run shell twice');
+    });
+
+    expect(mockScheduleToolCalls).toHaveBeenCalledTimes(1);
+    expect(mockScheduleToolCalls.mock.calls[0][0]).toEqual([
+      expect.objectContaining({ callId: 'generated-1' }),
+      expect.objectContaining({ callId: 'generated-2' }),
+    ]);
+  });
+
   it('drops a late tool result whose callId is already paired in chat.history (Race A dedup)', async () => {
     // Race A repro: the chat-internal repair pass already synthesized a
     // functionResponse for this callId on the Retry push (because the
@@ -3173,13 +3406,13 @@ describe('useGeminiStream', () => {
 
       expect(mockSendMessageStream).toHaveBeenCalledTimes(1);
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
 
       await act(async () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini',
           text: 'Hello',
@@ -3239,7 +3472,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
 
       await act(async () => {
         releaseNextChunk();
@@ -3251,7 +3484,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini',
           text: '哈哈',
@@ -3300,19 +3533,94 @@ describe('useGeminiStream', () => {
       });
 
       expect(mockSendMessageStream).toHaveBeenCalledTimes(1);
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
 
       await act(async () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           durationMs: expect.any(Number),
         }),
       ]);
       expect(result.current.thought).toEqual({ description: 'Thinking' });
+
+      act(() => {
+        result.current.cancelOngoingRequest();
+      });
+
+      await act(async () => {
+        releaseStream();
+      });
+    });
+
+    it('splits oversized streamed thoughts so the pending item stays bounded', async () => {
+      vi.useFakeTimers();
+
+      const splitLimit = 16_384;
+      const tailLength = 123;
+      const longThought = 'a'.repeat(splitLimit * 2 + tailLength);
+      vi.mocked(findLastSafeSplitPoint).mockImplementation(
+        (s: string, max?: number) =>
+          max !== undefined && s.length > max ? max : s.length,
+      );
+
+      let releaseStream!: () => void;
+      const holdStream = new Promise<void>((resolve) => {
+        releaseStream = resolve;
+      });
+
+      const mockStream = (async function* () {
+        yield {
+          type: ServerGeminiEventType.Thought,
+          value: { description: longThought },
+        };
+        await holdStream;
+      })();
+      mockSendMessageStream.mockReturnValue(mockStream);
+
+      const { result } = renderTestHook();
+
+      act(() => {
+        void result.current.submitQuery('test query');
+      });
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      await act(async () => {
+        vi.advanceTimersByTime(60);
+      });
+
+      const thoughtItems = mockAddItem.mock.calls
+        .map(([item]) => item as HistoryItem)
+        .filter(
+          (item) =>
+            item.type === 'gemini_thought' ||
+            item.type === 'gemini_thought_content',
+        );
+      expect(thoughtItems).toEqual([
+        expect.objectContaining({
+          type: 'gemini_thought',
+          text: 'a'.repeat(splitLimit),
+          durationMs: expect.any(Number),
+        }),
+        expect.objectContaining({
+          type: 'gemini_thought_content',
+          text: 'a'.repeat(splitLimit),
+        }),
+      ]);
+      expect(result.current.pendingHistoryItems).toEqual([
+        expect.objectContaining({
+          type: 'gemini_thought_content',
+          text: 'a'.repeat(tailLength),
+        }),
+      ]);
+      expect(result.current.thought?.description).toHaveLength(4_096);
 
       act(() => {
         result.current.cancelOngoingRequest();
@@ -3364,7 +3672,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
       expect(result.current.thought).toBeNull();
 
       await act(async () => {
@@ -3377,7 +3685,7 @@ describe('useGeminiStream', () => {
         vi.advanceTimersByTime(60);
       });
 
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           durationMs: expect.any(Number),
@@ -3883,7 +4191,7 @@ describe('useGeminiStream', () => {
       });
 
       // Sanity: the throttle has not fired yet.
-      expect(result.current.pendingGeminiHistoryItems).toEqual([]);
+      expect(result.current.pendingHistoryItems).toEqual([]);
 
       act(() => {
         result.current.cancelOngoingRequest();
@@ -5298,7 +5606,7 @@ describe('useGeminiStream', () => {
       await waitFor(() => {
         expect(result.current.thought?.description).toBe('thinking more');
       });
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           durationMs: expect.any(Number),
@@ -5364,7 +5672,7 @@ describe('useGeminiStream', () => {
         }),
         expect.any(Number),
       );
-      expect(result.current.pendingGeminiHistoryItems).toEqual([
+      expect(result.current.pendingHistoryItems).toEqual([
         expect.objectContaining({
           type: 'gemini_thought',
           durationMs: expect.any(Number),
@@ -5704,7 +6012,7 @@ describe('useGeminiStream', () => {
         });
 
         const findErrorItem = () =>
-          result.current.pendingGeminiHistoryItems.find(
+          result.current.pendingHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           );
 
@@ -5727,7 +6035,7 @@ describe('useGeminiStream', () => {
         });
 
         const errorAfterOneSecond =
-          result.current.pendingGeminiHistoryItems.find(
+          result.current.pendingHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           );
         expect((errorAfterOneSecond as { hint?: string })?.hint).toContain(
@@ -5748,7 +6056,7 @@ describe('useGeminiStream', () => {
         });
 
         // Error item (with hint) should be cleared after retry succeeds
-        const remainingError = result.current.pendingGeminiHistoryItems.find(
+        const remainingError = result.current.pendingHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         );
         expect(remainingError).toBeUndefined();
@@ -5816,14 +6124,14 @@ describe('useGeminiStream', () => {
           void result.current.submitQuery('Trigger retry after countdown');
         });
 
-        let errorItem = result.current.pendingGeminiHistoryItems.find(
+        let errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         ) as { hint?: string } | undefined;
         for (let attempts = 0; attempts < 5 && !errorItem; attempts++) {
           await act(async () => {
             await Promise.resolve();
           });
-          errorItem = result.current.pendingGeminiHistoryItems.find(
+          errorItem = result.current.pendingHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           ) as { hint?: string } | undefined;
         }
@@ -5834,7 +6142,7 @@ describe('useGeminiStream', () => {
         });
 
         const staleErrorBeforeRetryCompletes =
-          result.current.pendingGeminiHistoryItems.find(
+          result.current.pendingHistoryItems.find(
             (item) => item.type === MessageType.ERROR,
           ) as { hint?: string } | undefined;
         expect(staleErrorBeforeRetryCompletes?.hint).toContain('0s');
@@ -5845,7 +6153,7 @@ describe('useGeminiStream', () => {
           await Promise.resolve();
         });
 
-        const remainingError = result.current.pendingGeminiHistoryItems.find(
+        const remainingError = result.current.pendingHistoryItems.find(
           (item) => item.type === MessageType.ERROR,
         );
         expect(remainingError).toBeUndefined();
@@ -5854,7 +6162,7 @@ describe('useGeminiStream', () => {
       }
     });
 
-    it('should memoize pendingGeminiHistoryItems', () => {
+    it('should memoize pendingHistoryItems', () => {
       mockUseReactToolScheduler.mockReturnValue([
         [],
         mockScheduleToolCalls,
@@ -5885,9 +6193,9 @@ describe('useGeminiStream', () => {
         ),
       );
 
-      const firstResult = result.current.pendingGeminiHistoryItems;
+      const firstResult = result.current.pendingHistoryItems;
       rerender();
-      const secondResult = result.current.pendingGeminiHistoryItems;
+      const secondResult = result.current.pendingHistoryItems;
 
       expect(firstResult).toStrictEqual(secondResult);
 
@@ -5915,7 +6223,7 @@ describe('useGeminiStream', () => {
       ]);
 
       rerender();
-      const thirdResult = result.current.pendingGeminiHistoryItems;
+      const thirdResult = result.current.pendingHistoryItems;
 
       expect(thirdResult).not.toStrictEqual(secondResult);
     });
@@ -6092,7 +6400,7 @@ describe('useGeminiStream', () => {
       // Verify error message appears in pending history items (not via addItem,
       // since errors with retry hints are now stored as pending items)
       await waitFor(() => {
-        const errorItem = result.current.pendingGeminiHistoryItems.find(
+        const errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
@@ -6146,7 +6454,7 @@ describe('useGeminiStream', () => {
 
       // Verify error appears in pending history items
       await waitFor(() => {
-        const errorItem = result.current.pendingGeminiHistoryItems.find(
+        const errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
@@ -6169,7 +6477,7 @@ describe('useGeminiStream', () => {
 
       // Verify the error is cleared (no longer in pending history items)
       await waitFor(() => {
-        const errorItem = result.current.pendingGeminiHistoryItems.find(
+        const errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeUndefined();
@@ -6197,7 +6505,7 @@ describe('useGeminiStream', () => {
       });
 
       await waitFor(() => {
-        const errorItem = result.current.pendingGeminiHistoryItems.find(
+        const errorItem = result.current.pendingHistoryItems.find(
           (item) => item.type === 'error',
         );
         expect(errorItem).toBeDefined();
@@ -6238,7 +6546,7 @@ describe('useGeminiStream', () => {
       expect(errorCommit?.[0]).not.toHaveProperty('hint');
 
       // The pending region is cleared, as before.
-      const errorItem = result.current.pendingGeminiHistoryItems.find(
+      const errorItem = result.current.pendingHistoryItems.find(
         (item) => item.type === 'error',
       );
       expect(errorItem).toBeUndefined();

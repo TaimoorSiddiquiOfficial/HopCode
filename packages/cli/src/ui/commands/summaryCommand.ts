@@ -103,6 +103,7 @@ export const summaryCommand: SlashCommand = {
 
       const result = await runSideQuery(config, {
         purpose: 'project-summary',
+        skipOutputLanguagePreference: true,
         model: config.getModel(),
         systemInstruction: chatSystemInstruction,
         contents: [

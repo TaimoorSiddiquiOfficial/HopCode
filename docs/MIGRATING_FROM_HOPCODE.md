@@ -101,7 +101,7 @@ Features not available in HopCode:
 1. **Config directory rename** — `~/.hopcode` → `~/.hopcode`
 2. **Binary name** — `hopcode` → `hopcode`
 3. **NPM scope** — `@hoptrendy/*` → `@hoptrendy/*`
-4. **Docker image** — `ghcr.io/TaimoorSiddiquiOfficial/HopCode` → `ghcr.io/taimoorsiddiquiofficial/hopcode`
+4. **Docker image** — `ghcr.io/hoptrendy/hopcode` → `ghcr.io/hoptrendy/hopcode`
 
 ## Troubleshooting
 

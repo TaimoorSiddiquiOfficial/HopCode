@@ -112,8 +112,8 @@ describe('Config workflows feature gate', () => {
   afterEach(() => {
     // Restore env vars touched by tests
     for (const key of [
-      'HOPCODE_CODE_ENABLE_WORKFLOWS',
-      'HOPCODE_CODE_DISABLE_WORKFLOWS',
+      'HOPCODE_ENABLE_WORKFLOWS',
+      'HOPCODE_DISABLE_WORKFLOWS',
     ]) {
       if (originalEnv[key] === undefined) {
         delete process.env[key];
@@ -124,15 +124,15 @@ describe('Config workflows feature gate', () => {
   });
 
   it('defaults to disabled', () => {
-    delete process.env['HOPCODE_CODE_ENABLE_WORKFLOWS'];
-    delete process.env['HOPCODE_CODE_DISABLE_WORKFLOWS'];
+    delete process.env['HOPCODE_ENABLE_WORKFLOWS'];
+    delete process.env['HOPCODE_DISABLE_WORKFLOWS'];
     const cfg = new Config({ ...baseParams });
     expect(cfg.isWorkflowsEnabled()).toBe(false);
   });
 
-  it('respects HOPCODE_CODE_ENABLE_WORKFLOWS=1', () => {
-    delete process.env['HOPCODE_CODE_DISABLE_WORKFLOWS'];
-    process.env['HOPCODE_CODE_ENABLE_WORKFLOWS'] = '1';
+  it('respects HOPCODE_ENABLE_WORKFLOWS=1', () => {
+    delete process.env['HOPCODE_DISABLE_WORKFLOWS'];
+    process.env['HOPCODE_ENABLE_WORKFLOWS'] = '1';
     const cfg = new Config({ ...baseParams });
     expect(cfg.isWorkflowsEnabled()).toBe(true);
   });
@@ -140,9 +140,9 @@ describe('Config workflows feature gate', () => {
   // TST-I1: "respects setWorkflowsEnabled(true)" was deleted — it is a
   // getter/setter tautology that tests no logic.
 
-  it('HOPCODE_CODE_DISABLE_WORKFLOWS=1 overrides everything', () => {
-    process.env['HOPCODE_CODE_DISABLE_WORKFLOWS'] = '1';
-    process.env['HOPCODE_CODE_ENABLE_WORKFLOWS'] = '1';
+  it('HOPCODE_DISABLE_WORKFLOWS=1 overrides everything', () => {
+    process.env['HOPCODE_DISABLE_WORKFLOWS'] = '1';
+    process.env['HOPCODE_ENABLE_WORKFLOWS'] = '1';
     const cfg = new Config({ ...baseParams });
     cfg.setWorkflowsEnabled(true);
     expect(cfg.isWorkflowsEnabled()).toBe(false);
