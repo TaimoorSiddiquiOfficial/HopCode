@@ -163,8 +163,8 @@ function entrypoint(workdir: string, cliArgs: string[]): string[] {
         ? 'npm run debug --'
         : 'npm rebuild && npm run start --'
       : process.env['DEBUG']
-        ? `node --inspect-brk=0.0.0.0:${process.env['DEBUG_PORT'] || '9229'} $(which qwen)`
-        : 'qwen';
+        ? `node --inspect-brk=0.0.0.0:${process.env['DEBUG_PORT'] || '9229'} $(which hopcode)`
+        : 'hopcode';
 
   const args = [...shellCmds, cliCmd, ...quotedCliArgs];
   return ['bash', '-c', args.join(' ')];
@@ -227,7 +227,7 @@ export async function start_sandbox(
       '-D',
       `CACHE_DIR=${fs.realpathSync(execSync(`getconf DARWIN_USER_CACHE_DIR`).toString().trim())}`,
       '-D',
-      `QWEN_DIR=${fs.realpathSync(qwenDir)}`,
+      `HOPCODE_DIR=${fs.realpathSync(qwenDir)}`,
       '-D',
       `RUNTIME_DIR=${fs.realpathSync(runtimeDir)}`,
     ];
@@ -793,7 +793,7 @@ export async function start_sandbox(
     // finally switch to that user to run the qwen process. This is
     // necessary on Linux to ensure the user exists within the
     // container's /etc/passwd file, which is required by os.userInfo().
-    const username = 'qwen';
+    const username = 'hopcode';
     const homeDir = getContainerPath(os.homedir());
 
     const setupUserCommands = [

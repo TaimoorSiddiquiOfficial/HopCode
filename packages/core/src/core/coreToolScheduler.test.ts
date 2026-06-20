@@ -715,7 +715,7 @@ describe('CoreToolScheduler', () => {
         getSessionId: () => 'test-session-id',
         getUsageStatisticsEnabled: () => true,
         getDebugMode: () => false,
-        getApprovalMode: () => options.approvalMode ?? ApprovalMode.YOLO,
+        getApprovalMode: () => options.approvalMode ?? ApprovalMode.IZN,
         getPermissionsAllow: () => [],
         getPermissionsDeny: options.getPermissionsDeny ?? (() => undefined),
         getContentGeneratorConfig: () => ({
@@ -2116,7 +2116,7 @@ describe('CoreToolScheduler', () => {
         eventName: 'PostToolBatch',
         signal: abortController.signal,
         input: {
-          permission_mode: 'yolo',
+          permission_mode: 'izn',
           tool_calls: [
             expect.objectContaining({
               tool_name: 'alpha',
@@ -2252,7 +2252,7 @@ describe('CoreToolScheduler', () => {
     expect(batchRequest).toEqual(
       expect.objectContaining({
         input: {
-          permission_mode: 'yolo',
+          permission_mode: 'izn',
           tool_calls: [
             expect.objectContaining({
               tool_name: 'alpha',
@@ -3734,7 +3734,7 @@ describe('CoreToolScheduler edit cancellation', () => {
   });
 });
 
-describe('CoreToolScheduler YOLO mode', () => {
+describe('CoreToolScheduler IZN mode', () => {
   const runLongDisplayTool = async (
     longDisplay: string,
     isInteractive: boolean,
@@ -3772,7 +3772,7 @@ describe('CoreToolScheduler YOLO mode', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -3884,12 +3884,12 @@ describe('CoreToolScheduler YOLO mode', () => {
     const onAllToolCallsComplete = vi.fn();
     const onToolCallsUpdate = vi.fn();
 
-    // Configure the scheduler for YOLO mode.
+    // Configure the scheduler for IZN mode.
     const mockConfig = {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -3927,7 +3927,7 @@ describe('CoreToolScheduler YOLO mode', () => {
       name: 'mockTool',
       args: { param: 'value' },
       isClientInitiated: false,
-      prompt_id: 'prompt-id-yolo',
+      prompt_id: 'prompt-id-izn',
     };
 
     // Act
@@ -4293,7 +4293,7 @@ describe('CoreToolScheduler request queueing', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO, // Use YOLO to avoid confirmation prompts
+      getApprovalMode: () => ApprovalMode.IZN, // getApprovalMode: () => ApprovalMode.IZN, // Use IZN to avoid confirmation prompts
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -4418,7 +4418,7 @@ describe('CoreToolScheduler request queueing', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -5192,7 +5192,7 @@ describe('CoreToolScheduler Sequential Execution', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO, // Use YOLO to avoid confirmation prompts
+      getApprovalMode: () => ApprovalMode.IZN, // getApprovalMode: () => ApprovalMode.IZN, // Use IZN to avoid confirmation prompts
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -5315,7 +5315,7 @@ describe('CoreToolScheduler Sequential Execution', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -5833,7 +5833,7 @@ describe('CoreToolScheduler telemetry spans', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -7572,14 +7572,14 @@ describe('CoreToolScheduler telemetry spans', () => {
       getAllTools: () => [],
       getToolsByServer: () => [],
     } as unknown as ToolRegistry;
-    // The auto-approve YOLO path doesn't call _schedule's getMessageBus
+    // The auto-approve IZN path doesn't call _schedule's getMessageBus
     // branch, so the only getMessageBus call is the prelude one at
     // _executeToolCallBody. Make that call throw.
     const mockConfig = {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({}),
       getShellExecutionConfig: () => ({
@@ -9432,7 +9432,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -9714,7 +9714,7 @@ describe('CoreToolScheduler validation retry loop detection', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -10102,7 +10102,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -10313,7 +10313,7 @@ describe('CoreToolScheduler activation wiring', () => {
         getSessionId: () => 'test-session-id',
         getUsageStatisticsEnabled: () => true,
         getDebugMode: () => false,
-        getApprovalMode: () => ApprovalMode.YOLO,
+        getApprovalMode: () => ApprovalMode.IZN,
         getPermissionsAllow: () => [],
         getContentGeneratorConfig: () => ({
           model: 'test-model',
@@ -10430,7 +10430,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -10550,7 +10550,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -10645,7 +10645,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -10741,7 +10741,7 @@ describe('CoreToolScheduler activation wiring', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getPermissionsAllow: () => [],
       getContentGeneratorConfig: () => ({
         model: 'test-model',
@@ -10980,7 +10980,7 @@ describe('CoreToolScheduler shell-tool promote integration (#3831 PR-2)', () => 
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       getDebugMode: () => false,
-      getApprovalMode: () => ApprovalMode.YOLO,
+      getApprovalMode: () => ApprovalMode.IZN,
       getContentGeneratorConfig: () => ({
         model: 'test-model',
         authType: 'gemini',

@@ -6,7 +6,7 @@
 
 import { sanitizeForOsc } from '../ui/utils/osc8.js';
 
-export const DEFAULT_WINDOW_TITLE = 'qwen';
+export const DEFAULT_WINDOW_TITLE = 'hopcode';
 
 const MULTIPLEXER_ENV_KEYS = ['TMUX', 'STY', 'ZELLIJ', 'DVTM'] as const;
 
@@ -28,7 +28,7 @@ export function sanitizeWindowTitle(title: string): string {
  */
 export function computeWindowTitle(folderName?: string): string {
   return sanitizeWindowTitle(
-    process.env['CLI_TITLE'] || `Qwen - ${folderName || DEFAULT_WINDOW_TITLE}`,
+    process.env['CLI_TITLE'] || `HopCode - ${folderName || DEFAULT_WINDOW_TITLE}`,
   );
 }
 

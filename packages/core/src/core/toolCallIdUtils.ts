@@ -7,8 +7,8 @@
 import type { Content, FunctionCall, Part } from '@google/genai';
 import { createDebugLogger } from '../utils/debugLogger.js';
 
-const DUPLICATE_ID_SUFFIX = '__qwen_dup_';
-const GENERATED_ID_PREFIX = 'call_qwen_';
+const DUPLICATE_ID_SUFFIX = '__hopcode_dup_';
+const GENERATED_ID_PREFIX = 'call_hopcode_';
 const PROVIDER_TOOL_CALL_ID = Symbol('providerToolCallId');
 const debugLogger = createDebugLogger('TOOL_CALL_IDS');
 

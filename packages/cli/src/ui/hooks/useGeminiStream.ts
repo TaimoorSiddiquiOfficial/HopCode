@@ -658,7 +658,7 @@ export const useGeminiStream = (
 
   useEffect(() => {
     if (
-      config.getApprovalMode() === ApprovalMode.YOLO &&
+      config.getApprovalMode() === ApprovalMode.IZN &&
       streamingState === StreamingState.Idle
     ) {
       const lastUserMessageIndex = history.findLastIndex(
@@ -2279,7 +2279,7 @@ export const useGeminiStream = (
     async (newApprovalMode: ApprovalMode) => {
       // Auto-approve pending tool calls when switching to auto-approval modes
       if (
-        newApprovalMode === ApprovalMode.YOLO ||
+        newApprovalMode === ApprovalMode.IZN ||
         newApprovalMode === ApprovalMode.AUTO_EDIT
       ) {
         let awaitingApprovalCalls = toolCalls.filter(

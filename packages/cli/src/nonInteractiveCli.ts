@@ -396,12 +396,12 @@ export async function runNonInteractive(
         } else {
           // Headless / non-stream-json mode: there is no UI to
           // surface a prompt, so the only safe options are
-          // YOLO (auto-approve) or Cancel. Without this fallback
+          // IZN (auto-approve) or Cancel. Without this fallback
           // listener, the event has no subscriber and the teammate
           // hangs until its 600s stall timeout fires.
           approvalListener = (event) => {
             const mode = config.getApprovalMode();
-            if (mode === ApprovalMode.YOLO) {
+            if (mode === ApprovalMode.IZN) {
               // `respond` may reject if the teammate terminates between the
               // approval request and our response — catch it so it doesn't
               // become an unhandledRejection that can crash the process.
@@ -421,7 +421,7 @@ export async function runNonInteractive(
               `Auto-cancelling tool ${event.toolName} requested by ` +
               `teammate "${event.teammateName}": current approval mode ` +
               `(${mode}) cannot prompt in non-stream-json mode. ` +
-              `Use --yolo or stream-json to allow teammate tool calls.`;
+              `Use --izn or stream-json to allow teammate tool calls.`;
             process.stderr.write(`[team] ${reason}\n`);
             // Also surface to the leader's LLM, otherwise it just
             // sees the teammate fail without any signal that an

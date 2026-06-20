@@ -1414,7 +1414,7 @@ export class Session implements SessionContext {
             // wraps the whole turn, not just the stop-hook loop. Daemon turns
             // run autonomously in all approval modes (approvals are mediated by
             // the ACP client rather than by gating this loop), so unlike the
-            // CLI reference (useGeminiStream.ts, which only emits in YOLO) this
+            // CLI reference (useGeminiStream.ts, which only emits in IZN) this
             // is intentionally emitted for every mode.
             try {
               while (nextMessage !== null) {
@@ -3662,7 +3662,7 @@ export class Session implements SessionContext {
           //
           // L3: Tool's intrinsic default permission
           // L4: PermissionManager rule override
-          // L5: ApprovalMode override (YOLO / AUTO_EDIT / PLAN)
+          // L5: ApprovalMode override (IZN / AUTO_EDIT / PLAN)
           //
           // AUTO_EDIT auto-approval is handled HERE, same as coreToolScheduler.
           // The VS Code extension is just a UI layer for requestPermission.
@@ -4074,7 +4074,7 @@ export class Session implements SessionContext {
           }
 
           if (!didRequestPermission && !isTodoWriteTool) {
-            // Auto-approved (L3 allow / L4 PM allow / L5 YOLO|AUTO_EDIT)
+            // Auto-approved (L3 allow / L4 PM allow / L5 IZN|AUTO_EDIT)
             // → emit tool_call start notification
             const startParams: ToolCallStartParams = {
               callId,
@@ -4157,7 +4157,7 @@ export class Session implements SessionContext {
           // Clean up event listeners
           cleanupAgentToolResources();
 
-          // enter_plan_mode and the AUTO/YOLO gate path of exit_plan_mode change the
+          // enter_plan_mode and the AUTO/IZN gate path of exit_plan_mode change the
           // approval mode inside execute() without going through the user-confirmation
           // branch above, so notify the client of the current mode explicitly.
           // Only send when the mode actually changed (a gate "blocked" result keeps

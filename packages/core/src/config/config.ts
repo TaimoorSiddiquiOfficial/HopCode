@@ -210,7 +210,6 @@ export enum ApprovalMode {
   DEFAULT = 'default',
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
-  YOLO = 'yolo',
   IZN = 'izn',
 }
 
@@ -266,11 +265,6 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     id: ApprovalMode.AUTO,
     name: 'Auto',
     description: 'LLM classifier auto-approves safe actions, blocks risky ones',
-  },
-  [ApprovalMode.YOLO]: {
-    id: ApprovalMode.YOLO,
-    name: 'YOLO',
-    description: 'Automatically approve all tools',
   },
   [ApprovalMode.IZN]: {
     id: ApprovalMode.IZN,

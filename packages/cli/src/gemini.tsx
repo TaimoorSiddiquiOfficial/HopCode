@@ -1070,7 +1070,7 @@ export async function main() {
       }
     }
 
-    // Headless + YOLO without a sandbox lets the model auto-approve and
+    // Headless + IZN without a sandbox lets the model auto-approve and
     // execute shell / write / edit tools at the current process's
     // privilege level. Emit a one-line stderr warning so unattended runs
     // have at least an observable signal. Interactive runs are excluded
