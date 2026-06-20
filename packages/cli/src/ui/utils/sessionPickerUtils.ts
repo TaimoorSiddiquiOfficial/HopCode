@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { SessionListItem } from '@hopcode/hopcode-core';
+import type { SessionListItem } from '@hoptrendy/hopcode-core';
 import { getCachedStringWidth } from './textUtils.js';
 
 const graphemeSegmenter = new Intl.Segmenter(undefined, {

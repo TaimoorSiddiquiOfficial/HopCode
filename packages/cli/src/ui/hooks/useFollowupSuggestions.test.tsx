@@ -6,15 +6,15 @@
 
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Config, PromptSuggestionEvent } from '@hopcode/hopcode-core';
+import type { Config, PromptSuggestionEvent } from '@hoptrendy/hopcode-core';
 
 const { mockLogPromptSuggestion } = vi.hoisted(() => ({
   mockLogPromptSuggestion: vi.fn(),
 }));
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     logPromptSuggestion: mockLogPromptSuggestion,

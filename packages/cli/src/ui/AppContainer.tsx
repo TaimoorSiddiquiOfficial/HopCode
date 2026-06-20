@@ -66,7 +66,7 @@ import {
   GitWorktreeService,
   readWorktreeSessionMarker,
   isSessionRuntimeActive,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { buildResumedHistoryItems } from './utils/resumeHistoryUtils.js';
 import { loadLowlight } from './utils/lowlightLoader.js';
 import { restoreGoalFromHistory } from './utils/restoreGoal.js';

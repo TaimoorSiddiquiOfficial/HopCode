@@ -1,7 +1,7 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "description": "Qwen Code settings configuration",
+  "description": "HopCode settings configuration",
   "properties": {
     "mcpServers": {
       "description": "Configuration for MCP servers.",
@@ -65,7 +65,7 @@
           "default": 30
         },
         "gitCoAuthor": {
-          "description": "Attribution added to git commits and pull requests created through Qwen Code.",
+          "description": "Attribution added to git commits and pull requests created through HopCode.",
           "default": {
             "commit": true,
             "pr": true
@@ -78,12 +78,12 @@
               "type": "object",
               "properties": {
                 "commit": {
-                  "description": "Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through Qwen Code. Disabling skips both.",
+                  "description": "Add a Co-authored-by trailer to git commit messages AND attach a per-file AI-attribution git note (`refs/notes/ai-attribution`) for commits made through HopCode. Disabling skips both.",
                   "type": "boolean",
                   "default": true
                 },
                 "pr": {
-                  "description": "Append a Qwen Code attribution line to PR descriptions when running `gh pr create`.",
+                  "description": "Append a HopCode attribution line to PR descriptions when running `gh pr create`.",
                   "type": "boolean",
                   "default": true
                 }
@@ -128,7 +128,7 @@
           "default": true
         },
         "preventSystemSleep": {
-          "description": "Prevent the system from sleeping while Qwen Code is streaming a model response or executing tools. Idle prompt time and permission prompts do not inhibit sleep.",
+          "description": "Prevent the system from sleeping while HopCode is streaming a model response or executing tools. Idle prompt time and permission prompts do not inhibit sleep.",
           "type": "boolean",
           "default": true
         },
@@ -182,7 +182,7 @@
         "theme": {
           "description": "The color theme for the UI.",
           "type": "string",
-          "default": "Qwen Dark"
+          "default": "HopCode Dark"
         },
         "autoModeAcknowledged": {
           "description": "True once the user has seen the first-time information message about the AUTO approval mode. Set automatically; not intended for manual configuration.",
@@ -210,7 +210,7 @@
           "default": false
         },
         "showStatusInTitle": {
-          "description": "Show Qwen Code session name and status in the terminal window title",
+          "description": "Show HopCode session name and status in the terminal window title",
           "type": "boolean",
           "default": true
         },
@@ -255,7 +255,7 @@
           "default": true
         },
         "enableUserFeedback": {
-          "description": "Show optional feedback dialog after conversations to help improve Qwen performance.",
+          "description": "Show optional feedback dialog after conversations to help improve HopCode performance.",
           "type": "boolean",
           "default": true
         },
@@ -320,7 +320,7 @@
           "default": false
         },
         "customBannerTitle": {
-          "description": "Replace the default \">_ Qwen Code\" title shown in the banner info panel. The version suffix is always appended.",
+          "description": "Replace the default \">_ HopCode\" title shown in the banner info panel. The version suffix is always appended.",
           "type": "string",
           "default": ""
         },
@@ -391,7 +391,7 @@
               "additionalProperties": false
             }
           ],
-          "description": "Replace the default QWEN ASCII art. Accepts an inline string, {\"path\": \"...\"}, or {\"small\": ..., \"large\": ...} for width-aware selection."
+          "description": "Replace the default HOPCODE ASCII art. Accepts an inline string, {\"path\": \"...\"}, or {\"small\": ..., \"large\": ...} for width-aware selection."
         }
       }
     },
@@ -575,7 +575,7 @@
               "default": "auto"
             },
             "contextWindowSize": {
-              "description": "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from Qwen Code's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
+              "description": "Overrides the default context window size for the selected model. Use this setting when a provider's effective context limit differs from HopCode's default. This value defines the model's assumed maximum context capacity, not a per-request token limit.",
               "type": "number"
             }
           }
@@ -651,8 +651,8 @@
               "type": "boolean",
               "default": true
             },
-            "respectQwenIgnore": {
-              "description": "Respect .qwenignore files when searching",
+            "respectHopcodeIgnore": {
+              "description": "Respect .hopcodeignore files when searching",
               "type": "boolean",
               "default": true
             },
@@ -969,11 +969,11 @@
       }
     },
     "policy": {
-      "description": "Daemon multi-client coordination policies. Tool-level allow/deny rules live under `permissions`; this section is for runtime mediation behavior between concurrent HTTP clients sharing one `qwen serve` daemon.",
+      "description": "Daemon multi-client coordination policies. Tool-level allow/deny rules live under `permissions`; this section is for runtime mediation behavior between concurrent HTTP clients sharing one `hopcode serve` daemon.",
       "type": "object",
       "properties": {
         "permissionStrategy": {
-          "description": "How permission requests resolve when multiple clients are attached. `first-responder` (default) = any client decides, first wins. `designated` = only the prompt originator decides; falls back to first-responder if originator is anonymous. NOTE: client identity comes from self-declared X-Qwen-Client-Id with no proof-of-possession (pair-token identity is not implemented yet), so any client observing originatorClientId on SSE frames can register with the same id and impersonate the originator. `consensus` = N-of-M voters must agree. Default N=floor(M/2)+1, which means UNANIMITY for M=2 (quorum=2, both must agree) and supermajority for larger even M (M=4 → quorum=3; M=6 → quorum=4). For M=2 specifically, split votes resolve only via permissionTimeoutMs. `local-only` = only loopback clients can RESOLVE; remote clients can still ABORT a pending permission via the cancel sentinel ({outcome:\"cancelled\"}) — cancel stays cross-policy for consistency. Strict-cancel-too deployments need a dedicated loopback-bound daemon. Requires daemon restart — read once at boot. Options: first-responder, designated, consensus, local-only",
+          "description": "How permission requests resolve when multiple clients are attached. `first-responder` (default) = any client decides, first wins. `designated` = only the prompt originator decides; falls back to first-responder if originator is anonymous. NOTE: client identity comes from self-declared X-HopCode-Client-Id with no proof-of-possession (pair-token identity is not implemented yet), so any client observing originatorClientId on SSE frames can register with the same id and impersonate the originator. `consensus` = N-of-M voters must agree. Default N=floor(M/2)+1, which means UNANIMITY for M=2 (quorum=2, both must agree) and supermajority for larger even M (M=4 → quorum=3; M=6 → quorum=4). For M=2 specifically, split votes resolve only via permissionTimeoutMs. `local-only` = only loopback clients can RESOLVE; remote clients can still ABORT a pending permission via the cancel sentinel ({outcome:\"cancelled\"}) — cancel stays cross-policy for consistency. Strict-cancel-too deployments need a dedicated loopback-bound daemon. Requires daemon restart — read once at boot. Options: first-responder, designated, consensus, local-only",
           "enum": [
             "first-responder",
             "designated",
@@ -1061,6 +1061,38 @@
             "description": "URL pattern (supports * wildcard)",
             "type": "string"
           }
+        },
+        "powershell": {
+          "description": "PowerShell security policy settings.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Master switch for PowerShell execution. When false, all PowerShell commands are blocked.",
+              "type": "boolean",
+              "default": false
+            },
+            "mode": {
+              "description": "Default behavior when a PowerShell command does not match the allowlist or blocklist.",
+              "type": "string",
+              "default": "ask"
+            },
+            "allowlist": {
+              "description": "Command patterns that are automatically allowed. Supports * wildcard matching.",
+              "type": "array",
+              "items": {
+                "description": "Command pattern (supports * wildcard)",
+                "type": "string"
+              }
+            },
+            "blocklist": {
+              "description": "Command patterns that are always blocked. Supports * wildcard matching.",
+              "type": "array",
+              "items": {
+                "description": "Command pattern (supports * wildcard)",
+                "type": "string"
+              }
+            }
+          }
         }
       }
     },
@@ -1068,6 +1100,29 @@
       "description": "Advanced settings for power users.",
       "type": "object",
       "properties": {
+        "webSearch": {
+          "description": "Configuration for the web_search tool.",
+          "type": "object",
+          "properties": {
+            "default": {
+              "description": "The default web search provider to use (e.g., \"duckduckgo\", \"tavily\", \"google\").",
+              "type": "string"
+            },
+            "mode": {
+              "description": "Provider selection mode: \"auto\" tries providers in priority order with failover, \"manual\" uses only the default provider.",
+              "type": "string",
+              "default": "auto"
+            },
+            "provider": {
+              "description": "List of configured web search providers with their credentials and options.",
+              "type": "array",
+              "items": {
+                "description": "Provider configuration object",
+                "type": "object"
+              }
+            }
+          }
+        },
         "autoConfigureMemory": {
           "description": "Automatically configure Node.js memory limits",
           "type": "boolean",
@@ -2628,7 +2683,7 @@
       "type": "object",
       "properties": {
         "symlinkDirectories": {
-          "description": "Directories under the main repository to symlink into every general-purpose worktree on creation. Useful for sharing large opt-in dirs like `node_modules` so the model can run tests / builds inside the worktree without a fresh install. Paths must be relative to the repo root; absolute paths, anything containing `..`, and any path inside `.git` or `.qwen` (the CLI-managed metadata tree, which contains the worktrees directory itself) are rejected. Missing source dirs and existing destination paths are silently skipped (no overwrite, no failure).",
+          "description": "Directories under the main repository to symlink into every general-purpose worktree on creation. Useful for sharing large opt-in dirs like `node_modules` so the model can run tests / builds inside the worktree without a fresh install. Paths must be relative to the repo root; absolute paths, anything containing `..`, and any path inside `.git` or `.hopcode` (the CLI-managed metadata tree, which contains the worktrees directory itself) are rejected. Missing source dirs and existing destination paths are silently skipped (no overwrite, no failure).",
           "type": "array",
           "items": {
             "type": "string"

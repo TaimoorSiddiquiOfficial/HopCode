@@ -6,7 +6,7 @@
 
 import { render } from 'ink-testing-library';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AgentStatus } from '@hopcode/hopcode-core';
+import { AgentStatus } from '@hoptrendy/hopcode-core';
 import {
   useAgentViewActions,
   useAgentViewState,

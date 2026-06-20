@@ -15,13 +15,13 @@
 import {
   ChannelBase,
   SessionRouter,
-  getGlobalHopcodeDir,
-} from '@hopcode/channel-base';
+  getGlobalHopCodeDir,
+} from '@hoptrendy/channel-base';
 import type {
   ChannelConfig,
   ChannelBaseOptions,
   AcpBridge,
-} from '@hopcode/channel-base';
+} from '@hoptrendy/channel-base';
 import WebSocket from 'ws';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -154,7 +154,7 @@ export class QQChannel extends ChannelBase {
     options?: ChannelBaseOptions,
   ) {
     const safeName = name.replace(/[^A-Za-z0-9_-]/g, '_');
-    const stateDir = join(getGlobalHopcodeDir(), 'channels');
+    const stateDir = join(getGlobalHopCodeDir(), 'channels');
     mkdirSync(stateDir, { recursive: true });
     const sessionsPath = join(stateDir, `${safeName}-sessions.json`);
 

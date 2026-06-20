@@ -13,7 +13,6 @@
 
 import { createDebugLogger } from '../../utils/debugLogger.js';
 import type { Config } from '../../config/config.js';
-import { createConfigOverride } from '../../config/config.js';
 import { type ContentGenerator } from '../../core/contentGenerator.js';
 import type { RuntimeContentGeneratorView } from '../runtime/agent-context.js';
 import type { ToolRegistry } from '../../tools/tool-registry.js';
@@ -401,14 +400,22 @@ async function createPerAgentConfig(
   const agentWorkspace = new WorkspaceContext(cwd);
   const agentFileService = new FileDiscoveryService(cwd);
 
-  // Create the base override with workspace and file service
-  let override = createConfigOverride(base, {
-    getWorkingDir: () => cwd,
-    getTargetDir: () => cwd,
-    getProjectRoot: () => cwd,
-    getWorkspaceContext: () => agentWorkspace,
-    getFileService: () => agentFileService,
-  });
+  // Create the base override with workspace and file service by delegating
+  // through a new object prototype. This mirrors the existing worktree
+  // override pattern in workflow-orchestrator.ts and avoids depending on
+  // a `createConfigOverride` helper that no longer exists post-merge.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const override: any = Object.create(base);
+  override.cwd = cwd;
+  override.targetDir = cwd;
+  override.getCwd = () => cwd;
+  override.getWorkingDir = () => cwd;
+  override.getTargetDir = () => cwd;
+  override.getProjectRoot = () => cwd;
+  override.workspaceContext = agentWorkspace;
+  override.getWorkspaceContext = () => agentWorkspace;
+  override.fileDiscoveryService = agentFileService;
+  override.getFileService = () => agentFileService;
 
   let dedicatedContentGenerator: ContentGenerator | undefined;
   let runtimeView: RuntimeContentGeneratorView | undefined;
@@ -420,10 +427,7 @@ async function createPerAgentConfig(
   );
   agentRegistry.copyDiscoveredToolsFrom(base.getToolRegistry());
 
-  // Create a new override that includes the tool registry
-  override = createConfigOverride(override, {
-    getToolRegistry: () => agentRegistry,
-  });
+  override.getToolRegistry = () => agentRegistry;
 
   if (authOverrides?.authType) {
     try {

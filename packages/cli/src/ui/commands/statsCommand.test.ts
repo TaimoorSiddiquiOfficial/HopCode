@@ -32,7 +32,7 @@ import {
   Storage,
   getTokenUsageFilePath,
   recordTokenUsageFromApiResponse,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 const fsPromisesMock = vi.hoisted(() => ({
   open: vi.fn<typeof import('node:fs/promises').open>(),

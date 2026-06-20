@@ -30,7 +30,7 @@ vi.mock('./login.js', () => ({
   qrCodeLogin: vi.fn(),
 }));
 
-vi.mock('@hopcode/channel-base', () => ({
+vi.mock('@hoptrendy/channel-base', () => ({
   ChannelBase: class {
     protected config: Record<string, unknown> = {};
     protected bridge: Record<string, unknown> = {};
@@ -56,7 +56,7 @@ vi.mock('@hopcode/channel-base', () => ({
       return Promise.resolve();
     }
   },
-  getGlobalHopcodeDir: () => '/tmp/test-qwen',
+  getGlobalHopCodeDir: () => '/tmp/test-qwen',
 }));
 
 const { QQChannel } = await import('./QQChannel.js');
@@ -232,7 +232,7 @@ describe('sendMessage', () => {
         appID: 'test-app-id',
         appSecret: 'test-secret',
       },
-      {} as unknown as import('@hopcode/channel-base').AcpBridge,
+      {} as unknown as import('@hoptrendy/channel-base').AcpBridge,
     );
 
     // Set internal state for sendMessage preconditions.

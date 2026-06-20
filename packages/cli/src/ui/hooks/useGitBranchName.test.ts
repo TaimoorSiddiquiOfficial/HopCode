@@ -12,13 +12,13 @@ import { useGitBranchName } from './useGitBranchName.js';
 import { fs, vol } from 'memfs'; // For mocking fs
 import fsPromises from 'node:fs/promises';
 import path from 'node:path';
-import { isCommandAvailable, execCommand } from '@hopcode/hopcode-core';
+import { isCommandAvailable, execCommand } from '@hoptrendy/hopcode-core';
 
-// Mock @hopcode/hopcode-core
-vi.mock('@hopcode/hopcode-core', async () => {
+// Mock @hoptrendy/hopcode-core
+vi.mock('@hoptrendy/hopcode-core', async () => {
   const original = await vi.importActual<
-    typeof import('@hopcode/hopcode-core')
-  >('@hopcode/hopcode-core');
+    typeof import('@hoptrendy/hopcode-core')
+  >('@hoptrendy/hopcode-core');
   return {
     ...original,
     execCommand: vi.fn(),

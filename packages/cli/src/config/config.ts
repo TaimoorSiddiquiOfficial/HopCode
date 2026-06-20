@@ -55,6 +55,7 @@ import stripJsonComments from 'strip-json-comments';
 import { resolvePath } from '../utils/resolvePath.js';
 import { getCliVersion } from '../utils/version.js';
 import { loadSandboxConfig } from './sandboxConfig.js';
+import { buildWebSearchConfig } from './webSearch.js';
 import { appEvents } from '../utils/events.js';
 import { mcpCommand } from '../commands/mcp.js';
 import { channelCommand } from '../commands/channel.js';
@@ -1843,6 +1844,12 @@ export async function loadCliConfig(
     ? undefined
     : getPendingGatedMcpServers(mcpServers, cwd);
 
+  const webSearchConfig = buildWebSearchConfig(
+    argv,
+    settings,
+    selectedAuthType,
+  );
+
   const configParams: ConfigParameters = {
     sessionId,
     sessionData,
@@ -2033,6 +2040,17 @@ export async function loadCliConfig(
         }
       : undefined,
     settingsWatcher,
+    webSearchConfig,
+    powerShellConfig: settings.security?.powershell
+      ? {
+          enabled: settings.security.powershell.enabled ?? false,
+          mode:
+            (settings.security.powershell.mode as 'allow' | 'ask' | 'deny') ??
+            'ask',
+          allowlist: settings.security.powershell.allowlist ?? [],
+          blocklist: settings.security.powershell.blocklist ?? [],
+        }
+      : undefined,
   };
 
   const config = new Config(configParams);

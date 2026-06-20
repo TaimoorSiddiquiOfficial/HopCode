@@ -107,7 +107,7 @@ export async function tryGenerateSessionTitle(
   abortSignal: AbortSignal,
 ): Promise<SessionTitleOutcome> {
   try {
-    const model = config.getFastModelForSideQuery?.() ?? config.getFastModel();
+    const model = config.getFastModel();
     if (!model) return { ok: false, reason: 'no_fast_model' };
 
     const geminiClient = config.getGeminiClient();

@@ -53,9 +53,9 @@ const { mockDebugWarn } = vi.hoisted(() => ({
   mockDebugWarn: vi.fn(),
 }));
 
-vi.mock('@hopcode/hopcode-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@hopcode/hopcode-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...actual,
     createDebugLogger: () => ({

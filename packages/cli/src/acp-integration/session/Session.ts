@@ -28,7 +28,7 @@ import type {
   GoalTerminalEvent,
   ToolCallRequestInfo,
   ToolCallResponseInfo,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   AuthType,
   ApprovalMode,
@@ -99,11 +99,11 @@ import {
   sessionIdContext,
   dedupeToolCallsById,
   getProviderToolCallId,
-} from '@hopcode/hopcode-core';
-import { NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE } from '@hopcode/acp-bridge/bridgeErrors';
+} from '@hoptrendy/hopcode-core';
+import { NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE } from '@hoptrendy/acp-bridge/bridgeErrors';
 // Single source of truth shared with the daemon-side answerer (BridgeClient),
 // so a rename can't desync caller and answerer into a silent -32601 latch.
-import { MID_TURN_QUEUE_DRAIN_METHOD } from '@hopcode/acp-bridge/bridgeTypes';
+import { MID_TURN_QUEUE_DRAIN_METHOD } from '@hoptrendy/acp-bridge/bridgeTypes';
 import { getCommandSubcommandNames } from '../../services/commandMetadata.js';
 import { getEffectiveSupportedModes } from '../../services/commandUtils.js';
 
@@ -3004,7 +3004,7 @@ export class Session implements SessionContext {
       default: ApprovalMode.DEFAULT,
       'auto-edit': ApprovalMode.AUTO_EDIT,
       auto: ApprovalMode.AUTO,
-      yolo: ApprovalMode.YOLO,
+      izn: ApprovalMode.IZN,
     };
 
     // `modeId` arrives over the wire (ACP `session/set_mode`, or
@@ -3066,7 +3066,7 @@ export class Session implements SessionContext {
       selectedAuthType,
       parsed.modelId,
       selectedAuthType !== previousAuthType &&
-        selectedAuthType === AuthType.QWEN_OAUTH
+        selectedAuthType === AuthType.HOPCODE_OAUTH
         ? { requireCachedCredentials: true }
         : undefined,
     );

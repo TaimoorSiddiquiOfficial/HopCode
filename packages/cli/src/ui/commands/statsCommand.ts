@@ -27,7 +27,7 @@ import {
   type TokenUsageGroupSummary,
   type TokenUsagePeriod,
   type TokenUsageSummary,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 
 const VALID_EXPORT_FORMATS = new Set<TokenUsageExportFormat>(['csv', 'json']);
 

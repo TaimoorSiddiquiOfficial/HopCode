@@ -1,7 +1,7 @@
 ﻿export { QQChannel } from './QQChannel.js';
 
 import { QQChannel } from './QQChannel.js';
-import type { ChannelPlugin } from '@hopcode/channel-base';
+import type { ChannelPlugin } from '@hoptrendy/channel-base';
 
 export const plugin: ChannelPlugin = {
   channelType: 'qq',

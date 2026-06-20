@@ -22,8 +22,8 @@ import {
   Storage,
   writeRuntimeStatus,
   writeWorktreeSessionMarker,
-} from '@hopcode/hopcode-core';
-import type { Config } from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 
 const exec = promisify(execFile);
 

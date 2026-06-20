@@ -19,7 +19,7 @@ import {
   writeRuntimeStatus,
   persistSessionUsage,
   uiTelemetryService,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { render } from 'ink';
 import dns from 'node:dns';
 import os from 'node:os';
@@ -48,10 +48,7 @@ import {
   type InitializationResult,
 } from './core/initializer.js';
 import { handleList as handleListExtensions } from './commands/extensions/list.js';
-import {
-  initializeI18n,
-  resolveLanguageSetting,
-} from './i18n/index.js';
+import { initializeI18n, resolveLanguageSetting } from './i18n/index.js';
 import { runNonInteractive } from './nonInteractiveCli.js';
 import {
   setupStartupWorktree,
@@ -100,7 +97,7 @@ import { getUserStartupWarnings } from './utils/userStartupWarnings.js';
 import { getCliVersion } from './utils/version.js';
 import { initializeWarningHandler } from './utils/warningHandler.js';
 import { writeStderrLine } from './utils/stdioHelpers.js';
-import { getHeadlessYoloSafetyWarning } from './utils/headlessSafetyWarnings.js';
+import { getHeadlessIznSafetyWarning } from './utils/headlessSafetyWarnings.js';
 import { computeWindowTitle, writeTerminalTitle } from './utils/windowTitle.js';
 import {
   startEarlyInputCapture,
@@ -1080,8 +1077,8 @@ export async function main() {
     // because the user is at the keyboard and the TUI shows approval
     // state directly. See issue #4103.
     if (!config.isInteractive()) {
-      const yoloWarning = getHeadlessYoloSafetyWarning(config);
-      if (yoloWarning) writeStderrLine(yoloWarning);
+      const iznWarning = getHeadlessIznSafetyWarning(config);
+      if (iznWarning) writeStderrLine(iznWarning);
     }
 
     // For non-stream-json mode, initialize config here. Stream-json defers

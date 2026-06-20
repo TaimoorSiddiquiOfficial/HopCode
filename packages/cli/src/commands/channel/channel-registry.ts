@@ -1,4 +1,4 @@
-﻿import type { ChannelPlugin } from '@hopcode/channel-base';
+﻿import type { ChannelPlugin } from '@hoptrendy/channel-base';
 
 const registry = new Map<string, ChannelPlugin>();
 let builtinsPromise: Promise<void> | null = null;
@@ -7,11 +7,11 @@ function ensureBuiltins(): Promise<void> {
   if (!builtinsPromise) {
     builtinsPromise = (async () => {
       const labelled = [
-        { name: 'telegram', promise: import('@hopcode/channel-telegram') },
-        { name: 'weixin', promise: import('@hopcode/channel-weixin') },
-        { name: 'dingtalk', promise: import('@hopcode/channel-dingtalk') },
-        { name: 'feishu', promise: import('@hopcode/channel-feishu') },
-        { name: 'qqbot', promise: import('@hopcode/channel-qqbot') },
+        { name: 'telegram', promise: import('@hoptrendy/channel-telegram') },
+        { name: 'weixin', promise: import('@hoptrendy/channel-weixin') },
+        { name: 'dingtalk', promise: import('@hoptrendy/channel-dingtalk') },
+        { name: 'feishu', promise: import('@hoptrendy/channel-feishu') },
+        { name: 'qqbot', promise: import('@hoptrendy/channel-qqbot') },
       ];
 
       const results = await Promise.allSettled(labelled.map((l) => l.promise));

@@ -7,11 +7,15 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { getGlobalHopcodeDir } from '@hopcode/channel-base';
+import { getGlobalHopCodeDir } from '@hoptrendy/channel-base';
 
 /** Build the credential file path for a given safe channel name. */
 export function getCredsFilePath(safeName: string): string {
-  return join(getGlobalHopcodeDir(), 'channels', `${safeName}-credentials.json`);
+  return join(
+    getGlobalHopCodeDir(),
+    'channels',
+    `${safeName}-credentials.json`,
+  );
 }
 
 /** Try to load persisted credentials. Returns null if file missing or corrupt. */
@@ -45,7 +49,7 @@ export function saveCredentials(
   appId: string,
   appSecret: string,
 ): void {
-  const dir = join(getGlobalHopcodeDir(), 'channels');
+  const dir = join(getGlobalHopCodeDir(), 'channels');
   mkdirSync(dir, { recursive: true });
   writeFileSync(credsFile, JSON.stringify({ appId, appSecret }), {
     mode: 0o600,

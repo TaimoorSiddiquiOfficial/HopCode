@@ -109,7 +109,7 @@ vi.mock('node:stream', async (importOriginal) => {
 });
 
 // Mock core dependencies
-vi.mock('@hopcode/hopcode-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   createDebugLogger: () => ({
     debug: vi.fn(),
     error: vi.fn(),
@@ -119,7 +119,7 @@ vi.mock('@hopcode/hopcode-core', () => ({
   APPROVAL_MODE_INFO: {},
   APPROVAL_MODES: [],
   AuthType: {
-    QWEN_OAUTH: 'qwen-oauth',
+    HOPCODE_OAUTH: 'hopcode-oauth',
     USE_OPENAI: 'openai',
     USE_ANTHROPIC: 'anthropic',
     USE_GEMINI: 'gemini',
@@ -273,7 +273,7 @@ vi.mock('@hopcode/hopcode-core', () => ({
   MCP_BUDGET_WARN_FRACTION: 0.75,
   SessionService: vi.fn(),
   Storage: {
-    getGlobalHopcodeDir: vi.fn(() => '/tmp/qwen-global-test'),
+    getGlobalHopCodeDir: vi.fn(() => '/tmp/qwen-global-test'),
   },
   parse: vi.fn((yaml: string) => {
     const record: Record<string, unknown> = {};
@@ -472,7 +472,7 @@ import {
   fetchAllowedGitHub,
 } from './acpAgent.js';
 import { gzipSync } from 'node:zlib';
-import type { Config } from '@hopcode/hopcode-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../config/settings.js';
 import type { CliArgs } from '../config/config.js';
 import {
@@ -489,7 +489,7 @@ import {
   applyProviderInstallPlan,
   Storage,
   unregisterGoalHook,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { McpServer } from '@agentclientprotocol/sdk';
 import { AgentSideConnection } from '@agentclientprotocol/sdk';
 import { loadSettings } from '../config/settings.js';
@@ -1650,9 +1650,10 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
   });
 
   it('extMethod preflight surfaces SkillError as parse_error errorKind', async () => {
-    const skillError = new (
-      await import('@hopcode/hopcode-core')
-    ).SkillError('bad frontmatter', 'PARSE_ERROR');
+    const skillError = new (await import('@hoptrendy/hopcode-core')).SkillError(
+      'bad frontmatter',
+      'PARSE_ERROR',
+    );
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
@@ -3403,7 +3404,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 
   it('qwen/skills/install installs a GitHub directory skill through ACP', async () => {
     const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
-    vi.mocked(Storage.getGlobalHopcodeDir).mockReturnValue(tempHome);
+    vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
 
     const refreshCache = vi.fn().mockResolvedValue(undefined);
     const parseSkillContent = vi.fn(
@@ -3555,7 +3556,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 
   it('qwen/skills setEnabled and delete manage global skills through ACP', async () => {
     const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
-    vi.mocked(Storage.getGlobalHopcodeDir).mockReturnValue(tempHome);
+    vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
 
     const skillDir = path.join(tempHome, 'skills', 'pptx');
     const skillFile = path.join(skillDir, 'SKILL.md');
@@ -3641,7 +3642,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 
   it('qwen/skills rejects path-traversal slugs without touching the global dir', async () => {
     const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
-    vi.mocked(Storage.getGlobalHopcodeDir).mockReturnValue(tempHome);
+    vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
     // A sentinel that a `..` traversal could overwrite (install) or delete.
     const sentinel = path.join(tempHome, 'settings.json');
     await fs.writeFile(sentinel, '{"keep":true}', 'utf8');
@@ -3698,7 +3699,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 
   it('qwen/skills setEnabled preserves comments and nested hooks in frontmatter', async () => {
     const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
-    vi.mocked(Storage.getGlobalHopcodeDir).mockReturnValue(tempHome);
+    vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
 
     const skillDir = path.join(tempHome, 'skills', 'pptx');
     const skillFile = path.join(skillDir, 'SKILL.md');
@@ -3851,7 +3852,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     const tempProject = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qwen-project-skill-'),
     );
-    vi.mocked(Storage.getGlobalHopcodeDir).mockReturnValue(tempHome);
+    vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
 
     async function writeSkill(root: string, relativeDir: string, name: string) {
       const skillDir = path.join(root, relativeDir, name);
@@ -3996,7 +3997,12 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     const tempProject = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qwen-project-cwd-skill-'),
     );
-    const skillDir = path.join(tempProject, '.hopcode', 'skills', 'issue-fixer');
+    const skillDir = path.join(
+      tempProject,
+      '.hopcode',
+      'skills',
+      'issue-fixer',
+    );
     const skillFile = path.join(skillDir, 'SKILL.md');
     await fs.mkdir(skillDir, { recursive: true });
     await fs.writeFile(

@@ -71,6 +71,12 @@ import type { McpBudgetEvent } from '../tools/mcp-client-manager.js';
 import { ToolNames } from '../tools/tool-names.js';
 import type { LspClient, LspStatusSnapshot } from '../lsp/types.js';
 import type { InstructionLoadReason } from '../hooks/types.js';
+import type { WebSearchConfig } from '../tools/web-search/types.js';
+import { TaskStore } from '../services/task-store.js';
+import {
+  resolvePowerShellConfig,
+  type PowerShellSecurityConfig,
+} from '../security/powershell-security.js';
 
 // Other modules
 import { ideContextStore } from '../ide/ideContext.js';
@@ -265,6 +271,11 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     id: ApprovalMode.YOLO,
     name: 'YOLO',
     description: 'Automatically approve all tools',
+  },
+  [ApprovalMode.IZN]: {
+    id: ApprovalMode.IZN,
+    name: 'IZN',
+    description: 'Autonomous mode with scope reporting',
   },
 };
 
@@ -564,7 +575,7 @@ export const DEFAULT_TOOL_OUTPUT_BATCH_BUDGET = 200_000;
  * Provenance of an MCP server config. Two purposes (see issue #4615):
  *
  * - **Approval gating**: `'project'` (a workspace `.mcp.json`) and `'workspace'`
- *   (a workspace `.hopcode/settings.json`) are checked-in / shareable and therefore  
+ *   (a workspace `.hopcode/settings.json`) are checked-in / shareable and therefore
  *   untrusted — both are held behind the pending-approval gate. See
  *   {@link isGatedMcpScope}.
  * - **Precedence**: `'workspace'` and `'system'` rank ABOVE a `.mcp.json`
@@ -979,6 +990,10 @@ export interface ConfigParameters {
   ) => Promise<void>;
   /** Lifecycle handle for an external settings file watcher. Stopped during shutdown. */
   settingsWatcher?: { stopWatching(): void };
+  /** Web search provider configuration. */
+  webSearchConfig?: WebSearchConfig;
+  /** Resolved PowerShell security policy configuration. */
+  powerShellConfig?: PowerShellSecurityConfig;
 }
 
 function normalizeConfigOutputFormat(
@@ -1342,6 +1357,9 @@ export class Config {
   private readonly memoryManager: MemoryManager;
   private readonly modelChangeListeners = new Set<(model: string) => void>();
   private readonly settingsWatcher?: { stopWatching(): void };
+  private readonly webSearchConfig?: WebSearchConfig;
+  private readonly taskStore: TaskStore;
+  private readonly powerShellConfig: PowerShellSecurityConfig;
 
   constructor(params: ConfigParameters) {
     this.sessionId = params.sessionId ?? randomUUID();
@@ -1358,7 +1376,8 @@ export class Config {
     this.sessionData = params.sessionData;
     setDebugLogSession(this);
     this.debugLogger = createDebugLogger();
-    this.embeddingModel = params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
+    this.embeddingModel =
+      params.embeddingModel ?? DEFAULT_HOPCODE_EMBEDDING_MODEL;
     this.fileSystemService = new StandardFileSystemService();
     this.sandbox = params.sandbox;
     this.targetDir = path.resolve(params.targetDir);
@@ -1592,6 +1611,9 @@ export class Config {
     this.hooks = params.hooks;
     this.settingsWatcher = params.settingsWatcher;
     this.memoryManager = new MemoryManager();
+    this.webSearchConfig = params.webSearchConfig;
+    this.taskStore = new TaskStore(Storage.getRuntimeBaseDir(), this.sessionId);
+    this.powerShellConfig = resolvePowerShellConfig(params.powerShellConfig);
   }
 
   /**
@@ -3985,7 +4007,7 @@ export class Config {
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectHopcodeIgnore: this.fileFiltering.respectHopcodeIgnore,
+      respectHopCodeIgnore: this.fileFiltering.respectHopcodeIgnore,
     };
   }
 
@@ -4302,6 +4324,18 @@ export class Config {
 
   getAuthType(): AuthType | undefined {
     return this.getContentGeneratorConfig()?.authType;
+  }
+
+  getWebSearchConfig(): WebSearchConfig | undefined {
+    return this.webSearchConfig;
+  }
+
+  getTaskStore(): TaskStore {
+    return this.taskStore;
+  }
+
+  getPowerShellConfig(): PowerShellSecurityConfig {
+    return this.powerShellConfig;
   }
 
   getCliVersion(): string | undefined {
@@ -4909,6 +4943,10 @@ export class Config {
     await registerLazy(ToolNames.WEB_FETCH, async () => {
       const { WebFetchTool } = await import('../tools/web-fetch.js');
       return new WebFetchTool(this);
+    });
+    await registerLazy(ToolNames.WEB_SEARCH, async () => {
+      const { WebSearchTool } = await import('../tools/web-search/index.js');
+      return new WebSearchTool(this.webSearchConfig, this.getAuthType());
     });
     if (this.isLspEnabled() && this.getLspClient()) {
       await registerLazy(ToolNames.LSP, async () => {

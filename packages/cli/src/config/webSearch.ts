@@ -63,13 +63,14 @@ export function buildWebSearchConfig(
   let userDefault: string | undefined;
   let userMode: 'auto' | 'manual' | undefined;
 
-  if (settings.webSearch) {
+  const webSearchSettings = settings.advanced?.webSearch;
+  if (webSearchSettings) {
     // Use providers from settings.json
     providers = [
-      ...(settings.webSearch.provider as unknown as WebSearchProviderConfig[]),
+      ...(webSearchSettings.provider as unknown as WebSearchProviderConfig[]),
     ];
-    userDefault = settings.webSearch.default;
-    userMode = (settings.webSearch as unknown as WebSearchConfig).mode;
+    userDefault = webSearchSettings.default;
+    userMode = (webSearchSettings as unknown as WebSearchConfig).mode;
   } else {
     // Build providers from command line args and environment variables
 

@@ -15,8 +15,8 @@ vi.mock('node:fs', () => ({
   mkdirSync: mockMkdirSync,
 }));
 
-vi.mock('@hopcode/channel-base', () => ({
-  getGlobalHopcodeDir: () => '/tmp/test-qwen',
+vi.mock('@hoptrendy/channel-base', () => ({
+  getGlobalHopCodeDir: () => '/tmp/test-qwen',
 }));
 
 const { getCredsFilePath, loadCredentials, saveCredentials } = await import(

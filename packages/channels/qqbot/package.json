@@ -1,5 +1,5 @@
 ﻿{
-  "name": "@hopcode/channel-qqbot",
+  "name": "@hoptrendy/channel-qqbot",
   "version": "0.18.1",
   "description": "QQ Bot (QQ机器人) channel adapter for HopCode",
   "type": "module",
@@ -19,7 +19,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@hopcode/channel-base": "file:../base",
+    "@hoptrendy/channel-base": "file:../base",
     "@tencent-connect/qqbot-connector": "^1.1.0",
     "ws": "^8.18.0"
   },

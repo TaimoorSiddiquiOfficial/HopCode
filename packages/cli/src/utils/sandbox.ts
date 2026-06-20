@@ -15,12 +15,8 @@ import {
   SETTINGS_DIRECTORY_NAME,
 } from '../config/settings.js';
 import { promisify } from 'node:util';
-import type { Config, SandboxConfig } from '@hopcode/hopcode-core';
-import {
-  FatalSandboxError,
-  Storage,
-  isSubpath,
-} from '@hopcode/hopcode-core';
+import type { Config, SandboxConfig } from '@hoptrendy/hopcode-core';
+import { FatalSandboxError, Storage, isSubpath } from '@hoptrendy/hopcode-core';
 import { randomBytes } from 'node:crypto';
 import { writeStderrLine } from './stdioHelpers.js';
 import { parseSandboxImageName } from './sandboxImageName.js';
@@ -216,7 +212,7 @@ export async function start_sandbox(
     // same path the kernel will. mkdirSync first because realpathSync throws
     // on missing dirs and a custom HOPCODE_HOME / HOPCODE_RUNTIME_DIR may not exist
     // yet on first run.
-    const qwenDir = Storage.getGlobalHopcodeDir();
+    const qwenDir = Storage.getGlobalHopCodeDir();
     const runtimeDir = Storage.getRuntimeBaseDir();
     fs.mkdirSync(qwenDir, { recursive: true });
     fs.mkdirSync(runtimeDir, { recursive: true });
@@ -593,8 +589,7 @@ export async function start_sandbox(
 
   // name container after image, plus random suffix to avoid conflicts
   const imageName = parseSandboxImageName(image);
-  const isIntegrationTest =
-    process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
+  const isIntegrationTest = process.env['HOPCODE_INTEGRATION_TEST'] === 'true';
   let containerName;
   if (isIntegrationTest) {
     containerName = `hopcode-integration-test-${randomBytes(4).toString(
@@ -618,10 +613,7 @@ export async function start_sandbox(
 
   // copy HOPCODE_TEST_VAR for integration tests
   if (process.env['HOPCODE_TEST_VAR']) {
-    args.push(
-      '--env',
-      `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`,
-    );
+    args.push('--env', `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`);
   }
   for (const envVar of [
     'QWEN_DEBUG_LOG_FILE',

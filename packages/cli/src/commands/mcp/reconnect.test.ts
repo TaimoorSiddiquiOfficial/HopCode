@@ -9,7 +9,7 @@ import { reconnectCommand } from './reconnect.js';
 import { loadSettings } from '../../config/settings.js';
 import { assembleMcpServers } from '../../config/mcpServers.js';
 import { isWorkspaceTrusted } from '../../config/trustedFolders.js';
-import { Config, ExtensionManager } from '@hopcode/hopcode-core';
+import { Config, ExtensionManager } from '@hoptrendy/hopcode-core';
 
 const mockWriteStdoutLine = vi.hoisted(() => vi.fn());
 const mockWriteStderrLine = vi.hoisted(() => vi.fn());
@@ -39,7 +39,7 @@ vi.mock('../../config/mcpApprovals.js', () => ({
   getPendingGatedMcpServers: mockGetPendingGatedMcpServers,
 }));
 
-vi.mock('@hopcode/hopcode-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   Config: vi.fn(),
   FileDiscoveryService: vi.fn(),
   ExtensionManager: vi.fn(),

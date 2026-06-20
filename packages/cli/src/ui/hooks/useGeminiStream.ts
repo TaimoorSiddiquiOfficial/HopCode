@@ -27,7 +27,7 @@ import type {
   GeminiErrorEventValue,
   StopFailureErrorType,
   ActiveGoal,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   GeminiEventType as ServerGeminiEventType,
   SendMessageType,
@@ -57,7 +57,7 @@ import {
   setActiveGoal,
   clearActiveGoal,
   createDuplicateProviderToolCallResponse,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import { type Part, type PartListUnion, FinishReason } from '@google/genai';
 import type {
   HistoryItem,
@@ -865,9 +865,10 @@ export const useGeminiStream = (
               return { queryToSend: null, shouldProceed: false };
             }
             default: {
-              const unreachable: never = slashCommandResult;
+              const unhandled =
+                slashCommandResult as SlashCommandProcessorResult;
               throw new Error(
-                `Unhandled slash command result type: ${unreachable}`,
+                `Unhandled slash command result type: ${unhandled.type}`,
               );
             }
           }
@@ -3085,10 +3086,10 @@ export const useGeminiStream = (
   // otherwise a stale TeamManager could keep pushing into
   // the active queue ref after team recreation/remount.
   useEffect(() => {
-    let boundManager: import('@hopcode/hopcode-core').TeamManager | null =
+    let boundManager: import('@hoptrendy/hopcode-core').TeamManager | null =
       null;
     const handleManagerChange = (
-      manager: import('@hopcode/hopcode-core').TeamManager | null,
+      manager: import('@hoptrendy/hopcode-core').TeamManager | null,
     ) => {
       if (boundManager && boundManager !== manager) {
         boundManager.setLeaderMessageCallback(null);

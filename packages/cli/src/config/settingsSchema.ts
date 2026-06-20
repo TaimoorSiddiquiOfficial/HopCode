@@ -12,7 +12,7 @@ import type {
   AuthType,
   ChatCompressionSettings,
   ModelProvidersConfig,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import {
   ApprovalMode,
   DEFAULT_STOP_HOOK_BLOCK_CAP,
@@ -20,7 +20,7 @@ import {
   DEFAULT_TOOL_RESULTS_TOTAL_CHARS_THRESHOLD,
   DEFAULT_TRUNCATE_TOOL_OUTPUT_LINES,
   DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
-} from '@hopcode/hopcode-core';
+} from '@hoptrendy/hopcode-core';
 import type { CustomTheme } from '../ui/themes/theme.js';
 import { getLanguageSettingsOptions } from '../i18n/languages.js';
 
@@ -2288,6 +2288,65 @@ const SETTINGS_SCHEMA = {
           description: 'URL pattern (supports * wildcard)',
         },
       },
+      powershell: {
+        type: 'object',
+        label: 'PowerShell Security',
+        category: 'Security',
+        requiresRestart: true,
+        default: {},
+        description: 'PowerShell security policy settings.',
+        showInDialog: false,
+        properties: {
+          enabled: {
+            type: 'boolean',
+            label: 'Enable PowerShell',
+            category: 'Security',
+            requiresRestart: true,
+            default: false,
+            description:
+              'Master switch for PowerShell execution. When false, all PowerShell commands are blocked.',
+            showInDialog: false,
+          },
+          mode: {
+            type: 'string',
+            label: 'PowerShell Mode',
+            category: 'Security',
+            requiresRestart: true,
+            default: 'ask',
+            description:
+              'Default behavior when a PowerShell command does not match the allowlist or blocklist.',
+            showInDialog: false,
+          },
+          allowlist: {
+            type: 'array',
+            label: 'PowerShell Allowlist',
+            category: 'Security',
+            requiresRestart: true,
+            default: [] as string[],
+            description:
+              'Command patterns that are automatically allowed. Supports * wildcard matching.',
+            showInDialog: false,
+            items: {
+              type: 'string',
+              description: 'Command pattern (supports * wildcard)',
+            },
+          },
+          blocklist: {
+            type: 'array',
+            label: 'PowerShell Blocklist',
+            category: 'Security',
+            requiresRestart: true,
+            default: [] as string[],
+            description:
+              'Command patterns that are always blocked. Supports * wildcard matching.',
+            showInDialog: false,
+            items: {
+              type: 'string',
+              description: 'Command pattern (supports * wildcard)',
+            },
+          },
+        },
+      },
     },
   },
 
@@ -2300,6 +2359,51 @@ const SETTINGS_SCHEMA = {
     description: 'Advanced settings for power users.',
     showInDialog: false,
     properties: {
+      webSearch: {
+        type: 'object',
+        label: 'Web Search',
+        category: 'Advanced',
+        requiresRestart: true,
+        default: {},
+        description: 'Configuration for the web_search tool.',
+        showInDialog: false,
+        properties: {
+          default: {
+            type: 'string',
+            label: 'Default Provider',
+            category: 'Advanced',
+            requiresRestart: true,
+            default: undefined as string | undefined,
+            description:
+              'The default web search provider to use (e.g., "duckduckgo", "tavily", "google").',
+            showInDialog: false,
+          },
+          mode: {
+            type: 'string',
+            label: 'Search Mode',
+            category: 'Advanced',
+            requiresRestart: true,
+            default: 'auto',
+            description:
+              'Provider selection mode: "auto" tries providers in priority order with failover, "manual" uses only the default provider.',
+            showInDialog: false,
+          },
+          provider: {
+            type: 'array',
+            label: 'Providers',
+            category: 'Advanced',
+            requiresRestart: true,
+            default: [] as unknown[],
+            description:
+              'List of configured web search providers with their credentials and options.',
+            showInDialog: false,
+            items: {
+              type: 'object',
+              description: 'Provider configuration object',
+            },
+          },
+        },
+      },
       autoConfigureMemory: {
         type: 'boolean',
         label: 'Auto Configure Max Old Space Size',
