@@ -1131,7 +1131,7 @@ describe('subagent.ts', () => {
         expect(toolCallEvents[0].callId).toBe('call_1');
         expect(toolResultEvents[0].callId).toBe('call_1');
         expect(toolCallEvents[1].callId).toMatch(
-          /^call_1__qwen_dup_2:duplicate:/,
+          /^call_1__hopcode_dup_2:duplicate:/,
         );
         expect(toolResultEvents[1].callId).toBe(toolCallEvents[1].callId);
         expect(toolResultEvents[1].error).toContain(
@@ -1140,7 +1140,7 @@ describe('subagent.ts', () => {
 
         const thirdCallArgs = mockSendMessageStream.mock.calls[2][1];
         const parts = thirdCallArgs.message as Part[];
-        expect(parts[0].functionResponse?.id).toBe('call_1__qwen_dup_2');
+        expect(parts[0].functionResponse?.id).toBe('call_1__hopcode_dup_2');
         expect(parts[0].functionResponse?.response?.['error']).toContain(
           'Duplicate provider tool call id "call_1"',
         );
@@ -1232,7 +1232,7 @@ describe('subagent.ts', () => {
         expect(toolCallEvents).toHaveLength(1);
         expect(toolResultEvents).toHaveLength(1);
         expect(toolCallEvents[0].callId).toMatch(
-          /^call_1__qwen_dup_2:duplicate:/,
+          /^call_1__hopcode_dup_2:duplicate:/,
         );
         expect(toolResultEvents[0].callId).toBe(toolCallEvents[0].callId);
         expect(toolResultEvents[0].error).toContain(
@@ -1241,7 +1241,7 @@ describe('subagent.ts', () => {
 
         const secondCallArgs = mockSendMessageStream.mock.calls[1][1];
         const parts = secondCallArgs.message as Part[];
-        expect(parts[0].functionResponse?.id).toBe('call_1__qwen_dup_2');
+        expect(parts[0].functionResponse?.id).toBe('call_1__hopcode_dup_2');
         expect(parts[0].functionResponse?.response?.['error']).toContain(
           'Duplicate provider tool call id "call_1"',
         );

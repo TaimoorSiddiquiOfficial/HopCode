@@ -504,7 +504,7 @@ describe('runNonInteractive', () => {
     const toolCallEvent: ServerGeminiStreamEvent = {
       type: GeminiEventType.ToolCallRequest,
       value: {
-        callId: 'tool-history__qwen_dup_2',
+        callId: 'tool-history__hopcode_dup_2',
         providerCallId: 'tool-history',
         name: 'testTool',
         args: { arg1: 'value1' },
@@ -541,7 +541,7 @@ describe('runNonInteractive', () => {
 
     const duplicateParts = mockGeminiClient.sendMessageStream.mock.calls[1][0];
     expect(duplicateParts[0].functionResponse?.id).toBe(
-      'tool-history__qwen_dup_2',
+      'tool-history__hopcode_dup_2',
     );
     expect(duplicateParts[0].functionResponse?.response?.['error']).toContain(
       'Duplicate provider tool call id "tool-history"',

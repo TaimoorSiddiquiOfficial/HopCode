@@ -7866,7 +7866,7 @@ describe('Session', () => {
       const { parts } = result;
       expect(parts).toHaveLength(1);
       expect(result.stopAfterPermissionCancel).toBe(false);
-      expect(parts[0].functionResponse?.id).toBe('shell_1__qwen_dup_2');
+      expect(parts[0].functionResponse?.id).toBe('shell_1__hopcode_dup_2');
       expect(parts[0].functionResponse?.response).toEqual({
         error: expect.stringContaining(
           'Duplicate provider tool call id "shell_1"',
@@ -7875,7 +7875,7 @@ describe('Session', () => {
       expect(mockChatRecordingService.recordToolResult).toHaveBeenCalledWith(
         parts,
         expect.objectContaining({
-          callId: 'shell_1__qwen_dup_2',
+          callId: 'shell_1__hopcode_dup_2',
           status: 'error',
           resultDisplay: expect.stringContaining(
             'Duplicate provider tool call id "shell_1"',
@@ -7887,7 +7887,7 @@ describe('Session', () => {
         expect.objectContaining({
           update: expect.objectContaining({
             sessionUpdate: 'tool_call_update',
-            toolCallId: 'shell_1__qwen_dup_2',
+            toolCallId: 'shell_1__hopcode_dup_2',
             status: 'failed',
           }),
         }),
@@ -7896,7 +7896,7 @@ describe('Session', () => {
         expect.objectContaining({
           update: expect.objectContaining({
             sessionUpdate: 'tool_call',
-            toolCallId: 'shell_1__qwen_dup_2',
+            toolCallId: 'shell_1__hopcode_dup_2',
           }),
         }),
       );
@@ -7937,7 +7937,7 @@ describe('Session', () => {
       expect(mockToolRegistry.getTool).not.toHaveBeenCalled();
       const { parts } = result;
       expect(result.stopAfterPermissionCancel).toBe(false);
-      expect(parts[0].functionResponse?.id).toBe('todo_1__qwen_dup_2');
+      expect(parts[0].functionResponse?.id).toBe('todo_1__hopcode_dup_2');
       expect(parts[0].functionResponse?.response).toEqual({
         error: expect.stringContaining(
           'Duplicate provider tool call id "todo_1"',
@@ -7947,7 +7947,7 @@ describe('Session', () => {
         expect.objectContaining({
           update: expect.objectContaining({
             sessionUpdate: 'tool_call_update',
-            toolCallId: 'todo_1__qwen_dup_2',
+            toolCallId: 'todo_1__hopcode_dup_2',
             status: 'failed',
           }),
         }),
@@ -7962,7 +7962,7 @@ describe('Session', () => {
       expect(mockChatRecordingService.recordToolResult).toHaveBeenCalledWith(
         parts,
         expect.objectContaining({
-          callId: 'todo_1__qwen_dup_2',
+          callId: 'todo_1__hopcode_dup_2',
           status: 'error',
         }),
       );
@@ -8019,7 +8019,7 @@ describe('Session', () => {
       expect(result.stopAfterPermissionCancel).toBe(false);
       expect(parts.map((part) => part.functionResponse?.id)).toEqual([
         'call_a',
-        'dup_mid__qwen_dup_2',
+        'dup_mid__hopcode_dup_2',
         'call_c',
       ]);
       expect(parts[1].functionResponse?.response).toEqual({
