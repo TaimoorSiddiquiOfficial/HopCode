@@ -1114,7 +1114,7 @@ export class Session implements SessionContext {
   /**
    * Generate a server-side follow-up suggestion for the just-completed
    * turn and push it to attached clients via the daemon's
-   * `qwen/notify/session/prompt-suggestion` extNotification. Mirrors
+   * `hopcode/notify/session/prompt-suggestion` extNotification. Mirrors
    * the CLI's `AppContainer.tsx` integration: same `generatePromptSuggestion`
    * call, same `enableCacheSharing` flag forwarding, same curated
    * history slice (`getHistory(true).slice(-40)`).
@@ -1174,7 +1174,7 @@ export class Session implements SessionContext {
         if (ac.signal.aborted) return;
         if (r.suggestion) {
           await this.client.extNotification(
-            'qwen/notify/session/prompt-suggestion',
+            'hopcode/notify/session/prompt-suggestion',
             {
               v: 1,
               sessionId: this.sessionId,
@@ -2642,7 +2642,7 @@ export class Session implements SessionContext {
       .getChatRecordingService()
       ?.setTitleRecordedCallback((customTitle, titleSource) => {
         void this.client
-          .extNotification('qwen/notify/session/title-update', {
+          .extNotification('hopcode/notify/session/title-update', {
             v: 1,
             sessionId: this.sessionId,
             title: customTitle,
@@ -2945,7 +2945,7 @@ export class Session implements SessionContext {
     reason: PromptResponse['stopReason'],
   ): Promise<void> {
     try {
-      await this.client.extNotification('_qwencode/end_turn', {
+      await this.client.extNotification('_hopcode/end_turn', {
         sessionId: this.sessionId,
         reason,
         source: 'background_notification',
@@ -3025,7 +3025,7 @@ export class Session implements SessionContext {
     // A2 (#4511): notify attached clients of an in-session mode switch.
     // Mirrors the model-update extNotification in `setModel`.
     void this.client
-      .extNotification('qwen/notify/session/mode-update', {
+      .extNotification('hopcode/notify/session/mode-update', {
         v: 1,
         sessionId: this.sessionId,
         currentModeId: params.modeId,
@@ -3086,7 +3086,7 @@ export class Session implements SessionContext {
     // the change (the HTTP path also flows through this method), avoiding a
     // double publish. Fire-and-forget, matching the MCP-budget extNotification.
     void this.client
-      .extNotification('qwen/notify/session/model-update', {
+      .extNotification('hopcode/notify/session/model-update', {
         v: 1,
         sessionId: this.sessionId,
         currentModelId: effectiveModelId,
@@ -3167,7 +3167,7 @@ export class Session implements SessionContext {
     // legacy frame for this change, not two. `setMode` omits the flag, so
     // its dual-emit still fires (it has no `sendUpdate`).
     void this.client
-      .extNotification('qwen/notify/session/mode-update', {
+      .extNotification('hopcode/notify/session/mode-update', {
         v: 1,
         sessionId: this.sessionId,
         currentModeId: newModeId,
@@ -4688,7 +4688,7 @@ export class Session implements SessionContext {
       .then((hookResult) => {
         if (!hookResult.terminalSequence) return;
         return this.client.extNotification(
-          'qwen/notify/session/terminal-sequence',
+          'hopcode/notify/session/terminal-sequence',
           {
             v: 1,
             sessionId: this.sessionId,
