@@ -1003,6 +1003,7 @@ export const DAEMON_APPROVAL_MODES = [
   'default',
   'auto-edit',
   'auto',
+  'yolo',
   'izn',
 ] as const;
 export type DaemonApprovalMode = (typeof DAEMON_APPROVAL_MODES)[number];
@@ -1010,7 +1011,7 @@ export type DaemonApprovalMode = (typeof DAEMON_APPROVAL_MODES)[number];
 /**
  * Result body of `POST /session/:id/approval-mode`. `previous` and
  * `mode` are typed as `string` (rather than `DaemonApprovalMode`) so
- * older SDK builds against a hypothetical future fifth mode literal
+ * older SDK builds against a hypothetical future mode literal
  * still parse — branch on the values you handle and treat the rest as
  * opaque. `persisted: true` indicates the change was also written to
  * `tools.approvalMode` in workspace settings (set via the route's
