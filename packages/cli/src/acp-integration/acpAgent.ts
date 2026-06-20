@@ -4829,8 +4829,11 @@ class HopCodeAgent implements Agent {
       typeof params['cwd'] === 'string' ? params['cwd'] : undefined;
     const cwd = requestedCwd || process.cwd();
     const SESSION_ID_RE = /^[0-9a-fA-F-]{32,36}$/;
+    const normalizedMethod = method.startsWith('qwen/')
+      ? `hopcode/${method.slice('qwen/'.length)}`
+      : method;
 
-    switch (method) {
+    switch (normalizedMethod) {
       case 'hopcode/providers/list': {
         return {
           providers: ALL_PROVIDERS.map((provider) =>

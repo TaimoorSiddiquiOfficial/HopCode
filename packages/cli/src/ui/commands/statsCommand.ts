@@ -568,7 +568,7 @@ async function writeStatsExport(
         ? formatTokenUsageSummaryAsJson(summary)
         : `${formatTokenUsageSummaryAsCsv(summary)}\n`;
     const cwd = path.resolve(getConfigCwd(context));
-    const defaultFilename = `qwen-token-usage-${summary.period}-${summary.value}.${parsed.format}`;
+    const defaultFilename = `hopcode-token-usage-${summary.period}-${summary.value}.${parsed.format}`;
     const targetPath = path.resolve(cwd, parsed.outputPath || defaultFilename);
     const outputDirectory = path.dirname(targetPath);
 

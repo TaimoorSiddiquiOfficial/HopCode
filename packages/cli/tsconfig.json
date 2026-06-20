@@ -12,7 +12,14 @@
       "@hoptrendy/acp-bridge": ["../acp-bridge/src/index.ts"],
       "@hoptrendy/acp-bridge/*": ["../acp-bridge/src/*"],
       "@hoptrendy/hopcode-server": ["../server/src/index.ts"],
-      "@hoptrendy/hopcode-server/*": ["../server/src/*"]
+      "@hoptrendy/hopcode-server/*": ["../server/src/*"],
+      "@hoptrendy/channel-base": ["../channels/base/src/index.ts"],
+      "@hoptrendy/channel-telegram": ["../channels/telegram/src/index.ts"],
+      "@hoptrendy/channel-weixin": ["../channels/weixin/src/index.ts"],
+      "@hoptrendy/channel-dingtalk": ["../channels/dingtalk/src/index.ts"],
+      "@hoptrendy/channel-feishu": ["../channels/feishu/src/index.ts"],
+      "@hoptrendy/channel-qqbot": ["../channels/qqbot/src/index.ts"],
+      "@hoptrendy/quran-guidance": ["../quran-guidance/src/index.ts"]
     }
   },
   "include": [
@@ -101,6 +108,8 @@
     { "path": "../channels/telegram" },
     { "path": "../channels/weixin" },
     { "path": "../channels/dingtalk" },
-    { "path": "../channels/feishu" }
+    { "path": "../channels/feishu" },
+    { "path": "../channels/qqbot" },
+    { "path": "../quran-guidance" }
   ]
 }

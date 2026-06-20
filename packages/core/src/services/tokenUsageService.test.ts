@@ -36,8 +36,8 @@ describe('tokenUsageService', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-05-25T10:00:00.000Z'));
     originalRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
-    originalDebugLogFileEnv = process.env['QWEN_DEBUG_LOG_FILE'];
-    tempDir = await mkdtemp(path.join(tmpdir(), 'qwen-token-usage-'));
+    originalDebugLogFileEnv = process.env['HOPCODE_DEBUG_LOG_FILE'];
+    tempDir = await mkdtemp(path.join(tmpdir(), 'hopcode-token-usage-'));
     process.env['HOPCODE_RUNTIME_DIR'] = tempDir;
   });
 
@@ -51,9 +51,9 @@ describe('tokenUsageService', () => {
       process.env['HOPCODE_RUNTIME_DIR'] = originalRuntimeDir;
     }
     if (originalDebugLogFileEnv === undefined) {
-      delete process.env['QWEN_DEBUG_LOG_FILE'];
+      delete process.env['HOPCODE_DEBUG_LOG_FILE'];
     } else {
-      process.env['QWEN_DEBUG_LOG_FILE'] = originalDebugLogFileEnv;
+      process.env['HOPCODE_DEBUG_LOG_FILE'] = originalDebugLogFileEnv;
     }
     Storage.setRuntimeBaseDir(null);
     await rm(tempDir, { recursive: true, force: true });
@@ -604,7 +604,7 @@ describe('tokenUsageService', () => {
 
   it('tolerates malformed JSONL lines while querying', async () => {
     vi.useRealTimers();
-    process.env['QWEN_DEBUG_LOG_FILE'] = '1';
+    process.env['HOPCODE_DEBUG_LOG_FILE'] = '1';
     const filePath = getTokenUsageFilePath('2026-05');
     const sessionId = 'token-usage-read-test';
     setDebugLogSession({ getSessionId: () => sessionId });

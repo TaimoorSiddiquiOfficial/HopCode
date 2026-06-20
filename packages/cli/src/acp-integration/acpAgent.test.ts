@@ -4806,7 +4806,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 
     expect(extNotification).toHaveBeenCalledTimes(1);
     expect(extNotification).toHaveBeenCalledWith(
-      'qwen/notify/session/mcp-budget-event',
+      'hopcode/notify/session/mcp-budget-event',
       {
         v: 1,
         sessionId,
@@ -4830,7 +4830,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 
     expect(extNotification).toHaveBeenCalledTimes(2);
     expect(extNotification).toHaveBeenLastCalledWith(
-      'qwen/notify/session/mcp-budget-event',
+      'hopcode/notify/session/mcp-budget-event',
       {
         v: 1,
         sessionId,
@@ -5676,8 +5676,8 @@ describe('normalizeCoreSettingValue', () => {
   });
 
   it('accepts an allowed enum value and rejects an unknown one', () => {
-    expect(normalizeCoreSettingValue('tools.approvalMode', 'yolo')).toBe(
-      'yolo',
+    expect(normalizeCoreSettingValue('tools.approvalMode', 'auto')).toBe(
+      'auto',
     );
     expect(() =>
       normalizeCoreSettingValue('tools.approvalMode', 'bogus'),

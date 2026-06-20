@@ -684,10 +684,10 @@ describe('statsCommand', () => {
         messageType: 'info',
       });
       expect(result.content).toContain(
-        'Token usage exported to CSV: qwen-token-usage-month-2025-07.csv',
+        'Token usage exported to CSV: hopcode-token-usage-month-2025-07.csv',
       );
       const csv = await readFile(
-        path.join(tempDir, 'qwen-token-usage-month-2025-07.csv'),
+        path.join(tempDir, 'hopcode-token-usage-month-2025-07.csv'),
         'utf-8',
       );
       expect(csv).toContain(

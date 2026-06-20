@@ -1144,7 +1144,7 @@ export class Config {
    * `startMcpDiscoveryInBackground` (or legacy blocking discovery)
    * fires the first pass. Pre-fix the acpAgent registered after
    * `initialize()` returned, missing the first pass entirely under
-   * `HOPCODE_LEGACY_MCP_BLOCKING=1` and racing against background
+   * `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` and racing against background
    * discovery completion under the default mode.
    */
   private pendingMcpBudgetCallback?: (event: McpBudgetEvent) => void;
@@ -1358,7 +1358,7 @@ export class Config {
   private readonly modelChangeListeners = new Set<(model: string) => void>();
   private readonly settingsWatcher?: { stopWatching(): void };
   private readonly webSearchConfig?: WebSearchConfig;
-  private readonly taskStore: TaskStore;
+  private taskStore?: TaskStore;
   private readonly powerShellConfig: PowerShellSecurityConfig;
 
   constructor(params: ConfigParameters) {
@@ -1612,7 +1612,6 @@ export class Config {
     this.settingsWatcher = params.settingsWatcher;
     this.memoryManager = new MemoryManager();
     this.webSearchConfig = params.webSearchConfig;
-    this.taskStore = new TaskStore(Storage.getRuntimeBaseDir(), this.sessionId);
     this.powerShellConfig = resolvePowerShellConfig(params.powerShellConfig);
   }
 
@@ -1873,10 +1872,10 @@ export class Config {
     // after the registry exists. This lets `Config.initialize()` (and the
     // cli's `input_enabled` checkpoint) resolve without waiting on MCP
     // server response time. Users can opt back into the legacy synchronous
-    // behavior with `HOPCODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
+    // behavior with `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` — kept ≥ 1 release as
     // an escape hatch.
     const legacyBlockingMcp =
-      process.env['HOPCODE_LEGACY_MCP_BLOCKING'] === '1';
+      process.env['HOPCODE_CODE_LEGACY_MCP_BLOCKING'] === '1';
     // Also force the inline-discovery skip when the caller opts
     // out of MCP entirely (ACP bootstrap path) — otherwise the legacy
     // blocking mode would still spawn MCP servers via the tool-registry
@@ -2089,7 +2088,7 @@ export class Config {
    *
    * Resolves immediately when:
    * - bare mode is on (no MCP discovery is started),
-   * - `HOPCODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
+   * - `HOPCODE_CODE_LEGACY_MCP_BLOCKING=1` is set (MCP already discovered
    *   synchronously inside {@link initialize}), or
    * - no MCP servers are configured.
    */
@@ -4331,7 +4330,10 @@ export class Config {
   }
 
   getTaskStore(): TaskStore {
-    return this.taskStore;
+    return (this.taskStore ??= new TaskStore(
+      Storage.getRuntimeBaseDir(),
+      this.sessionId,
+    ));
   }
 
   getPowerShellConfig(): PowerShellSecurityConfig {
