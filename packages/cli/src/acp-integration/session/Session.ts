@@ -2902,7 +2902,7 @@ export class Session implements SessionContext {
       content: { type: 'text', text: item.displayText },
       _meta: {
         source: 'background_notification',
-        qwenDiscreteMessage: true,
+        hopcodeDiscreteMessage: true,
         backgroundTask: {
           taskId: item.taskId,
           status: item.status,
@@ -2923,7 +2923,7 @@ export class Session implements SessionContext {
       content: { type: 'text', text },
       _meta: {
         source: 'background_notification_response',
-        qwenDiscreteMessage: true,
+        hopcodeDiscreteMessage: true,
         backgroundTask: {
           taskId: item.taskId,
           status: item.status,
@@ -3114,7 +3114,7 @@ export class Session implements SessionContext {
 
     return {
       _meta: {
-        qwenModelSwitch: {
+        hopcodeModelSwitch: {
           authType: effectiveAuthType,
           modelId: effectiveModelId,
           baseUrl: after?.baseUrl ?? '(default)',
@@ -3336,7 +3336,7 @@ export class Session implements SessionContext {
 
     // Bounded-concurrency runner: matches core's `runConcurrently`
     // behaviour (`coreToolScheduler.ts:1506`), capped by
-    // `HOPCODE_MAX_TOOL_CONCURRENCY` (default 10). Results are returned
+    // `HOPCODE_CODE_MAX_TOOL_CONCURRENCY` (default 10). Results are returned
     // in input order regardless of resolution order.
     const runBounded = async (
       calls: FunctionCall[],
@@ -3345,7 +3345,7 @@ export class Session implements SessionContext {
       shouldSkipUnstarted?: () => boolean,
     ): Promise<RunToolResult[]> => {
       const parsed = parseInt(
-        process.env['HOPCODE_MAX_TOOL_CONCURRENCY'] || '',
+        process.env['HOPCODE_CODE_MAX_TOOL_CONCURRENCY'] || '',
         10,
       );
       const maxConcurrency =
