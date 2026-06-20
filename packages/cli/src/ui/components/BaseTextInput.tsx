@@ -133,7 +133,6 @@ export const BaseTextInput = ({
   showCursor = true,
   placeholder,
   prefix,
-  prefixWidth = 2,
   borderColor,
   topRightLabel,
   isActive = true,
