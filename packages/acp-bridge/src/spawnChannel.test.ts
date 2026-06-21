@@ -1,6 +1,6 @@
 ﻿/**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -27,7 +27,7 @@
  *     but the denylist still wins).
  *   - An `overrides` map with `undefined` value silently failing to
  *     delete a stale inherited var (PR 14 fix #4247 wenshao R5 —
- *     the `runQwenServe.ts:216` use case).
+ *     the `runHopCodeServe.ts:216` use case).
  *
  * Each branch listed below is now regression-guarded by an assertion.
  */
@@ -69,12 +69,15 @@ describe('createSpawnChannelFactory env policy', () => {
   const originalArgv1 = process.argv[1];
   let originalSimple: string | undefined;
   let originalServerToken: string | undefined;
+  let originalCliEntry: string | undefined;
 
   beforeEach(() => {
     mockSpawn.mockReset();
     originalSimple = process.env['HOPCODE_SIMPLE'];
     originalServerToken = process.env['HOPCODE_SERVER_TOKEN'];
-    process.argv[1] = '/tmp/qwen.js';
+    originalCliEntry = process.env['HOPCODE_CLI_ENTRY'];
+    process.argv[1] = '/tmp/hopcode.js';
+    delete process.env['HOPCODE_CLI_ENTRY'];
     process.env['HOPCODE_SIMPLE'] = '1';
     process.env['HOPCODE_SERVER_TOKEN'] = 'secret';
   });
@@ -90,6 +93,11 @@ describe('createSpawnChannelFactory env policy', () => {
       delete process.env['HOPCODE_SERVER_TOKEN'];
     } else {
       process.env['HOPCODE_SERVER_TOKEN'] = originalServerToken;
+    }
+    if (originalCliEntry === undefined) {
+      delete process.env['HOPCODE_CLI_ENTRY'];
+    } else {
+      process.env['HOPCODE_CLI_ENTRY'] = originalCliEntry;
     }
   });
 
@@ -108,6 +116,16 @@ describe('createSpawnChannelFactory env policy', () => {
     expect(spawnOptions?.env).not.toHaveProperty('HOPCODE_SIMPLE');
     expect(spawnOptions?.env).not.toHaveProperty('HOPCODE_SERVER_TOKEN');
     expect(spawnOptions?.env?.['HOPCODE_NO_RELAUNCH']).toBe('true');
+  });
+
+  it('uses HOPCODE_CLI_ENTRY when provided', async () => {
+    mockSpawn.mockReturnValue(createFakeChildProcess());
+    process.env['HOPCODE_CLI_ENTRY'] = '/tmp/custom-hopcode.js';
+
+    const factory = createSpawnChannelFactory();
+    await factory('/tmp/project', {});
+
+    expect(mockSpawn.mock.calls[0]?.[1]).toContain('/tmp/custom-hopcode.js');
   });
 });
 

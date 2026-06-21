@@ -302,9 +302,9 @@ export function startRssPolling(pid: number, intervalMs = 100): RssPoller {
  * `hopcode --acp` process between the daemon-facing ACP child and stdio MCP
  * servers.
  *
- * `pgrepOpts.acpFilter` defaults to `'hopcode.*--acp'` (matches the spawned
- * `hopcode --acp` child); pass an override only if a future bridge changes
- * the ACP child invocation shape.
+ * `pgrepOpts.acpFilter` defaults to matching a direct child with a `--acp`
+ * argument. The spawned command can be `node <path>/index.js --acp`, so this
+ * intentionally does not depend on the CLI entry path containing `hopcode`.
  *
  * Returns explicit PID arrays so callers can cross-check (e.g., assert
  * the ACP child PID matches what the test setup observed). `total` is
@@ -320,7 +320,7 @@ export function countDescendants(
   daemonPid: number,
   pgrepOpts: { acpFilter?: string; mcpFilter?: string } = {},
 ): DescendantCount {
-  const acpFilter = pgrepOpts.acpFilter ?? 'hopcode.*--acp';
+  const acpFilter = pgrepOpts.acpFilter ?? '[[:space:]]--acp($|[[:space:]])';
   const acpChildren = pgrepChildren(daemonPid, acpFilter);
   const mcpGrandchildren: number[] = [];
   for (const acpPid of acpChildren) {

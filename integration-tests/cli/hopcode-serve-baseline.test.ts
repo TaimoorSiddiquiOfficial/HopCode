@@ -101,7 +101,8 @@ const HAS_PROMPT_LATENCY_CREDENTIAL =
   process.env['HOPCODE_BASELINE_ENABLE_PROMPT_LATENCY'] === '1' ||
   PROMPT_LATENCY_CREDENTIAL_ENV_KEYS.some((key) => Boolean(process.env[key])) ||
   Object.entries(process.env).some(
-    ([key, value]) => key.startsWith('HOPCODE_CUSTOM_API_KEY_') && Boolean(value),
+    ([key, value]) =>
+      key.startsWith('HOPCODE_CUSTOM_API_KEY_') && Boolean(value),
   );
 const SKIP_PROMPT_LATENCY =
   process.env['HOPCODE_BASELINE_SKIP_PROMPT_LATENCY'] === '1' ||
@@ -447,7 +448,7 @@ async function measureRssAtSessionCount(sessionCount: number): Promise<{
       // measurement.
       //
       // Architectural note (F2 workspace pool): the daemon hosts a
-      // workspace-shared MCP transport pool (`QwenAgent.mcpPool`).
+      // workspace-shared MCP transport pool (`HopCodeAgent.mcpPool`).
       // All sessions of a workspace share ONE transport per configured
       // server, so pgrep observes exactly `MCP_SERVERS_CONFIGURED`
       // grandchildren regardless of session count. (Pre-F2, bootstrap
