@@ -1,4 +1,4 @@
-import HopCodeSettingsPage, { mcpServersMeta as meta } from './HopCodeSettingsPage';
+import HopCodeSettingsPage, { mcpServersMeta as meta } from './HopcodeSettingsPage';
 
 export { meta };
 

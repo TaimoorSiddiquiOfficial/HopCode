@@ -417,8 +417,9 @@ export async function checkForUpdates(options: CheckOptions = {}): Promise<Updat
   mainLog.info('[auto-update] Checking stable release feed', {
     brand: BRAND.id,
     provider: updateSource.provider,
-    owner: updateSource.owner,
-    repo: updateSource.repo,
+    ...(updateSource.provider === 'github'
+      ? { owner: updateSource.owner, repo: updateSource.repo }
+      : { url: updateSource.url }),
     autoDownload,
   })
 
@@ -549,8 +550,9 @@ export async function checkForUpdatesOnLaunch(): Promise<UpdateOnLaunchResult> {
   mainLog.info('[auto-update] Checking for updates on launch...', {
     brand: BRAND.id,
     provider: updateSource.provider,
-    owner: updateSource.owner,
-    repo: updateSource.repo,
+    ...(updateSource.provider === 'github'
+      ? { owner: updateSource.owner, repo: updateSource.repo }
+      : { url: updateSource.url }),
   })
 
   const info = await checkForUpdates({ autoDownload: true })

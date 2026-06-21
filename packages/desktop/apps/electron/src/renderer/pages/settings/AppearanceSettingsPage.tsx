@@ -29,7 +29,7 @@ import {
   SettingsToggle,
 } from '@/components/settings'
 import { usePetCompanion } from '@/pets/usePetCompanion'
-import { HopCodePet } from '@/components/pet/HopCodePet'
+import { HopCodePet } from '@/components/pet/HopcodePet'
 import { useWorkspaceIcons } from '@/hooks/useWorkspaceIcon'
 import { Info_DataTable, SortableHeader } from '@/components/info/Info_DataTable'
 import { Info_Badge } from '@/components/info/Info_Badge'

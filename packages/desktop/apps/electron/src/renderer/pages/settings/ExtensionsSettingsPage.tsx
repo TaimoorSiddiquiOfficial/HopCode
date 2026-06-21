@@ -1,4 +1,4 @@
-import HopCodeSettingsPage, { extensionsMeta as meta } from './HopCodeSettingsPage';
+import HopCodeSettingsPage, { extensionsMeta as meta } from './HopcodeSettingsPage';
 
 export { meta };
 

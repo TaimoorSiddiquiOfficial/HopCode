@@ -19,7 +19,7 @@ const getWorkspaceByNameOrIdMock = mock(
 const loadWorkspaceConfigMock = mock(
   (_rootPath: string) => mockedWorkspaceConfig,
 );
-const getQwenCoreSettingsViaAcpMock = mock(async () => ({
+const getHopCodeCoreSettingsViaAcpMock = mock(async () => ({
   user: {
     path: '',
     values: { 'tools.approvalMode': 'izn' },
@@ -35,7 +35,7 @@ const getQwenCoreSettingsViaAcpMock = mock(async () => ({
   },
   workspaceTrusted: true,
 }));
-const setQwenCoreSettingViaAcpMock = mock(async () => ({
+const setHopCodeCoreSettingViaAcpMock = mock(async () => ({
   user: { path: '', values: {}, mcpServers: [], hooks: [] },
   workspace: { path: '', values: {}, mcpServers: [], hooks: [] },
   merged: {
@@ -47,13 +47,17 @@ const setQwenCoreSettingViaAcpMock = mock(async () => ({
   workspaceTrusted: true,
 }));
 const applyGlobalPermissionModeMock = mock(async (_mode: string) => {});
-const getHopCodeMemoryPathsViaAcpMock = mock(async () => ({
+const getHopCodeMemoryPathsViaAcpMock = mock(async (_options: unknown) => ({
   userMemoryFile: '/tmp/HOPCODE.md',
   projectMemoryFile: '/tmp/project/AGENTS.md',
   autoMemoryDir: '/tmp/project/memory',
 }));
-const getHopCodeMemorySettingsViaAcpMock = mock(async () => ({}));
-const setHopCodeMemorySettingsViaAcpMock = mock(async () => ({}));
+const getHopCodeMemorySettingsViaAcpMock = mock(
+  async (_options: unknown) => ({}),
+);
+const setHopCodeMemorySettingsViaAcpMock = mock(
+  async (_options: unknown, _updates: unknown) => ({}),
+);
 
 mock.module('@craft-agent/shared/config', () => ({
   getPreferencesPath: () => '/tmp/preferences.json',
@@ -72,18 +76,18 @@ mock.module('@craft-agent/shared/workspaces', () => ({
 }));
 
 mock.module('@craft-agent/shared/agent', () => ({
-  getQwenCoreSettingsViaAcp: getQwenCoreSettingsViaAcpMock,
-  setQwenCoreSettingViaAcp: setQwenCoreSettingViaAcpMock,
-  setQwenMcpServerViaAcp: mock(async () => ({})),
-  removeQwenMcpServerViaAcp: mock(async () => ({})),
-  setQwenHookViaAcp: mock(async () => ({})),
-  removeQwenHookViaAcp: mock(async () => ({})),
-  setQwenExtensionSettingViaAcp: mock(async () => ({})),
+  getHopCodeCoreSettingsViaAcp: getHopCodeCoreSettingsViaAcpMock,
+  setHopCodeCoreSettingViaAcp: setHopCodeCoreSettingViaAcpMock,
+  setHopCodeMcpServerViaAcp: mock(async () => ({})),
+  removeHopCodeMcpServerViaAcp: mock(async () => ({})),
+  setHopCodeHookViaAcp: mock(async () => ({})),
+  removeHopCodeHookViaAcp: mock(async () => ({})),
+  setHopCodeExtensionSettingViaAcp: mock(async () => ({})),
   getHopCodePermissionSettingsViaAcp: mock(async () => ({})),
-  setQwenPermissionRulesViaAcp: mock(async () => ({})),
+  setHopCodePermissionRulesViaAcp: mock(async () => ({})),
   getHopCodeMemorySettingsViaAcp: getHopCodeMemorySettingsViaAcpMock,
   setHopCodeMemorySettingsViaAcp: setHopCodeMemorySettingsViaAcpMock,
-  gethopcodeSettingsPathViaAcp: mock(async () => ''),
+  getHopCodeSettingsPathViaAcp: mock(async () => ''),
   getHopCodeMemoryPathsViaAcp: getHopCodeMemoryPathsViaAcpMock,
 }));
 
@@ -98,8 +102,8 @@ describe('settings default thinking RPC handlers', () => {
     mockedWorkspaceConfig = null;
     getWorkspaceByNameOrIdMock.mockClear();
     loadWorkspaceConfigMock.mockClear();
-    getQwenCoreSettingsViaAcpMock.mockClear();
-    setQwenCoreSettingViaAcpMock.mockClear();
+    getHopCodeCoreSettingsViaAcpMock.mockClear();
+    setHopCodeCoreSettingViaAcpMock.mockClear();
     applyGlobalPermissionModeMock.mockClear();
     getHopCodeMemorySettingsViaAcpMock.mockClear();
     setHopCodeMemorySettingsViaAcpMock.mockClear();
@@ -189,7 +193,7 @@ describe('settings default thinking RPC handlers', () => {
     expect(setDefaultThinkingLevelMock).not.toHaveBeenCalled();
   });
 
-  it('returns global permission mode through Qwen ACP', async () => {
+  it('returns global permission mode through HopCode ACP', async () => {
     const getHandler = handlers.get(
       RPC_CHANNELS.settings.GET_GLOBAL_PERMISSION_MODE,
     );
@@ -197,13 +201,13 @@ describe('settings default thinking RPC handlers', () => {
 
     const result = await getHandler!(requestContext);
     expect(result).toBe('allow-all');
-    expect(getQwenCoreSettingsViaAcpMock).toHaveBeenCalledTimes(1);
+    expect(getHopCodeCoreSettingsViaAcpMock).toHaveBeenCalledTimes(1);
     expect(applyGlobalPermissionModeMock).toHaveBeenCalledWith('allow-all', {
       changedBy: 'restore',
     });
   });
 
-  it('persists global permission mode through Qwen ACP', async () => {
+  it('persists global permission mode through HopCode ACP', async () => {
     const setHandler = handlers.get(
       RPC_CHANNELS.settings.SET_GLOBAL_PERMISSION_MODE,
     );
@@ -211,12 +215,12 @@ describe('settings default thinking RPC handlers', () => {
 
     const result = await setHandler!(requestContext, 'izn');
     expect(result).toEqual({ success: true });
-    const call = setQwenCoreSettingViaAcpMock.mock.calls[0] as unknown[];
+    const call = setHopCodeCoreSettingViaAcpMock.mock.calls[0] as unknown[];
     expect(call.slice(1)).toEqual(['user', 'tools.approvalMode', 'izn']);
     expect(applyGlobalPermissionModeMock).toHaveBeenCalledWith('allow-all');
   });
 
-  it('syncs global permission mode when approval mode is saved as a Qwen core setting', async () => {
+  it('syncs global permission mode when approval mode is saved as a HopCode core setting', async () => {
     const setHandler = handlers.get(
       RPC_CHANNELS.settings.SET_HOPCODE_CORE_SETTING,
     );
@@ -227,7 +231,7 @@ describe('settings default thinking RPC handlers', () => {
     expect(applyGlobalPermissionModeMock).toHaveBeenCalledWith('allow-all');
   });
 
-  it('uses the workspace working directory as the Qwen memory project root', async () => {
+  it('uses the workspace working directory as the HopCode memory project root', async () => {
     mockedWorkspace = {
       id: 'ws-1',
       name: 'hopcode',
@@ -253,7 +257,7 @@ describe('settings default thinking RPC handlers', () => {
     });
   });
 
-  it('loads memory settings through the workspace Qwen ACP process', async () => {
+  it('loads memory settings through the workspace HopCode ACP process', async () => {
     mockedWorkspace = {
       id: 'ws-1',
       name: 'hopcode',
@@ -272,14 +276,16 @@ describe('settings default thinking RPC handlers', () => {
     await getHandler!(requestContext, 'ws-1');
 
     expect(getHopCodeMemorySettingsViaAcpMock).toHaveBeenCalledTimes(1);
-    expect(getHopCodeMemorySettingsViaAcpMock.mock.calls[0]?.[0]).toMatchObject({
-      cwd: '/Users/dragon/Documents/hopcode',
-      processCwd: '/Users/dragon/.craft-agent/workspaces/hopcode',
-      projectRoot: '/Users/dragon/Documents/hopcode',
-    });
+    expect(getHopCodeMemorySettingsViaAcpMock.mock.calls[0]?.[0]).toMatchObject(
+      {
+        cwd: '/Users/dragon/Documents/hopcode',
+        processCwd: '/Users/dragon/.craft-agent/workspaces/hopcode',
+        projectRoot: '/Users/dragon/Documents/hopcode',
+      },
+    );
   });
 
-  it('saves memory settings through the workspace Qwen ACP process', async () => {
+  it('saves memory settings through the workspace HopCode ACP process', async () => {
     mockedWorkspace = {
       id: 'ws-1',
       name: 'hopcode',
@@ -299,11 +305,13 @@ describe('settings default thinking RPC handlers', () => {
     await setHandler!(requestContext, updates, 'ws-1');
 
     expect(setHopCodeMemorySettingsViaAcpMock).toHaveBeenCalledTimes(1);
-    expect(setHopCodeMemorySettingsViaAcpMock.mock.calls[0]?.[0]).toMatchObject({
-      cwd: '/Users/dragon/Documents/hopcode',
-      processCwd: '/Users/dragon/.craft-agent/workspaces/hopcode',
-      projectRoot: '/Users/dragon/Documents/hopcode',
-    });
+    expect(setHopCodeMemorySettingsViaAcpMock.mock.calls[0]?.[0]).toMatchObject(
+      {
+        cwd: '/Users/dragon/Documents/hopcode',
+        processCwd: '/Users/dragon/.craft-agent/workspaces/hopcode',
+        projectRoot: '/Users/dragon/Documents/hopcode',
+      },
+    );
     expect(setHopCodeMemorySettingsViaAcpMock.mock.calls[0]?.[1]).toBe(updates);
   });
 });

@@ -13,7 +13,7 @@ import { usePetActivityState } from '@/pets/usePetActivityState';
 import { usePetNotifications } from '@/pets/usePetNotifications';
 import { normalizePetSize } from '@/pets/pet-size';
 import { PetNotifications } from './PetNotifications';
-import { HopCodePet } from './HopCodePet';
+import { HopCodePet } from './HopcodePet';
 
 function ignoreDragError(promise: Promise<void> | undefined): void {
   void promise?.catch(() => {});

@@ -9,7 +9,7 @@ import { prepareMcpOAuth } from '@craft-agent/shared/auth';
 import { validateMcpConnection } from '@craft-agent/shared/mcp';
 import { RPC_CHANNELS } from '@craft-agent/shared/protocol';
 import {
-  getQwenWorkspacePreflightViaAcp,
+  getHopCodeWorkspacePreflightViaAcp,
   listHopCodeProvidersViaAcp,
 } from '@craft-agent/shared/agent';
 import { buildBackendHostRuntimeContext } from '@craft-agent/server-core/handlers';
@@ -57,9 +57,7 @@ function findPreflightCell(
 
 type SetupSignal = 'complete' | 'maybe-required' | 'required';
 
-function preflightSetupSignal(
-  preflight: Record<string, unknown>,
-): SetupSignal {
+function preflightSetupSignal(preflight: Record<string, unknown>): SetupSignal {
   const auth = findPreflightCell(preflight, 'auth');
   const authDetail = isRecord(auth?.detail) ? auth.detail : {};
   const authStatus = auth?.status;
@@ -87,13 +85,13 @@ function hasExistingProviderConfig(catalog: {
   });
 }
 
-async function getQwenSetupNeeds(deps: HandlerDeps) {
+async function getHopCodeSetupNeeds(deps: HandlerDeps) {
   if (isSetupDeferred()) {
     return completeSetupNeeds();
   }
 
   try {
-    const preflight = await getQwenWorkspacePreflightViaAcp({
+    const preflight = await getHopCodeWorkspacePreflightViaAcp({
       hostRuntime: buildBackendHostRuntimeContext(deps.platform),
     });
     const signal = preflightSetupSignal(preflight);
@@ -109,7 +107,7 @@ async function getQwenSetupNeeds(deps: HandlerDeps) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     deps.platform.logger?.warn(
-      `Qwen setup preflight failed; continuing to main UI: ${message}`,
+      `HopCode setup preflight failed; continuing to main UI: ${message}`,
     );
     return completeSetupNeeds();
   }
@@ -125,7 +123,7 @@ export function registerOnboardingHandlers(
   server.handle(RPC_CHANNELS.onboarding.GET_AUTH_STATE, async () => {
     const authState = await getAuthState();
     const setupNeeds = getSetupNeeds(authState).isFullyConfigured
-      ? await getQwenSetupNeeds(deps)
+      ? await getHopCodeSetupNeeds(deps)
       : getSetupNeeds(authState);
     // Redact raw credentials — renderer only needs boolean flags (hasCredentials, setupNeeds)
     return {

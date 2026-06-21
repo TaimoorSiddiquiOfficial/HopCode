@@ -18,5 +18,5 @@ const hopcodeFetcher = new HopCodeModelFetcher()
  * from FetchableProvider, this object will fail to compile until you add it here.
  */
 export const MODEL_FETCHERS: ModelFetcherMap = {
-  qwen: hopcodeFetcher,
+  hopcode: hopcodeFetcher,
 }

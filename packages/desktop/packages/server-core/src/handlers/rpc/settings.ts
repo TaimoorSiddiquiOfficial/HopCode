@@ -24,18 +24,18 @@ import {
   THINKING_LEVEL_IDS,
 } from '@craft-agent/shared/agent/thinking-levels';
 import {
-  getQwenCoreSettingsViaAcp,
+  getHopCodeCoreSettingsViaAcp,
   getHopCodeMemorySettingsViaAcp,
   getHopCodePermissionSettingsViaAcp,
-  removeQwenHookViaAcp,
-  removeQwenMcpServerViaAcp,
+  removeHopCodeHookViaAcp,
+  removeHopCodeMcpServerViaAcp,
   setHopCodeMemorySettingsViaAcp,
-  setQwenCoreSettingViaAcp,
-  setQwenExtensionSettingViaAcp,
-  setQwenHookViaAcp,
-  setQwenMcpServerViaAcp,
-  setQwenPermissionRulesViaAcp,
-  gethopcodeSettingsPathViaAcp,
+  setHopCodeCoreSettingViaAcp,
+  setHopCodeExtensionSettingViaAcp,
+  setHopCodeHookViaAcp,
+  setHopCodeMcpServerViaAcp,
+  setHopCodePermissionRulesViaAcp,
+  getHopCodeSettingsPathViaAcp,
   getHopCodeMemoryPathsViaAcp,
 } from '@craft-agent/shared/agent';
 import type {
@@ -125,7 +125,7 @@ export const HANDLED_CHANNELS = [
   RPC_CHANNELS.dialog.OPEN_FOLDER,
 ] as const;
 
-async function getQwenWorkspaceAcpOptions(
+async function getHopCodeWorkspaceAcpOptions(
   deps: HandlerDeps,
   ctx: RequestContext,
   workspaceId?: string,
@@ -156,7 +156,7 @@ async function getQwenWorkspaceAcpOptions(
   };
 }
 
-function mapPermissionModeToQwenApprovalMode(mode: PermissionMode): string {
+function mapPermissionModeToHopCodeApprovalMode(mode: PermissionMode): string {
   switch (mode) {
     case 'allow-all':
       return 'izn';
@@ -170,7 +170,7 @@ function mapPermissionModeToQwenApprovalMode(mode: PermissionMode): string {
   }
 }
 
-function permissionModeFromQwenCoreSettings(
+function permissionModeFromHopCodeCoreSettings(
   snapshot: HopCodeCoreSettingsSnapshot,
 ): PermissionMode {
   const approvalMode =
@@ -193,10 +193,10 @@ export function registerSettingsHandlers(
   server.handle(
     RPC_CHANNELS.settings.GET_GLOBAL_PERMISSION_MODE,
     async (ctx) => {
-      const snapshot = await getQwenCoreSettingsViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      const snapshot = await getHopCodeCoreSettingsViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
       );
-      const mode = permissionModeFromQwenCoreSettings(snapshot);
+      const mode = permissionModeFromHopCodeCoreSettings(snapshot);
       await deps.sessionManager.applyGlobalPermissionMode(mode, {
         changedBy: 'restore',
       });
@@ -211,14 +211,14 @@ export function registerSettingsHandlers(
       if (!parsed) {
         throw new Error(`Invalid permission mode: ${mode}`);
       }
-      const snapshot = await setQwenCoreSettingViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      const snapshot = await setHopCodeCoreSettingViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
         'user',
         'tools.approvalMode',
-        mapPermissionModeToQwenApprovalMode(parsed),
+        mapPermissionModeToHopCodeApprovalMode(parsed),
       );
       await deps.sessionManager.applyGlobalPermissionMode(
-        permissionModeFromQwenCoreSettings(snapshot),
+        permissionModeFromHopCodeCoreSettings(snapshot),
       );
       return { success: true };
     },
@@ -249,7 +249,9 @@ export function registerSettingsHandlers(
   );
 
   server.handle(RPC_CHANNELS.settings.GET_HOPCODE_CORE_SETTINGS, async (ctx) =>
-    getQwenCoreSettingsViaAcp(await getQwenWorkspaceAcpOptions(deps, ctx)),
+    getHopCodeCoreSettingsViaAcp(
+      await getHopCodeWorkspaceAcpOptions(deps, ctx),
+    ),
   );
 
   server.handle(
@@ -260,15 +262,15 @@ export function registerSettingsHandlers(
       key: HopCodeCoreSettingKey,
       value: HopCodeSettingValue,
     ) => {
-      const snapshot = await setQwenCoreSettingViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      const snapshot = await setHopCodeCoreSettingViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
         scope,
         key,
         value,
       );
       if (key === 'tools.approvalMode') {
         await deps.sessionManager.applyGlobalPermissionMode(
-          permissionModeFromQwenCoreSettings(snapshot),
+          permissionModeFromHopCodeCoreSettings(snapshot),
         );
       }
       return snapshot;
@@ -283,8 +285,8 @@ export function registerSettingsHandlers(
       name: string,
       mcpServer: HopCodeMcpServerConfig,
     ) =>
-      setQwenMcpServerViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      setHopCodeMcpServerViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
         scope,
         name,
         mcpServer,
@@ -294,8 +296,8 @@ export function registerSettingsHandlers(
   server.handle(
     RPC_CHANNELS.settings.REMOVE_HOPCODE_MCP_SERVER,
     async (ctx, scope: HopCodeSettingsScope, name: string) =>
-      removeQwenMcpServerViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      removeHopCodeMcpServerViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
         scope,
         name,
       ),
@@ -310,8 +312,8 @@ export function registerSettingsHandlers(
       index: number | undefined,
       hook: HopCodeHookDefinition,
     ) =>
-      setQwenHookViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      setHopCodeHookViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
         scope,
         event,
         index,
@@ -327,8 +329,8 @@ export function registerSettingsHandlers(
       event: HopCodeHookEvent,
       index: number,
     ) =>
-      removeQwenHookViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      removeHopCodeHookViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
         scope,
         event,
         index,
@@ -344,8 +346,8 @@ export function registerSettingsHandlers(
       scope: HopCodeSettingsScope,
       value: HopCodeSettingValue,
     ) =>
-      setQwenExtensionSettingViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      setHopCodeExtensionSettingViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
         extensionId,
         settingKey,
         scope,
@@ -357,7 +359,7 @@ export function registerSettingsHandlers(
     RPC_CHANNELS.settings.GET_HOPCODE_PERMISSION_SETTINGS,
     async (ctx) =>
       getHopCodePermissionSettingsViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
       ),
   );
 
@@ -369,8 +371,8 @@ export function registerSettingsHandlers(
       ruleType: PermissionRuleType,
       rules: string[],
     ) =>
-      setQwenPermissionRulesViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx),
+      setHopCodePermissionRulesViaAcp(
+        await getHopCodeWorkspaceAcpOptions(deps, ctx),
         scope,
         ruleType,
         rules,
@@ -759,17 +761,13 @@ export function registerSettingsHandlers(
 
   // Load custom pets from ${CONFIG_DIR}/pets
   server.handle(RPC_CHANNELS.appearance.LOAD_CUSTOM_PETS, async () => {
-    const { loadCustomPets } = await import(
-      '@craft-agent/shared/config/pets'
-    );
+    const { loadCustomPets } = await import('@craft-agent/shared/config/pets');
     return loadCustomPets();
   });
 
   // Get rendered pet size
   server.handle(RPC_CHANNELS.appearance.GET_PET_SIZE, async () => {
-    const { getPetSize } = await import(
-      '@craft-agent/shared/config/storage'
-    );
+    const { getPetSize } = await import('@craft-agent/shared/config/storage');
     return getPetSize();
   });
 
@@ -777,9 +775,7 @@ export function registerSettingsHandlers(
   server.handle(
     RPC_CHANNELS.appearance.SET_PET_SIZE,
     async (_ctx, size: number) => {
-      const { setPetSize } = await import(
-        '@craft-agent/shared/config/storage'
-      );
+      const { setPetSize } = await import('@craft-agent/shared/config/storage');
       setPetSize(size);
     },
   );
@@ -844,21 +840,25 @@ export function registerSettingsHandlers(
     RPC_CHANNELS.memory.GET_SETTINGS,
     async (ctx, workspaceId?: string) =>
       getHopCodeMemorySettingsViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx, workspaceId),
+        await getHopCodeWorkspaceAcpOptions(deps, ctx, workspaceId),
       ),
   );
 
   server.handle(
     RPC_CHANNELS.memory.SET_SETTINGS,
-    async (ctx, updates: Partial<HopCodeMemorySettings>, workspaceId?: string) =>
+    async (
+      ctx,
+      updates: Partial<HopCodeMemorySettings>,
+      workspaceId?: string,
+    ) =>
       setHopCodeMemorySettingsViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx, workspaceId),
+        await getHopCodeWorkspaceAcpOptions(deps, ctx, workspaceId),
         updates,
       ),
   );
 
   server.handle(RPC_CHANNELS.memory.GET_SETTINGS_PATH, async () =>
-    gethopcodeSettingsPathViaAcp({
+    getHopCodeSettingsPathViaAcp({
       hostRuntime: buildBackendHostRuntimeContext(deps.platform),
     }),
   );
@@ -867,7 +867,7 @@ export function registerSettingsHandlers(
     RPC_CHANNELS.memory.GET_PATHS,
     async (ctx, workspaceId?: string) =>
       getHopCodeMemoryPathsViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx, workspaceId),
+        await getHopCodeWorkspaceAcpOptions(deps, ctx, workspaceId),
       ),
   );
 
@@ -884,7 +884,7 @@ export function registerSettingsHandlers(
       }
 
       const paths = await getHopCodeMemoryPathsViaAcp(
-        await getQwenWorkspaceAcpOptions(deps, ctx, workspaceId),
+        await getHopCodeWorkspaceAcpOptions(deps, ctx, workspaceId),
       );
       const targetPath =
         target === 'user'

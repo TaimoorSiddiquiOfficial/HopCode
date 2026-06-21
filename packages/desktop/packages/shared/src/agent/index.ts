@@ -1,25 +1,24 @@
 export * from './conversation-summary.ts';
 
- 
 export {
   HopCodeAgent,
   HopCodeBackend,
   getHopCodeMemorySettingsViaAcp,
   setHopCodeMemorySettingsViaAcp,
-  gethopcodeSettingsPathViaAcp,
-  getQwenCoreSettingsViaAcp,
-  setQwenCoreSettingViaAcp,
-  setQwenMcpServerViaAcp,
-  removeQwenMcpServerViaAcp,
-  setQwenHookViaAcp,
-  removeQwenHookViaAcp,
-  setQwenExtensionSettingViaAcp,
+  getHopCodeSettingsPathViaAcp,
+  getHopCodeCoreSettingsViaAcp,
+  setHopCodeCoreSettingViaAcp,
+  setHopCodeMcpServerViaAcp,
+  removeHopCodeMcpServerViaAcp,
+  setHopCodeHookViaAcp,
+  removeHopCodeHookViaAcp,
+  setHopCodeExtensionSettingViaAcp,
   getHopCodePermissionSettingsViaAcp,
-  setQwenPermissionRulesViaAcp,
+  setHopCodePermissionRulesViaAcp,
   getHopCodeMemoryPathsViaAcp,
   listHopCodeProvidersViaAcp,
-  getQwenWorkspacePreflightViaAcp,
-  fetchQwenModelsViaSharedAcp,
+  getHopCodeWorkspacePreflightViaAcp,
+  fetchHopCodeModelsViaSharedAcp,
   connectHopCodeProviderViaAcp,
 } from './hopcode-agent.ts';
 export * from './errors.ts';

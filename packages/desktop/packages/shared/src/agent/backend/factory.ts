@@ -213,7 +213,7 @@ export const BACKEND_CAPABILITIES: Record<AgentProvider, {
   needsHttpPoolServer: boolean;
   listsSessions: boolean;
 }> = {
-  qwen: { needsHttpPoolServer: true, listsSessions: true },
+  hopcode: { needsHttpPoolServer: true, listsSessions: true },
 };
 
 export function resolveModelForProvider(

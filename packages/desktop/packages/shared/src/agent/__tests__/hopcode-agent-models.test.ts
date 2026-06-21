@@ -8,9 +8,9 @@ import type { ModelDefinition } from '../../config/models.ts';
 import type { BackendConfig } from '../backend/types.ts';
 import {
   HopCodeAgent,
-  extractQwenParentToolUseId,
-  formatQwenAcpErrorMessage,
-  resolveQwenParentToolUseId,
+  extractHopCodeParentToolUseId,
+  formatHopCodeAcpErrorMessage,
+  resolveHopCodeParentToolUseId,
 } from '../hopcode-agent.ts';
 
 type HopCodeModelInternals = {
@@ -95,7 +95,7 @@ describe('HopCodeAgent ACP error formatting', () => {
       data: { details: '401 Unauthorized' },
     });
 
-    expect(formatQwenAcpErrorMessage(error)).toBe(
+    expect(formatHopCodeAcpErrorMessage(error)).toBe(
       'Internal error: 401 Unauthorized',
     );
   });
@@ -110,16 +110,16 @@ describe('HopCodeAgent ACP error formatting', () => {
       },
     });
 
-    expect(formatQwenAcpErrorMessage(error)).toBe(
+    expect(formatHopCodeAcpErrorMessage(error)).toBe(
       'Internal error: Model access denied',
     );
   });
 });
 
 describe('HopCodeAgent model metadata', () => {
-  it('extracts subagent parent metadata from Qwen ACP updates', () => {
+  it('extracts subagent parent metadata from HopCode ACP updates', () => {
     expect(
-      extractQwenParentToolUseId({
+      extractHopCodeParentToolUseId({
         _meta: {
           parentToolCallId: 'agent-parent-1',
           subagentType: 'general-purpose',
@@ -130,7 +130,7 @@ describe('HopCodeAgent model metadata', () => {
 
   it('falls back to the only active parent tool without self-referencing', () => {
     expect(
-      resolveQwenParentToolUseId({
+      resolveHopCodeParentToolUseId({
         update: {},
         toolUseId: 'read-child-1',
         activeParentToolUseIds: new Set(['agent-parent-1']),
@@ -138,7 +138,7 @@ describe('HopCodeAgent model metadata', () => {
     ).toBe('agent-parent-1');
 
     expect(
-      resolveQwenParentToolUseId({
+      resolveHopCodeParentToolUseId({
         update: {},
         toolUseId: 'agent-parent-1',
         activeParentToolUseIds: new Set(['agent-parent-1']),

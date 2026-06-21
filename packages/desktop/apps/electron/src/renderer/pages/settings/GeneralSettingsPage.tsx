@@ -1,4 +1,4 @@
-import HopCodeSettingsPage, { generalMeta as meta } from './HopCodeSettingsPage';
+import HopCodeSettingsPage, { generalMeta as meta } from './HopcodeSettingsPage';
 
 export { meta };
 
