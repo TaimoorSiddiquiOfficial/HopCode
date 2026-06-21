@@ -227,6 +227,7 @@ jobs:
       - name: 'Build Project'
         run: |-
           npm run build
+          npm run bundle
 
       - name: 'Run CLI Integration Tests'
         run: |-
@@ -275,6 +276,7 @@ jobs:
       - name: 'Build Project'
         run: |-
           npm run build
+          npm run bundle
 
       - name: 'Build Sandbox'
         env:
