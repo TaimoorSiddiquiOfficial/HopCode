@@ -37,7 +37,7 @@ the surface and the caller proves it is attached to the target session.
 
 ## Design
 
-`runQwenServe` resolves and trims the bearer token once. After that it computes
+`runHopCodeServe` resolves and trims the bearer token once. After that it computes
 one effective boolean:
 
 ```ts
@@ -56,8 +56,8 @@ token is configured, the handler rejects disabled shell with
 `session_shell_disabled`, then requires `X-Qwen-Client-Id`, then validates the
 command body, and finally delegates to the bridge.
 
-The ACP dispatcher keeps `_qwen/session/shell` dispatchable for old clients, but
-does not advertise it in the initialize `_qwen.methods` list unless the
+The ACP dispatcher keeps `_hopcode/session/shell` dispatchable for old clients, but
+does not advertise it in the initialize `_hopcode.methods` list unless the
 effective policy is enabled. Disabled ACP calls return a stable
 `session_shell_disabled` JSON-RPC error without logging the command or calling
 the bridge. Enabled calls still require the connection to own the session and

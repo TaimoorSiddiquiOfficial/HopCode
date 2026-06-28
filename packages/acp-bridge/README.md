@@ -60,7 +60,7 @@ Lift history (#4175 Mode B daemon roadmap):
   `maxSessions`, `eventRingSize`, `permissionResponseTimeoutMs`,
   persistence callbacks, etc.) plus the `DaemonStatusProvider`
   injection seam for daemon-host env / preflight cells (production
-  impl in `cli/src/serve/daemonStatusProvider.ts`) and the F1
+  impl in `cli/src/serve/daemon-status-provider.ts`) and the F1
   `BridgeFileSystem` injection seam for the ACP fs proxy.
 - `spawnChannel` (F1) — `defaultSpawnChannelFactory` + `killChild` +
   `SCRUBBED_CHILD_ENV_KEYS` denylist + `scrubChildEnv` pure env-policy
@@ -113,11 +113,9 @@ Both variants are stable across the F1 lift.
 
 ## Backward compatibility
 
-`packages/cli/src/serve/eventBus.ts` and
-`packages/cli/src/serve/inMemoryChannel.ts` remain as one-line
-re-export wrappers, so every existing relative import inside
-`serve/` and the one external import in `cli/src/commands/serve.ts`
-keeps resolving without churn.
+CLI code imports event-bus and in-memory channel primitives directly from
+`@hoptrendy/acp-bridge/eventBus` and
+`@hoptrendy/acp-bridge/inMemoryChannel`.
 
 After F1, `packages/cli/src/serve/httpAcpBridge.ts` shrinks to a
 ~97-line re-export shim that forwards every previously-exported

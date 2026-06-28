@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useI18n } from '../i18n';
 import styles from './WelcomeHeader.module.css';
 
@@ -66,18 +65,9 @@ export interface WelcomeHeaderProps {
   hideTips?: boolean;
 }
 
-export function WelcomeHeader({
-  version,
-  cwd,
-  currentModel,
-  currentMode,
-  hideTips = false,
-}: WelcomeHeaderProps) {
-  const { language, t } = useI18n();
-  const tip = useMemo(() => pickTip(language), [language]);
-  const displayPath = useMemo(() => shortenPath(cwd), [cwd]);
-  const model = currentModel || t('welcome.defaultModel');
-  const mode = formatMode(currentMode, t);
+export function WelcomeHeader(props: WelcomeHeaderProps) {
+  void props;
+  const { t } = useI18n();
 
   return (
     <div className={styles.header}>
@@ -115,13 +105,7 @@ export function WelcomeHeader({
           )}
         </div>
       </div>
-
-      {!hideTips && (
-        <div className={styles.tip}>
-          <span className={styles.tipLabel}>{t('welcome.tipLabel')}</span>
-          <span className={styles.tipText}>{tip}</span>
-        </div>
-      )}
+      <div className={styles.subtitle}>{t('welcome.prompt')}</div>
     </div>
   );
 }

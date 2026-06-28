@@ -30,7 +30,8 @@ HopCode loads MCP servers from `mcpServers` in your `settings.json`. You can con
 hopcode mcp add --transport http my-server http://localhost:3000/mcp
 ```
 
-2. Open MCP management dialog to view and manage servers:
+2. Start HopCode and open the MCP management dialog to view and manage
+   servers:
 
 ```bash
 hopcode mcp
@@ -94,7 +95,7 @@ JSON (`.hopcode/settings.json`):
 }
 ```
 
-CLI (writes to project scope by default):
+CLI (writes to user scope by default):
 
 ```bash
 hopcode mcp add pythonTools -e DATABASE_URL=$DB_CONNECTION_STRING -e API_KEY=$EXTERNAL_API_KEY \
@@ -146,6 +147,62 @@ CLI:
 ```bash
 hopcode mcp add --transport sse sseServer http://localhost:8080/sse --timeout 30000
 ```
+
+## Using MCP prompts and resources
+
+Besides tools, HopCode discovers and surfaces two other MCP primitives.
+
+### Prompts (slash commands)
+
+Any prompt a server advertises via `prompts/list` becomes an executable
+**slash command**. After discovery, type `/` and you'll see the prompt
+listed (labeled `MCP: <server>`); run it like any other command:
+
+```text
+/my_prompt --arg1="value" --arg2="value"
+# positional form also works:
+/my_prompt "value" "value"
+# show the prompt's arguments:
+/my_prompt help
+```
+
+The prompt's messages are sent to the model, which then acts on them.
+
+> Discovery is lenient about the declared `prompts` capability: some
+> servers implement `prompts/list` but omit `prompts` from their
+> `initialize` capabilities. HopCode attempts `prompts/list` anyway, so
+> those prompts still appear. A server that genuinely has no prompts simply
+> answers `Method not found`, which is ignored.
+
+### Resources
+
+Resources a server advertises via `resources/list` are discovered per
+server. Open the management dialog with `/mcp` and select a server to see
+its **Resources** count alongside its tools and prompts. Choose **View
+resources** to browse the server's resource URIs; selecting one shows its
+description and MIME type along with the exact `@server:uri` reference to
+paste into a message. As with prompts, the `resources` capability is not
+required to be declared.
+
+Inject a resource's contents into your message with the `@server:uri`
+syntax — type `@`, then the server name, a colon, and the resource URI:
+
+```text
+summarize @myserver:file:///docs/spec.md and list the open questions
+```
+
+Typing `@myserver:` shows an autocomplete list of that server's resources;
+keep typing to filter, matching (case-insensitively) either the resource URI
+or its friendly name/title. You don't have to know a URI by heart — before
+you reach the colon, typing part of a server name also suggests matching
+servers that expose resources, so you can pick one and drill straight into
+its resource list. On submit, the referenced resource is read and its contents are
+appended to your message (text inline, binary blobs as attachments); the
+`@server:uri` reference is preserved in the prompt so the model knows what
+it is looking at. The `server` prefix must match a configured MCP server —
+otherwise the token is treated as a normal file path, so existing
+`@path/to/file` references are unaffected. Resource reads are disabled in
+untrusted folders.
 
 ## Progressive availability and discovery timeouts
 
@@ -398,7 +455,7 @@ hopcode mcp add [options] <name> <commandOrUrl> [args...]
 | `<name>`                    | A unique name for the server.                                       | —                                      | `example-server`                                                   |
 | `<commandOrUrl>`            | The command to execute (for `stdio`) or the URL (for `http`/`sse`). | —                                      | `/usr/bin/python` or `http://localhost:8`                          |
 | `[args...]`                 | Optional arguments for a `stdio` command.                           | —                                      | `--port 5000`                                                      |
-| `-s`, `--scope`             | Configuration scope (user or project).                              | `project`                              | `-s user`                                                          |
+| `-s`, `--scope`             | Configuration scope (user or project).                              | `user`                                 | `-s user`                                                          |
 | `-t`, `--transport`         | Transport type (`stdio`, `sse`, `http`).                            | `stdio`                                | `-t sse`                                                           |
 | `-e`, `--env`               | Set environment variables.                                          | —                                      | `-e KEY=value`                                                     |
 | `-H`, `--header`            | Set HTTP headers for SSE and HTTP transports.                       | —                                      | `-H "X-Api-Key: abc123"`                                           |

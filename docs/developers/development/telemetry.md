@@ -74,6 +74,10 @@ These settings can be overridden by environment variables or CLI flags.
 corresponding environment variable to `true` or `1` will enable the feature. Any
 other value will disable it.
 
+**Note on integer environment variables:** `HOPCODE_TELEMETRY_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH`
+must be a positive integer when set. Invalid values fail telemetry configuration
+resolution instead of silently falling back.
+
 **Sensitive span attributes:** When `includeSensitiveSpanAttributes` is enabled,
 two things happen:
 
@@ -87,8 +91,18 @@ two things happen:
    - Tool inputs (`tool_input`) and tool results (`tool_result`)
    - Model output (`response.model_output`)
 
-   Each value is truncated at 60 KB; `*_truncated` and `*_original_length`
-   flags surface when truncation occurs.
+   Each content payload is truncated at `sensitiveSpanAttributeMaxLength`
+   JavaScript string units. The default is 1 MiB (`1048576`), raised from the
+   previous 60 KiB default; set `61440` to preserve the old cap. The limit
+   must be between `1` and `104857600` (100 MiB). For labeled attributes, fixed
+   labels such as `[USER PROMPT]`, `[TOOL INPUT: ...]`, and
+   `[TOOL RESULT: ...]` count against the cap; the truncation marker also counts
+   against it. The limit is measured as JavaScript string length rather than
+   UTF-8 bytes. Non-ASCII content can therefore occupy more bytes after OTLP
+   export. For most payload types, truncation adds both `*_truncated` and
+   `*_original_length`. System prompts also set `system_prompt_truncated` when
+   truncated, but use the always-present `system_prompt_length` for the original
+   length.
 
 2. **Log-to-span bridge spans** (used when HTTP traces are exported without a
    logs endpoint) keep their existing `prompt`, `function_args`, and
@@ -100,11 +114,14 @@ secrets in env vars or arguments), and model responses to the configured OTLP
 backend. Treat the backend as a privileged data sink. The flag defaults to
 `false`.
 
-**Cost / payload size:** A heavy turn (60 KB system prompt + 10 tool calls,
-each up to 60 KB input + 60 KB result, plus 60 KB model output) can produce up
-to ~1.5 MB of attribute payload before OTLP compression. When pointing tools
-that read large files (`read_file`, etc.) at long-running sessions, monitor
-exporter throughput.
+**Cost / payload size:** A heavy turn at the default limit (1 MiB system prompt
+plus 10 tool calls, each up to 1 MiB input + 1 MiB result, plus 1 MiB model
+output) can produce up to ~22 MiB of attribute payload before OTLP compression,
+plus up to 1 MiB per emitted tool schema in workspaces with large tool
+definitions. This is HopCode's application-side cap, not a guarantee that
+every collector or backend accepts a single attribute that large. If spans are
+rejected or dropped, lower `sensitiveSpanAttributeMaxLength` (for example, to
+`61440`) and monitor exporter throughput.
 
 This setting does not disable sensitive data in OTel logs or other telemetry
 sinks; non-internal API response telemetry can populate `response_text`, so
@@ -125,7 +142,7 @@ OpenTelemetry names: `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`,
 The `HOPCODE_TELEMETRY_OTLP_*` variants take precedence over the `OTEL_*` variants.
 
 For detailed information about all configuration options, see the
-[Configuration Guide](./cli/configuration.md).
+[Configuration Guide](../../users/configuration/settings.md).
 
 ### Resource attributes
 

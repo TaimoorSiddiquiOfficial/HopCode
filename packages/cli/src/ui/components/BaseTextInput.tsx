@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,6 +30,7 @@ import { keyMatchers, Command } from '../keyMatchers.js';
 import stringWidth from 'string-width';
 import { cpSlice, cpLen } from '../utils/textUtils.js';
 import { theme } from '../semantic-colors.js';
+import { renderSoftwareCursor } from '../utils/software-cursor.js';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -86,7 +87,7 @@ export interface BaseTextInputProps {
 // ─── Default line renderer ──────────────────────────────────
 
 /**
- * Renders a single visual line with an inverse-video block cursor.
+ * Renders a single visual line with a high-contrast block cursor.
  * Uses codepoint-aware string operations for Unicode/emoji safety.
  */
 export function defaultRenderLine({
@@ -101,12 +102,12 @@ export function defaultRenderLine({
 
   const len = cpLen(lineText);
 
-  // Cursor past end of line — append inverse space
+  // Cursor past end of line — append cursor space
   if (cursorCol >= len) {
     return (
       <Text>
         {lineText}
-        {chalk.inverse(' ') + '\u200B'}
+        {renderSoftwareCursor(' ') + '\u200B'}
       </Text>
     );
   }
@@ -118,7 +119,7 @@ export function defaultRenderLine({
   return (
     <Text>
       {before}
-      {chalk.inverse(cursorChar)}
+      {renderSoftwareCursor(cursorChar)}
       {after}
     </Text>
   );
@@ -279,11 +280,13 @@ export const BaseTextInput = ({
         borderColor={resolvedBorderColor}
       >
         {resolvedPrefix}
+        {/* No background fill: the input area blends into the terminal's own
+            background so it stays consistent across terminals and themes. */}
         <Box flexGrow={1} flexDirection="column">
           {buffer.text.length === 0 && placeholder ? (
             showCursor ? (
               <Text>
-                {chalk.inverse(placeholder.slice(0, 1))}
+                {renderSoftwareCursor(placeholder.slice(0, 1))}
                 <Text color={theme.text.secondary}>{placeholder.slice(1)}</Text>
               </Text>
             ) : (

@@ -1,6 +1,6 @@
-﻿/**
+/**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -48,7 +48,7 @@ describe('AgentComposer', () => {
         [
           'agent-1',
           {
-            modelId: 'qwen',
+            modelId: 'hopcode',
             color: 'cyan',
             interactiveAgent: {
               cancelCurrentRound: vi.fn(),

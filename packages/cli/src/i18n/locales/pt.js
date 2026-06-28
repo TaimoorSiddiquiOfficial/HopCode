@@ -1377,6 +1377,7 @@ export default {
   'Tools:': 'Ferramentas:',
   'Parameters:': 'Parâmetros:',
   'Prompts:': 'Prompts:',
+  'Resources:': 'Recursos:',
   Blocked: 'Bloqueado',
   '💡 Tips:': '💡 Dicas:',
   'to show server and tool descriptions':
@@ -1510,6 +1511,8 @@ export default {
   'No tasks currently running': 'Nenhuma tarefa em execução',
   'No entry to show.': 'Nenhuma entrada para mostrar.',
   'needs approval': 'precisa de aprovação',
+  'rejected — edit config to re-approve':
+    'rejeitado — edite a configuração para reaprovar',
   'Background agent needs approval':
     'Agente em segundo plano precisa de aprovação',
   'Approve or deny the request above': 'Aprove ou negue a solicitação acima',
@@ -2023,6 +2026,26 @@ export default {
     'Dreams posteriores podem ser ignorados como bloqueados até que a próxima varredura de sessões obsoletas limpe o arquivo.',
   "The scheduler gate did not see this dream's timestamp; the next dream cycle may re-fire sooner than usual.":
     'O gate do agendador não viu o timestamp deste dream; o próximo ciclo de dream pode disparar novamente antes do normal.',
+  // === History collapse/expand commands ===
+  'Set history to collapse by default when resuming a session':
+    'Set history to collapse by default when resuming a session',
+  'Set history to expand by default when resuming a session':
+    'Set history to expand by default when resuming a session',
+  'Expand the currently collapsed history transcript':
+    'Expand the currently collapsed history transcript',
+  'Control history display preferences and visibility':
+    'Control history display preferences and visibility',
+  'History will be collapsed by default for future resumed sessions.':
+    'History will be collapsed by default for future resumed sessions.',
+  'History will be expanded by default for future resumed sessions.':
+    'History will be expanded by default for future resumed sessions.',
+  'History is already expanded in this session.':
+    'History is already expanded in this session.',
+  'Usage: /history collapse-on-resume|expand-on-resume|expand-now':
+    'Usage: /history collapse-on-resume|expand-on-resume|expand-now',
+  'History collapsed: {{n}} messages hidden. Use /history expand-now to show.':
+    'Histórico recolhido: {{n}} mensagens ocultas. Use /history expand-now para mostrar.',
+
   // === Same-as-English optimization ===
   '(workspace)': '(espaço de trabalho)',
   'Ref:': 'Referência:',

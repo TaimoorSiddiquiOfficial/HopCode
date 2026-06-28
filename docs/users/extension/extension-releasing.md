@@ -75,7 +75,7 @@ To ensure HopCode can automatically find the correct release asset for each plat
 
 Archives must be fully contained extensions and have all the standard requirements - specifically the `hopcode-extension.json` file must be at the root of the archive.
 
-The rest of the layout should look exactly the same as a typical extension, see [extensions.md](extension.md).
+The rest of the layout should look exactly the same as a typical extension, see [introduction.md](./introduction.md).
 
 #### Example GitHub Actions workflow
 

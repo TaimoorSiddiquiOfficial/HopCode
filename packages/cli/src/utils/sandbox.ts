@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -212,9 +212,9 @@ export async function start_sandbox(
     // same path the kernel will. mkdirSync first because realpathSync throws
     // on missing dirs and a custom HOPCODE_HOME / HOPCODE_RUNTIME_DIR may not exist
     // yet on first run.
-    const qwenDir = Storage.getGlobalHopCodeDir();
+    const hopcodeDir = Storage.getGlobalHopCodeDir();
     const runtimeDir = Storage.getRuntimeBaseDir();
-    fs.mkdirSync(qwenDir, { recursive: true });
+    fs.mkdirSync(hopcodeDir, { recursive: true });
     fs.mkdirSync(runtimeDir, { recursive: true });
 
     const args = [
@@ -227,7 +227,7 @@ export async function start_sandbox(
       '-D',
       `CACHE_DIR=${fs.realpathSync(execSync(`getconf DARWIN_USER_CACHE_DIR`).toString().trim())}`,
       '-D',
-      `HOPCODE_DIR=${fs.realpathSync(qwenDir)}`,
+      `HOPCODE_DIR=${fs.realpathSync(hopcodeDir)}`,
       '-D',
       `RUNTIME_DIR=${fs.realpathSync(runtimeDir)}`,
     ];

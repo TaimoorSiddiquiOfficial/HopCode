@@ -1,4 +1,4 @@
-﻿# HopCode Configuration
+# HopCode Configuration
 
 > [!tip]
 >
@@ -91,9 +91,10 @@ Settings are organized into categories. Most settings should be placed within th
 
 #### output
 
-| Setting         | Type   | Description                   | Default  | Possible Values    |
-| --------------- | ------ | ----------------------------- | -------- | ------------------ |
-| `output.format` | string | The format of the CLI output. | `"text"` | `"text"`, `"json"` |
+| Setting                 | Type    | Description                                                    | Default  | Possible Values    |
+| ----------------------- | ------- | -------------------------------------------------------------- | -------- | ------------------ |
+| `output.format`         | string  | The format of the CLI output.                                  | `"text"` | `"text"`, `"json"` |
+| `output.showTimestamps` | boolean | Show an `[HH:MM:SS]` timestamp before each assistant response. | `false`  |                    |
 
 #### ui
 
@@ -111,6 +112,7 @@ Settings are organized into categories. Most settings should be placed within th
 | `ui.showLineNumbers`                    | boolean          | Show line numbers in code blocks in the CLI output.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `true`        |
 | `ui.renderMode`                         | string           | Default Markdown display mode. Use `"render"` for rich visual previews or `"raw"` to show source-oriented Markdown by default. Toggle during a session with `Alt/Option+M`; on macOS the terminal must send Option as Meta. See [Markdown Rendering](../features/markdown-rendering).                                                                                                                                                                                                                                                              | `"render"`    |
 | `ui.showCitations`                      | boolean          | Show citations for generated text in the chat.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `false`       |
+| `ui.history.collapseOnResume`           | boolean          | Whether to collapse history by default when resuming a session. Can be toggled via `/history collapse-on-resume` and `/history expand-on-resume`.                                                                                                                                                                                                                                                                                                                                                                                                  | `false`       |
 | `ui.compactMode`                        | boolean          | Hide tool output and thinking for a cleaner view. Toggle with `Ctrl+O` during a session or via the Settings dialog. Tool approval prompts are never hidden, even in compact mode. The setting persists across sessions.                                                                                                                                                                                                                                                                                                                            | `false`       |
 | `ui.shellOutputMaxLines`                | number           | Max number of shell output lines shown inline. Set to `0` to disable the cap and show full output. Hidden lines are surfaced via the `+N lines` indicator. Errors, `!`-prefix user-initiated commands, confirming tools, and focused embedded shells always show full output.                                                                                                                                                                                                                                                                      | `5`           |
 | `ui.enableWelcomeBack`                  | boolean          | Show welcome back dialog when returning to a project with conversation history. When enabled, HopCode will automatically detect if you're returning to a project with a previously generated project summary (`.hopcode/PROJECT_SUMMARY.md`) and show a dialog allowing you to continue your previous conversation or start fresh. If you choose **Start new chat session**, that choice is remembered for the current project until the project summary changes. This feature integrates with the `/summary` command and quit confirmation dialog. | `true`        |
@@ -185,7 +187,7 @@ Settings are organized into categories. Most settings should be placed within th
 }
 ```
 
-**max_tokens (adaptive output tokens):**
+**max_tokens (output token limit):**
 
 When `samplingParams.max_tokens` is not set, HopCode uses an adaptive output token strategy to optimize GPU resource usage:
 
@@ -218,7 +220,7 @@ Overrides the auto-detected input modalities for the selected model. HopCode aut
 
 Allows you to add custom HTTP headers to all API requests. This is useful for request tracing, monitoring, API gateway routing, or when different models require different headers. For provider models, define `customHeaders` in `modelProviders[].generationConfig.customHeaders`. For runtime models without a matching provider entry, define it in `model.generationConfig.customHeaders`. No merging occurs between the two levels.
 
-The `extra_body` field allows you to add custom parameters to the request body sent to the API. This is useful for provider-specific options that are not covered by the standard configuration fields. **Note: This field is only supported for OpenAI-compatible providers (`openai`, `qwen-oauth`). It is ignored for Anthropic and Gemini providers.** For provider models, define `extra_body` in `modelProviders[].generationConfig.extra_body`. For runtime models without a matching provider entry, define it in `model.generationConfig.extra_body`.
+The `extra_body` field allows you to add custom parameters to the request body sent to the API. This is useful for provider-specific options that are not covered by the standard configuration fields. **Note: This field is only supported for OpenAI-compatible providers (`openai`, `hopcode-oauth`). It is ignored for Anthropic and Gemini providers.** For provider models, define `extra_body` in `modelProviders[].generationConfig.extra_body`. For runtime models without a matching provider entry, define it in `model.generationConfig.extra_body`.
 
 **model.openAILoggingDir examples:**
 
@@ -282,11 +284,12 @@ If you are experiencing performance issues with file searching (e.g., with `@` c
 
 #### memory
 
-| Setting                          | Type    | Description                                                                       | Default |
-| -------------------------------- | ------- | --------------------------------------------------------------------------------- | ------- |
-| `memory.enableManagedAutoMemory` | boolean | Enable background extraction of memories from conversations.                      | `true`  |
-| `memory.enableManagedAutoDream`  | boolean | Enable automatic consolidation (deduplication and cleanup) of collected memories. | `true`  |
-| `memory.enableAutoSkill`         | boolean | Enable background review for reusable project skills after tool-heavy sessions.   | `true`  |
+| Setting                          | Type    | Description                                                                                                                    | Default |
+| -------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `memory.enableManagedAutoMemory` | boolean | Enable background extraction of memories from conversations.                                                                   | `true`  |
+| `memory.enableManagedAutoDream`  | boolean | Enable automatic consolidation (deduplication and cleanup) of collected memories.                                              | `true`  |
+| `memory.enableAutoSkill`         | boolean | Enable background review for reusable project skills after tool-heavy sessions.                                                | `true`  |
+| `memory.autoSkillConfirm`        | boolean | Ask for confirmation before auto-generated skills are added to the skill library. When off, auto-skills are saved immediately. | `true`  |
 
 See [Memory](../features/memory) for details on how auto-memory works and how to use the `/memory`, `/remember`, and `/dream` commands.
 
@@ -458,6 +461,19 @@ LSP server configuration is done through `.lsp.json` files in your project root 
 | `advanced.bugCommand`          | object           | Configuration for the bug report command. Overrides the default URL for the `/bug` command. Properties: `urlTemplate` (string): A URL that can contain `{title}` and `{info}` placeholders. Example: `"bugCommand": { "urlTemplate": "https://bug.example.com/new?title={title}&info={info}" }`                                          | `undefined`              |
 | `plansDirectory`               | string           | Custom directory for approved Plan Mode files. Relative paths are resolved from the project root, and the resolved path must stay within the project root. If unset, plan files are stored in `~/.hopcode/plans`. **Requires restart.** If the directory is inside the project root, add it to `.gitignore` to avoid committing plan files. | `undefined`              |
 
+#### experimental
+
+> [!warning]
+>
+> **Experimental features.** These toggles gate in-development capabilities and may change or be removed in future releases.
+
+| Setting                             | Type    | Description                                                                                                                                                                                                                                                                                          | Default |
+| ----------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `experimental.cron`                 | boolean | Enable in-session cron/loop tools (`cron_create`, `cron_list`, `cron_delete`) so the model can create recurring prompts. Can be disabled via the `HOPCODE_CODE_DISABLE_CRON=1` environment variable. Requires restart.                                                                                  | `true`  |
+| `experimental.agentTeam`            | boolean | Enable agent-team collaboration tools (`team_create`, `task_create`, `task_update`, `send_message`, etc.) for multi-agent coordination. Can also be enabled via `HOPCODE_CODE_ENABLE_AGENT_TEAM=1`. Requires restart.                                                                                   | `false` |
+| `experimental.artifact`             | boolean | Enable the Artifact tool, letting the model publish a self-contained HTML page and open it in the browser. Interactive, non-SDK sessions only. Toggle via `HOPCODE_CODE_ENABLE_ARTIFACT=1` / `HOPCODE_CODE_DISABLE_ARTIFACT=1`. Requires restart.                                                          | `false` |
+| `experimental.emitToolUseSummaries` | boolean | Generate a short LLM-based label after each tool-call batch completes. See [Tool-Use Summaries](../features/tool-use-summaries). Requires a fast model to be configured (`fastModel`); silently skipped otherwise. Can be overridden per-session with `HOPCODE_CODE_EMIT_TOOL_USE_SUMMARIES=0` or `=1`. | `true`  |
+
 #### mcpServers
 
 Configures connections to one or more Model-Context Protocol (MCP) servers for discovering and using custom tools. HopCode attempts to connect to each configured MCP server to discover available tools. If multiple MCP servers expose a tool with the same name, the tool names will be prefixed with the server alias you defined in the configuration (e.g., `serverAlias__actualToolName`) to avoid conflicts. Note that the system might strip certain schema properties from MCP tool definitions for compatibility. At least one of `command`, `url`, or `httpUrl` must be provided. If multiple are specified, the order of precedence is `httpUrl`, then `url`, then `command`.
@@ -481,15 +497,16 @@ Configures connections to one or more Model-Context Protocol (MCP) servers for d
 
 Configures logging and metrics collection for HopCode. For more information, see [telemetry](/developers/development/telemetry).
 
-| Setting                                    | Type    | Description                                                                                                                                                                                                                                                                              | Default |
-| ------------------------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `telemetry.enabled`                        | boolean | Whether or not telemetry is enabled.                                                                                                                                                                                                                                                     |         |
-| `telemetry.target`                         | string  | Informational label for the telemetry destination (`local` or `gcp`). Does not control exporter routing; set `telemetry.otlpEndpoint` or `telemetry.outfile` to configure where data is sent.                                                                                            |         |
-| `telemetry.otlpEndpoint`                   | string  | The endpoint for the OTLP Exporter.                                                                                                                                                                                                                                                      |         |
-| `telemetry.otlpProtocol`                   | string  | The protocol for the OTLP Exporter (`grpc` or `http`).                                                                                                                                                                                                                                   |         |
-| `telemetry.logPrompts`                     | boolean | Whether or not to include the content of user prompts in the logs.                                                                                                                                                                                                                       |         |
-| `telemetry.includeSensitiveSpanAttributes` | boolean | When enabled, attaches verbatim user prompts, system prompts, tool inputs/outputs, and model responses to native OTel span attributes (in addition to log-to-span bridge spans). ⚠️ Streams sensitive data — file contents, shell commands, conversation history — to your OTLP backend. | `false` |
-| `telemetry.outfile`                        | string  | Path to write telemetry to a file. When set, overrides OTLP export.                                                                                                                                                                                                                      |         |
+| Setting                                     | Type    | Description                                                                                                                                                                                                                                                                              | Default   |
+| ------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| `telemetry.enabled`                         | boolean | Whether or not telemetry is enabled.                                                                                                                                                                                                                                                     |           |
+| `telemetry.target`                          | string  | Informational label for the telemetry destination (`local` or `gcp`). Does not control exporter routing; set `telemetry.otlpEndpoint` or `telemetry.outfile` to configure where data is sent.                                                                                            |           |
+| `telemetry.otlpEndpoint`                    | string  | The endpoint for the OTLP Exporter.                                                                                                                                                                                                                                                      |           |
+| `telemetry.otlpProtocol`                    | string  | The protocol for the OTLP Exporter (`grpc` or `http`).                                                                                                                                                                                                                                   |           |
+| `telemetry.logPrompts`                      | boolean | Whether or not to include the content of user prompts in the logs.                                                                                                                                                                                                                       |           |
+| `telemetry.includeSensitiveSpanAttributes`  | boolean | When enabled, attaches verbatim user prompts, system prompts, tool inputs/outputs, and model responses to native OTel span attributes (in addition to log-to-span bridge spans). ⚠️ Streams sensitive data — file contents, shell commands, conversation history — to your OTLP backend. | `false`   |
+| `telemetry.sensitiveSpanAttributeMaxLength` | number  | Maximum JavaScript string length for each sensitive native OTel span attribute content payload. Must be between `1` and `104857600` (100 MiB). Set lower if your collector or backend rejects large attributes.                                                                          | `1048576` |
+| `telemetry.outfile`                         | string  | Path to write telemetry to a file. When set, overrides OTLP export.                                                                                                                                                                                                                      |           |
 
 ### Example `settings.json`
 
@@ -533,7 +550,8 @@ Here is an example of a `settings.json` file with the nested structure, new as o
     "target": "local",
     "otlpEndpoint": "http://localhost:4317",
     "logPrompts": true,
-    "includeSensitiveSpanAttributes": false
+    "includeSensitiveSpanAttributes": false,
+    "sensitiveSpanAttributeMaxLength": 1048576
   },
   "privacy": {
     "usageStatisticsEnabled": true
@@ -700,11 +718,11 @@ This example demonstrates how you can provide general project context, specific 
      - Location: The CLI searches for the configured context file in the current working directory and then in each parent directory up to either the project root (identified by a `.git` folder) or your home directory.
      - Scope: Provides context relevant to the entire project or a significant portion of it.
 - **Concatenation & UI Indication:** The contents of all found context files are concatenated (with separators indicating their origin and path) and provided as part of the system prompt. The CLI footer displays the count of loaded context files, giving you a quick visual cue about the active instructional context.
-- **Importing Content:** You can modularize your context files by importing other Markdown files using the `@path/to/file.md` syntax. For more details, see the [Memory Import Processor documentation](../configuration/memory).
+- **Importing Content:** You can modularize your context files by importing other Markdown files using the `@path/to/file.md` syntax. For more details, see the [Memory documentation](../features/memory.md).
 - **Commands for Memory Management:**
-  - Use `/memory refresh` to force a re-scan and reload of all context files from all configured locations. This updates the AI's instructional context.
-  - Use `/memory show` to display the combined instructional context currently loaded, allowing you to verify the hierarchy and content being used by the AI.
-  - See the [Commands documentation](../features/commands) for full details on the `/memory` command and its sub-commands (`show` and `refresh`).
+  - Use `/memory` to open the memory management dialog.
+  - Refresh memory from the dialog to re-scan and reload context files from all configured locations.
+  - See the [Commands documentation](../features/commands.md) for full details on the `/memory` command.
 
 By understanding and utilizing these configuration layers and the hierarchical nature of context files, you can effectively manage the AI's memory and tailor HopCode's responses to your specific needs and projects.
 

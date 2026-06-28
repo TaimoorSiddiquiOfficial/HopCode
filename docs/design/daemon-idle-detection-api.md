@@ -176,7 +176,7 @@ const healthHandler = (req: Request, res: Response): void => {
     });
   } catch (err) {
     writeStderrLine(
-      `qwen serve: /health deep probe failed: ${err instanceof Error ? err.message : String(err)}`,
+      `hopcode serve: /health deep probe failed: ${err instanceof Error ? err.message : String(err)}`,
     );
     res.status(503).json({ status: 'degraded' });
   }

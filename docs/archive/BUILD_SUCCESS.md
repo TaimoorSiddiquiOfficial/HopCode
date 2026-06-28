@@ -33,7 +33,7 @@
 
 - ✅ Fixed `hopcodeClient` → `qwenClient` (in qwenContentGenerator.ts)
 - ✅ Fixed `hopcodeIgnoreFilter` → `hopcodeignoreFilter` (in fileDiscoveryService.ts)
-- ✅ Fixed `hopcodeDir` → `qwenDir` (in logger.ts)
+- ✅ Fixed `hopcodeDir` → `hopcodeDir` (in logger.ts)
 - These refer to actual Qwen API services and file structures
 
 **Key Principle Applied:**
@@ -115,7 +115,7 @@
 - ✅ **Internal client library names** - `qwenClient` (fixed back)
 - ✅ **File format names** - `.hopcodeignore` files (kept correctly)
 - ✅ **Authentication type constants** - `AuthType.HOPCODE_OAUTH` (fixed back)
-- ✅ **Directory properties** - `qwenDir` (fixed back)
+- ✅ **Directory properties** - `hopcodeDir` (fixed back)
 - ✅ **Service filters** - `hopcodeignoreFilter` (fixed back)
 
 ---

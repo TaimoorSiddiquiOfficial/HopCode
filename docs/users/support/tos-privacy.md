@@ -1,4 +1,4 @@
-﻿# HopCode: Terms of Service and Privacy Notice
+# HopCode: Terms of Service and Privacy Notice
 
 HopCode is an open-source AI coding assistant tool maintained by the HopCode team. This document outlines the terms of service and privacy policies that apply when using HopCode's authentication methods and AI model services.
 
@@ -9,6 +9,7 @@ HopCode supports three authentication methods to access AI models. Your authenti
 1. **HopCode OAuth** — Log in with your qwen.ai account (free tier discontinued 2026-04-15)
 2. **Alibaba Cloud Coding Plan** — Use an API key from Alibaba Cloud
 3. **API Key** — Bring your own API key
+4. **Vertex AI** — Use Google Cloud Vertex AI
 
 For each authentication method, different Terms of Service and Privacy Notices may apply depending on the underlying service provider.
 
@@ -17,6 +18,7 @@ For each authentication method, different Terms of Service and Privacy Notices m
 | HopCode OAuth             | HopCode           | [Qwen Terms of Service](https://qwen.ai/termsservice)              | [Qwen Privacy Policy](https://qwen.ai/privacypolicy)               |
 | Alibaba Cloud Coding Plan | Alibaba Cloud     | See [details below](#2-if-you-are-using-alibaba-cloud-coding-plan) | See [details below](#2-if-you-are-using-alibaba-cloud-coding-plan) |
 | API Key                   | Various Providers | Depends on your chosen API provider (OpenAI, Anthropic, etc.)      | Depends on your chosen API provider                                |
+| Vertex AI                 | Google Cloud      | [Google Cloud Terms](https://cloud.google.com/terms)               | [Google Cloud Privacy](https://cloud.google.com/privacy)           |
 
 ## 1. If you are using HopCode OAuth Authentication
 
@@ -49,6 +51,14 @@ When you authenticate using API keys from other providers, the applicable Terms 
 > When using your own API key, you are subject to the terms and privacy policies of your chosen API provider, not HopCode's terms. Please review your provider's documentation for specific details about data usage, retention, and privacy practices.
 
 HopCode supports various OpenAI-compatible providers. Please refer to your specific provider's terms of service and privacy policy for detailed information.
+
+## 4. If you are using Vertex AI
+
+When you authenticate with Google Cloud Vertex AI, the applicable Terms of Service and Privacy Notice are Google Cloud's.
+
+> [!important]
+>
+> When using Vertex AI, you are subject to [Google Cloud's Terms of Service](https://cloud.google.com/terms) and [Google Cloud Privacy Notice](https://cloud.google.com/privacy), not HopCode's terms. Please review Google Cloud's documentation for specific details about data usage, retention, and privacy practices.
 
 ## Usage Statistics and Telemetry
 
@@ -109,4 +119,4 @@ You can switch between HopCode OAuth, Alibaba Cloud Coding Plan, and your own AP
 2. **Within the CLI**: Use the `/auth` command to reconfigure your authentication method
 3. **Environment variables**: Set up `.env` files for automatic API key authentication
 
-For detailed instructions, see the [Authentication Setup](../configuration/settings#environment-variables-for-api-access) documentation.
+For detailed instructions, see the [Authentication Setup](../configuration/auth.md) documentation.

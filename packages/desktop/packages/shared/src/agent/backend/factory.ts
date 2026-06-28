@@ -26,7 +26,7 @@ import {
   resolveBackendHostTooling as resolveHostToolingPaths,
   resolveBackendRuntimePaths,
 } from './internal/runtime-resolver.ts';
-import { hopcodeDriver } from './internal/drivers/qwen.ts';
+import { hopcodeDriver } from './internal/drivers/hopcode-driver.ts';
 
 export function detectProvider(_authType: string): AgentProvider {
   return 'hopcode';

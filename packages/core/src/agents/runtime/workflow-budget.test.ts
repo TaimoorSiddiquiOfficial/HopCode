@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -46,6 +46,16 @@ describe('resolveMaxTokensPerWorkflow', () => {
         [MAX_TOKENS_PER_WORKFLOW_ENV]: '1.5',
       }),
     ).toBeNull();
+  });
+
+  it('returns null on hex / scientific / non-decimal-integer overrides', () => {
+    // Number('0x2BF20')=180000, Number('1e6')=1000000, Number('5.0')=5 all
+    // pass Number.isInteger; only plain decimal integers should set a cap.
+    for (const raw of ['0x2BF20', '1e6', '5.0']) {
+      expect(
+        resolveMaxTokensPerWorkflow({ [MAX_TOKENS_PER_WORKFLOW_ENV]: raw }),
+      ).toBeNull();
+    }
   });
 
   it('returns null on zero / negative override', () => {

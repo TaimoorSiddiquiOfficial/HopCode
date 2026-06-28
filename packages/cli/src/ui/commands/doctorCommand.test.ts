@@ -109,6 +109,14 @@ describe('doctorCommand', () => {
 
     vi.mocked(doctorChecksModule.runDoctorChecks).mockResolvedValue(mockChecks);
     mockMemoryDiagnostics();
+    vi.mocked(cpuProfilerModule.isCpuProfileRecording).mockReturnValue(false);
+    vi.mocked(cpuProfilerModule.startCpuProfile).mockResolvedValue({
+      ok: true,
+    });
+    vi.mocked(cpuProfilerModule.stopCpuProfile).mockResolvedValue({
+      ok: true,
+      filePath: '/tmp/hopcode.cpuprofile',
+    });
     vi.mocked(collectMemoryDiagnostics).mockResolvedValue({
       timestamp: '2026-05-01T10:00:00.000Z',
       uptimeSeconds: 60,
@@ -1060,5 +1068,38 @@ describe('doctorCommand', () => {
     expect(doctorCommand.argumentHint).toBe(
       '[memory|cpu-profile|rollback] [--sample] [--snapshot] [--duration]',
     );
+  });
+
+  it('should reject non-integer cpu profile durations before recording', async () => {
+    mockContext = createMockCommandContext({
+      executionMode: 'non_interactive',
+      ui: {
+        addItem: vi.fn(),
+        setPendingItem: vi.fn(),
+      },
+    } as unknown as CommandContext);
+
+    for (const duration of ['1.5', '2s']) {
+      vi.mocked(cpuProfilerModule.startCpuProfile).mockClear();
+
+      const result = await doctorCommand.action!(
+        mockContext,
+        `cpu-profile --duration ${duration}`,
+      );
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          type: 'message',
+          messageType: 'error',
+          content: expect.stringContaining(
+            'Usage: /doctor cpu-profile [--duration <seconds>]',
+          ),
+        }),
+      );
+      expect(result?.type === 'message' ? result.content : '').toContain(
+        'Duration must be between 1 and',
+      );
+      expect(cpuProfilerModule.startCpuProfile).not.toHaveBeenCalled();
+    }
   });
 });

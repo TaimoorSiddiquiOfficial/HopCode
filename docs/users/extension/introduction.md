@@ -1,4 +1,4 @@
-﻿# HopCode Extensions
+# HopCode Extensions
 
 HopCode extensions package prompts, MCP servers, subagents, skills and custom commands into a familiar and user-friendly format. With extensions, you can expand the capabilities of HopCode and share those capabilities with others. They are designed to be easily installable and shareable.
 
@@ -12,11 +12,21 @@ We offer a suite of extension management tools using both `hopcode extensions` C
 
 You can manage extensions at runtime within the interactive CLI using `/extensions` slash commands. These commands support hot-reloading, meaning changes take effect immediately without restarting the application.
 
-| Command                               | Description                                                                  |
-| ------------------------------------- | ---------------------------------------------------------------------------- |
-| `/extensions` or `/extensions manage` | Manage all installed extensions                                              |
-| `/extensions install <source>`        | Install an extension from a git URL, local path, npm package, or marketplace |
-| `/extensions explore [source]`        | Open extensions source page(Gemini or ClaudeCode) in your browser            |
+| Command                               | Description                                                                                          |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `/extensions` or `/extensions manage` | Manage all installed extensions                                                                      |
+| `/extensions install <source>`        | Install an extension from a git URL, local path or archive, archive URL, npm package, or marketplace |
+| `/extensions explore [source]`        | Open extensions source page(Gemini or ClaudeCode) in your browser                                    |
+
+#### The interactive extension manager
+
+Running `/extensions` (or `/extensions manage`) opens an interactive manager with three tabs. Press `Tab` or the `←`/`→` arrows to switch between them.
+
+- **Discover** — browse plugins from your configured marketplace sources. Type to search, `Enter` to view a plugin's details, and install it (you'll be asked to choose an install scope). Press `Ctrl+R` to re-fetch the listings, and `Esc` to go back.
+- **Installed** — your installed extensions, grouped by scope (**User level**, **Project level**, and favorites). Use `↑`/`↓` to navigate, `Space` to enable/disable an extension, `f` to favorite it, and `Enter` to open its details. MCP servers bundled by an extension appear nested under their parent extension with live connection status; you can enable or disable each server individually from there.
+- **Sources** — manage the marketplace sources that feed the Discover tab. Use `↑`/`↓` to navigate, `Enter` to select a source, and `d` to remove one. These are the same sources managed by the `qwen extensions sources` CLI commands described below.
+
+Changes made here hot-reload immediately, without restarting HopCode.
 
 ### CLI Extension Management
 
@@ -133,6 +143,43 @@ hopcode extensions install /path/to/your/extension
 
 Note that we create a copy of the installed extension, so you will need to run `hopcode extensions update` to pull in changes from both locally-defined extensions and those on GitHub.
 
+#### From Archive URL
+
+```bash
+qwen extensions install https://example.com/your/extension.zip
+qwen extensions install https://example.com/your/extension.tar.gz
+```
+
+Archive URLs can be updated later as long as the URL continues to point at a newer archive for the same extension.
+
+#### Choosing an install scope
+
+By default, an installed extension is enabled globally (user scope). Pass `--scope project` to enable it only for the current workspace:
+
+```bash
+qwen extensions install <source> --scope project
+```
+
+`--scope workspace` is accepted as an alias of `--scope project`. This matches the scope choice offered when installing from the `/extensions manage` Discover tab.
+
+### Managing marketplace sources
+
+Marketplace sources (Claude plugin marketplaces) power the Discover tab in `/extensions manage`. You can manage them from the CLI as well:
+
+```bash
+# Add a marketplace (owner/repo, git URL, https URL to marketplace.json, or local path)
+qwen extensions sources add <source>
+
+# List configured marketplaces
+qwen extensions sources list
+
+# Re-fetch a marketplace's plugin listing
+qwen extensions sources update <name>
+
+# Remove a marketplace
+qwen extensions sources remove <name>
+```
+
 ### Uninstalling an extension
 
 To uninstall, run `hopcode extensions uninstall extension-name`, so, in the case of the install example:
@@ -207,7 +254,7 @@ The `hopcode-extension.json` file contains the configuration for the extension. 
 
 - `name`: The name of the extension. This is used to uniquely identify the extension and for conflict resolution when extension commands have the same name as user or project commands. The name should be lowercase or numbers and use dashes instead of underscores or spaces. This is how users will refer to your extension in the CLI. Note that we expect this name to match the extension directory name.
 - `version`: The version of the extension.
-- `mcpServers`: A map of MCP servers to configure. The key is the name of the server, and the value is the server configuration. These servers will be loaded on startup just like MCP servers configured in a [`settings.json` file](./cli/configuration.md). If both an extension and a `settings.json` file configure an MCP server with the same name, the server defined in the `settings.json` file takes precedence.
+- `mcpServers`: A map of MCP servers to configure. The key is the name of the server, and the value is the server configuration. These servers will be loaded on startup just like MCP servers configured in a [`settings.json` file](../configuration/settings.md). If both an extension and a `settings.json` file configure an MCP server with the same name, the server defined in the `settings.json` file takes precedence.
   - Note that all MCP server configuration options are supported except for `trust`.
 - `channels`: A map of custom channel adapters. The key is the channel type name, and the value has an `entry` (path to compiled JS entry point) and optional `displayName`. The entry point must export a `plugin` object conforming to the `ChannelPlugin` interface. See [Channel Plugins](../features/channels/plugins) for a full guide.
 - `contextFileName`: The name of the file that contains the context for the extension. This will be used to load the context from the extension directory. If this property is not used but a `HOPCODE.md` file is present in your extension directory, then that file will be loaded.
@@ -231,7 +278,7 @@ Extensions can require configuration through settings (such as API keys or crede
 hopcode extensions settings set <extension-name> <setting-name> [--scope user|workspace]
 ```
 
-**List all settings for an extension:**
+**List all settings and current values for an extension:**
 
 ```bash
 hopcode extensions settings list <extension-name>
@@ -260,7 +307,7 @@ When HopCode starts, it loads all the extensions and merges their configurations
 
 ### Custom commands
 
-Extensions can provide [custom commands](./cli/commands.md#custom-commands) by placing Markdown files in a `commands/` subdirectory within the extension directory. These commands follow the same format as user and project custom commands and use standard naming conventions.
+Extensions can provide [custom commands](../features/commands.md#4-custom-commands) by placing Markdown files in a `commands/` subdirectory within the extension directory. These commands follow the same format as user and project custom commands and use standard naming conventions.
 
 > **Note:** The command format has been updated from TOML to Markdown. TOML files are deprecated but still supported. You can migrate existing TOML commands using the automatic migration prompt that appears when TOML files are detected.
 

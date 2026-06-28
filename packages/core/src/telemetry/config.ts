@@ -4,9 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { TelemetrySettings } from '../config/config.js';
+import type {
+  ResolvedTelemetrySettings,
+  TelemetrySettings,
+} from '../config/config.js';
 import { FatalConfigError } from '../utils/errors.js';
-import { TelemetryTarget } from './index.js';
+import {
+  DEFAULT_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH,
+  SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT,
+  TelemetryTarget,
+  isValidSensitiveSpanAttributeMaxLength,
+} from './index.js';
 import type { ResourceAttributeWarnings } from './resource-attributes.js';
 import {
   coerceStringResourceAttributes,
@@ -40,6 +48,48 @@ export function parseTelemetryTargetValue(
   return undefined;
 }
 
+/**
+ * @throws FatalConfigError when the env var is set but invalid; telemetry
+ * config fails closed instead of silently falling back.
+ */
+function parseSensitiveSpanAttributeMaxLengthEnvValue(
+  envName: string,
+  value: string | undefined,
+): number | undefined {
+  if (value === undefined) return undefined;
+
+  const trimmed = value.trim();
+  const parsed = Number(trimmed);
+  if (
+    !/^\d+$/.test(trimmed) ||
+    !isValidSensitiveSpanAttributeMaxLength(parsed)
+  ) {
+    throw new FatalConfigError(
+      `Invalid ${envName}: must be a positive integer no greater than ${SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT}, got '${value}'`,
+    );
+  }
+
+  return parsed;
+}
+
+function parseSensitiveSpanAttributeMaxLengthSetting(
+  settingName: string,
+  value: unknown,
+): number | undefined {
+  if (value === undefined) return undefined;
+  if (
+    typeof value !== 'number' ||
+    !isValidSensitiveSpanAttributeMaxLength(value)
+  ) {
+    throw new FatalConfigError(
+      `Invalid ${settingName}: must be a positive integer no greater than ${SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT}, got ${String(
+        value,
+      )}`,
+    );
+  }
+  return value;
+}
+
 export interface TelemetryArgOverrides {
   telemetry?: boolean;
   telemetryTarget?: string | TelemetryTarget;
@@ -59,7 +109,7 @@ export async function resolveTelemetrySettings(options: {
   argv?: TelemetryArgOverrides;
   env?: Record<string, string | undefined>;
   settings?: TelemetrySettings;
-}): Promise<TelemetrySettings> {
+}): Promise<ResolvedTelemetrySettings> {
   const argv = options.argv ?? {};
   const env = options.env ?? {};
   const settings = options.settings ?? {};
@@ -123,6 +173,17 @@ export async function resolveTelemetrySettings(options: {
     ) ??
     settings.includeSensitiveSpanAttributes ??
     false;
+
+  const sensitiveSpanAttributeMaxLength =
+    parseSensitiveSpanAttributeMaxLengthEnvValue(
+      'HOPCODE_TELEMETRY_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH',
+      env['HOPCODE_TELEMETRY_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH'],
+    ) ??
+    parseSensitiveSpanAttributeMaxLengthSetting(
+      'telemetry.sensitiveSpanAttributeMaxLength',
+      settings.sensitiveSpanAttributeMaxLength,
+    ) ??
+    DEFAULT_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH;
 
   const outfile =
     argv.telemetryOutfile ??
@@ -206,6 +267,7 @@ export async function resolveTelemetrySettings(options: {
     otlpMetricsEndpoint,
     logPrompts,
     includeSensitiveSpanAttributes,
+    sensitiveSpanAttributeMaxLength,
     outfile,
     resourceAttributes,
     metrics: { includeSessionId: metricsIncludeSessionId },

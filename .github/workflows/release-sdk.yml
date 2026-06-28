@@ -422,7 +422,6 @@ jobs:
           gh pr merge "${PR_URL}" \
             --squash \
             --auto \
-            --delete-branch \
             --subject "chore(release): sdk-typescript ${RELEASE_TAG} [skip ci]"
 
       - name: 'Create Issue on Failure'

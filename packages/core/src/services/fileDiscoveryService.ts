@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -7,7 +7,10 @@
 import type { GitIgnoreFilter } from '../utils/gitIgnoreParser.js';
 import type { HopCodeIgnoreFilter } from '../utils/hopCodeIgnoreParser.js';
 import { GitIgnoreParser } from '../utils/gitIgnoreParser.js';
-import { HopCodeIgnoreParser } from '../utils/hopCodeIgnoreParser.js';
+import {
+  formatHopCodeIgnoreFileNames,
+  HopCodeIgnoreParser,
+} from '../utils/hopCodeIgnoreParser.js';
 import { isGitRepository } from '../utils/gitUtils.js';
 import * as path from 'node:path';
 
@@ -24,19 +27,25 @@ export interface FilterReport {
 
 export class FileDiscoveryService {
   private gitIgnoreFilter: GitIgnoreFilter | null = null;
-  private HopCodeIgnoreFilter: HopCodeIgnoreFilter | null = null;
+  private hopCodeIgnoreFilter: HopCodeIgnoreFilter | null = null;
   private projectRoot: string;
 
-  constructor(projectRoot: string) {
+  constructor(
+    projectRoot: string,
+    private readonly customIgnoreFiles?: string[],
+  ) {
     this.projectRoot = path.resolve(projectRoot);
     if (isGitRepository(this.projectRoot)) {
       this.gitIgnoreFilter = new GitIgnoreParser(this.projectRoot);
     }
-    this.HopCodeIgnoreFilter = new HopCodeIgnoreParser(this.projectRoot);
+    this.hopCodeIgnoreFilter = new HopCodeIgnoreParser(
+      this.projectRoot,
+      customIgnoreFiles,
+    );
   }
 
   /**
-   * Filters a list of file paths based on git ignore rules
+   * Filters a list of file paths based on git and AI ignore rules.
    */
   filterFiles(
     filePaths: string[],
@@ -109,8 +118,8 @@ export class FileDiscoveryService {
    * Checks if a single file should be hopcode-ignored
    */
   shouldHopCodeIgnoreFile(filePath: string): boolean {
-    if (this.HopCodeIgnoreFilter) {
-      return this.HopCodeIgnoreFilter.isIgnored(filePath);
+    if (this.hopCodeIgnoreFilter) {
+      return this.hopCodeIgnoreFilter.isIgnored(filePath);
     }
     return false;
   }
@@ -147,7 +156,7 @@ export class FileDiscoveryService {
    * Returns loaded patterns from .hopcodeignore
    */
   getHopCodeIgnorePatterns(): string[] {
-    return this.HopCodeIgnoreFilter?.getPatterns() ?? [];
+    return this.hopCodeIgnoreFilter?.getPatterns() ?? [];
   }
 
   /**
@@ -155,5 +164,16 @@ export class FileDiscoveryService {
    */
   gethopcodeignorePatterns(): string[] {
     return this.getHopCodeIgnorePatterns();
+  }
+
+  getHopCodeIgnoreFileDisplayForPath(filePath: string): string {
+    return (
+      this.hopCodeIgnoreFilter?.getIgnoreFileNameForPath(filePath) ??
+      this.getHopCodeIgnoreFileNamesDisplay()
+    );
+  }
+
+  getHopCodeIgnoreFileNamesDisplay(): string {
+    return formatHopCodeIgnoreFileNames(this.customIgnoreFiles);
   }
 }

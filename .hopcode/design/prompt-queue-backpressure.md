@@ -10,7 +10,7 @@
 
 - Default: `maxPendingPromptsPerSession = 5`.
 - Disabled: `0` or `Infinity` means unlimited.
-- Invalid: negative numbers, fractions, and `NaN` are rejected by bridge construction and `runQwenServe`. The CLI flag accepts non-negative integers; `0` disables the cap.
+- Invalid: negative numbers, fractions, and `NaN` are rejected by bridge construction and `runHopCodeServe`. The CLI flag accepts non-negative integers; `0` disables the cap.
 - Authority: the bridge is the admission gate. SDK-side accounting is an early-fail guard, not a replacement for server enforcement.
 - Prompt deadline: `--prompt-deadline-ms` still applies only to prompts that were already accepted. It is not a queue admission cap.
 

@@ -167,10 +167,10 @@ Write-Host "=========================================" -ForegroundColor Cyan
 $codeFiles = Get-SourceFiles -Extensions @("*.ts", "*.tsx", "*.js", "*.mjs", "*.cjs")
 
 $identifierReplacements = @{
-    "QwenCode" = "HopCode"
-    "QwenOAuth2" = "HopCodeOAuth2"
-    "QwenOAuth" = "HopCodeOAuth"
-    "QwenOAuthConfig" = "HopCodeOAuthConfig"
+    "HopCode" = "HopCode"
+    "HopCodeOAuth2" = "HopCodeOAuth2"
+    "HopCodeOAuth" = "HopCodeOAuth"
+    "HopCodeOAuthConfig" = "HopCodeOAuthConfig"
     "QwenAgentManager" = "HopCodeAgentManager"
     "QwenAgent" = "HopCodeAgent"
     "QwenLogger" = "HopCodeLogger"
@@ -178,11 +178,11 @@ $identifierReplacements = @{
     "QwenServe" = "HopCodeServe"
     "QwenExecutable" = "HopCodeExecutable"
     "QwenContentGenerator" = "HopCodeContentGenerator"
-    "QwenCodeWebUI" = "HopCodeWebUI"
-    "Qwenignore" = "HopCodeIgnore"
+    "HopCodeWebUI" = "HopCodeWebUI"
+    "hopcodeignore" = "HopCodeIgnore"
     "qwenClient" = "hopCodeClient"
     "qwenName" = "hopCodeName"
-    "qwenDir" = "hopCodeDir"
+    "hopcodeDir" = "hopCodeDir"
     "qwenArgs" = "hopCodeArgs"
     "qwenLocalePathPattern" = "hopCodeLocalePathPattern"
     "HOPCODE_command" = "hopcode_command"
@@ -232,23 +232,23 @@ $stringReplacements = [ordered]@{
     # HOPCODE_code_sdk stays as-is (external Python SDK) - skip
     # HOPCODE_code_cli -> hopcode_cli
     "HOPCODE_code_cli" = "hopcode_cli"
-    # qwencode -> hopcode (single word form)
-    "qwencode" = "hopcode"
+    # HopCode -> hopcode (single word form)
+    "HopCode" = "hopcode"
     # Config dir references
     ".hopcode/" = ".hopcode/"
     ".hopcode\" = ".hopcode\"
     "/.qwen" = "/.hopcode"
-    "~/.qwen" = "~/.hopcode"
+    "~/.hopcode" = "~/.hopcode"
     # Path references (system config paths)
     "/etc/hopcode/" = "/etc/hopcode/"
-    "/etc/qwencode/" = "/etc/hopcode/"
+    "/etc/HopCode/" = "/etc/hopcode/"
     'C:\ProgramData\hopcode\' = 'C:\ProgramData\hopcode\'
-    "/Library/Application Support/QwenCode/" = "/Library/Application Support/HopCode/"
+    "/Library/Application Support/HopCode/" = "/Library/Application Support/HopCode/"
     "/Library/Application Support/HopCode/" = "/Library/Application Support/HopCode/"
     # Copyright
-    "Copyright 2025 Qwen Team" = "Copyright 2025-2026 HopCode Team"
+    "Copyright 2025 HopCode Team" = "Copyright 2025-2026 HopCode Team"
     "Copyright 2025 Qwen" = "Copyright 2025-2026 HopCode"
-    "Copyright 2026 Qwen Team" = "Copyright 2026 HopCode Team"
+    "Copyright 2026 HopCode Team" = "Copyright 2026 HopCode Team"
     # Product names in comments/strings (careful not to touch model names)
     "HopCode" = "HopCode"
 }
@@ -270,7 +270,7 @@ Write-Host "=========================================" -ForegroundColor Cyan
 
 # We need to be very careful here - only replace "hopcode" when it's:
 # 1. Part of an identifier like "HOPCODE_status" (not a model name)
-# 2. A standalone product reference like "qwen serve"
+# 2. A standalone product reference like "hopcode serve"
 # NOT when it's a model name like "qwen3-max" or "qwen3-coder-plus"
 
 $regexFiles = Get-SourceFiles -Extensions @("*.ts", "*.tsx", "*.js", "*.mjs", "*.cjs")
@@ -288,7 +288,7 @@ foreach ($file in $regexFiles) {
     # Replace "qwen " or "qwen/" or "qwen." etc. when it's clearly a product reference
     # But NOT "qwen3" (model name) or "HOPCODE_code_sdk" (external SDK)
     
-    # Pattern: "qwen serve" -> "hopcode serve"
+    # Pattern: "hopcode serve" -> "hopcode serve"
     # Pattern: "hopcode" as standalone word before certain keywords
     # Pattern: variable names like HOPCODE_executable, etc.
     # These are handled by the specific replacements above

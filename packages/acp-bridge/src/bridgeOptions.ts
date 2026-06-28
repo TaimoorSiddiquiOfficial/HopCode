@@ -254,7 +254,7 @@ export interface BridgeOptions {
    * status cells (env snapshot, daemon preflight). Production
    * `hopcode serve` provides
    * `createDaemonStatusProvider()` from
-   * `cli/src/serve/daemonStatusProvider.ts`.
+   * `cli/src/serve/daemon-status-provider.ts`.
    *
    * **When omitted**: the bridge returns idle placeholders for
    * `getWorkspaceEnvStatus` (full envelope with empty `cells: []`

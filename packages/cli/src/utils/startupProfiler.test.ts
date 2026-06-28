@@ -1,4 +1,4 @@
-﻿import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'node:fs';
 import {
   initStartupProfiler,
@@ -14,6 +14,7 @@ vi.mock('node:fs');
 
 describe('startupProfiler', () => {
   const savedEnv: Record<string, string | undefined> = {};
+  const savedArgv = process.argv;
 
   function saveEnv(...keys: string[]) {
     for (const k of keys) {
@@ -48,6 +49,7 @@ describe('startupProfiler', () => {
 
   afterEach(() => {
     restoreEnv();
+    process.argv = savedArgv;
   });
 
   function enableProfiler() {
@@ -373,6 +375,34 @@ describe('startupProfiler', () => {
         .calls[0]![0] as string;
       // outer-prefixed filename keeps it distinct from sandbox-child reports.
       expect(writtenPath).toMatch(/[\\/]outer-/);
+    });
+
+    it('collects outside sandbox for hopcode serve with the primary startup flag', () => {
+      process.env['HOPCODE_CODE_PROFILE_STARTUP'] = '1';
+      delete process.env['SANDBOX'];
+      process.argv = ['node', 'hopcode', 'serve'];
+
+      initStartupProfiler();
+      profileCheckpoint('serve_listener_ready');
+
+      const report = getStartupReport();
+      expect(report).not.toBeNull();
+      expect(report!.outerProcess).toBe(false);
+      expect(report!.phases[0]!.name).toBe('serve_listener_ready');
+    });
+
+    it('collects outside sandbox for bundled hopcode serve argv shape', () => {
+      process.env['HOPCODE_CODE_PROFILE_STARTUP'] = '1';
+      delete process.env['SANDBOX'];
+      process.argv = ['node', 'hopcode', '/repo/dist/cli.js', 'serve'];
+
+      initStartupProfiler();
+      profileCheckpoint('serve_listener_ready');
+
+      const report = getStartupReport();
+      expect(report).not.toBeNull();
+      expect(report!.outerProcess).toBe(false);
+      expect(report!.phases[0]!.name).toBe('serve_listener_ready');
     });
   });
 });

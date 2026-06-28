@@ -1056,7 +1056,7 @@ describe('CronScheduler', () => {
         vi.useRealTimers();
         usingFakeTimers = false;
 
-        // The probe acquired the lock and flipped this session to owner.
+        // The probe acquired the lock.
         await vi.waitFor(async () => {
           const raw = await fs.readFile(getLockFilePath(tmpDir), 'utf-8');
           expect(JSON.parse(raw).sessionId).toBe('session-1');

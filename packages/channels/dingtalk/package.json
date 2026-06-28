@@ -15,7 +15,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "test": "vitest run",
+    "test:ci": "vitest run"
   },
   "dependencies": {
     "dingtalk-stream-sdk-nodejs": "^2.0.4",

@@ -7,7 +7,7 @@
 
 Agent Arena lets you pit multiple AI models against each other on the same task. Each model runs as a fully independent agent in its own isolated Git worktree, so file operations never interfere. When all agents finish, you compare results and select a winner to merge back into your main workspace.
 
-Unlike [subagents](/users/features/sub-agents), which delegate focused subtasks within a single session, Arena agents are complete, top-level agent instances — each with its own model, context window, and full tool access.
+Unlike [subagents](./sub-agents.md), which delegate focused subtasks within a single session, Arena agents are complete, top-level agent instances — each with its own model, context window, and full tool access.
 
 This page covers:
 
@@ -104,7 +104,7 @@ If you want to inspect the complete reasoning path before deciding, each agent's
 
 ## Configuration
 
-Arena behavior can be customized in [settings.json](/users/configuration/settings):
+Arena behavior can be customized in [settings.json](../configuration/settings.md):
 
 ```json
 {

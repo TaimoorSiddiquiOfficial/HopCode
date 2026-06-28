@@ -565,6 +565,7 @@ export type HopCodeCoreSettingKey =
   | 'memory.enableManagedAutoMemory'
   | 'memory.enableManagedAutoDream'
   | 'memory.enableAutoSkill'
+  | 'memory.autoSkillConfirm'
   | 'disableAllHooks'
 
 export interface HopCodeMcpServerConfig {

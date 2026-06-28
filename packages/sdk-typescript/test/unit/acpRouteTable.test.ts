@@ -275,6 +275,18 @@ describe('acpRouteTable – matchRoute', () => {
     expect(result!.mapping.method).toBe('_hopcode/session/tasks');
   });
 
+  it('GET /session/:id/lsp maps to _hopcode/session/lsp', () => {
+    const result = matchRoute('/session/s18/lsp', 'GET');
+    expect(result).not.toBeNull();
+    expect(result!.mapping.method).toBe('_hopcode/session/lsp');
+    const params = result!.mapping.extractParams(
+      result!.segments,
+      undefined,
+      'GET',
+    );
+    expect(params).toEqual({ sessionId: 's18' });
+  });
+
   // ---- Granular workspace routes ----------------------------------------
 
   it('GET /workspace/mcp maps to _hopcode/workspace/mcp', () => {

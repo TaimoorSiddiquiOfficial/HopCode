@@ -25,7 +25,7 @@ standard ACP method (model switch, workspace introspection, heartbeat,
 multi-client permission policy, SSE backpressure tuning). Rationale in §5.
 
 A complete, locally-runnable reference implementation ships in this PR
-(`packages/cli/src/serve/acpHttp/`) plus a verification harness
+(`packages/cli/src/serve/acp-http/`) plus a verification harness
 (`scripts/acp-http-smoke.mjs`).
 
 ---
@@ -151,15 +151,15 @@ client  ────────────────────────
                                                                  hopcode --acp child
 ```
 
-### 3.1 New module layout (`packages/cli/src/serve/acpHttp/`)
+### 3.1 New module layout (`packages/cli/src/serve/acp-http/`)
 
-| File                    | Responsibility                                                                                                                                                                              |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `index.ts`              | `mountAcpHttp(app, bridge, opts)` — registers `/acp` routes on the existing Express app.                                                                                                    |
-| `connectionRegistry.ts` | `Acp-Connection-Id` → `AcpConnection` (connection SSE writer, `Map<sessionId, SessionStream>`, pending agent→client requests by JSON-RPC id, monotonic id allocator). TTL + DELETE cleanup. |
-| `jsonRpc.ts`            | JSON-RPC 2.0 parse/validate/serialize helpers; error codes (`-32600` etc.); `_qwen/` namespace guard.                                                                                       |
-| `dispatch.ts`           | Maps inbound JSON-RPC methods → `HttpAcpBridge` calls. Maps `BridgeEvent`s → outbound JSON-RPC frames. The translation table (§4).                                                          |
-| `sseStream.ts`          | Long-lived SSE writer (reuses the backpressure/heartbeat pattern from `server.ts`). Distinct from REST `/events` (different framing: full JSON-RPC objects, not qwen event envelopes).      |
+| File                     | Responsibility                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index.ts`               | `mountAcpHttp(app, bridge, opts)` — registers `/acp` routes on the existing Express app.                                                                                                    |
+| `connection-registry.ts` | `Acp-Connection-Id` → `AcpConnection` (connection SSE writer, `Map<sessionId, SessionStream>`, pending agent→client requests by JSON-RPC id, monotonic id allocator). TTL + DELETE cleanup. |
+| `json-rpc.ts`            | JSON-RPC 2.0 parse/validate/serialize helpers; error codes (`-32600` etc.); `_hopcode/` namespace guard.                                                                                       |
+| `dispatch.ts`            | Maps inbound JSON-RPC methods → `HttpAcpBridge` calls. Maps `BridgeEvent`s → outbound JSON-RPC frames. The translation table (§4).                                                          |
+| `sse-stream.ts`          | Long-lived SSE writer (reuses the backpressure/heartbeat pattern from `server.ts`). Distinct from REST `/events` (different framing: full JSON-RPC objects, not qwen event envelopes).      |
 
 No change to `bridge.ts` / `eventBus.ts` (additive consumer only).
 
@@ -197,9 +197,9 @@ No change to `bridge.ts` / `eventBus.ts` (additive consumer only).
 | `session/list`                              | `bridge.listSessions` (`unstable_listSessions`)       | connection stream                      |
 | `session/set_mode`                          | approval-mode route logic                             | session stream                         |
 | JSON-RPC **response** (to agent→client req) | resolve pending (`§4.3`)                              | —                                      |
-| `_qwen/session/set_model`                   | `bridge.setSessionModel` (`unstable_setSessionModel`) | session stream                         |
-| `_qwen/workspace/list` etc.                 | workspace introspection routes                        | connection stream                      |
-| `_qwen/session/heartbeat`                   | `bridge.heartbeat`                                    | connection stream                      |
+| `_hopcode/session/set_model`                   | `bridge.setSessionModel` (`unstable_setSessionModel`) | session stream                         |
+| `_hopcode/workspace/list` etc.                 | workspace introspection routes                        | connection stream                      |
+| `_hopcode/session/heartbeat`                   | `bridge.heartbeat`                                    | connection stream                      |
 
 ### 4.2 Outbound (BridgeEvent → JSON-RPC on session stream)
 
@@ -207,8 +207,8 @@ No change to `bridge.ts` / `eventBus.ts` (additive consumer only).
 | ------------------------------------------------------------------ | ------------------------------------------------------------------- |
 | `session_update`                                                   | `{method:"session/update", params:<data>}` notification             |
 | permission request                                                 | `{id:<n>, method:"session/request_permission", params}` request     |
-| `client_evicted` / `slow_client_warning` / `state_resync_required` | `{method:"_qwen/notify", params:{kind,…}}` notification             |
-| `stream_error`                                                     | JSON-RPC error response on the active prompt id (or `_qwen/notify`) |
+| `client_evicted` / `slow_client_warning` / `state_resync_required` | `{method:"_hopcode/notify", params:{kind,…}}` notification             |
+| `stream_error`                                                     | JSON-RPC error response on the active prompt id (or `_hopcode/notify`) |
 | prompt settle                                                      | `{id:<promptId>, result:{stopReason}}`                              |
 
 ### 4.3 Pending agent→client requests
@@ -284,7 +284,7 @@ thin compat shim over `/acp` (separate, later PR).
 - `session/request_permission` agent→client round-trip.
 - `_hopcode/session/set_model` extension as the worked example of #2.
 - Bearer-auth + host allowlist reuse (same middleware as REST).
-- Unit tests (`acpHttp/*.test.ts`) + a black-box smoke script driving a real daemon.
+- Unit tests (`acp-http/*.test.ts`) + a black-box smoke script driving a real daemon.
 
 **Deferred (documented, not built now):**
 
@@ -326,11 +326,11 @@ thin compat shim over `/acp` (separate, later PR).
 
 ## 10. Implementation & verification log (v1)
 
-Implemented in `packages/cli/src/serve/acpHttp/` (`jsonRpc.ts`, `sseStream.ts`,
-`connectionRegistry.ts`, `dispatch.ts`, `index.ts`), mounted from `server.ts`
+Implemented in `packages/cli/src/serve/acp-http/` (`json-rpc.ts`, `sse-stream.ts`,
+`connection-registry.ts`, `dispatch.ts`, `index.ts`), mounted from `server.ts`
 via `mountAcpHttp(app, bridge, { boundWorkspace })`.
 
-### Automated (`packages/cli/src/serve/acpHttp/*.test.ts`)
+### Automated (`packages/cli/src/serve/acp-http/*.test.ts`)
 
 `transport.test.ts` boots a real Express server + the real `mountAcpHttp` over
 a controllable fake bridge and drives it with `fetch` + manual SSE parsing.
@@ -382,7 +382,7 @@ All fixes verified by the expanded vitest suite (**18 tests**) + a fresh live sm
 | R1  | **P0**   | Session-stream **reconnect was permanently dead**: `SessionBinding.abort` was created once and reused; on stream close it was aborted forever, so a reconnect's `subscribeEvents(signal)` got an already-aborted signal and received zero events. | `attachSessionStream` now installs a **fresh** `AbortController` per stream (and closes any prior stream); `index.ts` pumps on that fresh signal.                                      |
 | R2  | **P0**   | `await dispatcher.handle()` ran **after** `res.end(202)`; a throwing bridge call (notably the un-try/caught `isResponse` path) would reject and surface as an unhandled rejection → possible daemon crash.                                        | Wrapped the `isResponse` path in try/catch; `.catch()` on the awaited `handle(...)` and on `pumpSessionEvents(...)`.                                                                   |
 | R3  | **P1**   | **No connection→session ownership**: any authenticated connection could open the session SSE for, or prompt, _any_ sessionId in the workspace (read-eavesdrop; prompt was only blocked incidentally by the unregistered-clientId error).          | `AcpConnection.ownedSessions` populated by `session/new`/`load`/`resume`; session stream returns `403` and per-session POSTs return `INVALID_PARAMS` for unowned ids (`requireOwned`). |
-| R4  | **P1**   | `mountAcpHttp` handle was discarded → TTL sweep timer + live SSE streams leaked on shutdown.                                                                                                                                                      | Handle parked on `app.locals`; `runQwenServe` close hook calls `dispose()` before `bridge.shutdown()` (mirrors the device-flow registry).                                              |
+| R4  | **P1**   | `mountAcpHttp` handle was discarded → TTL sweep timer + live SSE streams leaked on shutdown.                                                                                                                                                      | Handle parked on `app.locals`; `runHopCodeServe` close hook calls `dispose()` before `bridge.shutdown()` (mirrors the device-flow registry).                                              |
 | R5  | **P1**   | **Pending permission leak**: closing a session/connection with a permission outstanding left the bridge blocked awaiting a vote.                                                                                                                  | `closeSessionStream`/`destroy` cancel matching pending requests via an injected `onAbandonPending` → `cancelAbandonedPermission`.                                                      |
 | R6  | **P1**   | Pre-attach frame buffers (`connBuffer`/`binding.buffer`) were unbounded.                                                                                                                                                                          | Capped at 256 frames (drop-oldest), matching the EventBus `maxQueued`.                                                                                                                 |
 | R7  | **P2**   | `initialize` ignored the client's requested `protocolVersion`.                                                                                                                                                                                    | Negotiates `min(requested, 1)`.                                                                                                                                                        |
@@ -494,10 +494,10 @@ Another reviewer pass (qwen3.7-max). Suite **30 tests**, live re-verified.
 | F1  | **P0**   | Concurrent `session/close` TOCTOU: `ownedSessions.delete` ran only in `finally` (after the await), so two concurrent closes both passed `requireOwned` → misleading error to the 2nd + redundant bridge close. | Delete the ownership gate SYNCHRONOUSLY before the await; bridge close runs once. Test added.                                                                                                               |
 | F2  | **P1**   | Pump lifecycle: a CLEAN iterator end (subprocess ended, `done`) resolved → the `.catch` never fired → zombie stream; and a MID-STREAM iterator error sent no `stream_error`.                                   | `pumpSessionEvents` wraps the whole loop (sync + mid-stream errors send `stream_error` then re-throw); the consumer `.then(onDone, onErr)` closes the stream on BOTH paths (identity-guarded). Tests added. |
 | F3  | **P2**   | 503 connection-cap rejection had no stderr log.                                                                                                                                                                | `writeStderrLine` with the cap value.                                                                                                                                                                       |
-| F4  | **P2**   | `_qwen/notify stream_error` spread let `event.data.kind` shadow the discriminator.                                                                                                                             | Spread first, then `kind: 'stream_error'`.                                                                                                                                                                  |
+| F4  | **P2**   | `_hopcode/notify stream_error` spread let `event.data.kind` shadow the discriminator.                                                                                                                             | Spread first, then `kind: 'stream_error'`.                                                                                                                                                                  |
 | F5  | **P2**   | `MAX_WORKSPACE_PATH_LENGTH` redeclared (`= 4096`) vs the canonical `fs/paths.js`.                                                                                                                              | Import from `../fs/paths.js` (no divergence).                                                                                                                                                               |
-| F6  | **P2**   | `isObjectParams` duplicated `jsonRpc.isObject`.                                                                                                                                                                | Import `isObject`.                                                                                                                                                                                          |
-| F7  | **P2**   | Raw `process.stderr.write` in `index.ts`/`sseStream.ts` vs `writeStderrLine` elsewhere.                                                                                                                        | Unified on `writeStderrLine` across the module.                                                                                                                                                             |
+| F6  | **P2**   | `isObjectParams` duplicated `json-rpc.isObject`.                                                                                                                                                               | Import `isObject`.                                                                                                                                                                                          |
+| F7  | **P2**   | Raw `process.stderr.write` in `index.ts`/`sse-stream.ts` vs `writeStderrLine` elsewhere.                                                                                                                       | Unified on `writeStderrLine` across the module.                                                                                                                                                             |
 
 ---
 
@@ -514,8 +514,8 @@ Another reviewer pass (qwen3.7-max). Suite **30 tests**, live re-verified.
 
 落地：
 
-- **命名空间 `_qwen/` → 反向域名 `_qwen/`**；`_meta` 统一 `_meta:{ "hopcode": … }`（含 `initialize` 能力广告与 `session/request_permission` 的 requestId）。
-- **模型 + 审批模式 → 标准 `session/set_config_option`**（`configId:"model"|"mode"`），路由到现有 `bridge.setSessionModel`/`setSessionApprovalMode`；`session/new` 结果**广告 `configOptions`**（取自子进程会话状态 `getSessionContextStatus().state.configOptions`，已是 ACP 形状）。**删除**厂商 `_qwen/session/set_model`。
+- **命名空间 `_hopcode/` → 反向域名 `_hopcode/`**；`_meta` 统一 `_meta:{ "hopcode": … }`（含 `initialize` 能力广告与 `session/request_permission` 的 requestId）。
+- **模型 + 审批模式 → 标准 `session/set_config_option`**（`configId:"model"|"mode"`），路由到现有 `bridge.setSessionModel`/`setSessionApprovalMode`；`session/new` 结果**广告 `configOptions`**（取自子进程会话状态 `getSessionContextStatus().state.configOptions`，已是 ACP 形状）。**删除**厂商 `_hopcode/session/set_model`。
 - REST(http+sse) **无需同步修改**：两 transport 共用同一 bridge，状态天然一致。
 
 ### 17.2 本批新增的 `/acp` 方法（bridge 已支持，1:1 对齐 REST）
@@ -523,13 +523,13 @@ Another reviewer pass (qwen3.7-max). Suite **30 tests**, live re-verified.
 | REST                                                  | `/acp`                                             | bridge                                   |
 | ----------------------------------------------------- | -------------------------------------------------- | ---------------------------------------- |
 | `POST /session/:id/model` / `approval-mode`           | **标准** `session/set_config_option`（model/mode） | setSessionModel / setSessionApprovalMode |
-| `GET /session/:id/context`                            | `_qwen/session/context`                            | getSessionContextStatus                  |
-| `GET /session/:id/supported-commands`                 | `_qwen/session/supported_commands`                 | getSessionSupportedCommandsStatus        |
-| `PATCH /session/:id/metadata`                         | `_qwen/session/update_metadata`                    | updateSessionMetadata                    |
-| `GET /workspace/{mcp,skills,providers,env,preflight}` | `_qwen/workspace/{…}`                              | getWorkspace\*Status                     |
-| `POST /workspace/init`                                | `_qwen/workspace/init`                             | initWorkspace                            |
-| `POST /workspace/tools/:name/enable`                  | `_qwen/workspace/set_tool_enabled`                 | setWorkspaceToolEnabled                  |
-| `POST /workspace/mcp/:server/restart`                 | `_qwen/workspace/restart_mcp_server`               | restartMcpServer                         |
+| `GET /session/:id/context`                            | `_hopcode/session/context`                            | getSessionContextStatus                  |
+| `GET /session/:id/supported-commands`                 | `_hopcode/session/supported_commands`                 | getSessionSupportedCommandsStatus        |
+| `PATCH /session/:id/metadata`                         | `_hopcode/session/update_metadata`                    | updateSessionMetadata                    |
+| `GET /workspace/{mcp,skills,providers,env,preflight}` | `_hopcode/workspace/{…}`                              | getWorkspace\*Status                     |
+| `POST /workspace/init`                                | `_hopcode/workspace/init`                             | initWorkspace                            |
+| `POST /workspace/tools/:name/enable`                  | `_hopcode/workspace/set_tool_enabled`                 | setWorkspaceToolEnabled                  |
+| `POST /workspace/mcp/:server/restart`                 | `_hopcode/workspace/restart_mcp_server`               | restartMcpServer                         |
 
 （既有：session/new·load·resume·close·list·prompt·cancel、heartbeat、permission、events 已对齐。）
 

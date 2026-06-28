@@ -61,11 +61,20 @@ foreach ($file in $files) {
 
     # 7. .qwen/ directory path -> .hopcode/ 
     # Careful: only config directory references, not model names
+    $content = $content -replace '\.qwenignore', '.hopcodeignore'
     $content = $content -replace '\.qwen/', '.hopcode/'
     $content = $content -replace '\.qwen\\', '.hopcode\'
+    $content = $content -replace "'\.qwen'", "'.hopcode'"
+    $content = $content -replace '"\.qwen"', '".hopcode"'
+    $content = $content -replace '\.qwen-runtime', '.hopcode-runtime'
+    $content = $content -replace '\.qwen-home', '.hopcode-home'
+    $content = $content -replace '/tmp/\.qwen', '/tmp/.hopcode'
+    $content = $content -replace '~/\.qwen', '~/.hopcode'
 
     # 8. Config meta: qwen-ignore -> hopcode-ignore
     $content = $content -replace 'qwen-ignore', 'hopcode-ignore'
+    $content = $content -replace 'qwenignore', 'hopcodeignore'
+    $content = $content -replace 'respectQwenIgnore', 'respectHopCodeIgnore'
 
     # 9. Temp dir prefixes
     $content = $content -replace 'qwen-wt-', 'hopcode-wt-'
@@ -78,8 +87,11 @@ foreach ($file in $files) {
     # 11. qwen-oauth -> hopcode-oauth
     $content = $content -replace 'qwen-oauth', 'hopcode-oauth'
 
-    # 12. @hoptrendy/ -> @hoptrendy/
-    $content = $content -replace '@hoptrendy/', '@hoptrendy/'
+    # 12. Package scopes imported by upstream files
+    $content = $content -replace '@qwen-code/qwen-code-core', '@hoptrendy/hopcode-core'
+    $content = $content -replace '@qwen-code/acp-bridge', '@hoptrendy/acp-bridge'
+    $content = $content -replace '@qwen-code/sdk', '@hoptrendy/sdk'
+    $content = $content -replace '@qwen-code/webui', '@hoptrendy/webui'
 
     # 13. qwen-code (package name) -> hopcode
     # Only when it's clearly the package name, not a model
@@ -88,12 +100,17 @@ foreach ($file in $files) {
     # 14. qwen-serve -> hopcode-serve
     $content = $content -replace 'qwen-serve', 'hopcode-serve'
 
+    # 14b. Serve entrypoint rename from upstream kebab-case files
+    $content = $content -replace 'run-qwen-serve', 'run-hopcode-serve'
+    $content = $content -replace 'runQwenServe', 'runHopCodeServe'
+
     # 15. Tailwind theme key qwen: -> hopcode: (only in tailwind config)
     # Too dangerous as blanket replacement; handle separately
 
     # 16. CLI binary references (very targeted)
     $content = $content -replace '\bqwen --', 'hopcode --'
     $content = $content -replace '\bqwen -p', 'hopcode -p'
+    $content = $content -replace '\bqwen serve\b', 'hopcode serve'
     $content = $content -replace 'bin/qwen\b', 'bin/hopcode'
     $content = $content -replace 'bin\\qwen\b', 'bin\hopcode'
     $content = $content -replace 'qwen\.cmd\b', 'hopcode.cmd'
@@ -113,6 +130,28 @@ foreach ($file in $files) {
 
     # 20. binary: qwen -> hopcode
     $content = $content -replace 'binary:\s*qwen', 'binary: hopcode'
+
+    # 21. HopCode OAuth and device-flow identifiers. These are product auth
+    # identifiers, not Qwen model names.
+    $content = $content -replace 'QwenCode', 'HopCode'
+    $content = $content -replace 'qwenCode', 'hopCode'
+    $content = $content -replace 'qwenDir', 'hopcodeDir'
+    $content = $content -replace 'qwenHome', 'hopcodeHome'
+    $content = $content -replace 'QwenOAuth', 'HopCodeOAuth'
+    $content = $content -replace 'qwenOAuth', 'hopCodeOAuth'
+    $content = $content -replace 'QwenCredentials', 'HopCodeCredentials'
+    $content = $content -replace 'IQwen', 'IHopCode'
+    $content = $content -replace 'qwen-device-flow-provider', 'hopcode-device-flow-provider'
+
+    # 22. Common upstream headers/prompts.
+    $content = $content -replace 'Qwen Team', 'HopCode Team'
+
+    # 23. ACP/web-shell extension metadata keys.
+    $content = $content -replace 'qwenDiscreteMessage', 'hopcodeDiscreteMessage'
+    $content = $content -replace '_qwen/', '_hopcode/'
+    $content = $content -replace '_meta\.qwen', '_meta.hopcode'
+    $content = $content -replace '\{ qwen:', '{ hopcode:'
+    $content = $content -replace 'qwen\.methods', 'hopcode.methods'
 
     if ($content -ne $original) {
         [System.IO.File]::WriteAllText($file, $content)

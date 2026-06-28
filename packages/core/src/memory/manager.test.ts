@@ -27,7 +27,8 @@ vi.mock('./dream.js', () => ({
   runManagedAutoMemoryDream: vi.fn(),
 }));
 
-vi.mock('./skillReviewAgentPlanner.js', () => ({
+vi.mock('./skillReviewAgentPlanner.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./skillReviewAgentPlanner.js')>()),
   runSkillReviewByAgent: vi.fn(),
 }));
 
@@ -152,15 +153,15 @@ describe('MemoryManager', () => {
                     file_path: `${projectRoot}/.hopcode/memory/user/test.md`,
                   },
                 },
-              },
-            ],
-          },
-        ],
-      });
+              ],
+            },
+          ],
+        });
 
-      expect(result.skippedReason).toBe('memory_tool');
-      expect(vi.mocked(runAutoMemoryExtract)).not.toHaveBeenCalled();
-    });
+        expect(result.skippedReason).toBe('memory_tool');
+        expect(vi.mocked(runAutoMemoryExtract)).not.toHaveBeenCalled();
+      },
+    );
 
     it('queues a trailing extract when one is already running', async () => {
       let resolveFirst!: (
@@ -345,6 +346,125 @@ describe('MemoryManager', () => {
       expect(mgr.listTasksByType('skill-review', '/project')[0]?.status).toBe(
         'completed',
       );
+    });
+  });
+
+  // ─── scheduleSkillReview() confirmBeforePersist ───────────────────────────
+
+  describe('scheduleSkillReview() confirmBeforePersist', () => {
+    let tempDir: string;
+    let projectRoot: string;
+    let skillFilePath: string;
+
+    beforeEach(async () => {
+      vi.resetAllMocks();
+      tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'mgr-skill-confirm-'));
+      projectRoot = path.join(tempDir, 'project');
+      await fs.mkdir(projectRoot, { recursive: true });
+      skillFilePath = path.join(
+        projectRoot,
+        '.hopcode',
+        'skills',
+        'auto-skill-foo',
+        'SKILL.md',
+      );
+      // The agent CREATES the skill at run time (it did not exist before the
+      // review) — staging only quarantines newly-created skills, so the mock
+      // must write the file when invoked rather than the test pre-creating it.
+      vi.mocked(runSkillReviewByAgent).mockImplementation(async () => {
+        await fs.mkdir(path.dirname(skillFilePath), { recursive: true });
+        await fs.writeFile(
+          skillFilePath,
+          '---\ndescription: Foo skill\n---\n# Foo\n',
+        );
+        return { touchedSkillFiles: [skillFilePath] };
+      });
+    });
+
+    afterEach(async () => {
+      await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    it('stages the skill and records pendingSkills when confirmBeforePersist is true', async () => {
+      const mgr = new MemoryManager();
+      const result = mgr.scheduleSkillReview({
+        projectRoot,
+        sessionId: 'sess',
+        history: [{ role: 'user', parts: [{ text: 'hi' }] }],
+        toolCallCount: 25,
+        threshold: 2,
+        skillsModified: false,
+        config: makeMockConfig(),
+        confirmBeforePersist: true,
+      });
+
+      expect(result.status).toBe('scheduled');
+      const record = await result.promise!;
+
+      expect(record.status).toBe('completed');
+      const pendingSkills = record.metadata?.['pendingSkills'] as
+        | unknown[]
+        | undefined;
+      expect(pendingSkills).toBeDefined();
+      expect(pendingSkills).toHaveLength(1);
+
+      // The skill must no longer be under .hopcode/skills/
+      await expect(fs.access(skillFilePath)).rejects.toThrow();
+    });
+
+    it('leaves the skill in place and sets no pendingSkills when confirmBeforePersist is false', async () => {
+      const mgr = new MemoryManager();
+      const result = mgr.scheduleSkillReview({
+        projectRoot,
+        sessionId: 'sess',
+        history: [{ role: 'user', parts: [{ text: 'hi' }] }],
+        toolCallCount: 25,
+        threshold: 2,
+        skillsModified: false,
+        config: makeMockConfig(),
+        confirmBeforePersist: false,
+      });
+
+      expect(result.status).toBe('scheduled');
+      const record = await result.promise!;
+
+      expect(record.status).toBe('completed');
+      expect(record.metadata?.['pendingSkills']).toBeUndefined();
+
+      // The skill must still be under .hopcode/skills/
+      await expect(fs.access(skillFilePath)).resolves.toBeUndefined();
+    });
+
+    it('falls back to systemMessage as progress text when staging yields zero pending', async () => {
+      // The skill exists BEFORE the review, so the agent edits it in place and
+      // staging skips it (only new skills are staged) — zero pending, but the
+      // edit is still a durable change, so the agent's systemMessage should win
+      // over the "without durable changes" default.
+      await fs.mkdir(path.dirname(skillFilePath), { recursive: true });
+      await fs.writeFile(skillFilePath, '---\ndescription: Foo\n---\n# Foo\n');
+      vi.mocked(runSkillReviewByAgent).mockImplementation(async () => {
+        await fs.writeFile(
+          skillFilePath,
+          '---\ndescription: Foo v2\n---\n# Foo v2\n',
+        );
+        return {
+          touchedSkillFiles: [skillFilePath],
+          systemMessage: 'Skill review updated 1 file(s).',
+        };
+      });
+      const mgr = new MemoryManager();
+      const record = await mgr.scheduleSkillReview({
+        projectRoot,
+        sessionId: 'sess',
+        history: [{ role: 'user', parts: [{ text: 'hi' }] }],
+        toolCallCount: 25,
+        threshold: 2,
+        skillsModified: false,
+        config: makeMockConfig(),
+        confirmBeforePersist: true,
+      }).promise!;
+      expect(record.metadata?.['pendingSkills']).toBeUndefined();
+      expect(record.progressText).toBe('Skill review updated 1 file(s).');
     });
   });
 

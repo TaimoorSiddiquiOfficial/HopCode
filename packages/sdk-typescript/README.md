@@ -75,18 +75,18 @@ Creates a new query session with the HopCode.
 | `sessionId`              | `string`                                      | -                | Specify a session ID for the new session. Ensures SDK and CLI use the same ID without resuming history. Equivalent to CLI's `--session-id` flag.                                                                                                                                                                                                                                                                                                                                                            |
 
 > [!tip]
-> If you need to configure `coreTools`, `excludeTools`, or `allowedTools`, it is **strongly recommended** to read the [permissions configuration documentation](../docs/users/configuration/settings.md#permissions) first, especially the **Tool name aliases** and **Rule syntax examples** sections, to understand the available aliases and pattern matching syntax (e.g., `Bash(git *)`, `Read(.env)`, `Edit(/src/**)`).
+> If you need to configure `coreTools`, `excludeTools`, or `allowedTools`, it is **strongly recommended** to read the [permissions configuration documentation](../../docs/users/configuration/settings.md#permissions) first, especially the **Tool name aliases** and **Rule syntax examples** sections. Rule patterns such as `Bash(git *)`, `Read(.env)`, and `Edit(/src/**)` apply to `excludeTools` and `allowedTools`; `coreTools` accepts aliases but strips invocation specifiers.
 
 ### Timeouts
 
 The SDK enforces the following default timeouts:
 
-| Timeout          | Default  | Description                                                                                                                  |
-| ---------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `canUseTool`     | 1 minute | Maximum time for `canUseTool` callback to respond. If exceeded, the tool request is auto-denied.                             |
-| `mcpRequest`     | 1 minute | Maximum time for SDK MCP tool calls to complete.                                                                             |
-| `controlRequest` | 1 minute | Maximum time for control operations like `initialize()`, `setModel()`, `setPermissionMode()`, and `interrupt()` to complete. |
-| `streamClose`    | 1 minute | Maximum time to wait for initialization to complete before closing CLI stdin in multi-turn mode with SDK MCP servers.        |
+| Timeout          | Default  | Description                                                                                                                                       |
+| ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `canUseTool`     | 1 minute | Maximum time for `canUseTool` callback to respond. If exceeded, the tool request is auto-denied.                                                  |
+| `mcpRequest`     | 1 minute | Maximum time for SDK MCP tool calls to complete.                                                                                                  |
+| `controlRequest` | 1 minute | Maximum time for control operations like `initialize()`, `setModel()`, `setPermissionMode()`, `getContextUsage()`, and `interrupt()` to complete. |
+| `streamClose`    | 1 minute | Maximum time to wait for initialization to complete before closing CLI stdin in multi-turn mode with SDK MCP servers.                             |
 
 You can customize these timeouts via the `timeout` option:
 
@@ -216,6 +216,11 @@ await q.setPermissionMode('izn');
 
 // Change model mid-session
 await q.setModel('qwen-max');
+
+// Get context window usage breakdown (token counts per category)
+const usage = await q.getContextUsage();
+// Pass true to hint that per-item details should be displayed
+const detail = await q.getContextUsage(true);
 
 // Close the session
 await q.close();
@@ -503,4 +508,4 @@ npm install -g @hoptrendy/hopcode@latest
 
 ## License
 
-Apache-2.0 - see [LICENSE](./LICENSE) for details.
+Apache-2.0 - see [LICENSE](../../LICENSE) for details.

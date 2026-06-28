@@ -5,43 +5,15 @@
  */
 
 /**
- * Lightweight configuration for memory/context file naming.
- * Extracted from memoryTool.ts to avoid loading the full tool module
- * when only the filename configuration is needed.
+ * Lightweight re-export for memory/context file naming.
+ * Kept outside memoryTool.ts so callers can read filename configuration
+ * without loading the full tool module.
  */
-
-export const DEFAULT_CONTEXT_FILENAME = 'HOPCODE.md';
-export const AGENT_CONTEXT_FILENAME = 'AGENTS.md';
-export const MEMORY_SECTION_HEADER = '## HopCode Added Memories';
-
-// This variable will hold the currently configured filename for context files.
-// It defaults to include both HOPCODE.md and AGENTS.md but can be overridden by setGeminiMdFilename.
-// HOPCODE.md is first to maintain backward compatibility (used by /init command and save_memory tool).
-let currentGeminiMdFilename: string | string[] = [
-  DEFAULT_CONTEXT_FILENAME,
+export {
   AGENT_CONTEXT_FILENAME,
-];
-
-export function setGeminiMdFilename(newFilename: string | string[]): void {
-  if (Array.isArray(newFilename)) {
-    if (newFilename.length > 0) {
-      currentGeminiMdFilename = newFilename.map((name) => name.trim());
-    }
-  } else if (newFilename && newFilename.trim() !== '') {
-    currentGeminiMdFilename = newFilename.trim();
-  }
-}
-
-export function getCurrentGeminiMdFilename(): string {
-  if (Array.isArray(currentGeminiMdFilename)) {
-    return currentGeminiMdFilename[0];
-  }
-  return currentGeminiMdFilename;
-}
-
-export function getAllGeminiMdFilenames(): string[] {
-  if (Array.isArray(currentGeminiMdFilename)) {
-    return currentGeminiMdFilename;
-  }
-  return [currentGeminiMdFilename];
-}
+  DEFAULT_CONTEXT_FILENAME,
+  MEMORY_SECTION_HEADER,
+  getAllGeminiMdFilenames,
+  getCurrentGeminiMdFilename,
+  setGeminiMdFilename,
+} from '../memory/const.js';

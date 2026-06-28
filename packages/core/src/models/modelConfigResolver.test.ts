@@ -238,6 +238,7 @@ describe('modelConfigResolver', () => {
         });
 
         expect(result.config.timeout).toBeUndefined();
+        expect(result.sources['timeout']).toBeUndefined();
       });
 
       it('negative HOPCODE_API_TIMEOUT_MS ignored in OAuth path', () => {
@@ -276,7 +277,7 @@ describe('modelConfigResolver', () => {
           },
         });
 
-        expect(result.config.timeout).toBe(12345);
+        expect(result.config.timeout).toBeUndefined();
       });
 
       it('HOPCODE_API_TIMEOUT_MS works with proxy in OAuth path', () => {
@@ -566,7 +567,6 @@ describe('modelConfigResolver', () => {
           },
         });
 
-        // Number() implicitly trims whitespace, so this should parse correctly
         expect(result.config.timeout).toBe(300000);
         expect(result.sources['timeout'].kind).toBe('env');
       });
@@ -801,8 +801,8 @@ describe('modelConfigResolver', () => {
         },
       });
 
-      expect(result.config.timeout).toBe(180000);
-      expect(result.sources['timeout'].kind).toBe('env');
+      expect(result.config.timeout).toBe(30000);
+      expect(result.sources['timeout'].kind).toBe('settings');
     });
 
     it('ignores empty string HOPCODE_API_TIMEOUT_MS', () => {

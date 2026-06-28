@@ -9,7 +9,8 @@ It complements, rather than replaces, these existing docs:
 | [`../../users/hopcode-serve.md`](../../users/hopcode-serve.md)                             | Operators             | User quickstart, flags, threat model                     |
 | [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md)                             | Protocol implementers | HTTP route catalog, request/response shapes, error codes |
 | [`../examples/daemon-client-quickstart.md`](../examples/daemon-client-quickstart.md) | SDK users             | End-to-end TypeScript walkthrough                        |
-| [`../daemon-client-adapters/`](../daemon-client-adapters/)                           | Adapter authors       | Client adapter design notes                              |
+| [`../daemon-client-adapters/`](../daemon-client-adapters/)                           | Adapter authors       | Legacy client adapter design docs                        |
+| [`14-cli-tui-adapter.md`](./14-cli-tui-adapter.md)                                   | Adapter authors       | Client adapter design notes                              |
 | [`../../design/f2-mcp-transport-pool.md`](../../design/f2-mcp-transport-pool.md)     | F2 maintainers        | Workspace MCP transport pool design v2.2                 |
 
 If you want to **start a daemon and use it**, read `hopcode-serve.md` first. If you want to **build a client against the wire format**, read `hopcode-serve-protocol.md`. If you want to **understand, extend, or debug the daemon internals**, read this set.
@@ -149,11 +150,11 @@ Use these anchors when moving from the docs into the latest `main` code:
 
 ### Historical or deprecated surfaces
 
-| Surface                                          | Status                                                                                                         |
-| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `docs/developers/daemon-client-adapters/tui.md`  | Historical draft for the old `DaemonTuiAdapter` spike; current shared UI transcript architecture is in doc 14. |
-| `packages/cli/src/ui/daemon/DaemonTuiAdapter.ts` | Legacy experimental adapter still in-tree. New shared UI work should prefer SDK `daemon/ui/*`.                 |
-| `--no-http-bridge`                               | Accepted for compatibility but falls back to http-bridge and prints stderr.                                    |
+| Surface                                            | Status                                                                                                         |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `docs/developers/daemon-client-adapters/tui.md`    | Historical draft for the old `DaemonTuiAdapter` spike; current shared UI transcript architecture is in doc 14. |
+| `packages/cli/src/ui/daemon/daemon-tui-adapter.ts` | Legacy experimental adapter still in-tree. New shared UI work should prefer SDK `daemon/ui/*`.                 |
+| `--no-http-bridge`                                 | Accepted for compatibility but falls back to http-bridge and prints stderr.                                    |
 
 ### Forward compatibility
 

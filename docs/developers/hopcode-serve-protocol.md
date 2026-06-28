@@ -129,6 +129,7 @@ registry. Clients **must** gate UI off `features`, not off `mode` (per design
  'workspace_agents', 'workspace_agent_generate', 'workspace_env',
  'workspace_preflight', 'session_context', 'session_context_usage',
  'session_supported_commands', 'session_tasks', 'session_stats',
+ 'session_lsp', 'session_status',
  'session_close', 'session_metadata', 'mcp_guardrails',
  'workspace_mcp_manage', 'mcp_guardrail_events',
  'mcp_server_runtime_mutation',
@@ -293,7 +294,10 @@ warning severity, otherwise `ok`. Issue codes are stable and include
 `session_capacity_high`, `connection_capacity_high`, `pending_permissions`,
 `acp_channel_down`, `preflight_error`, `mcp_budget_warning`,
 `mcp_budget_exhausted`, `rate_limit_hits`, and
-`workspace_status_unavailable`.
+`workspace_status_unavailable`. During the short window after the listener is
+ready but before the full runtime is mounted, `/daemon/status` may report
+`daemon_runtime_starting`; if the async runtime mount fails, it reports
+`daemon_runtime_failed` while non-status runtime routes return `503`.
 
 Security: the response never includes bearer tokens, client ids, full ACP
 connection ids, device-flow user codes, or verification URLs. `summary` omits
@@ -343,6 +347,7 @@ Capability tags:
 - `session_context` → `GET /session/:id/context`
 - `session_supported_commands` → `GET /session/:id/supported-commands`
 - `session_tasks` → `GET /session/:id/tasks`
+- `session_status` → `GET /session/:id/status`
 
 Common status cell:
 
@@ -1005,6 +1010,43 @@ prompt and can be queried while the session is streaming. The response only
 contains whitelisted metadata from the agent, shell, and monitor task
 registries; controllers, timers, offsets, pending messages, and raw registry
 objects are never exposed.
+
+### `GET /session/:id/lsp`
+
+```json
+{
+  "v": 1,
+  "sessionId": "<sid>",
+  "workspaceCwd": "/canonical/path",
+  "enabled": true,
+  "configuredServers": 1,
+  "readyServers": 1,
+  "failedServers": 0,
+  "inProgressServers": 0,
+  "notStartedServers": 0,
+  "servers": [
+    {
+      "name": "typescript",
+      "status": "READY",
+      "languages": ["typescript", "javascript"],
+      "transport": "stdio",
+      "command": "typescript-language-server"
+    }
+  ]
+}
+```
+
+`status` is one of `NOT_STARTED`, `IN_PROGRESS`, `READY`, or `FAILED`.
+Optional `error` is present on failed servers when available. Disabled LSP
+(including bare mode) returns HTTP 200 with `enabled: false`, zero counts, and
+`servers: []`. LSP enabled with no configured servers returns `enabled: true`,
+`configuredServers: 0`, and `servers: []`. If initialization fails before the
+client exists, the response may include `initializationError`; if a live client
+cannot provide a snapshot, the response includes `statusUnavailable: true`.
+
+This route exposes only stable client-facing fields. It intentionally omits
+debug internals such as process IDs, spawn args, stderr tails, root URIs, and
+workspace-folder paths.
 
 ### `POST /session`
 

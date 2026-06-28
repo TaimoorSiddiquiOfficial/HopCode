@@ -1,33 +1,48 @@
 ﻿# Ignoring Files
 
-This document provides an overview of the HopCode Ignore (`.hopcodeignore`) feature of HopCode.
+This document provides an overview of the HopCode Ignore (`.hopcodeignore`) feature of HopCode. HopCode also recognizes custom ignore files configured by `context.fileFiltering.customIgnoreFiles`, which defaults to the compatibility files `.agentignore` and `.aiignore`.
 
-HopCode includes the ability to automatically ignore files, similar to `.gitignore` (used by Git). Adding paths to your `.hopcodeignore` file will exclude them from tools that support this feature, although they will still be visible to other services (such as Git).
+HopCode includes the ability to automatically ignore files, similar to `.gitignore` (used by Git). Adding paths to `.hopcodeignore` or a configured custom ignore file will exclude them from tools that support this feature, although they will still be visible to other services (such as Git).
 
 ## How it works
 
-When you add a path to your `.hopcodeignore` file, tools that respect this file will exclude matching files and directories from their operations. For example, when you use the [`read_many_files`](../../developers/tools/multi-file) command, any paths in your `.hopcodeignore` file will be automatically excluded.
+When you add a path to one of these ignore files, tools that respect HopCode ignore rules will exclude matching files and directories from their operations. For example, when you use the [`read_many_files`](../../developers/tools/multi-file) command, any paths in `.hopcodeignore` or configured custom ignore files will be automatically excluded.
 
-For the most part, `.hopcodeignore` follows the conventions of `.gitignore` files:
+For the most part, these ignore files follow the conventions of `.gitignore` files:
 
 - Blank lines and lines starting with `#` are ignored.
 - Standard glob patterns are supported (such as `*`, `?`, and `[]`).
 - Putting a `/` at the end will only match directories.
-- Putting a `/` at the beginning anchors the path relative to the `.hopcodeignore` file.
+- Putting a `/` at the beginning anchors the path relative to the ignore file.
 - `!` negates a pattern.
 
-You can update your `.hopcodeignore` file at any time. To apply the changes, you must restart your HopCode session.
+You can update these ignore files at any time. To apply the changes, you must restart your HopCode session.
 
-## How to use `.hopcodeignore`
+## How to use ignore files
 
-| Step                      | Description                                                                               |
-| ------------------------- | ----------------------------------------------------------------------------------------- |
-| **Enable .hopcodeignore** | Create a file named `.hopcodeignore` in your project root directory                       |
-| **Add ignore rules**      | Open `.hopcodeignore` file and add paths to ignore, example: `/archive/` or `apikeys.txt` |
+| Step                    | Description                                                                                                                                         |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Enable ignore rules** | Create `.hopcodeignore`, a default custom file (`.agentignore` / `.aiignore`), or a configured custom ignore file in your project root directory |
+| **Add ignore rules**    | Open the ignore file and add paths to ignore, example: `/archive/` or `apikeys.txt`                                                                 |
 
-### `.hopcodeignore` examples
+By default, HopCode reads `.hopcodeignore`, `.agentignore`, and `.aiignore`.
+To use a different custom ignore file, configure:
 
-You can use `.hopcodeignore` to ignore directories and files:
+```json
+{
+  "context": {
+    "fileFiltering": {
+      "customIgnoreFiles": [".cursorignore"]
+    }
+  }
+}
+```
+
+`.hopcodeignore` is always included when `context.fileFiltering.respectHopCodeIgnore` is enabled. Custom ignore file paths are relative to the project root.
+
+### Ignore file examples
+
+You can use any supported ignore file to ignore directories and files:
 
 ```
 # Exclude your /packages/ directory and all subdirectories
@@ -37,7 +52,7 @@ You can use `.hopcodeignore` to ignore directories and files:
 apikeys.txt
 ```
 
-You can use wildcards in your `.hopcodeignore` file with `*`:
+You can use wildcards in your ignore file with `*`:
 
 ```
 # Exclude all .md files
@@ -52,4 +67,4 @@ Finally, you can exclude files and directories from exclusion with `!`:
 !README.md
 ```
 
-To remove paths from your `.hopcodeignore` file, delete the relevant lines.
+To remove paths from an ignore file, delete the relevant lines.

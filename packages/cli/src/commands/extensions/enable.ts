@@ -8,7 +8,7 @@ import { type CommandModule } from 'yargs';
 import { FatalConfigError, getErrorMessage } from '@hoptrendy/hopcode-core';
 import { SettingScope } from '../../config/settings.js';
 import { writeStdoutLine } from '../../utils/stdioHelpers.js';
-import { getExtensionManager } from './utils.js';
+import { getExtensionManager, resolveExtensionCommandScope } from './utils.js';
 import { t } from '../../i18n/index.js';
 
 interface EnableArgs {
@@ -20,11 +20,8 @@ export async function handleEnable(args: EnableArgs) {
   const extensionManager = await getExtensionManager();
 
   try {
-    if (args.scope?.toLowerCase() === 'workspace') {
-      extensionManager.enableExtension(args.name, SettingScope.Workspace);
-    } else {
-      extensionManager.enableExtension(args.name, SettingScope.User);
-    }
+    const scope = resolveExtensionCommandScope(args.scope);
+    await extensionManager.enableExtension(args.name, scope);
     if (args.scope) {
       writeStdoutLine(
         t('Extension "{{name}}" successfully enabled for scope "{{scope}}".', {
@@ -60,21 +57,7 @@ export const enableCommand: CommandModule = {
         type: 'string',
       })
       .check((argv) => {
-        if (
-          argv.scope &&
-          !Object.values(SettingScope)
-            .map((s) => s.toLowerCase())
-            .includes((argv.scope as string).toLowerCase())
-        ) {
-          throw new Error(
-            t('Invalid scope: {{scope}}. Please use one of {{scopes}}.', {
-              scope: argv.scope as string,
-              scopes: Object.values(SettingScope)
-                .map((s) => s.toLowerCase())
-                .join(', '),
-            }),
-          );
-        }
+        resolveExtensionCommandScope(argv.scope as string | undefined);
         return true;
       }),
   handler: async (argv) => {

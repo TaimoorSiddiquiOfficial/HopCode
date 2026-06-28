@@ -22,9 +22,9 @@ These commands help you save, restore, and summarize work progress.
 | ---------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- |
 | `/init`          | Analyze current directory and create initial context file                | `/init`                                                       |
 | `/summary`       | Generate project summary based on conversation history                   | `/summary`                                                    |
-| `/compress`      | Replace chat history with summary to save Tokens                         | `/compress`                                                   |
+| `/compress`      | Replace chat history with summary to save Tokens                         | `/compress` or `/summarize`                                   |
 | `/compress-fast` | Fast compression without AI — strips old tool outputs and thinking parts | `/compress-fast`                                              |
-| `/resume`        | Resume a previous conversation session                                   | `/resume`                                                     |
+| `/resume`        | Resume a previous conversation session                                   | `/resume` or `/continue`                                      |
 | `/recap`         | Generate a one-line session recap now                                    | `/recap`                                                      |
 | `/restore`       | Revert project files to the checkpoint before a tool call ran            | `/restore` (list) or `/restore <ID>`                          |
 | `/delete`        | Delete a previous session                                                | `/delete`                                                     |
@@ -33,6 +33,10 @@ These commands help you save, restore, and summarize work progress.
 | `/rewind`        | Rewind conversation to a previous turn                                   | `/rewind` or `/rollback`                                      |
 | `/export`        | Export session history to file                                           | `/export html`, `/export md`, `/export json`, `/export jsonl` |
 | `/rename`        | Rename or tag the current session                                        | `/rename My Feature` or `/tag`                                |
+
+> [!note]
+>
+> `/summarize` is an alias for `/compress` (it compresses chat history — a destructive operation). To generate a non-destructive project summary instead, use `/summary`.
 
 ### 1.2 Interface and Workspace Control
 
@@ -307,22 +311,22 @@ Commands for obtaining information and performing system settings.
 
 ### 1.10 Common Shortcuts
 
-| Shortcut           | Function                | Note                   |
-| ------------------ | ----------------------- | ---------------------- |
-| `Ctrl/cmd+L`       | Clear screen            | Equivalent to `/clear` |
-| `Ctrl/cmd+T`       | Toggle tool description | MCP tool management    |
-| `Ctrl/cmd+C`×2     | Exit confirmation       | Secure exit mechanism  |
-| `Ctrl/cmd+Z`       | Undo input              | Text editing           |
-| `Ctrl/cmd+Shift+Z` | Redo input              | Text editing           |
+| Shortcut           | Function                | Note                                                                      |
+| ------------------ | ----------------------- | ------------------------------------------------------------------------- |
+| `Ctrl/cmd+L`       | Clear screen            | Clears the visible screen only (does not reset the session like `/clear`) |
+| `Ctrl/cmd+T`       | Toggle tool description | MCP tool management                                                       |
+| `Ctrl/cmd+C`×2     | Exit confirmation       | Secure exit mechanism                                                     |
+| `Ctrl/cmd+Z`       | Undo input              | Text editing                                                              |
+| `Ctrl/cmd+Shift+Z` | Redo input              | Text editing                                                              |
 
 ### 1.11 Authentication Commands
 
 Use `/auth` inside a HopCode session to configure authentication. Use `/doctor` to inspect the current authentication and environment status.
 
-| Command   | Description                                |
-| --------- | ------------------------------------------ |
-| `/auth`   | Configure authentication interactively     |
-| `/doctor` | Show authentication and environment checks |
+| Command   | Description                                                            |
+| --------- | ---------------------------------------------------------------------- |
+| `/auth`   | Configure authentication interactively (aliases: `/connect`, `/login`) |
+| `/doctor` | Show authentication and environment checks                             |
 
 > [!note]
 >

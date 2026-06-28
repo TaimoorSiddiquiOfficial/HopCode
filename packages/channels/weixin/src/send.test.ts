@@ -297,7 +297,7 @@ describe('validateImagePath', () => {
   });
 
   it('reports the allowed directories when a Windows image path is rejected', () => {
-    const imagePath = 'D:\\WorkGroup\\QwenCode\\002\\hello.png';
+    const imagePath = 'D:\\WorkGroup\\HopCode\\002\\hello.png';
     const workspaceDir = 'D:\\OtherProject';
     mockRealpathSync.mockImplementation((p: string) => {
       if (p.includes('hello.png')) return imagePath;

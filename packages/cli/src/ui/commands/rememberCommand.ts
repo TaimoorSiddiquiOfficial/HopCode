@@ -43,15 +43,16 @@ export const rememberCommand: SlashCommand = {
       };
     }
 
-    const useManagedMemory = config?.getManagedAutoMemoryEnabled() ?? false;
+    const useManagedMemory = config?.isManagedMemoryAvailable() ?? false;
 
     if (useManagedMemory) {
-      // In managed auto-memory mode the save_memory tool is not registered.
-      // Submit a prompt so the main agent writes the per-entry file directly,
-      // choosing the appropriate type (user / feedback / project / reference)
-      // AND the appropriate scope (user-level for cross-project facts,
-      // project-level for this-project-only facts) based on the content,
-      // following the per-type `<scope>` guidance in buildManagedAutoMemoryPrompt.
+      // The save_memory tool was removed; submit a prompt so the main
+      // agent writes the per-entry file directly, choosing the
+      // appropriate type (user / feedback / project / reference) AND
+      // the appropriate scope (user-level for cross-project facts,
+      // project-level for this-project-only facts) based on the
+      // content, following the per-type `<scope>` guidance in
+      // buildManagedAutoMemoryPrompt.
       const projectDir = config
         ? getAutoMemoryRoot(config.getProjectRoot())
         : undefined;

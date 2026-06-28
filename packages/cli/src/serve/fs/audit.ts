@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -6,7 +6,10 @@
 
 import { createHash } from 'node:crypto';
 import * as path from 'node:path';
-import { EVENT_SCHEMA_VERSION, type BridgeEvent } from '../eventBus.js';
+import {
+  EVENT_SCHEMA_VERSION,
+  type BridgeEvent,
+} from '@hoptrendy/acp-bridge/eventBus';
 import type { FsErrorKind } from './errors.js';
 import type { Intent, ResolvedPath } from './paths.js';
 

@@ -291,7 +291,7 @@ are listed; nightly and preview pre-releases are intentionally omitted.
 - core: serialize team task claims per agent and add mailbox lock parity ([#4981](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4981))
 - core: support .toml command files in extension command discovery ([#5017](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/5017))
 - stats: dedup usage records by sessionId and skip in-progress writes ([#4995](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4995))
-- test: unbreak qwen serve integration suites after the daemon batch merge ([#5041](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/5041))
+- test: unbreak hopcode serve integration suites after the daemon batch merge ([#5041](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/5041))
 - release: allow fzfWorker.js in standalone dist allowlist ([#5049](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/5049))
 
 ### Performance
@@ -520,7 +520,7 @@ are listed; nightly and preview pre-releases are intentionally omitted.
 - cli: add configurable plansDirectory for Plan Mode ([#4062](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4062))
 - cli: add structured memory diagnostics JSON ([#3785](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3785))
 - core: fail impossible goals ([#4230](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4230))
-- serve: add /demo debug page for qwen serve daemon ([#4132](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4132))
+- serve: add /demo debug page for hopcode serve daemon ([#4132](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4132))
 - worktree: Phase C — session persistence, hooksPath, Footer + WorktreeExitDialog, three-mode --resume restore ([#4174](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4174))
 - core: extend cross-auth fast models to agents ([#4153](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4153))
 - cli,core: add Auto approval mode with LLM classifier ([#4151](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/4151))
@@ -968,7 +968,7 @@ are listed; nightly and preview pre-releases are intentionally omitted.
 - cli: remove residual blank lines after MCP init completes ([#3509](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3509))
 - sdk-java: pass custom env to CLI process ([#3543](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3543))
 - cli: promote resubmitted history prompt to most recent ([#3531](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3531))
-- Strengthen error handling in qwenOAuth2.ts to prevent unhandled 'error' event ([#3481](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3481))
+- Strengthen error handling in HopCodeOAuth2.ts to prevent unhandled 'error' event ([#3481](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3481))
 - acp: support SSE and HTTP MCP servers in ACP mode ([#3574](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3574))
 - cli: run ACP Agent tool calls concurrently (#2516) ([#3463](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3463))
 - cli: disable Kitty keyboard protocol on SIGINT to prevent garbled 9;5u output ([#3544](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/3544))
@@ -2070,7 +2070,7 @@ _See [GitHub release](https://github.com/TaimoorSiddiquiOfficial/HopCode/release
 - Fix multi-language and documentation related issues. ([#1332](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1332))
 - support merge ChatCompletionContentPart && add filterEmptyMessages ([#1288](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1288))
 - Feat/javasdk ([#1412](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1412))
-- Doc/qwencode java ([#1414](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1414))
+- Doc/HopCode java ([#1414](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1414))
 - Fix resume command broken after new chat ([#1374](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1374))
 - chore: bump version to 0.6.1 ([#1423](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1423))
 - [OpenaiContentGenerate] convertOpenAIResponseToGemini record thoughtsTokenCount ([#1393](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/1393))
@@ -2623,7 +2623,7 @@ _See [GitHub release](https://github.com/TaimoorSiddiquiOfficial/HopCode/release
 
 - Add systemPromptMappings Configuration Feature ([#108](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/108))
 - update /bug command to point to hopcode repo ([#154](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/154))
-- add qwencoder as co-author ([#207](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/207))
+- add HopCoder as co-author ([#207](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/207))
 - oauth: add Qwen OAuth integration ([#225](https://github.com/TaimoorSiddiquiOfficial/HopCode/pull/225))
 
 ### Fixed

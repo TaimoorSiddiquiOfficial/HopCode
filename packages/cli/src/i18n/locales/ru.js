@@ -1325,6 +1325,7 @@ export default {
   'Tools:': 'Инструменты:',
   'Parameters:': 'Параметры:',
   'Prompts:': 'Промпты:',
+  'Resources:': 'Ресурсы:',
   Blocked: 'Заблокировано',
   '💡 Tips:': '💡 Подсказки:',
   Use: 'Используйте',
@@ -1427,6 +1428,8 @@ export default {
   'No tasks currently running': 'Нет запущенных задач',
   'No entry to show.': 'Нет записи для отображения.',
   'needs approval': 'требует подтверждения',
+  'rejected — edit config to re-approve':
+    'отклонено — измените конфигурацию для повторного подтверждения',
   'Background agent needs approval': 'Фоновый агент требует подтверждения',
   'Approve or deny the request above': 'Подтвердите или отклоните запрос выше',
   Running: 'Выполняется',
@@ -2016,6 +2019,26 @@ export default {
     'Последующие dream-запуски могут пропускаться как заблокированные, пока следующая очистка устаревших сессий не удалит файл.',
   "The scheduler gate did not see this dream's timestamp; the next dream cycle may re-fire sooner than usual.":
     'Планировщик не увидел временную метку этого dream-запуска; следующий цикл dream может запуститься раньше обычного.',
+  // === History collapse/expand commands ===
+  'Set history to collapse by default when resuming a session':
+    'Set history to collapse by default when resuming a session',
+  'Set history to expand by default when resuming a session':
+    'Set history to expand by default when resuming a session',
+  'Expand the currently collapsed history transcript':
+    'Expand the currently collapsed history transcript',
+  'Control history display preferences and visibility':
+    'Control history display preferences and visibility',
+  'History will be collapsed by default for future resumed sessions.':
+    'History will be collapsed by default for future resumed sessions.',
+  'History will be expanded by default for future resumed sessions.':
+    'History will be expanded by default for future resumed sessions.',
+  'History is already expanded in this session.':
+    'History is already expanded in this session.',
+  'Usage: /history collapse-on-resume|expand-on-resume|expand-now':
+    'Usage: /history collapse-on-resume|expand-on-resume|expand-now',
+  'History collapsed: {{n}} messages hidden. Use /history expand-now to show.':
+    'История свёрнута: {{n}} сообщений скрыто. Используйте /history expand-now для отображения.',
+
   // === Same-as-English optimization ===
   ' (not in model registry)': ' (не в реестре моделей)',
   'start server': 'запустить сервер',

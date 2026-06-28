@@ -22,6 +22,10 @@ import type { FileFilteringOptions } from '../config/constants.js';
 import { DEFAULT_FILE_FILTERING_OPTIONS } from '../config/constants.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import type { PermissionDecision } from '../permissions/types.js';
+import {
+  getHopCodeIgnoreFileNames,
+  HopCodeIgnoreParser,
+} from '../utils/hopCodeIgnoreParser.js';
 import { recordGrepResultFileReads } from './grepReadTracking.js';
 
 const debugLogger = createDebugLogger('RIPGREP');
@@ -34,6 +38,12 @@ interface RipgrepJsonMatch {
     lines?: { text?: string };
     line_number: number;
   };
+}
+
+interface RipgrepMatchLine {
+  rawLine: string;
+  filePath: string;
+  key: string;
 }
 
 function isRipgrepJsonMatch(value: unknown): value is RipgrepJsonMatch {
@@ -65,21 +75,25 @@ function getRipgrepJsonPath(match: RipgrepJsonMatch): string | undefined {
 }
 
 /**
- * Per-process cache for `.hopcodeignore` discovery. The same directories show
+ * Per-process cache for ignore-file discovery. The same directories show
  * up across many Grep invocations in a typical session — without caching,
  * each invocation pays 2-3 sync syscalls per searchPath. Bounded so a
  * pathologically long session can't grow without limit.
  *
- * `dirIsDir`: searchPath → boolean (is the path itself a directory?)
- * `hopcodeIgnore`: dir → string | null (cached `.hopcodeignore` path or null)
+ * `hopCodeIgnore`: dir → supported ignore-file paths
  *
- * **Known staleness window:** a `.hopcodeignore` created mid-session, or a
- * searchPath whose type flips (dir→file or vice versa), will not be
- * picked up until the entry rotates out of the FIFO (256 entries). Users
- * rarely add ignore files mid-session; a process restart resets the cache.
+ * **Known staleness window:** an ignore file created mid-session will not be
+ * picked up until the entry rotates out of the FIFO (256 entries).
  */
-const dirIsDirCache = new Map<string, boolean>();
-const hopcodeIgnoreCache = new Map<string, string | null>();
+interface HopCodeIgnoreFileForRipgrep {
+  ignoreFileName: string;
+  ignoreFilePath: string;
+}
+
+const hopCodeIgnoreCache = new Map<
+  string,
+  readonly HopCodeIgnoreFileForRipgrep[]
+>();
 const RIPGREP_CACHE_MAX = 256;
 function trimCache<K, V>(m: Map<K, V>): void {
   if (m.size <= RIPGREP_CACHE_MAX) return;
@@ -87,25 +101,43 @@ function trimCache<K, V>(m: Map<K, V>): void {
   if (oldest !== undefined) m.delete(oldest as K);
 }
 
-function toAbsoluteResultPath(filePath: string, searchPaths: string[]): string {
-  if (path.isAbsolute(filePath) || path.win32.isAbsolute(filePath)) {
-    return filePath;
+function toAbsoluteResultPath(
+  filePath: string,
+  searchPaths: string[],
+  cache?: Map<string, string>,
+): string {
+  const cachedPath = cache?.get(filePath);
+  if (cachedPath !== undefined) {
+    return cachedPath;
   }
-  for (const searchPath of searchPaths) {
-    const candidate = path.resolve(searchPath, filePath);
-    if (fs.existsSync(candidate)) {
-      return candidate;
+
+  let absolutePath: string;
+  if (path.isAbsolute(filePath) || path.win32.isAbsolute(filePath)) {
+    absolutePath = filePath;
+  } else {
+    absolutePath = path.resolve(searchPaths[0], filePath);
+    for (const searchPath of searchPaths) {
+      const candidate = path.resolve(searchPath, filePath);
+      if (fs.existsSync(candidate)) {
+        absolutePath = candidate;
+        break;
+      }
     }
   }
-  return path.resolve(searchPaths[0], filePath);
+
+  cache?.set(filePath, absolutePath);
+  return absolutePath;
+}
+
+function isHopCodeIgnoreFileName(ignoreFileName: string): boolean {
+  return ignoreFileName === '.hopcodeignore';
 }
 
 /**
  * Test-only: clear ripGrep's module-level discovery caches between cases.
  */
 export function _resetRipGrepCachesForTest(): void {
-  dirIsDirCache.clear();
-  hopcodeIgnoreCache.clear();
+  hopCodeIgnoreCache.clear();
 }
 
 /**
@@ -213,12 +245,7 @@ class GrepToolInvocation extends BaseToolInvocation<
         return { llmContent: noMatchMsg, returnDisplay: `No matches found` };
       }
 
-      interface RipgrepMatchLine {
-        rawLine: string;
-        filePath: string;
-        key: string;
-      }
-
+      const resolvedPathCache = new Map<string, string>();
       let allLines = rawOutput
         .split('\n')
         .filter((line) => line.trim())
@@ -271,6 +298,16 @@ class GrepToolInvocation extends BaseToolInvocation<
             },
           ];
         });
+
+      const filteringOptions = this.getFileFilteringOptions();
+      if (filteringOptions.respectHopCodeIgnore) {
+        allLines = this.filterHopCodeIgnoredMatches(
+          allLines,
+          searchPaths,
+          resolvedPathCache,
+          filteringOptions.customIgnoreFiles,
+        );
+      }
 
       // Deduplicate lines from potentially overlapping workspace directories.
       // ripgrep reports the same file twice when given paths like /a and /a/sub.
@@ -367,7 +404,7 @@ class GrepToolInvocation extends BaseToolInvocation<
       const resultFilePaths = Array.from(
         new Set(
           visibleLines.map((line) =>
-            toAbsoluteResultPath(line.filePath, searchPaths),
+            toAbsoluteResultPath(line.filePath, searchPaths, resolvedPathCache),
           ),
         ),
       );
@@ -386,6 +423,34 @@ class GrepToolInvocation extends BaseToolInvocation<
         returnDisplay: `Error: ${errorMessage}`,
       };
     }
+  }
+
+  private filterHopCodeIgnoredMatches(
+    lines: RipgrepMatchLine[],
+    searchPaths: string[],
+    resolvedPathCache: Map<string, string>,
+    customIgnoreFiles?: string[],
+  ): RipgrepMatchLine[] {
+    const parsers = new Map<string, HopCodeIgnoreParser>();
+
+    return lines.filter((line) => {
+      const absolutePath = toAbsoluteResultPath(
+        line.filePath,
+        searchPaths,
+        resolvedPathCache,
+      );
+      const ignoreRoot = this.getIgnoreRootForSearchPath(absolutePath);
+      if (ignoreRoot === undefined) {
+        return true;
+      }
+      let parser = parsers.get(ignoreRoot);
+      if (parser === undefined) {
+        parser = new HopCodeIgnoreParser(ignoreRoot, customIgnoreFiles);
+        parsers.set(ignoreRoot, parser);
+      }
+
+      return !parser.isIgnored(absolutePath);
+    });
   }
 
   private async performRipgrepSearch(options: {
@@ -415,29 +480,45 @@ class GrepToolInvocation extends BaseToolInvocation<
     if (filteringOptions.respectHopCodeIgnore) {
       // Load .hopcodeignore from each workspace directory, not just the primary one
       const seenIgnoreFiles = new Set<string>();
+      // Pass .hopcodeignore last so custom ignore negations cannot override it.
+      const nonHopCodeIgnorePaths: string[] = [];
+      const hopCodeIgnorePathsForRipgrep: string[] = [];
+      const ignoreFileNames = getHopCodeIgnoreFileNames(
+        filteringOptions.customIgnoreFiles,
+      );
       for (const searchPath of paths) {
-        let isDir = dirIsDirCache.get(searchPath);
-        if (isDir === undefined) {
-          try {
-            isDir = fs.statSync(searchPath).isDirectory();
-          } catch {
-            isDir = false;
+        const ignoreRoot = this.getIgnoreRootForSearchPath(searchPath);
+        if (ignoreRoot === undefined) {
+          continue;
+        }
+        const cacheKey = [ignoreRoot, ...ignoreFileNames].join('\0');
+        let hopCodeIgnoreFiles = hopCodeIgnoreCache.get(cacheKey);
+        if (hopCodeIgnoreFiles === undefined) {
+          hopCodeIgnoreFiles = ignoreFileNames
+            .map((ignoreFileName) => ({
+              ignoreFileName,
+              ignoreFilePath: path.join(ignoreRoot, ignoreFileName),
+            }))
+            .filter(({ ignoreFilePath }) => fs.existsSync(ignoreFilePath));
+          hopCodeIgnoreCache.set(cacheKey, hopCodeIgnoreFiles);
+          trimCache(hopCodeIgnoreCache);
+        }
+        for (const { ignoreFileName, ignoreFilePath } of hopCodeIgnoreFiles) {
+          if (!seenIgnoreFiles.has(ignoreFilePath)) {
+            if (isHopCodeIgnoreFileName(ignoreFileName)) {
+              hopCodeIgnorePathsForRipgrep.push(ignoreFilePath);
+            } else {
+              nonHopCodeIgnorePaths.push(ignoreFilePath);
+            }
+            seenIgnoreFiles.add(ignoreFilePath);
           }
-          dirIsDirCache.set(searchPath, isDir);
-          trimCache(dirIsDirCache);
         }
-        const dir = isDir ? searchPath : path.dirname(searchPath);
-        let hopcodeIgnorePath = hopcodeIgnoreCache.get(dir);
-        if (hopcodeIgnorePath === undefined) {
-          const candidate = path.join(dir, '.hopcodeignore');
-          hopcodeIgnorePath = fs.existsSync(candidate) ? candidate : null;
-          hopcodeIgnoreCache.set(dir, hopcodeIgnorePath);
-          trimCache(hopcodeIgnoreCache);
-        }
-        if (hopcodeIgnorePath && !seenIgnoreFiles.has(hopcodeIgnorePath)) {
-          rgArgs.push('--ignore-file', hopcodeIgnorePath);
-          seenIgnoreFiles.add(hopcodeIgnorePath);
-        }
+      }
+      for (const hopCodeIgnorePath of [
+        ...nonHopCodeIgnorePaths,
+        ...hopCodeIgnorePathsForRipgrep,
+      ]) {
+        rgArgs.push('--ignore-file', hopCodeIgnorePath);
       }
     }
 
@@ -462,6 +543,25 @@ class GrepToolInvocation extends BaseToolInvocation<
     return { stdout: result.stdout, truncated: result.truncated };
   }
 
+  private getIgnoreRootForSearchPath(searchPath: string): string | undefined {
+    const resolvedSearchPath = path.resolve(searchPath);
+    for (const workspaceDir of this.config
+      .getWorkspaceContext()
+      .getDirectories()) {
+      const resolvedWorkspaceDir = path.resolve(workspaceDir);
+      const relative = path.relative(resolvedWorkspaceDir, resolvedSearchPath);
+      if (
+        relative === '' ||
+        (relative !== '..' &&
+          !relative.startsWith(`..${path.sep}`) &&
+          !path.isAbsolute(relative))
+      ) {
+        return resolvedWorkspaceDir;
+      }
+    }
+    return undefined;
+  }
+
   private getFileFilteringOptions(): FileFilteringOptions {
     const options = this.config.getFileFilteringOptions?.();
     return {
@@ -471,6 +571,9 @@ class GrepToolInvocation extends BaseToolInvocation<
       respectHopCodeIgnore:
         options?.respectHopCodeIgnore ??
         DEFAULT_FILE_FILTERING_OPTIONS.respectHopCodeIgnore,
+      customIgnoreFiles:
+        options?.customIgnoreFiles ??
+        DEFAULT_FILE_FILTERING_OPTIONS.customIgnoreFiles,
     };
   }
 

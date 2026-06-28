@@ -1,7 +1,10 @@
 export interface HopCodeMemorySettings {
   enableManagedAutoMemory: boolean;
   enableManagedAutoDream: boolean;
+  enableTeamMemory: boolean;
+  enableTeamMemorySync: boolean;
   enableAutoSkill: boolean;
+  autoSkillConfirm: boolean;
 }
 
 export interface HopCodeMemoryPaths {
@@ -15,7 +18,10 @@ export type HopCodeMemoryPathTarget = 'user' | 'project' | 'auto';
 export const DEFAULT_HOPCODE_MEMORY_SETTINGS: HopCodeMemorySettings = {
   enableManagedAutoMemory: true,
   enableManagedAutoDream: false,
+  enableTeamMemory: false,
+  enableTeamMemorySync: false,
   enableAutoSkill: false,
+  autoSkillConfirm: true,
 };
 
 type JsonRecord = Record<string, unknown>;

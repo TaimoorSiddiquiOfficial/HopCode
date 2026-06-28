@@ -96,9 +96,9 @@ describe('writeTerminalTitle', () => {
     vi.stubEnv('DVTM', undefined);
     const write = vi.fn();
 
-    writeTerminalTitle(write, 'qwen');
+    writeTerminalTitle(write, 'hopcode');
 
-    const padded = 'qwen'.padEnd(80, ' ');
+    const padded = 'hopcode'.padEnd(80, ' ');
     expect(write).toHaveBeenCalledWith(
       `\x1b]0;${padded}\x07\x1b]2;${padded}\x07`,
     );

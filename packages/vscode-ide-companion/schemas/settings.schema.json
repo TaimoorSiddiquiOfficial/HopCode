@@ -14,7 +14,12 @@
       "additionalProperties": true
     },
     "modelProviders": {
-      "description": "Model providers configuration grouped by authType. Each authType contains an array of model configurations.",
+      "description": "Model providers configuration keyed by provider id (a built-in AuthType such as \"openai\" or \"gemini\", or a custom id mapped via providerProtocol). Each entry is an array of model configurations.",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "providerProtocol": {
+      "description": "Maps a custom modelProviders provider id to the SDK protocol that routes its requests (e.g. {\"idealab\": \"openai\"}). Lets a custom provider id reuse a built-in protocol. Built-in provider ids (openai, gemini, anthropic, vertex-ai, hopcode-oauth) are routed automatically and need no entry.",
       "type": "object",
       "additionalProperties": true
     },
@@ -44,6 +49,40 @@
           "type": "boolean",
           "default": false
         },
+        "voice": {
+          "description": "Voice dictation settings.",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "Enable voice dictation in the prompt input.",
+              "type": "boolean",
+              "default": false
+            },
+            "mode": {
+              "description": "How push-to-talk behaves: \"hold\" to talk while held, or \"tap\" to start and tap (or pause) to stop and submit. Options: hold, tap",
+              "enum": [
+                "hold",
+                "tap"
+              ],
+              "default": "hold"
+            },
+            "language": {
+              "description": "Preferred spoken language for voice transcription (e.g. \"english\", \"chinese\"). Leave empty to auto-detect.",
+              "type": "string",
+              "default": ""
+            },
+            "keytermsFile": {
+              "description": "Path to a custom keyterms file (one term per line, \"#\" for comments) that biases voice transcription toward domain-specific terms. Relative paths resolve from the workspace root; defaults to \".hopcode/voice-keyterms.txt\" when present. The file contents are sent to the ASR provider and it is read only in trusted workspaces. Only applies to Qwen ASR models (qwen3-asr-*).",
+              "type": "string",
+              "default": ""
+            },
+            "refineTranscript": {
+              "description": "Clean up voice transcripts with the fast model before inserting them — removes filler words and fixes recognition errors while preserving meaning. Falls back to the raw transcript on failure, and is skipped when no fast model is configured.",
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
         "enableAutoUpdate": {
           "description": "Enable automatic update checks and installations on startup.",
           "type": "boolean",
@@ -57,12 +96,14 @@
         "sessionRecapAwayThresholdMinutes": {
           "description": "How many minutes the terminal must be blurred before an auto-recap fires on the next focus-in. Matches Claude Code's default of 5 minutes; raise if you briefly alt-tab and do not want recaps to pile up.",
           "type": "number",
-          "default": 5
+          "default": 5,
+          "minimum": 1
         },
         "cleanupPeriodDays": {
           "description": "Number of days to retain ~/.hopcode/file-history/ session backups used by /rewind. Backups older than this are removed by a background housekeeping pass that runs at most once per day. Set to 0 for minimum retention (~1 hour) — protects sessions touched in the last hour, plus the currently active session. Other persistent caches will honor the same setting in the future.",
           "type": "number",
-          "default": 30
+          "default": 30,
+          "minimum": 0
         },
         "gitCoAuthor": {
           "description": "Attribution added to git commits and pull requests created through HopCode.",
@@ -158,6 +199,11 @@
             "json"
           ],
           "default": "text"
+        },
+        "showTimestamps": {
+          "description": "Show [HH:MM:SS] timestamp before each assistant response.",
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -190,7 +236,7 @@
           "default": false
         },
         "statusLine": {
-          "description": "Status line display configuration. Use `type: \"preset\"` with built-in item ids, or `type: \"command\"` with a shell command. Optional command `refreshInterval` (seconds, >= 1) re-runs the command on a timer so external data stays fresh. Set `respectUserColors: true` to preserve ANSI color codes in command output instead of applying dim/theme styling. Set `hideContextIndicator: true` to hide the built-in context usage indicator in the footer right section.",
+          "description": "Status line display configuration. Use `type: \"preset\"` with built-in item ids, or `type: \"command\"` with a shell command. Optional command `refreshInterval` (seconds, >= 1) re-runs the command on a timer so external data stays fresh. Set `respectUserColors: true` to preserve ANSI color codes in command output instead of applying dim/theme styling. Set `hideContextIndicator: true` to hide the built-in context usage indicator in the footer right section. When unset (default), the built-in default preset (model, git branch, context usage, current dir) is shown automatically; set to `null` to explicitly disable the status line.",
           "type": "object",
           "additionalProperties": true
         },
@@ -209,6 +255,11 @@
           "type": "boolean",
           "default": false
         },
+        "disableWorkflowKeywordTrigger": {
+          "description": "When true, mentioning the word `workflow` in a prompt no longer softly steers the turn toward the Workflow tool (and the Footer `workflow active` indicator is suppressed). Only applies when workflows are enabled.",
+          "type": "boolean",
+          "default": false
+        },
         "showStatusInTitle": {
           "description": "Show HopCode session name and status in the terminal window title",
           "type": "boolean",
@@ -218,6 +269,17 @@
           "description": "Hide helpful tips in the UI",
           "type": "boolean",
           "default": false
+        },
+        "history": {
+          "description": "History display settings.",
+          "type": "object",
+          "properties": {
+            "collapseOnResume": {
+              "description": "Whether to collapse history by default when resuming a session.",
+              "type": "boolean",
+              "default": false
+            }
+          }
         },
         "showLineNumbers": {
           "description": "Show line numbers in the code output.",
@@ -430,6 +492,13 @@
           "type": "boolean",
           "default": false
         },
+        "sensitiveSpanAttributeMaxLength": {
+          "description": "Maximum JavaScript string length for each sensitive native OTel span attribute content payload. Default: 1048576 (1 MiB). Maximum: 104857600 (100 MiB). Set lower if your collector or backend rejects large span attributes.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 104857600,
+          "default": 1048576
+        },
         "resourceAttributes": {
           "description": "Static resource attributes attached to every span/log/metric the SDK exports (OTLP or file outfile — they share the same Resource). Merged with the OTEL_RESOURCE_ATTRIBUTES env var; settings win on key conflict. Reserved keys (service.version, session.id) are dropped with a warning.",
           "type": "object",
@@ -468,6 +537,16 @@
     },
     "fastModel": {
       "description": "Model used for generating prompt suggestions and speculative execution. Leave empty to use the main model. A smaller/faster model (e.g., qwen3-coder-flash) reduces latency and cost.",
+      "type": "string",
+      "default": ""
+    },
+    "visionModel": {
+      "description": "Image-capable model used as the vision bridge: when a text-only main model receives an image, it is transcribed by this model first. Set with /model --vision. Leave empty to auto-pick a same-provider vision model.",
+      "type": "string",
+      "default": ""
+    },
+    "voiceModel": {
+      "description": "Model used for voice transcription. Set with /model --voice. Leave empty to keep voice dictation disabled until a voice model is selected.",
       "type": "string",
       "default": ""
     },
@@ -518,7 +597,7 @@
           "default": false
         },
         "skipLoopDetection": {
-          "description": "Skip streaming loop detection. Defaults to true to avoid false-positive interruptions; set to false to re-enable as an unattended-run guardrail.",
+          "description": "Skip the opt-in streaming loop-detection heuristics (content/thought repetition, read-file and action stagnation, global-duplicate and alternating tool-call patterns). Defaults to true to avoid false-positive interruptions; set to false to re-enable them as an unattended-run guardrail. A minimal always-on guard (consecutive identical tool calls plus a per-turn tool-call cap) still runs regardless of this setting.",
           "type": "boolean",
           "default": true
         },
@@ -606,8 +685,11 @@
           "description": "The name of the context file or files."
         },
         "importFormat": {
-          "description": "The format to use when importing memory.",
-          "type": "string"
+          "description": "The format to use when importing memory. Options: tree, flat",
+          "enum": [
+            "tree",
+            "flat"
+          ]
         },
         "includeDirectories": {
           "description": "Additional directories to include in the workspace context. Missing directories will be skipped with a warning.",
@@ -631,9 +713,9 @@
               "default": 60
             },
             "toolResultsNumToKeep": {
-              "description": "Number of most-recent compactable tool results to preserve when clearing. Floor at 1.",
-              "type": "number",
-              "default": 5
+              "type": "integer",
+              "default": 5,
+              "description": "Integer number of most-recent compactable tool results to preserve when clearing. Values below 1 are floored to 1."
             },
             "toolResultsTotalCharsThreshold": {
               "description": "Total compactable tool result output characters allowed in history before clearing oldest results. Use -1 to disable. This is a soft threshold: protected recent tool results may keep the total above it.",
@@ -656,6 +738,17 @@
               "type": "boolean",
               "default": true
             },
+            "customIgnoreFiles": {
+              "description": "Project-root-relative ignore files to use instead of the defaults (`.agentignore`, `.aiignore`) when respecthopcodeignore is enabled. .hopcodeignore is always included when respecthopcodeignore is enabled.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                ".agentignore",
+                ".aiignore"
+              ]
+            },
             "enableRecursiveFileSearch": {
               "description": "Enable recursive file search functionality",
               "type": "boolean",
@@ -667,6 +760,12 @@
               "default": true
             }
           }
+        },
+        "autoCompactThreshold": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 1,
+          "description": "Fraction of context window at which auto-compaction triggers (greater than 0, up to 1). Default is 0.7 (70%)."
         }
       }
     },
@@ -688,6 +787,21 @@
           "description": "Enable background review for reusable project skills after tool-heavy sessions.",
           "type": "boolean",
           "default": true
+        },
+        "autoSkillConfirm": {
+          "description": "Ask for confirmation before auto-generated skills are added to the skill library. When off, auto-skills are saved immediately.",
+          "type": "boolean",
+          "default": true
+        },
+        "enableTeamMemory": {
+          "description": "Enable a project memory tier shared with collaborators via the git-tracked `.hopcode/team-memory/` directory. Off by default; writes to it are secret-scanned and reviewable in the git diff.",
+          "type": "boolean",
+          "default": false
+        },
+        "enableTeamMemorySync": {
+          "description": "When team memory is enabled, automatically commit, fast-forward-pull, and push the `.hopcode/team-memory/` directory at session start so collaborators stay in sync. Off by default; requires a configured git upstream.",
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -955,9 +1069,16 @@
           "type": "object",
           "properties": {
             "enabled": {
-              "description": "When enabled (default), the cua-driver computer_use__* tools are registered as deferred built-ins.",
+              "description": "When enabled (default), the cua-driver computer_use__* tools are registered as deferred built-ins. Set to false to prevent the driver from being downloaded or spawned.",
               "type": "boolean",
               "default": true
+            },
+            "idleTimeoutMs": {
+              "description": "Milliseconds to keep the cua-driver process alive after the last computer_use__* call. The default is 300000 (5 minutes). Set to 0 to keep it running until hopcode exits.",
+              "type": "number",
+              "default": 300000,
+              "minimum": 0,
+              "maximum": 2147483647
             },
             "maxImageDimension": {
               "description": "Longest-edge pixel cap applied to cua-driver screenshots (via set_config's max_image_dimension). -1 (default) keeps cua-driver's built-in default (1568); 0 disables resizing (full resolution); a positive value caps the longest edge. Lower caps cut vision-token cost at the expense of fine detail. Overridable via the HOPCODE_COMPUTER_USE_MAX_IMAGE_DIMENSION env var.",
@@ -1129,8 +1250,11 @@
           "default": false
         },
         "dnsResolutionOrder": {
-          "description": "The DNS resolution order.",
-          "type": "string"
+          "description": "The DNS resolution order. Options: ipv4first, verbatim",
+          "enum": [
+            "ipv4first",
+            "verbatim"
+          ]
         },
         "excludedEnvVars": {
           "description": "Environment variables to exclude from project context.",
@@ -1205,9 +1329,10 @@
       "default": false
     },
     "stopHookBlockingCap": {
-      "description": "Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_STOP_HOOK_BLOCK_CAP.",
-      "type": "number",
-      "default": 8
+      "type": "integer",
+      "minimum": 1,
+      "default": 8,
+      "description": "Maximum consecutive blocking Stop/SubagentStop hook decisions before HopCode overrides the hook loop and ends the turn. Can be overridden by HOPCODE_STOP_HOOK_BLOCK_CAP."
     },
     "hooks": {
       "description": "Hook event configurations for extending CLI behavior at various lifecycle points.",
@@ -2671,10 +2796,87 @@
           "type": "boolean",
           "default": false
         },
+        "artifact": {
+          "description": "Enable the Artifact tool (experimental). When enabled, the model can publish a self-contained HTML page as an interactive Artifact and open it in the browser. Interactive, non-SDK sessions only. Can also be enabled via HOPCODE_CODE_ENABLE_ARTIFACT=1, or hard-disabled via HOPCODE_CODE_DISABLE_ARTIFACT=1.",
+          "type": "boolean",
+          "default": false
+        },
         "emitToolUseSummaries": {
           "description": "Generate a short LLM-based label after each tool batch completes. In compact mode the label replaces the generic `Tool × N` header; in full mode it appears as a dim `● <label>` line below the tool group. Requires a fast model to be configured; runs in parallel with the next API call so latency is hidden. Currently affects interactive CLI rendering only — SDK / non-interactive emission of the `tool_use_summary` message is not yet wired (the message factory is exported for a follow-up PR). Can be overridden with HOPCODE_EMIT_TOOL_USE_SUMMARIES=0 or =1.",
           "type": "boolean",
           "default": true
+        }
+      }
+    },
+    "artifact": {
+      "description": "Configuration for the experimental Artifact tool (enable it via experimental.artifact). Selects the publish backend and, for the host backend, the upload command and shareable URL template.",
+      "type": "object",
+      "properties": {
+        "autoOpen": {
+          "description": "Open published artifacts in the browser automatically. Set to false to publish without launching a browser. HOPCODE_ARTIFACT_NO_AUTO_OPEN=1 overrides this setting.",
+          "type": "boolean",
+          "default": true
+        },
+        "publisher": {
+          "description": "Where artifacts are published: 'local' (a file:// page on disk, the default), 'host' (upload via artifact.host.uploadCommand and return a shareable link), or 'oss' (native Aliyun OSS upload). Options: local, host, oss",
+          "enum": [
+            "local",
+            "host",
+            "oss"
+          ],
+          "default": "local"
+        },
+        "host": {
+          "description": "Host-backend config, used when artifact.publisher is \"host\".",
+          "type": "object",
+          "properties": {
+            "uploadCommand": {
+              "description": "Command that uploads the artifact, run with execFile (no shell). {file} = local HTML path, {key} = remote object key. e.g. \"aws s3 cp {file} s3://bucket/{key} --content-type text/html\".",
+              "type": "string",
+              "default": ""
+            },
+            "urlTemplate": {
+              "description": "Shareable URL template; {key} is substituted. e.g. \"https://bucket.example.com/{key}\".",
+              "type": "string",
+              "default": ""
+            },
+            "keyPrefix": {
+              "description": "Remote key prefix; the object key is \"{prefix}/{id}/index.html\".",
+              "type": "string",
+              "default": "artifacts"
+            }
+          }
+        },
+        "oss": {
+          "description": "Native Aliyun OSS backend, used when artifact.publisher is \"oss\". Credentials are read from OSS_ACCESS_KEY_ID / OSS_ACCESS_KEY_SECRET (or ALIBABA_CLOUD_*), never from settings.",
+          "type": "object",
+          "properties": {
+            "bucket": {
+              "description": "OSS bucket name.",
+              "type": "string",
+              "default": ""
+            },
+            "endpoint": {
+              "description": "OSS endpoint host, e.g. \"oss-cn-hangzhou.aliyuncs.com\".",
+              "type": "string",
+              "default": ""
+            },
+            "keyPrefix": {
+              "description": "Remote key prefix; the object key is \"{prefix}/{id}/index.html\".",
+              "type": "string",
+              "default": "artifacts"
+            },
+            "acl": {
+              "description": "Object ACL applied on upload. \"public-read\" (default) makes the link shareable.",
+              "type": "string",
+              "default": "public-read"
+            },
+            "publicBaseUrl": {
+              "description": "Optional CDN / custom-domain base for the returned URL. Upload still goes through endpoint. e.g. \"https://cdn.example.com\".",
+              "type": "string",
+              "default": ""
+            }
+          }
         }
       }
     },

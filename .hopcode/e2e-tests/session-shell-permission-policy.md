@@ -11,19 +11,19 @@ an authenticated daemon.
 1. Start `hopcode serve` on loopback without `--token` or
    `HOPCODE_SERVER_TOKEN`.
    - `/capabilities.features` must not include `session_shell_command`.
-   - ACP initialize `_meta.qwen.methods` must not include
-     `_qwen/session/shell`.
+   - ACP initialize `_meta.hopcode.methods` must not include
+     `_hopcode/session/shell`.
    - `POST /session/:id/shell` must return `401 token_required`.
 
 2. Start `hopcode serve --token <token>` without `--enable-session-shell`.
    - `/capabilities.features` must not include `session_shell_command`.
-   - ACP initialize must not advertise `_qwen/session/shell`.
+   - ACP initialize must not advertise `_hopcode/session/shell`.
    - Authenticated REST shell calls must return
      `session_shell_disabled`.
 
 3. Start `hopcode serve --token <token> --enable-session-shell`.
    - `/capabilities.features` must include `session_shell_command`.
-   - ACP initialize must advertise `_qwen/session/shell`.
+   - ACP initialize must advertise `_hopcode/session/shell`.
    - REST shell without `X-Qwen-Client-Id` must return
      `client_id_required`.
    - REST shell with the session-bound client id must execute and stream

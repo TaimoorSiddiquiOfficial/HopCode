@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as crypto from 'node:crypto';
-import * as net from 'node:net';
-import * as path from 'node:path';
 import express from 'express';
 import type { Application, NextFunction, Request, Response } from 'express';
 import type { ApprovalMode } from '@hoptrendy/hopcode-core';
@@ -36,7 +33,8 @@ import {
   hostAllowlist,
   parseAllowOriginPatterns,
 } from './auth.js';
-import {
+import type {
+  DeviceFlowProvider,
   DeviceFlowRegistry,
   setDeviceFlowRegistry,
   TooManyActiveDeviceFlowsError,
@@ -48,7 +46,7 @@ import {
   type DeviceFlowPublicView,
 } from './auth/deviceFlow.js';
 import { mapDomainErrorToErrorKind } from '@hoptrendy/acp-bridge';
-import { HopCodeOAuthDeviceFlowProvider } from './auth/hopCodeDeviceFlowProvider.js';
+import { HopCodeOAuthDeviceFlowProvider } from './auth/hopcode-device-flow-provider.js';
 import { createBridgeFileSystemAdapter } from './bridgeFileSystemAdapter.js';
 import { createDaemonStatusProvider } from './daemonStatusProvider.js';
 import { isServeDebugMode } from './debugMode.js';
@@ -61,74 +59,96 @@ import {
 } from './daemonStatus.js';
 import {
   canonicalizeWorkspace,
-  CancelSentinelCollisionError,
-  BranchWhilePromptActiveError,
   createAcpSessionBridge,
-  InvalidClientIdError,
-  InvalidPermissionOptionError,
-  InvalidSessionMetadataError,
-  InvalidSessionScopeError,
-  MAX_WORKSPACE_PATH_LENGTH,
-  McpServerNotFoundError,
-  McpServerRestartFailedError,
-  PermissionForbiddenError,
-  PermissionPolicyNotImplementedError,
-  PromptQueueFullError,
-  RestoreInProgressError,
-  SessionBusyError,
-  InvalidRewindTargetError,
-  SessionLimitExceededError,
-  SessionNotFoundError,
-  SessionShellClientRequiredError,
-  SessionShellDisabledError,
-  WorkspaceInitConflictError,
-  WorkspaceInitPathEscapeError,
-  WorkspaceInitSymlinkError,
-  WorkspaceInitRaceError,
-  WorkspaceMismatchError,
-  type BridgeSessionSummary,
   type AcpSessionBridge,
-} from './acpSessionBridge.js';
+} from './acp-session-bridge.js';
 import {
-  getAdvertisedServeFeatures,
-  getServeProtocolVersions,
-} from './capabilities.js';
-import { SubscriberLimitExceededError, type BridgeEvent } from './eventBus.js';
-import {
-  CAPABILITIES_SCHEMA_VERSION,
-  type CapabilitiesEnvelope,
-  type ServeAuthProviderCatalog,
-  type ServeAuthProviderDescriptor,
   type ServeAuthProviderInstallRequest,
   type ServeAuthProviderInstallResult,
   type ServeOptions,
 } from './types.js';
-import { getDemoHtml } from './demo.js';
-import { mountWorkspaceMemoryRoutes } from './workspaceMemory.js';
-import { mountWorkspaceAgentsRoutes } from './workspaceAgents.js';
 import {
-  createWorkspaceFileSystemFactory,
-  type WorkspaceFileSystemFactory,
-} from './fs/index.js';
-import { registerWorkspaceFileReadRoutes } from './routes/workspaceFileRead.js';
-import { registerWorkspaceFileWriteRoutes } from './routes/workspaceFileWrite.js';
+  mountWebShellAssets,
+  mountWebShellSpaFallback,
+} from './web-shell-static.js';
+import { mountWorkspaceMemoryRoutes } from './workspace-memory.js';
+import { mountWorkspaceAgentsRoutes } from './workspace-agents.js';
+import { registerDaemonStatusRoutes } from './routes/daemon-status.js';
+import { createHealthDemoRoutes } from './routes/health-demo.js';
+import { registerWorkspaceAuthRoutes } from './routes/workspace-auth.js';
+import { registerWorkspaceExtensionRoutes } from './routes/workspace-extensions.js';
+import type { WorkspaceFileSystemFactory } from './fs/index.js';
+import { registerWorkspaceFileReadRoutes } from './routes/workspace-file-read.js';
+import { registerWorkspaceFileWriteRoutes } from './routes/workspace-file-write.js';
+import { registerWorkspaceSetupGithubRoutes } from './routes/workspace-setup-github.js';
+import { registerWorkspaceTrustRoutes } from './routes/workspace-trust.js';
+import { registerPermissionRoutes } from './routes/permission.js';
+import { registerSessionRoutes } from './routes/session.js';
+import {
+  registerWorkspaceDiagnosticStatusRoutes,
+  registerWorkspaceStatusRoutes,
+} from './routes/workspace-status.js';
 import {
   createDaemonWorkspaceService,
   type DaemonWorkspaceService,
-  type WorkspaceRequestContext,
 } from './workspace-service/index.js';
-import { registerWorkspaceSettingsRoutes } from './routes/workspaceSettings.js';
-import { registerA2uiActionRoutes } from './routes/a2uiAction.js';
+import { registerCapabilitiesRoutes } from './routes/capabilities.js';
+import { registerWorkspacePermissionsRoutes } from './routes/workspace-permissions.js';
+import { registerWorkspaceSettingsRoutes } from './routes/workspace-settings.js';
 import {
-  createRateLimiter,
-  setRateLimiter,
-  type RateLimiterInstance,
-} from './rateLimit.js';
+  getActiveSseCount,
+  registerSseEventsRoutes,
+} from './routes/sse-events.js';
+import {
+  registerWorkspaceVoiceRoutes,
+  type WorkspaceVoiceRouteDeps,
+} from './routes/workspace-voice.js';
+import { registerA2uiActionRoutes } from './routes/a2ui-action.js';
+import { setRateLimiter } from './rate-limit.js';
+import {
+  sendBridgeError as sendBridgeErrorResponse,
+  sendPermissionVoteError as sendPermissionVoteErrorResponse,
+  type SendBridgeError,
+} from './server/error-response.js';
+import { resolveBridgeFsFactory } from './server/fs-factory.js';
+import {
+  createBuildWorkspaceCtx,
+  parseAndValidateWorkspaceClientId,
+  parseClientIdHeader,
+  safeBody,
+} from './server/request-helpers.js';
+import { daemonTelemetryMiddleware } from './server/telemetry.js';
+import { installAccessLogMiddleware } from './server/access-log.js';
+import { setupDeviceFlowRegistry } from './server/device-flow-registry.js';
+import {
+  installFinalErrorHandler,
+  installJsonBodyParser,
+} from './server/error-handlers.js';
+import { installRateLimiter } from './server/rate-limiter-setup.js';
+import { createServeFeatures } from './server/serve-features.js';
+import { installSelfOriginStripMiddleware } from './server/self-origin.js';
+import { registerWorkspaceLifecycleRoutes } from './routes/workspace-lifecycle.js';
+import { registerWorkspaceMcpControlRoutes } from './routes/workspace-mcp-control.js';
+import { registerWorkspaceToolsRoutes } from './routes/workspace-tools.js';
 
-let activeSseCount = 0;
-export function getActiveSseCount(): number {
-  return activeSseCount;
-}
+export {
+  createDefaultFsAuditEmit,
+  resolveBridgeFsFactory,
+} from './server/fs-factory.js';
+export {
+  PromptDeadlineExceededError,
+  resolvePromptDeadlineMs,
+} from './server/prompt-deadline.js';
+export { detectFromLoopback } from './server/request-helpers.js';
+export {
+  InvalidCursorError,
+  listWorkspaceSessionsForResponse,
+} from './server/session-list.js';
+export type {
+  ListWorkspaceSessionsOptions,
+  ListWorkspaceSessionsResult,
+} from './server/session-list.js';
+export { getActiveSseCount } from './routes/sse-events.js';
 
 /**
  * Build a no-op fs-audit emitter that logs a warning every
@@ -178,419 +198,6 @@ export function createDefaultFsAuditEmit(): (event: BridgeEvent) => void {
  * `createServeApp` repeatedly would flood stderr with identical lines.
  */
 let warnedDefaultTrust = false;
-
-export function resolveBridgeFsFactory(input: {
-  boundWorkspace: string;
-  injected?: WorkspaceFileSystemFactory;
-  trusted: boolean;
-  emit?: (event: BridgeEvent) => void;
-}): WorkspaceFileSystemFactory {
-  if (input.injected) return input.injected;
-  return createWorkspaceFileSystemFactory({
-    boundWorkspace: input.boundWorkspace,
-    trusted: input.trusted,
-    emit: input.emit ?? createDefaultFsAuditEmit(),
-  });
-}
-
-const DEFAULT_SESSION_PAGE_SIZE = 20;
-const MAX_SESSION_PAGE_SIZE = 100;
-
-export interface ListWorkspaceSessionsOptions {
-  cursor?: string;
-  size?: number;
-}
-
-export interface ListWorkspaceSessionsResult {
-  sessions: BridgeSessionSummary[];
-  nextCursor?: string;
-}
-
-export class InvalidCursorError extends Error {
-  constructor(cursor: string) {
-    super(`Invalid cursor: "${cursor}" is not a valid numeric cursor`);
-    this.name = 'InvalidCursorError';
-  }
-}
-
-export async function listWorkspaceSessionsForResponse(
-  bridge: AcpSessionBridge,
-  workspaceCwd: string,
-  options?: ListWorkspaceSessionsOptions,
-): Promise<ListWorkspaceSessionsResult> {
-  const pageSize = Math.min(
-    Math.max(options?.size ?? DEFAULT_SESSION_PAGE_SIZE, 1),
-    MAX_SESSION_PAGE_SIZE,
-  );
-
-  let numericCursor: number | undefined;
-  if (options?.cursor) {
-    const parsed = Number(options.cursor);
-    if (!Number.isFinite(parsed)) {
-      throw new InvalidCursorError(options.cursor);
-    }
-    numericCursor = parsed;
-  }
-  const isFirstPage = numericCursor === undefined;
-
-  const sessionService = new SessionService(workspaceCwd);
-  const persisted = await sessionService.listSessions({
-    cursor: numericCursor,
-    size: pageSize,
-  });
-  const bySessionId = new Map<string, BridgeSessionSummary>();
-
-  for (const item of persisted.items) {
-    bySessionId.set(item.sessionId, {
-      sessionId: item.sessionId,
-      workspaceCwd: item.cwd,
-      createdAt: item.startTime,
-      updatedAt: new Date(item.mtime).toISOString(),
-      title: item.customTitle ?? item.prompt,
-      clientCount: 0,
-      hasActivePrompt: false,
-    });
-  }
-
-  const liveSessions = bridge.listWorkspaceSessions(workspaceCwd);
-  for (const live of liveSessions) {
-    const existing = bySessionId.get(live.sessionId);
-    if (existing) {
-      bySessionId.set(live.sessionId, {
-        ...existing,
-        ...live,
-        createdAt: existing.createdAt,
-        title: live.title ?? existing.title,
-        updatedAt: live.updatedAt ?? existing.updatedAt,
-        clientCount: live.clientCount,
-        hasActivePrompt: live.hasActivePrompt,
-      });
-    } else if (
-      isFirstPage &&
-      !(await sessionService.sessionExists(live.sessionId))
-    ) {
-      bySessionId.set(live.sessionId, {
-        ...live,
-        createdAt: live.createdAt,
-        clientCount: live.clientCount,
-        hasActivePrompt: live.hasActivePrompt,
-      });
-    }
-  }
-
-  const sessions = [...bySessionId.values()].sort((a, b) => {
-    const aTime = Date.parse(a.updatedAt ?? a.createdAt);
-    const bTime = Date.parse(b.updatedAt ?? b.createdAt);
-    return bTime - aTime;
-  });
-
-  const nextCursor =
-    persisted.nextCursor != null ? String(persisted.nextCursor) : undefined;
-
-  return { sessions, nextCursor };
-}
-
-const AUTH_PROVIDER_STEPS: ServeAuthProviderDescriptor['steps'] = [
-  'protocol',
-  'baseUrl',
-  'apiKey',
-  'models',
-  'advancedConfig',
-];
-
-function buildAuthProviderDescriptor(
-  provider: (typeof ALL_PROVIDERS)[number],
-): ServeAuthProviderDescriptor {
-  const steps = AUTH_PROVIDER_STEPS.filter((step) =>
-    shouldShowStep(provider, step),
-  );
-  return {
-    id: provider.id,
-    label: provider.label,
-    description: provider.description,
-    ...(provider.uiGroup ? { uiGroup: provider.uiGroup } : {}),
-    protocol: provider.protocol,
-    ...(provider.protocolOptions
-      ? { protocolOptions: [...provider.protocolOptions] }
-      : {}),
-    ...(provider.baseUrl !== undefined ? { baseUrl: provider.baseUrl } : {}),
-    ...(typeof provider.envKey === 'string' ? { envKey: provider.envKey } : {}),
-    ...(provider.models
-      ? {
-          models: provider.models.map((model) => ({
-            id: model.id,
-            ...(model.contextWindowSize !== undefined
-              ? { contextWindowSize: model.contextWindowSize }
-              : {}),
-            ...(model.enableThinking !== undefined
-              ? { enableThinking: model.enableThinking }
-              : {}),
-            ...(model.modalities ? { modalities: model.modalities } : {}),
-            ...(model.description ? { description: model.description } : {}),
-          })),
-        }
-      : {}),
-    ...(provider.modelsEditable !== undefined
-      ? { modelsEditable: provider.modelsEditable }
-      : {}),
-    ...(provider.apiKeyPlaceholder
-      ? { apiKeyPlaceholder: provider.apiKeyPlaceholder }
-      : {}),
-    ...(typeof provider.documentationUrl === 'string'
-      ? { documentationUrl: provider.documentationUrl }
-      : {}),
-    ...(provider.showAdvancedConfig !== undefined
-      ? { showAdvancedConfig: provider.showAdvancedConfig }
-      : {}),
-    ...(provider.uiLabels ? { uiLabels: provider.uiLabels } : {}),
-    steps,
-  };
-}
-
-function buildAuthProviderCatalog(
-  workspaceCwd: string,
-): ServeAuthProviderCatalog {
-  const providers = ALL_PROVIDERS.map(buildAuthProviderDescriptor);
-  const providerIdsByGroup = (group: string) =>
-    providers
-      .filter((provider) => provider.uiGroup === group)
-      .map((provider) => provider.id);
-  return {
-    v: 1,
-    workspaceCwd,
-    providers,
-    groups: [
-      {
-        id: 'alibaba',
-        label: 'Alibaba ModelStudio',
-        description:
-          'Official recommended setup: Coding Plan, Token Plan, or Standard API Key',
-        providerIds: providerIdsByGroup('alibaba'),
-      },
-      {
-        id: 'third-party',
-        label: 'Third-party Providers',
-        description: 'Choose a built-in provider and connect with an API key',
-        providerIds: providerIdsByGroup('third-party'),
-      },
-      {
-        id: 'custom',
-        label: 'Custom Provider',
-        description:
-          'Manually connect a local server, proxy, or unsupported provider',
-        providerIds: providerIdsByGroup('custom'),
-      },
-    ],
-  };
-}
-
-function parseStringArray(value: unknown): string[] | undefined {
-  if (!Array.isArray(value)) return undefined;
-  const result = value
-    .map((item) => (typeof item === 'string' ? item.trim() : ''))
-    .filter((item) => item.length > 0);
-  return result.length > 0 ? [...new Set(result)] : undefined;
-}
-
-function parsePositiveBoundedInteger(
-  value: unknown,
-  max: number,
-): number | undefined {
-  if (
-    typeof value !== 'number' ||
-    !Number.isInteger(value) ||
-    !Number.isFinite(value) ||
-    value <= 0 ||
-    value > max
-  ) {
-    return undefined;
-  }
-  return value;
-}
-
-function parseIPv4MappedHexSuffix(suffix: string): string | undefined {
-  const hexParts = suffix.split(':');
-  if (hexParts.length !== 2) return undefined;
-
-  const [hiRaw, loRaw] = hexParts;
-  if (!/^[0-9a-f]{1,4}$/i.test(hiRaw) || !/^[0-9a-f]{1,4}$/i.test(loRaw)) {
-    return undefined;
-  }
-
-  const hi = Number.parseInt(hiRaw, 16);
-  const lo = Number.parseInt(loRaw, 16);
-  return `${(hi >> 8) & 0xff}.${hi & 0xff}.${(lo >> 8) & 0xff}.${lo & 0xff}`;
-}
-
-function parseIPv6FirstHextet(host: string): number | undefined {
-  const first = host.split(':', 1)[0];
-  if (!first || !/^[0-9a-f]{1,4}$/i.test(first)) return undefined;
-  return Number.parseInt(first, 16);
-}
-
-function isBlockedAuthProviderHost(hostname: string): boolean {
-  const stripped = hostname.endsWith('.') ? hostname.slice(0, -1) : hostname;
-  const host = stripped.toLowerCase();
-  if (host === 'localhost' || host.endsWith('.localhost')) return true;
-
-  const bareHost =
-    host.startsWith('[') && host.endsWith(']') ? host.slice(1, -1) : host;
-  const ipVersion = net.isIP(bareHost);
-  if (ipVersion === 4) {
-    const parts = bareHost.split('.').map((part) => Number(part));
-    const [a, b] = parts;
-    return (
-      a === 0 ||
-      a === 10 ||
-      a === 127 ||
-      (a === 100 && b !== undefined && b >= 64 && b <= 127) ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b !== undefined && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168)
-    );
-  }
-
-  if (ipVersion === 6) {
-    if (bareHost === '::' || bareHost === '::1') return true;
-    const firstHextet = parseIPv6FirstHextet(bareHost);
-    if (
-      firstHextet !== undefined &&
-      ((firstHextet >= 0xfe80 && firstHextet <= 0xfebf) ||
-        (firstHextet & 0xfe00) === 0xfc00)
-    ) {
-      return true;
-    }
-    if (bareHost.startsWith('::ffff:')) {
-      const suffix = bareHost.slice('::ffff:'.length);
-      if (net.isIP(suffix) === 4) {
-        return isBlockedAuthProviderHost(suffix);
-      }
-      const mappedIPv4 = parseIPv4MappedHexSuffix(suffix);
-      return mappedIPv4 ? isBlockedAuthProviderHost(mappedIPv4) : true;
-    }
-  }
-
-  return false;
-}
-
-function parseAuthProviderBaseUrl(
-  value: unknown,
-  allowPrivateBaseUrl: boolean,
-): string | undefined | null {
-  if (value === undefined || value === null) return undefined;
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
-  let parsed: URL;
-  try {
-    parsed = new URL(trimmed);
-  } catch {
-    return null;
-  }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
-  if (parsed.username || parsed.password) return null;
-  if (!allowPrivateBaseUrl && isBlockedAuthProviderHost(parsed.hostname)) {
-    return null;
-  }
-  return parsed.toString().replace(/\/$/, '');
-}
-
-type AuthProviderParseResult =
-  | { ok: true; value: ServeAuthProviderInstallRequest }
-  | { ok: false; code: string; error: string };
-
-function parseAuthProviderInstallRequest(
-  body: Record<string, unknown>,
-  options?: { allowPrivateBaseUrl?: boolean },
-): AuthProviderParseResult {
-  const providerId = body['providerId'];
-  const apiKey = body['apiKey'];
-  if (
-    typeof providerId !== 'string' ||
-    providerId.trim().length === 0 ||
-    typeof apiKey !== 'string' ||
-    apiKey.trim().length === 0
-  ) {
-    return {
-      ok: false,
-      code: 'invalid_request',
-      error: '`providerId` and `apiKey` are required',
-    };
-  }
-  const protocol = body['protocol'];
-  const baseUrl = parseAuthProviderBaseUrl(
-    body['baseUrl'],
-    options?.allowPrivateBaseUrl === true,
-  );
-  if (baseUrl === null) {
-    return {
-      ok: false,
-      code: 'invalid_base_url',
-      error:
-        '`baseUrl` must be an http(s) URL without credentials or blocked private-network host',
-    };
-  }
-  const modelIds = parseStringArray(body['modelIds']);
-  const rawAdvanced =
-    body['advancedConfig'] && typeof body['advancedConfig'] === 'object'
-      ? (body['advancedConfig'] as Record<string, unknown>)
-      : undefined;
-  const rawMultimodal =
-    rawAdvanced?.['multimodal'] && typeof rawAdvanced['multimodal'] === 'object'
-      ? (rawAdvanced['multimodal'] as Record<string, unknown>)
-      : undefined;
-  const contextWindowSize = parsePositiveBoundedInteger(
-    rawAdvanced?.['contextWindowSize'],
-    10_000_000,
-  );
-  const maxTokens = parsePositiveBoundedInteger(
-    rawAdvanced?.['maxTokens'],
-    10_000_000,
-  );
-  const advancedConfig = rawAdvanced
-    ? {
-        ...(typeof rawAdvanced['enableThinking'] === 'boolean'
-          ? { enableThinking: rawAdvanced['enableThinking'] }
-          : {}),
-        ...(rawMultimodal
-          ? {
-              multimodal: {
-                ...(typeof rawMultimodal['image'] === 'boolean'
-                  ? { image: rawMultimodal['image'] }
-                  : {}),
-                ...(typeof rawMultimodal['pdf'] === 'boolean'
-                  ? { pdf: rawMultimodal['pdf'] }
-                  : {}),
-                ...(typeof rawMultimodal['audio'] === 'boolean'
-                  ? { audio: rawMultimodal['audio'] }
-                  : {}),
-                ...(typeof rawMultimodal['video'] === 'boolean'
-                  ? { video: rawMultimodal['video'] }
-                  : {}),
-              },
-            }
-          : {}),
-        ...(contextWindowSize !== undefined ? { contextWindowSize } : {}),
-        ...(maxTokens !== undefined ? { maxTokens } : {}),
-      }
-    : undefined;
-  return {
-    ok: true,
-    value: {
-      providerId: providerId.trim(),
-      ...(typeof protocol === 'string' && protocol.trim()
-        ? {
-            protocol:
-              protocol.trim() as ServeAuthProviderInstallRequest['protocol'],
-          }
-        : {}),
-      ...(baseUrl ? { baseUrl } : {}),
-      apiKey,
-      ...(modelIds ? { modelIds } : {}),
-      ...(advancedConfig ? { advancedConfig } : {}),
-    },
-  };
-}
 
 export interface ServeAppDeps {
   /** Bridge instance; tests inject a fake. Defaults to a fresh real one. */
@@ -651,7 +258,9 @@ export interface ServeAppDeps {
    * stderr-only behavior.
    */
   daemonLog?: DaemonLogger;
+  startup?: DaemonStartupSnapshot;
   workspace?: DaemonWorkspaceService;
+  statusProvider?: DaemonStatusProvider;
   persistDisabledTools?: (
     workspace: string,
     toolName: string,
@@ -663,219 +272,16 @@ export interface ServeAppDeps {
     scope: import('../config/settings.js').SettingScope,
     key: string,
     value: unknown,
+  ) => Promise<void | import('../config/settings.js').LoadedSettings>;
+  persistSettings?: (
+    workspace: string,
+    writes: Array<{
+      scope: import('../config/settings.js').SettingScope;
+      key: string;
+      value: unknown;
+    }>,
   ) => Promise<void>;
-}
-
-function resolveDaemonTelemetryRoute(
-  req: Request,
-):
-  | { route: string; sessionId?: string; permissionRequestId?: string }
-  | undefined {
-  const path = req.path.replace(/\/$/, '') || '/';
-  if (req.method === 'POST' && path === '/session') {
-    return { route: 'POST /session' };
-  }
-  if (req.method === 'POST' && path === '/sessions/delete') {
-    return { route: 'POST /sessions/delete' };
-  }
-  if (req.method === 'GET' && path === '/daemon/status') {
-    return { route: 'GET /daemon/status' };
-  }
-  const sessionAction = path.match(
-    /^\/session\/([^/]+)\/(load|resume|prompt|cancel|recap|btw|mid-turn-message|model|shell|detach|rewind|approval-mode|language|a2ui-action)$/,
-  );
-  const sessionActionId = sessionAction?.[1];
-  const sessionActionName = sessionAction?.[2];
-  if (sessionActionId && sessionActionName && req.method === 'POST') {
-    return {
-      route: `POST /session/:id/${sessionActionName}`,
-      sessionId: sessionActionId,
-    };
-  }
-  const sessionMetadata = path.match(/^\/session\/([^/]+)\/metadata$/);
-  if (sessionMetadata?.[1] && req.method === 'PATCH') {
-    return {
-      route: 'PATCH /session/:id/metadata',
-      sessionId: sessionMetadata[1],
-    };
-  }
-  const sessionPermission = path.match(
-    /^\/session\/([^/]+)\/permission\/([^/]+)$/,
-  );
-  if (
-    sessionPermission?.[1] &&
-    sessionPermission?.[2] &&
-    req.method === 'POST'
-  ) {
-    const rawRequestId = sessionPermission[2];
-    return {
-      route: 'POST /session/:id/permission/:requestId',
-      sessionId: sessionPermission[1],
-      ...(rawRequestId.length <= MAX_CLIENT_ID_LENGTH &&
-      CLIENT_ID_RE.test(rawRequestId)
-        ? { permissionRequestId: rawRequestId }
-        : {}),
-    };
-  }
-  const globalPermission = path.match(/^\/permission\/([^/]+)$/);
-  if (globalPermission?.[1] && req.method === 'POST') {
-    const rawRequestId = globalPermission[1];
-    return {
-      route: 'POST /permission/:requestId',
-      ...(rawRequestId.length <= MAX_CLIENT_ID_LENGTH &&
-      CLIENT_ID_RE.test(rawRequestId)
-        ? { permissionRequestId: rawRequestId }
-        : {}),
-    };
-  }
-  const deleteSession = path.match(/^\/session\/([^/]+)$/);
-  const deleteSessionId = deleteSession?.[1];
-  if (deleteSessionId && req.method === 'DELETE') {
-    return { route: 'DELETE /session/:id', sessionId: deleteSessionId };
-  }
-  if (req.method === 'GET' && /^\/workspace\/[^/]+\/sessions$/.test(path)) {
-    return { route: 'GET /workspace/:id/sessions' };
-  }
-  if (req.method === 'POST' && path === '/workspace/init') {
-    return { route: 'POST /workspace/init' };
-  }
-  if (req.method === 'POST' && path === '/workspace/reload') {
-    return { route: 'POST /workspace/reload' };
-  }
-  const mcpRestart = path.match(/^\/workspace\/mcp\/([^/]+)\/restart$/);
-  if (mcpRestart?.[1] && req.method === 'POST') {
-    return { route: 'POST /workspace/mcp/:server/restart' };
-  }
-  if (req.method === 'POST' && path === '/workspace/mcp/servers') {
-    return { route: 'POST /workspace/mcp/servers' };
-  }
-  const mcpDelete = path.match(/^\/workspace\/mcp\/servers\/([^/]+)$/);
-  if (mcpDelete?.[1] && req.method === 'DELETE') {
-    return { route: 'DELETE /workspace/mcp/servers/:name' };
-  }
-  if (req.method === 'POST' && path === '/workspace/auth/device-flow') {
-    return { route: 'POST /workspace/auth/device-flow' };
-  }
-  const deviceFlowDelete = path.match(
-    /^\/workspace\/auth\/device-flow\/([^/]+)$/,
-  );
-  if (deviceFlowDelete?.[1] && req.method === 'DELETE') {
-    return { route: 'DELETE /workspace/auth/device-flow/:id' };
-  }
-  const toolEnable = path.match(/^\/workspace\/tools\/([^/]+)\/enable$/);
-  if (toolEnable?.[1] && req.method === 'POST') {
-    return { route: 'POST /workspace/tools/:name/enable' };
-  }
-  if (path === '/workspace/settings') {
-    if (req.method === 'GET') return { route: 'GET /workspace/settings' };
-    if (req.method === 'POST') return { route: 'POST /workspace/settings' };
-  }
-  return undefined;
-}
-
-function daemonTelemetryMiddleware(
-  boundWorkspace: string,
-): (req: Request, res: Response, next: NextFunction) => void {
-  const workspaceHash = hashDaemonWorkspace(boundWorkspace);
-  return (req, res, next) => {
-    const route = resolveDaemonTelemetryRoute(req);
-    if (!route) {
-      next();
-      return;
-    }
-    const rawClientId = req.get(CLIENT_ID_HEADER);
-    const clientId =
-      rawClientId !== undefined &&
-      rawClientId !== '' &&
-      rawClientId.length <= MAX_CLIENT_ID_LENGTH &&
-      CLIENT_ID_RE.test(rawClientId)
-        ? rawClientId
-        : undefined;
-    const startMs = Date.now();
-    void withDaemonRequestSpan(
-      {
-        method: req.method,
-        route: route.route,
-        workspaceHash,
-        ...(route.sessionId ? { sessionId: route.sessionId } : {}),
-        ...(route.permissionRequestId
-          ? { permissionRequestId: route.permissionRequestId }
-          : {}),
-        ...(clientId ? { clientId } : {}),
-      },
-      async (span) =>
-        await new Promise<void>((resolve, reject) => {
-          let done = false;
-          const finish = () => {
-            if (done) return;
-            done = true;
-            recordDaemonHttpResponse(span, res.statusCode);
-            recordDaemonHttpRequest(
-              Date.now() - startMs,
-              route.route,
-              res.statusCode,
-            );
-            resolve();
-          };
-          res.once('finish', finish);
-          res.once('close', finish);
-          try {
-            next();
-          } catch (error) {
-            recordDaemonError(span, error);
-            reject(error);
-          }
-        }),
-    ).catch(next);
-  };
-}
-
-/**
- * Sentinel passed as `AbortController.abort(reason)` when a prompt
- * exceeds its server-configured wallclock. Exported so tests can
- * match on the class identity.
- */
-export class PromptDeadlineExceededError extends Error {
-  readonly deadlineMs: number;
-  constructor(deadlineMs: number) {
-    super(`prompt exceeded the ${deadlineMs}ms deadline`);
-    this.name = 'PromptDeadlineExceededError';
-    this.deadlineMs = deadlineMs;
-  }
-}
-
-/**
- * Resolve the effective per-prompt wallclock from the server flag +
- * an optional request body override. Returns `undefined` when no
- * deadline applies. The request override may SHORTEN the deadline but
- * never EXTEND it — operators stay the upper bound.
- */
-export function resolvePromptDeadlineMs(
-  serverMs: number | undefined,
-  requestMs: number | undefined,
-): number | undefined {
-  if (serverMs === undefined || !Number.isFinite(serverMs) || serverMs <= 0) {
-    return undefined;
-  }
-  if (
-    requestMs === undefined ||
-    !Number.isFinite(requestMs) ||
-    requestMs <= 0
-  ) {
-    return serverMs;
-  }
-  return Math.min(serverMs, requestMs);
-}
-
-// Keep in sync with acp-bridge bridge.ts and SDK DaemonClient.ts.
-const DEFAULT_MAX_PENDING_PROMPTS_PER_SESSION = 5;
-
-function advertisedMaxPendingPromptsPerSession(
-  value: number | undefined,
-): number | null {
-  if (value === undefined) return DEFAULT_MAX_PENDING_PROMPTS_PER_SESSION;
-  if (value === 0 || value === Number.POSITIVE_INFINITY) return null;
-  return value;
+  voiceTranscriber?: WorkspaceVoiceRouteDeps['transcribe'];
 }
 
 /**
@@ -887,29 +293,9 @@ function advertisedMaxPendingPromptsPerSession(
  * resolves. Defaults to `opts.port` for callers (e.g. tests) that pin a port
  * up front.
  *
- * Supported routes:
- *   - `GET  /health`
- *   - `GET  /daemon/status`
- *   - `GET  /capabilities`
- *   - `GET  /workspace/mcp`
- *   - `GET  /workspace/skills`
- *   - `GET  /workspace/providers`
- *   - `GET  /workspace/env`
- *   - `GET  /workspace/preflight`
- *   - `POST /session`
- *   - `POST /session/:id/load`
- *   - `POST /session/:id/resume`
- *   - `GET  /workspace/:id/sessions`
- *   - `GET  /session/:id/context`
- *   - `GET  /session/:id/supported-commands`
- *   - `GET  /session/:id/tasks`
- *   - `POST /session/:id/prompt`
- *   - `POST /session/:id/cancel`
- *   - `POST /session/:id/heartbeat`
- *   - `POST /session/:id/model`
- *   - `GET  /session/:id/events` (SSE)
- *   - `POST /session/:id/permission/:requestId`
- *   - `POST /permission/:requestId`
+ * Route modules are registered below in middleware order. Keep this file as
+ * the assembly point so auth/rate-limit/body-parser/REST/ACP/Web Shell order
+ * stays reviewable in one place.
  *
  * **Workspace validation contract.** `createServeApp` itself does NOT
  * verify that `opts.workspace` exists or is a directory — it
@@ -969,6 +355,15 @@ export function createServeApp(
     typeof opts.token === 'string' && opts.token.length > 0;
   const sessionShellCommandEnabled =
     opts.enableSessionShell === true && tokenConfigured;
+  const { languageCodes, currentServeFeatures, invalidateServeFeaturesCache } =
+    createServeFeatures({
+      opts,
+      boundWorkspace,
+      persistSettingAvailable: deps.persistSetting !== undefined,
+      reloadAvailable: deps.workspace !== undefined,
+      sessionShellCommandEnabled,
+    });
+  const statusProvider = deps.statusProvider ?? createDaemonStatusProvider();
   const bridge =
     deps.bridge ??
     createAcpSessionBridge({
@@ -980,40 +375,13 @@ export function createServeApp(
       sessionShellCommandEnabled,
       // Wire the production status provider so direct embeds / tests
       // that don't inject `deps.bridge` get daemon env + preflight cells.
-      statusProvider: createDaemonStatusProvider(),
+      statusProvider,
       // Wire the WorkspaceFileSystem adapter so ACP writeTextFile /
       // readTextFile pick up trust / TOCTOU / audit.
       fileSystem: createBridgeFileSystemAdapter(fsFactory),
     });
 
-  // Allow same-origin requests from the demo page. Browsers send an
-  // `Origin` header on same-origin POST/fetch calls; `denyBrowserOriginCors`
-  // below would reject them. This middleware strips `Origin` when it
-  // matches the daemon's own address so the demo page's API calls pass
-  // through. Only loopback origins are matched — non-loopback deployments
-  // require the operator to front the daemon with a reverse proxy for
-  // browser access anyway (per the threat-model docs).
-  let cachedStripPort = -1;
-  let cachedSelfOrigins: Set<string> = new Set();
-  app.use((req: import('express').Request, _res, next) => {
-    const origin = req.headers.origin;
-    if (origin) {
-      const port = getPort();
-      if (port !== cachedStripPort) {
-        cachedStripPort = port;
-        cachedSelfOrigins = new Set([
-          `http://127.0.0.1:${port}`,
-          `http://localhost:${port}`,
-          `http://[::1]:${port}`,
-          `http://host.docker.internal:${port}`,
-        ]);
-      }
-      if (cachedSelfOrigins.has(origin)) {
-        delete req.headers.origin;
-      }
-    }
-    next();
-  });
+  installSelfOriginStripMiddleware(app, getPort);
 
   // Park the factory on `app.locals` so route handlers can pick it up
   // via `req.app.locals.fsFactory` without re-threading the value
@@ -1093,16 +461,13 @@ export function createServeApp(
 
   const { daemonLog } = deps;
 
-  const sendBridgeError = (
-    res: import('express').Response,
-    err: unknown,
-    ctx?: BridgeErrorContext,
-  ) => sendBridgeErrorImpl(res, err, ctx, daemonLog);
+  const sendBridgeError: SendBridgeError = (res, err, ctx) =>
+    sendBridgeErrorResponse(res, err, ctx, daemonLog);
   const sendPermissionVoteError = (
     res: import('express').Response,
     err: unknown,
     ctx: { route: string; sessionId?: string },
-  ) => sendPermissionVoteErrorImpl(res, err, ctx, daemonLog);
+  ) => sendPermissionVoteErrorResponse(res, err, ctx, daemonLog);
 
   const workspace: DaemonWorkspaceService =
     deps.workspace ??
@@ -1122,9 +487,22 @@ export function createServeApp(
         bridge.queryWorkspaceStatus(method, idle),
       invokeWorkspaceCommand: (method, params, invokeOpts) =>
         bridge.invokeWorkspaceCommand(method, params, invokeOpts),
-      publishWorkspaceEvent: (event) => bridge.publishWorkspaceEvent(event),
+      refreshExtensionsForAllSessions: () =>
+        bridge.refreshExtensionsForAllSessions(),
+      ...(deps.persistSetting ? { persistSetting: deps.persistSetting } : {}),
+      ...(deps.persistSettings
+        ? { persistSettings: deps.persistSettings }
+        : {}),
+      publishWorkspaceEvent: (event) => {
+        if (
+          event.type === 'settings_changed' ||
+          event.type === 'settings_reloaded'
+        ) {
+          invalidateServeFeaturesCache();
+        }
+        bridge.publishWorkspaceEvent(event);
+      },
     });
-
   // Order matters: rejection guards (CORS / Host allowlist / bearer auth)
   // run BEFORE the JSON body parser. Otherwise an unauthenticated POST
   // gets a full 10MB `JSON.parse` before the 401 fires — a trivially
@@ -1311,57 +689,16 @@ export function createServeApp(
 
   // Rate limiter: after auth (only count authenticated requests),
   // before body parser (reject early without burning JSON.parse CPU).
-  let rateLimiter: RateLimiterInstance | undefined;
-  if (opts.rateLimit) {
-    const windowMs = opts.rateLimitWindowMs ?? 60_000;
-    rateLimiter = createRateLimiter({
-      tiers: {
-        prompt: { windowMs, max: opts.rateLimitPrompt ?? 10 },
-        mutation: { windowMs, max: opts.rateLimitMutation ?? 30 },
-        read: { windowMs, max: opts.rateLimitRead ?? 120 },
-      },
-      hostname: opts.hostname,
-      onLimitReached: daemonLog
-        ? (tier, key, suppressed) => {
-            daemonLog.warn(
-              `rate limit hit${suppressed > 0 ? ` (${suppressed} suppressed)` : ''}`,
-              { tier, key: key.slice(0, 64) },
-            );
-          }
-        : undefined,
-      onError: daemonLog
-        ? (err, path) => {
-            daemonLog.warn(
-              `rate limiter error (fail-open): ${err instanceof Error ? err.message : String(err)}`,
-              { path },
-            );
-          }
-        : undefined,
-    });
-    app.use(rateLimiter.middleware);
-  }
+  const rateLimiter = installRateLimiter(app, opts, daemonLog);
+  installJsonBodyParser(app);
 
-  app.use(express.json({ limit: '10mb' }));
-  app.use(
-    (
-      err: unknown,
-      _req: import('express').Request,
-      res: import('express').Response,
-      next: import('express').NextFunction,
-    ) => {
-      if (sendJsonBodyParserError(res, err)) return;
-      next(err);
-    },
-  );
-
-  if (!exposeHealthPreAuth) {
+  if (!healthDemoRoutes.exposeHealthPreAuth) {
     // Non-loopback OR loopback with `--require-auth`: register
     // `/health` and `/demo` AFTER `bearerAuth` so probes must carry
     // the token. Otherwise unauthenticated callers can ping any
     // reachable address:port to confirm a daemon exists (and `/demo`
     // leaks the full API surface).
-    app.get('/health', healthHandler);
-    app.get('/demo', demoHandler);
+    healthDemoRoutes.register(app);
   }
 
   // Mutation-route gate factory. Non-strict mode is passthrough;
@@ -1373,36 +710,8 @@ export function createServeApp(
 
   app.use(daemonTelemetryMiddleware(boundWorkspace));
 
-  function buildWorkspaceCtx(
-    req: import('express').Request,
-    route: string,
-    clientId?: string,
-  ): WorkspaceRequestContext {
-    return {
-      originatorClientId: clientId,
-      route,
-      workspaceCwd: boundWorkspace,
-    };
-  }
+  const buildWorkspaceCtx = createBuildWorkspaceCtx(boundWorkspace);
 
-  const LANGUAGE_CODES = [...SUPPORTED_LANGUAGES.map((l) => l.code), 'auto'];
-  const currentServeFeatures = () =>
-    getAdvertisedServeFeatures(undefined, {
-      requireAuth: opts.requireAuth === true,
-      mcpPoolActive: opts.mcpPoolActive !== false,
-      allowOriginActive:
-        opts.allowOrigins !== undefined && opts.allowOrigins.length > 0,
-      ...(opts.promptDeadlineMs !== undefined
-        ? { promptDeadlineMs: opts.promptDeadlineMs }
-        : {}),
-      ...(opts.writerIdleTimeoutMs !== undefined
-        ? { writerIdleTimeoutMs: opts.writerIdleTimeoutMs }
-        : {}),
-      persistSettingAvailable: deps.persistSetting !== undefined,
-      sessionShellCommandEnabled,
-      rateLimit: opts.rateLimit === true,
-      reloadAvailable: deps.workspace !== undefined,
-    });
   const acpHandleRef: { current?: AcpHttpHandle } = {};
 
   app.get('/daemon/status', async (req, res) => {
@@ -1475,62 +784,11 @@ export function createServeApp(
     res.status(200).json(envelope);
   });
 
-  app.get('/workspace/mcp', async (req, res) => {
-    try {
-      const ctx = buildWorkspaceCtx(req, 'GET /workspace/mcp');
-      res.status(200).json(await workspace.getWorkspaceMcpStatus(ctx));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/mcp' });
-    }
-  });
-
-  app.get('/workspace/mcp/:server/tools', async (req, res) => {
-    const serverName = req.params['server'];
-    if (!serverName || typeof serverName !== 'string') {
-      res.status(400).json({
-        error: 'Server name path parameter is required',
-        code: 'invalid_server_name',
-      });
-      return;
-    }
-    if (serverName.length > MAX_SERVER_NAME_LENGTH) {
-      res.status(400).json({
-        error: `Server name exceeds ${MAX_SERVER_NAME_LENGTH}-character limit`,
-        code: 'invalid_server_name',
-      });
-      return;
-    }
-    try {
-      res.status(200).json(await bridge.getWorkspaceMcpToolsStatus(serverName));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/mcp/:server/tools' });
-    }
-  });
-
-  app.get('/workspace/skills', async (req, res) => {
-    try {
-      const ctx = buildWorkspaceCtx(req, 'GET /workspace/skills');
-      res.status(200).json(await workspace.getWorkspaceSkillsStatus(ctx));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/skills' });
-    }
-  });
-
-  app.get('/workspace/tools', async (_req, res) => {
-    try {
-      res.status(200).json(await bridge.getWorkspaceToolsStatus());
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/tools' });
-    }
-  });
-
-  app.get('/workspace/providers', async (req, res) => {
-    try {
-      const ctx = buildWorkspaceCtx(req, 'GET /workspace/providers');
-      res.status(200).json(await workspace.getWorkspaceProvidersStatus(ctx));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/providers' });
-    }
+  registerWorkspaceStatusRoutes(app, {
+    boundWorkspace,
+    bridge,
+    workspace,
+    sendBridgeError,
   });
 
   // Workspace memory + agents CRUD routes.
@@ -1549,51 +807,20 @@ export function createServeApp(
     safeBody,
   });
 
-  // TODO(#4175 PR 24 — PermissionMediator audit log): emit an
-  // `audit.diagnostic_read` event from these two routes so a security
-  // operator can correlate "who read what when". Read-only diagnostic
-  // surfaces are reconnaissance vectors (env: secret-var presence;
-  // preflight: workspace path + CLI entry + Node version) and the absence
-  // of audit emission here is a deliberate scope deferral, not an
-  // oversight — the audit topic does not yet exist; PR 24 lands the
-  // shared `bridge.emitAudit` infrastructure that this and PR 18's
-  // `fs.access` events will both use.
-  app.get('/workspace/env', async (req, res) => {
-    try {
-      const ctx = buildWorkspaceCtx(req, 'GET /workspace/env');
-      res.status(200).json(await workspace.getWorkspaceEnvStatus(ctx));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/env' });
-    }
+  registerWorkspaceDiagnosticStatusRoutes(app, {
+    boundWorkspace,
+    bridge,
+    workspace,
+    sendBridgeError,
   });
 
-  app.get('/workspace/preflight', async (req, res) => {
-    try {
-      const ctx = buildWorkspaceCtx(req, 'GET /workspace/preflight');
-      res.status(200).json(await workspace.getWorkspacePreflightStatus(ctx));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/preflight' });
-    }
-  });
-
-  // GET /workspace/hooks — read-only hook configuration status.
-  app.get('/workspace/hooks', async (req, res) => {
-    try {
-      const ctx = buildWorkspaceCtx(req, 'GET /workspace/hooks');
-      res.status(200).json(await workspace.getWorkspaceHooksStatus(ctx));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/hooks' });
-    }
-  });
-
-  // GET /workspace/extensions — read-only installed extension status.
-  app.get('/workspace/extensions', async (req, res) => {
-    try {
-      const ctx = buildWorkspaceCtx(req, 'GET /workspace/extensions');
-      res.status(200).json(await workspace.getWorkspaceExtensionsStatus(ctx));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /workspace/extensions' });
-    }
+  registerWorkspaceExtensionRoutes(app, {
+    boundWorkspace,
+    bridge,
+    workspace,
+    mutate,
+    safeBody,
+    sendBridgeError,
   });
 
   // Workspace file routes (read-only + mutation).
@@ -1606,6 +833,35 @@ export function createServeApp(
     parseClientId: parseClientIdHeader,
     safeBody,
   });
+  registerWorkspaceSetupGithubRoutes(app, {
+    boundWorkspace,
+    bridge,
+    mutate,
+    parseClientId: parseClientIdHeader,
+    safeBody,
+  });
+  registerWorkspaceTrustRoutes(app, {
+    boundWorkspace,
+    workspace,
+    mutate,
+    safeBody,
+    parseAndValidateClientId: (req, res) =>
+      parseAndValidateWorkspaceClientId(req, res, bridge),
+  });
+
+  const broadcastSettingsChanged = (
+    key: string,
+    value: unknown,
+    scope: string,
+    clientId: string | undefined,
+  ) => {
+    invalidateServeFeaturesCache();
+    bridge.publishWorkspaceEvent({
+      type: 'settings_changed',
+      data: { key, value, scope },
+      ...(clientId ? { originatorClientId: clientId } : {}),
+    });
+  };
 
   if (deps.persistSetting) {
     const persistSetting = deps.persistSetting;
@@ -1613,18 +869,33 @@ export function createServeApp(
       boundWorkspace,
       mutate,
       safeBody,
-      persistSetting,
-      broadcastSettingsChanged: (key, value, scope, clientId) => {
-        bridge.publishWorkspaceEvent({
-          type: 'settings_changed',
-          data: { key, value, scope },
-          ...(clientId ? { originatorClientId: clientId } : {}),
-        });
+      persistSetting: async (...args) => {
+        await persistSetting(...args);
       },
+      broadcastSettingsChanged,
       parseAndValidateClientId: (req, res) =>
         parseAndValidateWorkspaceClientId(req, res, bridge),
     });
   }
+  registerWorkspacePermissionsRoutes(app, {
+    boundWorkspace,
+    mutate,
+    safeBody,
+    workspace,
+    parseAndValidateClientId: (req, res) =>
+      parseAndValidateWorkspaceClientId(req, res, bridge),
+  });
+  registerWorkspaceVoiceRoutes(app, {
+    boundWorkspace,
+    mutate,
+    safeBody,
+    persistSetting: deps.persistSetting,
+    persistSettings: deps.persistSettings,
+    transcribe: deps.voiceTranscriber,
+    broadcastSettingsChanged,
+    parseAndValidateClientId: (req, res) =>
+      parseAndValidateWorkspaceClientId(req, res, bridge),
+  });
 
   // A2UI action inbound (the upstream half of A2UI-over-MCP): user
   // interactions from web clients are proxied to the UI MCP server's
@@ -1635,8 +906,8 @@ export function createServeApp(
     safeBody,
     // UI-server discovery uses the daemon's workspace MCP status, which
     // includes servers registered at runtime.
-    getMcpServers: async (req) => {
-      const ctx = buildWorkspaceCtx(req, 'POST /session/:id/a2ui-action');
+    getMcpServers: async () => {
+      const ctx = buildWorkspaceCtx('POST /session/:id/a2ui-action');
       const status = await workspace.getWorkspaceMcpStatus(ctx);
       return (status.servers ?? []) as Array<{
         name: string;
@@ -1791,324 +1062,51 @@ export function createServeApp(
     });
   });
 
-  app.get('/workspace/auth/providers', (_req, res) => {
-    res.status(200).json(buildAuthProviderCatalog(boundWorkspace));
+  registerSessionRoutes(app, {
+    boundWorkspace,
+    bridge,
+    mutate,
+    sendBridgeError,
+    daemonLog,
+    promptDeadlineMs: opts.promptDeadlineMs,
+    sessionShellCommandEnabled,
+    languageCodes,
   });
 
-  app.post(
-    '/workspace/auth/provider',
-    mutate({ strict: true }),
-    async (req, res) => {
-      if (!deps.installAuthProvider) {
-        res.status(501).json({
-          error: 'Auth provider installation is not implemented by this daemon',
-          code: 'not_implemented',
-        });
-        return;
-      }
-      const parsed = parseAuthProviderInstallRequest(safeBody(req), {
-        allowPrivateBaseUrl: opts.allowPrivateAuthBaseUrl === true,
-      });
-      if (!parsed.ok) {
-        res.status(400).json({
-          error: parsed.error,
-          code: parsed.code,
-        });
-        return;
-      }
-      const installRequest = parsed.value;
-      const knownProvider = ALL_PROVIDERS.find(
-        (provider) => provider.id === installRequest.providerId,
-      );
-      if (!knownProvider) {
-        res.status(400).json({
-          error: `Unsupported auth provider: ${installRequest.providerId}`,
-          code: 'unsupported_provider',
-        });
-        return;
-      }
-      if (installRequest.protocol) {
-        const allowedProtocols =
-          knownProvider.protocolOptions && knownProvider.protocolOptions.length
-            ? knownProvider.protocolOptions
-            : [knownProvider.protocol];
-        if (!allowedProtocols.includes(installRequest.protocol)) {
-          res.status(400).json({
-            error: `protocol must be one of: ${allowedProtocols.join(', ')}`,
-            code: 'unsupported_protocol',
-          });
-          return;
-        }
-      }
-      try {
-        res.status(200).json(await deps.installAuthProvider(installRequest));
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'POST /workspace/auth/provider',
-          providerId: installRequest.providerId,
-        });
-      }
-    },
-  );
-
-  app.post('/session', mutate(), async (req, res) => {
-    const body = safeBody(req);
-    // 1 daemon = 1 workspace. Three input shapes:
-    //   - `cwd` ABSENT from body → fall back to the daemon's bound
-    //     workspace (clients pre-flight
-    //     `caps.workspaceCwd` and may then omit `cwd`).
-    //   - `cwd` PRESENT but not a string → 400 malformed. A
-    //     client/orchestrator serialization bug (`cwd: null`,
-    //     `cwd: 123`, `cwd: {}`) must not silently bind a session
-    //     to the daemon's workspace; surface the bug instead.
-    //   - `cwd` PRESENT as a string → fall through to the
-    //     `path.isAbsolute` check (empty string and relative both
-    //     fail there with "must be an absolute path when provided").
-    //
-    // `safeBody` returns an `Object.create(null)` map, so
-    // `'cwd' in body` reflects exactly "did the client send the
-    // key?" without prototype-chain confusion. The presence-check
-    // is safe as long as `PROTOTYPE_POLLUTION_KEYS` doesn't grow to
-    // include `cwd` — see the cross-reference in the const's JSDoc
-    // for what to do if that invariant ever has to break.
-    const hasCwd = 'cwd' in body;
-    if (hasCwd && typeof body['cwd'] !== 'string') {
-      res
-        .status(400)
-        .json({ error: '`cwd` must be a string absolute path when provided' });
-      return;
-    }
-    // Length cap BEFORE assignment so a multi-MB `cwd` body can't
-    // amplify through downstream interpolations
-    // (`WorkspaceMismatchError`'s `.message` echoes `requested` twice;
-    // `sendBridgeError` writes it to stderr; `res.json` echoes it
-    // again). On the loopback-default-no-token deployment shape this
-    // is pre-auth, so a 10 MB cwd body — right under
-    // `express.json({limit: '10mb'})` — would otherwise cost
-    // ~60 MB per request × `maxConnections` (default 256). The
-    // `MAX_WORKSPACE_PATH_LENGTH` constant matches Linux's PATH_MAX
-    // (4096); legitimate filesystem paths fit well under it. The
-    // `WorkspaceMismatchError` constructor also truncates as a
-    // belt-and-suspenders defense for non-route callers (tests,
-    // embeds, future entry points that throw the error directly).
-    if (hasCwd && (body['cwd'] as string).length > MAX_WORKSPACE_PATH_LENGTH) {
-      res.status(400).json({
-        error: `\`cwd\` exceeds the ${MAX_WORKSPACE_PATH_LENGTH}-character limit`,
-      });
-      return;
-    }
-    const cwd = hasCwd ? (body['cwd'] as string) : boundWorkspace;
-    if (!path.isAbsolute(cwd)) {
-      res
-        .status(400)
-        .json({ error: '`cwd` must be an absolute path when provided' });
-      return;
-    }
-    const modelServiceId =
-      typeof body['modelServiceId'] === 'string'
-        ? (body['modelServiceId'] as string)
-        : undefined;
-    // Per-request `sessionScope` override. Validate at the route
-    // boundary so a 400 surfaces before touching the bridge.
-    const rawSessionScope = body['sessionScope'];
-    let sessionScope: 'single' | 'thread' | undefined;
-    if (rawSessionScope !== undefined) {
-      if (rawSessionScope !== 'single' && rawSessionScope !== 'thread') {
-        res.status(400).json({
-          error: '`sessionScope` must be "single" or "thread" when provided',
-          code: 'invalid_session_scope',
-        });
-        return;
-      }
-      sessionScope = rawSessionScope;
-    }
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      const session = await bridge.spawnOrAttach({
-        workspaceCwd: cwd,
-        modelServiceId,
-        ...(clientId !== undefined ? { clientId } : {}),
-        ...(sessionScope !== undefined ? { sessionScope } : {}),
-      });
-      // Client may have disconnected during the 1–3s spawn window. If
-      // so, the response can't be delivered. The session is otherwise
-      // orphaned (in `byId` / `defaultEntry` with no client knowing the
-      // id), and under churn this leaks one child per aborted request.
-      //
-      // Detect "can we still write the response?" via `res.writable`,
-      // which stays true until the SOCKET destination side closes
-      // (the right signal for our case). The legacy `req.aborted`
-      // only flips while the request body is still being received,
-      // so a client that completed the POST and then closed during
-      // the spawn would slip past it. `req.destroyed` is too eager
-      // — clients (incl. supertest) close their writable end after
-      // sending the body even though they're still listening for the
-      // response. `res.writable` is the documented signal for
-      // "ServerResponse can still send to client".
-      //
-      // Combined with `!session.attached` we only reap when WE spawned
-      // a fresh child for this request — if another client legitimately
-      // attached, killing it would tear out their work mid-flight.
-      // The disconnect-without-reap branch also needs to skip
-      // `res.json` — writing to a closed socket would throw EPIPE
-      // through Express's default error handler.
-      if (daemonLog) {
-        daemonLog.info(
-          session.attached ? 'session attached' : 'session spawned',
-          { sessionId: session.sessionId, clientId: session.clientId },
-        );
-      }
-      if (!res.writable) {
-        if (daemonLog) {
-          daemonLog.warn(
-            'session reaped (client disconnected before response)',
-            {
-              sessionId: session.sessionId,
-              attached: session.attached,
-            },
-          );
-        }
-        if (!session.attached) {
-          // `requireZeroAttaches: true` closes a race: if
-          // a second client called `spawnOrAttach` for the same
-          // workspace between our `await` resolving and this reap
-          // dispatching, the bridge will see `attachCount > 0` and
-          // skip the kill. Without the flag, that second client's
-          // session would die mid-prompt.
-          bridge
-            .killSession(session.sessionId, { requireZeroAttaches: true })
-            .catch(() => {
-              // Best-effort cleanup; channel.exited will eventually reap.
-            });
-        } else {
-          // When an attaching client disconnects
-          // before its 200 response can be written, the
-          // `attachCount` bump we did inside `spawnOrAttach` is
-          // fictitious — there's no live attaching client. Roll the
-          // counter back and let the bridge decide whether to reap
-          // (it does if attachCount returns to 0 AND no live SSE
-          // subscribers). Without this, both-coalesced-callers-
-          // disconnect leaves an orphan agent child no client knows
-          // the id of.
-          bridge.detachClient(session.sessionId, session.clientId).catch(() => {
-            // Best-effort cleanup; channel.exited will eventually reap.
-          });
-        }
-        return;
-      }
-      res.status(200).json(session);
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'POST /session' });
-    }
+  registerWorkspaceMcpControlRoutes(app, {
+    boundWorkspace,
+    bridge,
+    workspace,
+    mutate,
+    safeBody,
+    sendBridgeError,
+    parseAndValidateClientId: (req, res) =>
+      parseAndValidateWorkspaceClientId(req, res, bridge),
+  });
+  registerWorkspaceLifecycleRoutes(app, {
+    boundWorkspace,
+    workspace,
+    mutate,
+    safeBody,
+    sendBridgeError,
+    invalidateServeFeaturesCache,
+    parseAndValidateClientId: (req, res) =>
+      parseAndValidateWorkspaceClientId(req, res, bridge),
+  });
+  registerWorkspaceToolsRoutes(app, {
+    boundWorkspace,
+    workspace,
+    mutate,
+    safeBody,
+    sendBridgeError,
+    parseAndValidateClientId: (req, res) =>
+      parseAndValidateWorkspaceClientId(req, res, bridge),
   });
 
-  const restoreSessionHandler =
-    (action: 'load' | 'resume') =>
-    async (req: express.Request, res: express.Response) => {
-      const sessionId = requireSessionId(req, res);
-      if (!sessionId) return;
-      const body = safeBody(req);
-      const cwd = parseOptionalWorkspaceCwd(body, boundWorkspace, res);
-      if (cwd === undefined) return;
-      const clientId = parseClientIdHeader(req, res);
-      if (clientId === null) return;
-      try {
-        const session =
-          action === 'load'
-            ? await bridge.loadSession({
-                sessionId,
-                workspaceCwd: cwd,
-                ...(clientId !== undefined ? { clientId } : {}),
-              })
-            : await bridge.resumeSession({
-                sessionId,
-                workspaceCwd: cwd,
-                ...(clientId !== undefined ? { clientId } : {}),
-              });
-        if (daemonLog) {
-          daemonLog.info(
-            `session ${action}${session.attached ? ' (attached)' : ''}`,
-            { sessionId: session.sessionId, clientId: session.clientId },
-          );
-        }
-        // Mirror the `POST /session` disconnect-cleanup path (see the
-        // long comment above the matching `if (!res.writable)` there
-        // for the rationale around `res.writable` vs `req.aborted` /
-        // `req.destroyed`, plus the `requireZeroAttaches` race
-        // and the attach-rollback case). Restore needs the
-        // same cleanup because a client that disconnects during a
-        // multi-second `session/load` would otherwise leave a freshly
-        // restored session in `byId` with no client holding its id.
-        if (!res.writable) {
-          if (!session.attached) {
-            bridge
-              .killSession(session.sessionId, { requireZeroAttaches: true })
-              .catch(() => {
-                // Best-effort cleanup; channel.exited will eventually reap.
-              });
-          } else {
-            bridge
-              .detachClient(session.sessionId, session.clientId)
-              .catch(() => {
-                // Best-effort cleanup; channel.exited will eventually reap.
-              });
-          }
-          return;
-        }
-        res.status(200).json(session);
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: `POST /session/:id/${action}`,
-          sessionId,
-        });
-      }
-    };
-
-  app.post('/session/:id/load', mutate(), restoreSessionHandler('load'));
-  app.post('/session/:id/resume', mutate(), restoreSessionHandler('resume'));
-
-  app.post('/session/:id/branch', mutate(), async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    const body = safeBody(req);
-    let name = typeof body?.['name'] === 'string' ? body['name'] : undefined;
-    if (name) {
-      // eslint-disable-next-line no-control-regex
-      name = name.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
-      if (name.length > 200) {
-        name = name.slice(0, 200);
-      }
-    }
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      const result = await bridge.branchSession(
-        sessionId,
-        { name },
-        { clientId },
-      );
-      if (!res.writable) {
-        if (!result.attached) {
-          bridge
-            .killSession(result.sessionId, { requireZeroAttaches: true })
-            .catch(() => {
-              // Best-effort cleanup; channel.exited will eventually reap.
-            });
-        } else {
-          bridge.detachClient(result.sessionId, result.clientId).catch(() => {
-            // Best-effort cleanup; channel.exited will eventually reap.
-          });
-        }
-        return;
-      }
-      res.status(201).json(result);
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/branch',
-        sessionId,
-      });
-    }
+  registerPermissionRoutes(app, {
+    bridge,
+    mutate,
+    sendPermissionVoteError,
   });
 
   app.get('/session/:id/context', async (req, res) => {
@@ -3803,6 +2801,15 @@ export function createServeApp(
     token: opts.token,
     sessionShellCommandEnabled,
     checkRate: rateLimiter?.checkRate,
+    // Browser captures audio and streams raw PCM here; the daemon transcribes
+    // server-side via the reused CLI voice pipeline. Shares the ACP upgrade
+    // listener's loopback/CSRF/bearer checks.
+    extraWsRoutes: [
+      {
+        path: '/voice/stream',
+        onConnection: createVoiceWsConnectionHandler(boundWorkspace),
+      },
+    ],
   });
   if (acpHandleRef.current) {
     app.locals['acpHandle'] = acpHandleRef.current;

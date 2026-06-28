@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -342,12 +342,12 @@ export class SleepInhibitor {
 }
 
 const WINDOWS_INHIBIT_SCRIPT = `
-Add-Type -Namespace QwenCode -Name SleepUtil -MemberDefinition '[DllImport("kernel32.dll")] public static extern uint SetThreadExecutionState(uint esFlags);';
-[QwenCode.SleepUtil]::SetThreadExecutionState(0x80000001) | Out-Null;
+Add-Type -Namespace HopCode -Name SleepUtil -MemberDefinition '[DllImport("kernel32.dll")] public static extern uint SetThreadExecutionState(uint esFlags);';
+[HopCode.SleepUtil]::SetThreadExecutionState(0x80000001) | Out-Null;
 try {
   while ($true) { Start-Sleep -Seconds 3600 }
 } finally {
-  [QwenCode.SleepUtil]::SetThreadExecutionState(0x80000000) | Out-Null;
+  [HopCode.SleepUtil]::SetThreadExecutionState(0x80000000) | Out-Null;
 }
 `.trim();
 

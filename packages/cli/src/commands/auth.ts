@@ -43,6 +43,7 @@ const legacySubcommands = [
   'status',
   'coding-plan',
   'openrouter',
+  'requesty',
   'api-key',
   'hopcode-oauth',
 ];

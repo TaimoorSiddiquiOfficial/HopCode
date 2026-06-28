@@ -44,9 +44,24 @@ export const EVENT_SKILL_LAUNCH = 'hopcode.skill_launch';
 export const EVENT_AUTH = 'hopcode.auth';
 export const EVENT_USER_FEEDBACK = 'hopcode.user_feedback';
 
+export const DEFAULT_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH = 1024 * 1024;
+export const SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT = 100 * 1024 * 1024;
+
+export function isValidSensitiveSpanAttributeMaxLength(value: number): boolean {
+  return (
+    Number.isSafeInteger(value) &&
+    value >= 1 &&
+    value <= SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT
+  );
+}
+
 // Prompt Suggestion Events
 export const EVENT_PROMPT_SUGGESTION = 'hopcode.prompt_suggestion';
 export const EVENT_SPECULATION = 'hopcode.speculation';
+
+// Workflow Events (#4721)
+export const EVENT_WORKFLOW_KEYWORD = 'hopcode.workflow_keyword';
+export const EVENT_WORKFLOW_RUN = 'hopcode.workflow_run';
 
 // Arena Events
 export const EVENT_ARENA_SESSION_STARTED = 'hopcode.arena_session_started';

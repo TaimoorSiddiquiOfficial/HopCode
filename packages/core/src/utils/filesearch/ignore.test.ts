@@ -4,12 +4,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { describe, it, expect, afterEach } from 'vitest';
+import fs from 'node:fs';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { Ignore, loadIgnoreRules } from './ignore.js';
 import {
   createTmpDir,
   cleanupTmpDir,
 } from '../../test-utils/file-system-test-helpers.js';
+
+const mockDebugLogger = vi.hoisted(() => ({
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  isEnabled: vi.fn(() => false),
+}));
+
+vi.mock('../debugLogger.js', () => ({
+  createDebugLogger: () => mockDebugLogger,
+}));
 
 describe('Ignore', () => {
   describe('getDirectoryFilter', () => {
@@ -66,12 +79,21 @@ describe('Ignore', () => {
     ig2.add('baz');
     expect(ig1.getFingerprint()).not.toBe(ig2.getFingerprint());
   });
+
+  it('should include addSource patterns in the fingerprint', () => {
+    const ig1 = new Ignore().addSource('build/');
+    const ig2 = new Ignore().addSource('dist/');
+
+    expect(ig1.getFingerprint()).not.toBe(ig2.getFingerprint());
+  });
 });
 
 describe('loadIgnoreRules', () => {
   let tmpDir: string;
 
   afterEach(async () => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
     if (tmpDir) {
       await cleanupTmpDir(tmpDir);
     }
@@ -147,6 +169,61 @@ describe('loadIgnoreRules', () => {
     });
     const fileFilter = ignore.getFileFilter();
     expect(fileFilter('anyfile.txt')).toBe(false);
+  });
+
+  it('should handle ignore files that cannot be read gracefully', async () => {
+    tmpDir = await createTmpDir({
+      '.hopcodeignore': '*.log',
+    });
+    const originalReadFileSync = fs.readFileSync;
+    vi.spyOn(fs, 'readFileSync').mockImplementation(((
+      filePath: fs.PathOrFileDescriptor,
+      options?: BufferEncoding | null,
+    ) => {
+      if (String(filePath).endsWith('.hopcodeignore')) {
+        throw new Error('ignore file disappeared');
+      }
+      return originalReadFileSync(filePath, options);
+    }) as typeof fs.readFileSync);
+
+    expect(() =>
+      loadIgnoreRules({
+        projectRoot: tmpDir,
+        useGitignore: false,
+        usehopcodeignore: true,
+        ignoreDirs: [],
+      }),
+    ).not.toThrow();
+  });
+
+  it('should warn when an existing ignore file cannot be read', async () => {
+    tmpDir = await createTmpDir({
+      '.agentignore': '*.log',
+    });
+    const originalReadFileSync = fs.readFileSync;
+    vi.spyOn(fs, 'readFileSync').mockImplementation(((
+      filePath: fs.PathOrFileDescriptor,
+      options?: BufferEncoding | null,
+    ) => {
+      if (String(filePath).endsWith('.agentignore')) {
+        const error = new Error('permission denied') as NodeJS.ErrnoException;
+        error.code = 'EACCES';
+        throw error;
+      }
+      return originalReadFileSync(filePath, options);
+    }) as typeof fs.readFileSync);
+
+    expect(() =>
+      loadIgnoreRules({
+        projectRoot: tmpDir,
+        useGitignore: false,
+        usehopcodeignore: true,
+        ignoreDirs: [],
+      }),
+    ).not.toThrow();
+    expect(mockDebugLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to read'),
+    );
   });
 
   it('should always add .git to the ignore list', async () => {

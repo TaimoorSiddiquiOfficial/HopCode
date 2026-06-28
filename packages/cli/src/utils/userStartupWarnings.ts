@@ -5,7 +5,6 @@
  */
 
 import fs from 'node:fs/promises';
-import * as os from 'node:os';
 import path from 'node:path';
 import { canUseRipgrep } from '@hoptrendy/hopcode-core';
 
@@ -81,7 +80,6 @@ const ripgrepAvailabilityCheck: WarningCheck = {
 
 // All warning checks
 const WARNING_CHECKS: readonly WarningCheck[] = [
-  homeDirectoryCheck,
   rootDirectoryCheck,
   ripgrepAvailabilityCheck,
 ];

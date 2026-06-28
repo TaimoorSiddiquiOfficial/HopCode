@@ -36,6 +36,13 @@ type McpPanelActiveEvent = CustomEvent<{ id: string; active: boolean }>;
 interface SerializedMcpStatusMessage {
   status: DaemonWorkspaceMcpStatus;
   toolsByServer: Record<string, DaemonWorkspaceMcpToolsStatus>;
+  /**
+   * Per-server MCP resources, preloaded alongside tools so the dialog can
+   * browse them offline. Keyed by server name. Optional because messages
+   * serialized by older clients omit it — consumers must read defensively
+   * (`?? {}`), and the optional type forces that at compile time.
+   */
+  resourcesByServer?: Record<string, DaemonWorkspaceMcpResourcesStatus>;
   showDescriptions: boolean;
   showSchema: boolean;
   showTips: boolean;
@@ -56,7 +63,11 @@ function parseMcpStatusMessage(
   return parsed;
 }
 
-export { serializeMcpStatusMessage, parseMcpStatusMessage };
+export {
+  serializeMcpStatusMessage,
+  parseMcpStatusMessage,
+  type SerializedMcpStatusMessage,
+};
 
 function statusDisplay(
   server: DaemonWorkspaceMcpServerStatus,
@@ -836,5 +847,3 @@ export function McpStatusMessage({
     </div>
   );
 }
-
-export { ACTIVE_EVENT as MCP_STATUS_ACTIVE_EVENT };

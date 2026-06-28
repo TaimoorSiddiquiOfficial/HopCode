@@ -171,7 +171,9 @@ details.
 
 ### Device-flow auth
 
-Separate OAuth surface for provider authentication (Qwen OAuth, etc.):
+Separate OAuth surface for provider authentication. The v1 provider identifier is
+`hopcode-oauth`, but Qwen OAuth free tier was discontinued on 2026-04-15; new
+setups should use a currently supported auth provider when one is available.
 
 - `POST /workspace/auth/device-flow` — start a flow; returns `{deviceFlowId, providerId, expiresAt, verificationUrl, userCode}`.
 - `GET /workspace/auth/device-flow/:id` — poll state.
@@ -180,10 +182,10 @@ Separate OAuth surface for provider authentication (Qwen OAuth, etc.):
 
 SSE events `auth_device_flow_{started, throttled, authorized, failed, cancelled}` fan-out flow state to all subscribers so multi-client UIs stay in sync. See [`09-event-schema.md`](./09-event-schema.md).
 
-Implementation: `packages/cli/src/serve/auth/deviceFlow.ts` + `qwenDeviceFlowProvider.ts`.
+Implementation: `packages/cli/src/serve/auth/device-flow.ts` + `hopcode-device-flow-provider.ts`.
 
 **Log injection / Trojan Source defense**: `sanitizeForStderr(value)`
-(`deviceFlow.ts`) replaces ASCII control characters and Unicode control
+(`device-flow.ts`) replaces ASCII control characters and Unicode control
 characters with `?`. A malicious IdP could otherwise forge log lines or hide
 payloads:
 

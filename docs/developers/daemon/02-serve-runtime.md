@@ -51,7 +51,7 @@
 | `serve/acpHttp/`                                             | ACP Streamable HTTP transport (RFD #721), mounted at `/acp`. Seven files implement JSON-RPC POST, SSE GET, DELETE teardown, and shared bridge usage in parallel with the REST surface.                                                                                                                                                                                                                                                                       |
 | `serve/demo.ts`                                              | Self-contained inline HTML for `GET /demo`: browser debug console with chat UI, event log, and workspace inspector. On loopback without `--require-auth`, it is registered **before** `bearerAuth`; on non-loopback or with `--require-auth`, it is registered **after** `bearerAuth`. Served with CSP `default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'` plus `X-Frame-Options: DENY`. |
 
-**Re-export shims** for compatibility with pre-F1 import paths:
+**ACP bridge package imports**:
 
 - `serve/eventBus.ts` -> `@hoptrendy/acp-bridge/eventBus`
 - `serve/status.ts` -> `@hoptrendy/acp-bridge/status`
@@ -147,7 +147,7 @@ See [`17-configuration.md`](./17-configuration.md) for the merged reference.
 - `packages/cli/src/serve/runHopCodeServe.ts` (bootstrap, boot validation, graceful shutdown)
 - `packages/cli/src/serve/server.ts` (`createServeApp()`, middleware and route assembly)
 - `packages/cli/src/serve/auth.ts` (CORS, Host allowlist, bearer auth, mutation gate)
-- `packages/cli/src/serve/rateLimit.ts` (per-tier HTTP rate limit)
+- `packages/cli/src/serve/rate-limit.ts` (per-tier HTTP rate limit)
 - `packages/cli/src/serve/capabilities.ts` (capability registry and conditional advertisement)
 - `packages/cli/src/serve/types.ts` (`ServeOptions`, `CapabilitiesEnvelope`)
 - `packages/cli/src/serve/daemonStatusProvider.ts`

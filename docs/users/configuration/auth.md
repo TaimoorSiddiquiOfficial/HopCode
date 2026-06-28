@@ -23,7 +23,7 @@ Start the CLI and follow the browser flow:
 hopcode
 ```
 
-Then run `/auth` and choose the OAuth provider from the interactive dialog.
+Qwen OAuth is no longer offered as a selectable entry in the `/auth` dialog; run `/auth` and choose one of the current options (Alibaba ModelStudio, Third-party Providers, or Custom Provider) instead.
 
 > [!note]
 >
@@ -71,15 +71,18 @@ If you prefer to skip the interactive `/auth` flow, add the following to `~/.hop
 ```json
 {
   "modelProviders": {
-    "openai": [
-      {
-        "id": "qwen3-coder-plus",
-        "name": "qwen3-coder-plus (Coding Plan)",
-        "baseUrl": "https://coding.dashscope.aliyuncs.com/v1",
-        "description": "qwen3-coder-plus from Alibaba Cloud Coding Plan",
-        "envKey": "BAILIAN_CODING_PLAN_API_KEY"
-      }
-    ]
+    "openai": {
+      "protocol": "openai",
+      "models": [
+        {
+          "id": "qwen3-coder-plus",
+          "name": "qwen3-coder-plus (Coding Plan)",
+          "baseUrl": "https://coding.dashscope.aliyuncs.com/v1",
+          "description": "qwen3-coder-plus from Alibaba Cloud Coding Plan",
+          "envKey": "BAILIAN_CODING_PLAN_API_KEY"
+        }
+      ]
+    }
   },
   "env": {
     "BAILIAN_CODING_PLAN_API_KEY": "sk-sp-xxxxxxxxx"
@@ -101,7 +104,7 @@ If you prefer to skip the interactive `/auth` flow, add the following to `~/.hop
 
 ## 🚀 Option 3: API Key (flexible)
 
-Use this if you want to connect to third-party providers such as OpenAI, Anthropic, Google, Azure OpenAI, OpenRouter, ModelScope, or a self-hosted endpoint. Supports multiple protocols and providers.
+Use this if you want to connect to third-party providers such as OpenAI, Anthropic, Google, Azure OpenAI, OpenRouter, Requesty, ModelScope, or a self-hosted endpoint. Supports multiple protocols and providers.
 
 ### Recommended: One-file setup via `settings.json`
 
@@ -110,15 +113,18 @@ The simplest way to get started with API Key authentication is to put everything
 ```json
 {
   "modelProviders": {
-    "openai": [
-      {
-        "id": "qwen3-coder-plus",
-        "name": "qwen3-coder-plus",
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-        "description": "Qwen3-Coder via Dashscope",
-        "envKey": "DASHSCOPE_API_KEY"
-      }
-    ]
+    "openai": {
+      "protocol": "openai",
+      "models": [
+        {
+          "id": "qwen3-coder-plus",
+          "name": "qwen3-coder-plus",
+          "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+          "description": "Qwen3-Coder via Dashscope",
+          "envKey": "DASHSCOPE_API_KEY"
+        }
+      ]
+    }
   },
   "env": {
     "DASHSCOPE_API_KEY": "sk-xxxxxxxxxxxxx"
@@ -153,15 +159,16 @@ The key concept is **Model Providers** (`modelProviders`): HopCode supports mult
 
 #### Supported protocols
 
-| Protocol          | `modelProviders` key | Environment variables                                        | Providers                                                                                   |
-| ----------------- | -------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| OpenAI-compatible | `openai`             | `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`          | OpenAI, Azure OpenAI, OpenRouter, ModelScope, Alibaba Cloud, any OpenAI-compatible endpoint |
-| Anthropic         | `anthropic`          | `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL` | Anthropic Claude                                                                            |
-| Google GenAI      | `gemini`             | `GEMINI_API_KEY`, `GEMINI_MODEL`                             | Google Gemini                                                                               |
+| Protocol          | `modelProviders` key | Environment variables                                                                                | Providers                                                                                             |
+| ----------------- | -------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| OpenAI-compatible | `openai`             | `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`                                                  | OpenAI, Azure OpenAI, OpenRouter, Requesty, ModelScope, Alibaba Cloud, any OpenAI-compatible endpoint |
+| Anthropic         | `anthropic`          | `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL`                                         | Anthropic Claude                                                                                      |
+| Google GenAI      | `gemini`             | `GEMINI_API_KEY`, `GEMINI_MODEL`                                                                     | Google Gemini                                                                                         |
+| Vertex AI         | `vertex-ai`          | `GOOGLE_API_KEY`, `GOOGLE_MODEL` (sets `GOOGLE_GENAI_USE_VERTEXAI=true`; uses the `gemini` protocol) | Google Vertex AI                                                                                      |
 
 #### Step 1: Configure models and providers in `~/.hopcode/settings.json`
 
-Define which models are available for each protocol. Each model entry requires at minimum an `id` and an `envKey` (the environment variable name that holds your API key).
+Define which models are available for each protocol. Each model entry requires at minimum an `id`; `envKey` (the environment variable name that holds your API key) is optional and recommended — when omitted, it falls back to the auth type's default env key (e.g. `OPENAI_API_KEY` for `openai`).
 
 > [!important]
 >
@@ -172,28 +179,37 @@ Edit `~/.hopcode/settings.json` (create it if it doesn't exist). You can mix mul
 ```json
 {
   "modelProviders": {
-    "openai": [
-      {
-        "id": "gpt-4o",
-        "name": "GPT-4o",
-        "envKey": "OPENAI_API_KEY",
-        "baseUrl": "https://api.openai.com/v1"
-      }
-    ],
-    "anthropic": [
-      {
-        "id": "claude-sonnet-4-20250514",
-        "name": "Claude Sonnet 4",
-        "envKey": "ANTHROPIC_API_KEY"
-      }
-    ],
-    "gemini": [
-      {
-        "id": "gemini-2.5-pro",
-        "name": "Gemini 2.5 Pro",
-        "envKey": "GEMINI_API_KEY"
-      }
-    ]
+    "openai": {
+      "protocol": "openai",
+      "models": [
+        {
+          "id": "gpt-4o",
+          "name": "GPT-4o",
+          "envKey": "OPENAI_API_KEY",
+          "baseUrl": "https://api.openai.com/v1"
+        }
+      ]
+    },
+    "anthropic": {
+      "protocol": "anthropic",
+      "models": [
+        {
+          "id": "claude-sonnet-4-20250514",
+          "name": "Claude Sonnet 4",
+          "envKey": "ANTHROPIC_API_KEY"
+        }
+      ]
+    },
+    "gemini": {
+      "protocol": "gemini",
+      "models": [
+        {
+          "id": "gemini-2.5-pro",
+          "name": "Gemini 2.5 Pro",
+          "envKey": "GEMINI_API_KEY"
+        }
+      ]
+    }
   }
 }
 ```
@@ -204,13 +220,13 @@ Edit `~/.hopcode/settings.json` (create it if it doesn't exist). You can mix mul
 
 **`ModelConfig` fields (each entry inside `modelProviders`):**
 
-| Field              | Required | Description                                                          |
-| ------------------ | -------- | -------------------------------------------------------------------- |
-| `id`               | Yes      | Model ID sent to the API (e.g. `gpt-4o`, `claude-sonnet-4-20250514`) |
-| `name`             | No       | Display name in the `/model` picker (defaults to `id`)               |
-| `envKey`           | Yes      | Environment variable name for the API key (e.g. `OPENAI_API_KEY`)    |
-| `baseUrl`          | No       | API endpoint override (useful for proxies or custom endpoints)       |
-| `generationConfig` | No       | Fine-tune `timeout`, `maxRetries`, `samplingParams`, etc.            |
+| Field              | Required | Description                                                                                                                                        |
+| ------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`               | Yes      | Model ID sent to the API (e.g. `gpt-4o`, `claude-sonnet-4-20250514`)                                                                               |
+| `name`             | No       | Display name in the `/model` picker (defaults to `id`)                                                                                             |
+| `envKey`           | No       | Environment variable name for the API key (e.g. `OPENAI_API_KEY`); optional/recommended — defaults to the auth type's default env key when omitted |
+| `baseUrl`          | No       | API endpoint override (useful for proxies or custom endpoints)                                                                                     |
+| `generationConfig` | No       | Fine-tune `timeout`, `maxRetries`, `samplingParams`, etc.                                                                                          |
 
 > [!note]
 >

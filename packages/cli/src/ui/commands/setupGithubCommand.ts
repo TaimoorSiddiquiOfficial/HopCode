@@ -4,18 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import path from 'node:path';
-import * as fs from 'node:fs';
-import { Writable } from 'node:stream';
-import { ProxyAgent } from 'undici';
-
 import type { CommandContext } from '../../ui/commands/types.js';
 import {
-  getGitRepoRoot,
-  getLatestGitHubRelease,
-  isGitHubRepository,
-  getGitHubRepoInfo,
-} from '../../utils/gitUtils.js';
+  GITHUB_WORKFLOW_PATHS,
+  setupGithub,
+  updateGitignore as updateGitignoreWithStatus,
+} from '../../services/setup-github.js';
 
 import type { SlashCommand, SlashCommandActionReturn } from './types.js';
 import { CommandKind } from './types.js';
@@ -34,19 +28,13 @@ export const GITHUB_WORKFLOW_PATHS = [
 ];
 
 // Generate OS-specific commands to open the GitHub pages needed for setup.
-function getOpenUrlsCommands(readmeUrl: string): string[] {
+function getOpenUrlsCommands(readmeUrl: string, secretsUrl?: string): string[] {
   // Determine the OS-specific command to open URLs, ex: 'open', 'xdg-open', etc
   const openCmd = getUrlOpenCommand();
 
   // Build a list of URLs to open
   const urlsToOpen = [readmeUrl];
-
-  const repoInfo = getGitHubRepoInfo();
-  if (repoInfo) {
-    urlsToOpen.push(
-      `https://github.com/${repoInfo.owner}/${repoInfo.repo}/settings/secrets/actions`,
-    );
-  }
+  if (secretsUrl) urlsToOpen.push(secretsUrl);
 
   // Create and join the individual commands
   const commands = urlsToOpen.map((url) => `${openCmd} "${url}"`);
@@ -114,24 +102,6 @@ export const setupGithubCommand: SlashCommand = {
       );
     }
 
-    if (!isGitHubRepository()) {
-      throw new Error(
-        'Unable to determine the GitHub repository. /setup-github must be run from a git repository.',
-      );
-    }
-
-    // Find the root directory of the repo
-    let gitRepoRoot: string;
-    try {
-      gitRepoRoot = getGitRepoRoot();
-    } catch (_error) {
-      debugLogger.debug(`Failed to get git repo root:`, _error);
-      throw new Error(
-        'Unable to determine the GitHub repository. /setup-github must be run from a git repository.',
-      );
-    }
-
-    // Get the latest release tag from GitHub
     const proxy = context?.services?.config?.getProxy();
     const releaseTag = await getLatestGitHubRelease(proxy);
     const readmeUrl = `https://github.com/TaimoorSiddiquiOfficial/HopCode/blob/${releaseTag}/docs/github-actions/README.md#quick-start`;
@@ -207,9 +177,9 @@ export const setupGithubCommand: SlashCommand = {
     const commands = [];
     commands.push('set -eEuo pipefail');
     commands.push(
-      `echo "Successfully downloaded ${GITHUB_WORKFLOW_PATHS.length} workflows and updated .gitignore. Follow the steps in ${readmeUrl} (skipping the /setup-github step) to complete setup."`,
+      `echo "Successfully downloaded ${GITHUB_WORKFLOW_PATHS.length} workflows and updated .gitignore. Follow the steps in ${result.readmeUrl} (skipping the /setup-github step) to complete setup."`,
     );
-    commands.push(...getOpenUrlsCommands(readmeUrl));
+    commands.push(...getOpenUrlsCommands(result.readmeUrl, result.secretsUrl));
 
     const command = `(${commands.join(' && ')})`;
     return {

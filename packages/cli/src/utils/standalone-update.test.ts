@@ -13,6 +13,7 @@ import {
   ensureBinWrapper,
   ensurePathInShellRc,
   performStandaloneUpdate,
+  isSafeTarEntryPath,
 } from './standalone-update.js';
 
 describe('standalone-update', () => {
@@ -257,6 +258,25 @@ describe('standalone-update', () => {
 
       // Clean up lock
       fs.unlinkSync(lockPath);
+    });
+  });
+
+  describe('isSafeTarEntryPath', () => {
+    it('allows double dots inside a filename segment', () => {
+      expect(isSafeTarEntryPath('hopcode/release..notes.md')).toBe(true);
+      expect(isSafeTarEntryPath('hopcode/node/lib/foo..bar')).toBe(true);
+      expect(isSafeTarEntryPath('hopcode/.../file.txt')).toBe(true);
+    });
+
+    it('rejects parent-directory segments and absolute paths', () => {
+      expect(isSafeTarEntryPath('../hopcode/manifest.json')).toBe(false);
+      expect(isSafeTarEntryPath('hopcode/../manifest.json')).toBe(false);
+      expect(isSafeTarEntryPath('hopcode\\..\\manifest.json')).toBe(false);
+      expect(isSafeTarEntryPath('/tmp/hopcode/manifest.json')).toBe(false);
+      expect(isSafeTarEntryPath('C:\\tmp\\hopcode\\manifest.json')).toBe(
+        false,
+      );
+      expect(isSafeTarEntryPath('')).toBe(false);
     });
   });
 

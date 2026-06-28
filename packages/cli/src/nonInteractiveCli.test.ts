@@ -99,10 +99,12 @@ describe('runNonInteractive', () => {
     sendMessageStream: Mock;
     getChatRecordingService: Mock;
     getChat: Mock;
+    stripOrphanedUserEntriesFromHistory: Mock;
     getHistoryFunctionResponseIds: Mock;
     consumePendingMemoryTaskPromises: Mock;
     recordCompletedToolCall: Mock;
   };
+  let mockGetDebugResponses: Mock;
 
   beforeEach(async () => {
     // Reset module-level state from any prior test in this file. Without
@@ -113,6 +115,7 @@ describe('runNonInteractive', () => {
 
     mockCoreExecuteToolCall = vi.mocked(executeToolCall);
     mockShutdownTelemetry = vi.mocked(shutdownTelemetry);
+    mockGetDebugResponses = vi.fn().mockReturnValue([]);
     mockGetCommandsForMode.mockImplementation((mode: ExecutionMode) =>
       filterCommandsForMode(mockGetCommands(), mode),
     );
@@ -159,6 +162,7 @@ describe('runNonInteractive', () => {
       sendMessageStream: vi.fn(),
       consumePendingMemoryTaskPromises: vi.fn().mockReturnValue([]),
       recordCompletedToolCall: vi.fn(),
+      stripOrphanedUserEntriesFromHistory: vi.fn(),
       getChatRecordingService: vi.fn(() => ({
         initialize: vi.fn(),
         recordMessage: vi.fn(),
@@ -286,6 +290,12 @@ describe('runNonInteractive', () => {
         totalLinesAdded: 0,
         totalLinesRemoved: 0,
       },
+      skills: {
+        totalCalls: 0,
+        totalSuccess: 0,
+        totalFail: 0,
+        byName: {},
+      },
       ...overrides,
     };
   }
@@ -341,6 +351,182 @@ describe('runNonInteractive', () => {
     expect(mockShutdownTelemetry).toHaveBeenCalled();
   });
 
+  describe('continueInterrupted', () => {
+    it('re-submits an orphaned trailing user prompt with Retry semantics', async () => {
+      setupMetricsMock();
+      // The orphan strip + restore is owned by the Retry send path in
+      // client.ts (covered by client.test.ts); here we only assert the
+      // continuation hands off to that path with Retry semantics.
+      mockGeminiClient.getChat = vi.fn(() => ({
+        getDebugResponses: mockGetDebugResponses,
+        getHistory: vi
+          .fn()
+          .mockReturnValue([
+            { role: 'user', parts: [{ text: 'do the thing' }] },
+          ]),
+      }));
+      mockGeminiClient.sendMessageStream.mockReturnValue(
+        createStreamFromEvents([
+          {
+            type: GeminiEventType.Finished,
+            value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
+          },
+        ]),
+      );
+
+      await runNonInteractive(mockConfig, mockSettings, '', 'prompt-c1', {
+        continueInterrupted: true,
+      });
+
+      expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledWith(
+        [{ text: 'do the thing' }],
+        expect.any(AbortSignal),
+        'prompt-c1',
+        expect.objectContaining({ type: SendMessageType.Retry }),
+      );
+    });
+
+    it('adds plan mode reminders to an interrupted prompt replay', async () => {
+      setupMetricsMock();
+      mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.PLAN);
+      mockGeminiClient.stripOrphanedUserEntriesFromHistory = vi.fn();
+      mockGeminiClient.getChat = vi.fn(() => ({
+        getDebugResponses: mockGetDebugResponses,
+        getHistory: vi
+          .fn()
+          .mockReturnValue([
+            { role: 'user', parts: [{ text: 'do the thing' }] },
+          ]),
+      }));
+      mockGeminiClient.sendMessageStream.mockReturnValue(
+        createStreamFromEvents([
+          {
+            type: GeminiEventType.Finished,
+            value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
+          },
+        ]),
+      );
+
+      await runNonInteractive(mockConfig, mockSettings, '', 'prompt-c-plan', {
+        continueInterrupted: true,
+      });
+
+      const [request, , , options] =
+        mockGeminiClient.sendMessageStream.mock.calls[0]!;
+      expect(options).toEqual(
+        expect.objectContaining({ type: SendMessageType.Retry }),
+      );
+      expect(request).toEqual([
+        { text: expect.stringContaining(SYSTEM_REMINDER_OPEN) },
+        { text: 'do the thing' },
+      ]);
+    });
+
+    it('closes dangling tool calls with synthesized ToolResult parts', async () => {
+      setupMetricsMock();
+      mockGeminiClient.getChat = vi.fn(() => ({
+        getDebugResponses: mockGetDebugResponses,
+        getHistory: vi.fn().mockReturnValue([
+          {
+            role: 'model',
+            parts: [{ functionCall: { id: 'call-1', name: 'shell' } }],
+          },
+        ]),
+      }));
+      mockGeminiClient.sendMessageStream.mockReturnValue(
+        createStreamFromEvents([
+          {
+            type: GeminiEventType.Finished,
+            value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
+          },
+        ]),
+      );
+
+      await runNonInteractive(mockConfig, mockSettings, '', 'prompt-c2', {
+        continueInterrupted: true,
+      });
+
+      const [request, , , options] =
+        mockGeminiClient.sendMessageStream.mock.calls[0]!;
+      expect(options).toEqual(
+        expect.objectContaining({ type: SendMessageType.ToolResult }),
+      );
+      expect(request).toEqual([
+        {
+          functionResponse: {
+            id: 'call-1',
+            name: 'shell',
+            response: { error: expect.stringContaining('not recorded') },
+          },
+        },
+      ]);
+    });
+
+    it('adds plan mode reminders to a continued tool result without moving function responses', async () => {
+      setupMetricsMock();
+      mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.PLAN);
+      mockGeminiClient.getChat = vi.fn(() => ({
+        getDebugResponses: mockGetDebugResponses,
+        getHistory: vi.fn().mockReturnValue([
+          {
+            role: 'model',
+            parts: [{ functionCall: { id: 'call-1', name: 'shell' } }],
+          },
+        ]),
+      }));
+      mockGeminiClient.sendMessageStream.mockReturnValue(
+        createStreamFromEvents([
+          {
+            type: GeminiEventType.Finished,
+            value: { reason: undefined, usageMetadata: { totalTokenCount: 5 } },
+          },
+        ]),
+      );
+
+      await runNonInteractive(
+        mockConfig,
+        mockSettings,
+        '',
+        'prompt-c-tool-plan',
+        {
+          continueInterrupted: true,
+        },
+      );
+
+      const [request, , , options] =
+        mockGeminiClient.sendMessageStream.mock.calls[0]!;
+      expect(options).toEqual(
+        expect.objectContaining({ type: SendMessageType.ToolResult }),
+      );
+      expect(request).toEqual([
+        {
+          functionResponse: {
+            id: 'call-1',
+            name: 'shell',
+            response: { error: expect.stringContaining('not recorded') },
+          },
+        },
+        { text: expect.stringContaining(SYSTEM_REMINDER_OPEN) },
+      ]);
+    });
+
+    it('is a no-op when the last turn ended cleanly', async () => {
+      setupMetricsMock();
+      mockGeminiClient.getChat = vi.fn(() => ({
+        getDebugResponses: mockGetDebugResponses,
+        getHistory: vi
+          .fn()
+          .mockReturnValue([{ role: 'model', parts: [{ text: 'all done' }] }]),
+      }));
+
+      await runNonInteractive(mockConfig, mockSettings, '', 'prompt-c3', {
+        continueInterrupted: true,
+      });
+
+      expect(mockGeminiClient.sendMessageStream).not.toHaveBeenCalled();
+    });
+  });
+
   it('on EPIPE, destroys stdout and returns normally instead of process.exit', async () => {
     // Regression: process.exit(0) on EPIPE bypassed runExitCleanup → flush()
     // and dropped queued JSONL writes for `hopcode -p ... | head -1` patterns.
@@ -371,6 +557,173 @@ describe('runNonInteractive', () => {
     await runNonInteractive(mockConfig, mockSettings, 'test', 'p1');
 
     expect(stdoutDestroySpy).toHaveBeenCalled();
+  });
+
+  it('returns non-zero and skips pending tool calls after loop detection', async () => {
+    setupMetricsMock();
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
+      value: {
+        callId: 'tool-1',
+        name: 'testTool',
+        args: { arg1: 'value1' },
+        isClientInitiated: false,
+        prompt_id: 'prompt-id-loop-detected',
+      },
+    };
+    const events: ServerGeminiStreamEvent[] = [
+      toolCallEvent,
+      {
+        type: GeminiEventType.LoopDetected,
+        value: { loopType: LoopType.TURN_TOOL_CALL_CAP },
+      },
+    ];
+    mockGeminiClient.sendMessageStream.mockReturnValue(
+      createStreamFromEvents(events),
+    );
+
+    const exitCode = await runNonInteractive(
+      mockConfig,
+      mockSettings,
+      'Use a tool',
+      'prompt-id-loop-detected',
+    );
+
+    expect(exitCode).toBe(1);
+    expect(mockCoreExecuteToolCall).not.toHaveBeenCalled();
+    expect(processStdoutSpy).not.toHaveBeenCalled();
+    expect(processStderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Loop detection halted the run'),
+    );
+  });
+
+  it('shows the always-on hint (not the skipLoopDetection escape) for a consecutive-identical halt', async () => {
+    setupMetricsMock();
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
+      value: {
+        callId: 'tool-1',
+        name: 'run_shell_command',
+        args: { command: 'echo loop' },
+        isClientInitiated: false,
+        prompt_id: 'prompt-id-consecutive-loop',
+      },
+    };
+    const events: ServerGeminiStreamEvent[] = [
+      toolCallEvent,
+      {
+        type: GeminiEventType.LoopDetected,
+        value: { loopType: LoopType.CONSECUTIVE_IDENTICAL_TOOL_CALLS },
+      },
+    ];
+    mockGeminiClient.sendMessageStream.mockReturnValue(
+      createStreamFromEvents(events),
+    );
+
+    const exitCode = await runNonInteractive(
+      mockConfig,
+      mockSettings,
+      'Repeat a tool',
+      'prompt-id-consecutive-loop',
+    );
+
+    expect(exitCode).toBe(1);
+    // The consecutive guard is always-on, so the headless message must flag it
+    // as always-on and must NOT suggest the skipLoopDetection escape hatch,
+    // which cannot disable it.
+    expect(processStderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'always-on guard and cannot be disabled via `model.skipLoopDetection`',
+      ),
+    );
+    expect(processStderrSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Set the `model.skipLoopDetection` setting to true',
+      ),
+    );
+  });
+
+  it('shows the skipLoopDetection escape hint for a heuristic loop type', async () => {
+    setupMetricsMock();
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
+      value: {
+        callId: 'tool-1',
+        name: 'run_shell_command',
+        args: { command: 'echo loop' },
+        isClientInitiated: false,
+        prompt_id: 'prompt-id-heuristic-loop',
+      },
+    };
+    const events: ServerGeminiStreamEvent[] = [
+      toolCallEvent,
+      {
+        type: GeminiEventType.LoopDetected,
+        value: { loopType: LoopType.REPETITIVE_THOUGHTS },
+      },
+    ];
+    mockGeminiClient.sendMessageStream.mockReturnValue(
+      createStreamFromEvents(events),
+    );
+
+    const exitCode = await runNonInteractive(
+      mockConfig,
+      mockSettings,
+      'Repeat a tool',
+      'prompt-id-heuristic-loop',
+    );
+
+    expect(exitCode).toBe(1);
+    // A heuristic loop IS gated by skipLoopDetection, so the message must offer
+    // that escape hatch and must NOT claim it is an always-on guard. (Mutation
+    // guard: routing all types into the always-on hint would fail here.)
+    expect(processStderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Set the `model.skipLoopDetection` setting to true',
+      ),
+    );
+    expect(processStderrSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('always-on guard'),
+    );
+  });
+
+  it('marks JSON output as an error when loop detection halts the run', async () => {
+    (mockConfig.getOutputFormat as Mock).mockReturnValue(OutputFormat.JSON);
+    setupMetricsMock();
+    const events: ServerGeminiStreamEvent[] = [
+      { type: GeminiEventType.Content, value: 'Partial work' },
+      {
+        type: GeminiEventType.LoopDetected,
+        value: { loopType: LoopType.TURN_TOOL_CALL_CAP },
+      },
+    ];
+    mockGeminiClient.sendMessageStream.mockReturnValue(
+      createStreamFromEvents(events),
+    );
+
+    const exitCode = await runNonInteractive(
+      mockConfig,
+      mockSettings,
+      'Test input',
+      'prompt-id-loop-json',
+    );
+
+    expect(exitCode).toBe(1);
+    const outputCalls = processStdoutSpy.mock.calls.filter(
+      (call) => typeof call[0] === 'string',
+    );
+    const lastOutput = outputCalls.at(-1)?.[0];
+    expect(typeof lastOutput).toBe('string');
+    const parsed = JSON.parse(lastOutput as string) as Array<{
+      type?: string;
+      is_error?: boolean;
+      error?: { message?: string };
+    }>;
+    const resultMessage = parsed.find((msg) => msg.type === 'result');
+    expect(resultMessage?.is_error).toBe(true);
+    expect(resultMessage?.error?.message).toContain(
+      'Loop detection halted the run',
+    );
   });
 
   it('should handle a single tool call and respond', async () => {
@@ -494,6 +847,159 @@ describe('runNonInteractive', () => {
       'Duplicate provider tool call id "tool-1"',
     );
     expect(processStdoutSpy).toHaveBeenCalledWith('Final answer\n');
+  });
+
+  it('should stop repeated duplicate provider tool-call responses', async () => {
+    setupMetricsMock();
+    vi.mocked(mockConfig.getMaxToolCalls).mockReturnValue(1);
+    const toolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
+      value: {
+        callId: 'tool-1',
+        providerCallId: 'tool-1',
+        name: 'testTool',
+        args: { arg1: 'value1' },
+        isClientInitiated: false,
+        prompt_id: 'prompt-id-dup-loop',
+      },
+    };
+    const freshToolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
+      value: {
+        callId: 'tool-2',
+        providerCallId: 'tool-2',
+        name: 'testTool',
+        args: { arg1: 'value2' },
+        isClientInitiated: false,
+        prompt_id: 'prompt-id-dup-loop',
+      },
+    };
+    mockCoreExecuteToolCall.mockResolvedValue({
+      responseParts: [{ text: 'Tool response' }],
+    });
+
+    mockGeminiClient.sendMessageStream
+      .mockReturnValueOnce(createStreamFromEvents([toolCallEvent]))
+      .mockReturnValueOnce(createStreamFromEvents([toolCallEvent]))
+      .mockReturnValueOnce(
+        createStreamFromEvents([toolCallEvent, freshToolCallEvent]),
+      );
+
+    const exitCode = await runNonInteractive(
+      mockConfig,
+      mockSettings,
+      'Use a tool',
+      'prompt-id-dup-loop',
+    );
+
+    expect(exitCode).toBe(1);
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(3);
+    expect(mockCoreExecuteToolCall).toHaveBeenCalledTimes(1);
+    expect(mockGeminiClient.recordCompletedToolCall).toHaveBeenCalledTimes(1);
+
+    const duplicateParts = mockGeminiClient.sendMessageStream.mock.calls[2][0];
+    expect(duplicateParts[0].functionResponse?.response?.['error']).toContain(
+      'Duplicate provider tool call id "tool-1"',
+    );
+    expect(processStderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining(LoopType.GLOBAL_TOOL_CALL_DUPLICATE),
+    );
+    expect(processStderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'always-on guard and cannot be disabled via `model.skipLoopDetection`',
+      ),
+    );
+    expect(processStderrSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Set the `model.skipLoopDetection` setting to true',
+      ),
+    );
+  });
+
+  it('should stop repeated duplicate provider tool-call responses from drain items', async () => {
+    setupMetricsMock();
+    mockGeminiClient.getHistoryFunctionResponseIds.mockReturnValue(
+      new Set(['tool-drain']),
+    );
+
+    const notificationXml =
+      '<task-notification>\n' +
+      '<task-id>mon_1</task-id>\n' +
+      '<kind>monitor</kind>\n' +
+      '<status>running</status>\n' +
+      '<summary>Monitor emitted event #1.</summary>\n' +
+      '<result>ready</result>\n' +
+      '</task-notification>';
+    mockMonitorRegistry.setNotificationCallback.mockImplementation((cb) => {
+      if (!cb) return;
+      cb('Monitor "logs" event #1: ready', notificationXml, {
+        monitorId: 'mon_1',
+        toolUseId: 'tool_mon_1',
+        status: 'running',
+        eventCount: 1,
+      });
+    });
+
+    const duplicateToolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
+      value: {
+        callId: 'tool-drain__HOPCODE_dup_2',
+        providerCallId: 'tool-drain',
+        name: 'testTool',
+        args: { arg1: 'value1' },
+        isClientInitiated: false,
+        prompt_id: 'prompt-id-drain-dup-loop',
+      },
+    };
+    const freshToolCallEvent: ServerGeminiStreamEvent = {
+      type: GeminiEventType.ToolCallRequest,
+      value: {
+        callId: 'tool-fresh',
+        providerCallId: 'tool-fresh',
+        name: 'testTool',
+        args: { arg1: 'value2' },
+        isClientInitiated: false,
+        prompt_id: 'prompt-id-drain-dup-loop',
+      },
+    };
+
+    mockGeminiClient.sendMessageStream
+      .mockReturnValueOnce(
+        createStreamFromEvents([
+          { type: GeminiEventType.Content, value: 'Monitor launched.' },
+          {
+            type: GeminiEventType.Finished,
+            value: {
+              reason: undefined,
+              usageMetadata: { totalTokenCount: 2 },
+            },
+          },
+        ]),
+      )
+      .mockReturnValueOnce(createStreamFromEvents([duplicateToolCallEvent]))
+      .mockReturnValueOnce(
+        createStreamFromEvents([duplicateToolCallEvent, freshToolCallEvent]),
+      );
+
+    const exitCode = await runNonInteractive(
+      mockConfig,
+      mockSettings,
+      'Watch the logs',
+      'prompt-id-drain-dup-loop',
+    );
+
+    expect(exitCode).toBe(1);
+    expect(mockGeminiClient.sendMessageStream).toHaveBeenCalledTimes(3);
+    expect(mockCoreExecuteToolCall).not.toHaveBeenCalled();
+
+    const duplicateParts = mockGeminiClient.sendMessageStream.mock
+      .calls[2][0] as Part[];
+    expect(duplicateParts[0].functionResponse?.response?.['error']).toContain(
+      'Duplicate provider tool call id "tool-drain"',
+    );
+    expect(processStderrSpy).toHaveBeenCalledWith(
+      expect.stringContaining(LoopType.GLOBAL_TOOL_CALL_DUPLICATE),
+    );
   });
 
   it('should ignore duplicate provider tool-call ids already present in chat history', async () => {

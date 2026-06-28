@@ -40,7 +40,7 @@
 | `packages/acp-bridge/src/bridgeOptions.ts`                                  | Update JSDoc references                                                                              |
 | `packages/acp-bridge/src/status.ts`                                         | Update error message class name                                                                      |
 | `packages/cli/src/serve/httpAcpBridge.ts` → rename to `acpSessionBridge.ts` | Update re-exports                                                                                    |
-| `packages/cli/src/serve/runQwenServe.ts`                                    | Construct workspace service, inject callbacks                                                        |
+| `packages/cli/src/serve/runHopCodeServe.ts`                                    | Construct workspace service, inject callbacks                                                        |
 | `packages/cli/src/serve/server.ts`                                          | Rewire workspace routes to call service                                                              |
 | `packages/cli/src/serve/workspaceAgents.ts`                                 | Extract business logic → agentsService, keep as route shell                                          |
 | `packages/cli/src/serve/workspaceMemory.ts`                                 | Extract business logic → memoryService, keep as route shell                                          |
@@ -1206,7 +1206,7 @@ grep -rn "HttpAcpBridge\|createHttpAcpBridge\|httpAcpBridge" packages/ --include
 
 Update each file to use new names. Key files:
 
-- `packages/cli/src/serve/runQwenServe.ts`
+- `packages/cli/src/serve/runHopCodeServe.ts`
 - `packages/cli/src/serve/workspaceAgents.ts`
 - `packages/cli/src/serve/workspaceMemory.ts`
 - `packages/cli/src/serve/server.ts`
@@ -1236,7 +1236,7 @@ git commit -m "refactor(bridge): rename HttpAcpBridge → AcpSessionBridge"
 
 **Files:**
 
-- Modify: `packages/cli/src/serve/runQwenServe.ts`
+- Modify: `packages/cli/src/serve/runHopCodeServe.ts`
 - Modify: `packages/cli/src/serve/server.ts`
 - Modify: `packages/cli/src/serve/workspaceAgents.ts`
 - Modify: `packages/cli/src/serve/workspaceMemory.ts`

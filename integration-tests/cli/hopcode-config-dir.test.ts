@@ -30,6 +30,9 @@ import {
 } from 'node:fs';
 import { join, resolve } from 'node:path';
 
+// Keep in sync with SETTINGS_VERSION in packages/cli/src/config/settings.ts.
+const CURRENT_SETTINGS_VERSION = 4;
+
 // Helper: list files under a directory recursively, returning relative paths
 function listFilesRecursive(dir: string, base = dir): string[] {
   if (!existsSync(dir)) return [];
@@ -217,9 +220,7 @@ describe('HOPCODE_HOME environment variable', () => {
       );
       const migrated = JSON.parse(migratedRaw) as Record<string, unknown>;
 
-      // Migration should have bumped the version to the current SETTINGS_VERSION
-      // (packages/cli/src/config/settings.ts). Update this when the schema bumps.
-      expect(migrated['$version']).toBe(4);
+      expect(migrated['$version']).toBe(CURRENT_SETTINGS_VERSION);
     });
   });
 
@@ -252,7 +253,14 @@ describe('HOPCODE_HOME environment variable', () => {
       // Bump alongside SETTINGS_VERSION in packages/cli/src/config/settings.ts.
       writeFileSync(
         join(customConfigDir, 'settings.json'),
-        JSON.stringify({ $version: 4, customKey: 'in-global-dir' }, null, 2),
+        JSON.stringify(
+          {
+            $version: CURRENT_SETTINGS_VERSION,
+            customKey: 'in-global-dir',
+          },
+          null,
+          2,
+        ),
       );
 
       // Overwrite the workspace settings.json with V1 format so migration is observable
@@ -291,7 +299,7 @@ describe('HOPCODE_HOME environment variable', () => {
         string,
         unknown
       >;
-      expect(workspaceSettings['$version']).toBe(4);
+      expect(workspaceSettings['$version']).toBe(CURRENT_SETTINGS_VERSION);
       expect(workspaceSettings['customWorkspaceKey']).toBe('workspace-value');
 
       // The HOPCODE_HOME settings.json must be unchanged (still at the version we wrote)

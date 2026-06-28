@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025-2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
@@ -375,7 +375,7 @@ describe('persistStartupWorktreeSidecar', () => {
 
   beforeEach(async () => {
     prevCwd = process.cwd();
-    runtimeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-wt-runtime-'));
+    runtimeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-wt-runtime-'));
     Storage.setRuntimeBaseDir(runtimeDir);
   });
 

@@ -7,8 +7,8 @@ import type { OpenAICompatibleProvider } from './types.js';
 import { buildRuntimeFetchOptions } from '../../../utils/runtimeFetchOptions.js';
 import {
   tokenLimit,
-  CAPPED_DEFAULT_MAX_TOKENS,
   hasExplicitOutputLimit,
+  parsePositiveIntegerEnvValue,
 } from '../../tokenLimits.js';
 
 type AssistantMessageWithReasoningFields =
@@ -142,7 +142,7 @@ export class DefaultOpenAICompatibleProvider
    *    - Otherwise use min(modelLimit, CAPPED_DEFAULT_MAX_TOKENS=8K)
    *    - Requests hitting the 8K cap get one clean retry at 64K (geminiChat.ts)
    * 3. If model has no specific limit (tokenLimit returns default):
-   *    - Still apply CAPPED_DEFAULT_MAX_TOKENS as safeguard
+   *    - Use DEFAULT_OUTPUT_TOKEN_LIMIT
    *
    * Examples:
    * - User sets 4K, known model limit 64K ? uses 4K (respects user preference)
@@ -184,17 +184,18 @@ export class DefaultOpenAICompatibleProvider
         effectiveMaxTokens = userMaxTokens;
       }
     } else {
-      // No explicit user config — check env var, then use capped default.
-      // Capped default (8K) reduces GPU slot over-reservation by ~4×.
+      // No explicit user config ï¿½ check env var, then use capped default.
+      // Capped default (8K) reduces GPU slot over-reservation by ~4ï¿½.
       // Requests hitting the cap get one clean retry at 64K (geminiChat.ts).
-      const envVal = process.env['HOPCODE_MAX_OUTPUT_TOKENS'];
-      const envMaxTokens = envVal ? parseInt(envVal, 10) : NaN;
-      if (!isNaN(envMaxTokens) && envMaxTokens > 0) {
+      const envMaxTokens = parsePositiveIntegerEnvValue(
+        process.env['HOPCODE_MAX_OUTPUT_TOKENS'],
+      );
+      if (envMaxTokens !== undefined) {
         effectiveMaxTokens = isKnownModel
           ? Math.min(envMaxTokens, modelLimit)
           : envMaxTokens;
       } else {
-        effectiveMaxTokens = Math.min(modelLimit, CAPPED_DEFAULT_MAX_TOKENS);
+        effectiveMaxTokens = modelLimit;
       }
     }
 

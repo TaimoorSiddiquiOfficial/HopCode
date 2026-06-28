@@ -6,7 +6,7 @@
 
 import { createHash, timingSafeEqual } from 'node:crypto';
 import type { Request, Response, NextFunction, RequestHandler } from 'express';
-import { isLoopbackBind } from './loopbackBinds.js';
+import { isLoopbackBind } from './loopback-binds.js';
 
 /**
  * Reject any request that carries an `Origin` header. CLI/SDK clients never

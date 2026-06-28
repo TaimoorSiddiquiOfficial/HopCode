@@ -52,6 +52,7 @@ export const ToolNames = {
   MONITOR: 'monitor',
   NOTEBOOK_EDIT: 'notebook_edit',
   TOOL_SEARCH: 'tool_search',
+  READ_MCP_RESOURCE: 'read_mcp_resource',
   ENTER_WORKTREE: 'enter_worktree',
   EXIT_WORKTREE: 'exit_worktree',
   BG_STOP: 'bg_stop',
@@ -65,6 +66,7 @@ export const ToolNames = {
   // round 1 removed the old ocu-era 9-name list, which still carried
   // `get_app_state` / `perform_secondary_action` that no longer exist.
   WORKFLOW: 'workflow',
+  ARTIFACT: 'artifact',
 } as const;
 
 /**
@@ -107,6 +109,7 @@ export const ToolDisplayNames = {
   MONITOR: 'Monitor',
   NOTEBOOK_EDIT: 'NotebookEdit',
   TOOL_SEARCH: 'ToolSearch',
+  READ_MCP_RESOURCE: 'ReadMcpResource',
   ENTER_WORKTREE: 'EnterWorktree',
   EXIT_WORKTREE: 'ExitWorktree',
   BG_STOP: 'BgStop',
@@ -115,6 +118,7 @@ export const ToolDisplayNames = {
   WEB_SEARCH: 'WebSearch',
   // computer_use__* display names are not enumerated here (see ToolNames).
   WORKFLOW: 'Workflow',
+  ARTIFACT: 'Artifact',
 } as const;
 
 // Migration from old tool names to new tool names

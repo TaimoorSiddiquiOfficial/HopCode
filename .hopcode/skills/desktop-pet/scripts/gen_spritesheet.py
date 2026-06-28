@@ -6,7 +6,7 @@ Generates a 1536×1872 pixel-art chibi spritesheet (8 cols × 9 rows, 192×208 p
 customized via a JSON config describing colors, headgear, and features.
 
 Usage:
-  python3 gen_spritesheet.py --output ~/.qwen/pets/mychar/spritesheet.webp --config '{...}'
+  python3 gen_spritesheet.py --output ~/.hopcode/pets/mychar/spritesheet.webp --config '{...}'
   python3 gen_spritesheet.py --output out.webp --config-file config.json
 """
 

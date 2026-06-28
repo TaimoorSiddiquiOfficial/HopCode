@@ -30,7 +30,7 @@ The `modelProviders` object keys must be valid `authType` values. Currently supp
 | `hopcode-oauth` | HopCode OAuth (hard-coded, cannot be overridden in `modelProviders`)                    |
 
 > [!warning]
-> If an invalid auth type key is used (e.g., a typo like `"openai-custom"`), the configuration will be **silently skipped** and the models will not appear in the `/model` picker. Always use one of the supported auth type values listed above.
+> If an unknown auth type key is used (e.g., a typo like `"openai-custom"`), a non-empty key is accepted as-is as its own auth-type group, but it will not map to a known protocol — so its models won't work as intended and won't behave correctly in the `/model` picker. Only blank (empty or whitespace-only) keys are skipped. Always use one of the supported auth type values listed above.
 
 ### SDKs Used for API Requests
 
@@ -47,72 +47,89 @@ This means the `baseUrl` you configure should be compatible with the correspondi
 
 ### OpenAI-compatible providers (`openai`)
 
-This auth type supports not only OpenAI's official API but also any OpenAI-compatible endpoint, including aggregated model providers like OpenRouter.
+This auth type supports not only OpenAI's official API but also any OpenAI-compatible endpoint, including aggregated model providers like OpenRouter and Requesty.
 
 ```json
 {
   "env": {
     "OPENAI_API_KEY": "sk-your-actual-openai-key-here",
-    "OPENROUTER_API_KEY": "sk-or-your-actual-openrouter-key-here"
+    "OPENROUTER_API_KEY": "sk-or-your-actual-openrouter-key-here",
+    "REQUESTY_API_KEY": "sk-your-actual-requesty-key-here"
   },
   "modelProviders": {
-    "openai": [
-      {
-        "id": "gpt-4o",
-        "name": "GPT-4o",
-        "envKey": "OPENAI_API_KEY",
-        "baseUrl": "https://api.openai.com/v1",
-        "generationConfig": {
-          "timeout": 60000,
-          "maxRetries": 3,
-          "enableCacheControl": true,
-          "contextWindowSize": 128000,
-          "modalities": {
-            "image": true
-          },
-          "customHeaders": {
-            "X-Client-Request-ID": "req-123"
-          },
-          "extra_body": {
-            "enable_thinking": true,
-            "service_tier": "priority"
-          },
-          "samplingParams": {
-            "temperature": 0.2,
-            "top_p": 0.8,
-            "max_tokens": 4096,
-            "presence_penalty": 0.1,
-            "frequency_penalty": 0.1
+    "openai": {
+      "protocol": "openai",
+      "models": [
+        {
+          "id": "gpt-4o",
+          "name": "GPT-4o",
+          "envKey": "OPENAI_API_KEY",
+          "baseUrl": "https://api.openai.com/v1",
+          "generationConfig": {
+            "timeout": 60000,
+            "maxRetries": 3,
+            "enableCacheControl": true,
+            "contextWindowSize": 128000,
+            "modalities": {
+              "image": true
+            },
+            "customHeaders": {
+              "X-Client-Request-ID": "req-123"
+            },
+            "extra_body": {
+              "enable_thinking": true,
+              "service_tier": "priority"
+            },
+            "samplingParams": {
+              "temperature": 0.2,
+              "top_p": 0.8,
+              "max_tokens": 4096,
+              "presence_penalty": 0.1,
+              "frequency_penalty": 0.1
+            }
+          }
+        },
+        {
+          "id": "gpt-4o-mini",
+          "name": "GPT-4o Mini",
+          "envKey": "OPENAI_API_KEY",
+          "baseUrl": "https://api.openai.com/v1",
+          "generationConfig": {
+            "timeout": 30000,
+            "samplingParams": {
+              "temperature": 0.5,
+              "max_tokens": 2048
+            }
+          }
+        },
+        {
+          "id": "openai/gpt-4o",
+          "name": "GPT-4o (via OpenRouter)",
+          "envKey": "OPENROUTER_API_KEY",
+          "baseUrl": "https://openrouter.ai/api/v1",
+          "generationConfig": {
+            "timeout": 120000,
+            "maxRetries": 3,
+            "samplingParams": {
+              "temperature": 0.7
+            }
+          }
+        },
+        {
+          "id": "openai/gpt-4o-mini",
+          "name": "GPT-4o Mini (via Requesty)",
+          "envKey": "REQUESTY_API_KEY",
+          "baseUrl": "https://router.requesty.ai/v1",
+          "generationConfig": {
+            "timeout": 120000,
+            "maxRetries": 3,
+            "samplingParams": {
+              "temperature": 0.7
+            }
           }
         }
-      },
-      {
-        "id": "gpt-4o-mini",
-        "name": "GPT-4o Mini",
-        "envKey": "OPENAI_API_KEY",
-        "baseUrl": "https://api.openai.com/v1",
-        "generationConfig": {
-          "timeout": 30000,
-          "samplingParams": {
-            "temperature": 0.5,
-            "max_tokens": 2048
-          }
-        }
-      },
-      {
-        "id": "openai/gpt-4o",
-        "name": "GPT-4o (via OpenRouter)",
-        "envKey": "OPENROUTER_API_KEY",
-        "baseUrl": "https://openrouter.ai/api/v1",
-        "generationConfig": {
-          "timeout": 120000,
-          "maxRetries": 3,
-          "samplingParams": {
-            "temperature": 0.7
-          }
-        }
-      }
-    ]
+      ]
+    }
   }
 }
 ```
@@ -125,37 +142,40 @@ This auth type supports not only OpenAI's official API but also any OpenAI-compa
     "ANTHROPIC_API_KEY": "sk-ant-your-actual-anthropic-key-here"
   },
   "modelProviders": {
-    "anthropic": [
-      {
-        "id": "claude-3-5-sonnet",
-        "name": "Claude 3.5 Sonnet",
-        "envKey": "ANTHROPIC_API_KEY",
-        "baseUrl": "https://api.anthropic.com/v1",
-        "generationConfig": {
-          "timeout": 120000,
-          "maxRetries": 3,
-          "contextWindowSize": 200000,
-          "samplingParams": {
-            "temperature": 0.7,
-            "max_tokens": 8192,
-            "top_p": 0.9
+    "anthropic": {
+      "protocol": "anthropic",
+      "models": [
+        {
+          "id": "claude-3-5-sonnet",
+          "name": "Claude 3.5 Sonnet",
+          "envKey": "ANTHROPIC_API_KEY",
+          "baseUrl": "https://api.anthropic.com/v1",
+          "generationConfig": {
+            "timeout": 120000,
+            "maxRetries": 3,
+            "contextWindowSize": 200000,
+            "samplingParams": {
+              "temperature": 0.7,
+              "max_tokens": 8192,
+              "top_p": 0.9
+            }
+          }
+        },
+        {
+          "id": "claude-3-opus",
+          "name": "Claude 3 Opus",
+          "envKey": "ANTHROPIC_API_KEY",
+          "baseUrl": "https://api.anthropic.com/v1",
+          "generationConfig": {
+            "timeout": 180000,
+            "samplingParams": {
+              "temperature": 0.3,
+              "max_tokens": 4096
+            }
           }
         }
-      },
-      {
-        "id": "claude-3-opus",
-        "name": "Claude 3 Opus",
-        "envKey": "ANTHROPIC_API_KEY",
-        "baseUrl": "https://api.anthropic.com/v1",
-        "generationConfig": {
-          "timeout": 180000,
-          "samplingParams": {
-            "temperature": 0.3,
-            "max_tokens": 4096
-          }
-        }
-      }
-    ]
+      ]
+    }
   }
 }
 ```
@@ -168,29 +188,32 @@ This auth type supports not only OpenAI's official API but also any OpenAI-compa
     "GEMINI_API_KEY": "AIza-your-actual-gemini-key-here"
   },
   "modelProviders": {
-    "gemini": [
-      {
-        "id": "gemini-2.0-flash",
-        "name": "Gemini 2.0 Flash",
-        "envKey": "GEMINI_API_KEY",
-        "baseUrl": "https://generativelanguage.googleapis.com",
-        "capabilities": {
-          "vision": true
-        },
-        "generationConfig": {
-          "timeout": 60000,
-          "maxRetries": 2,
-          "contextWindowSize": 1000000,
-          "schemaCompliance": "auto",
-          "samplingParams": {
-            "temperature": 0.4,
-            "top_p": 0.95,
-            "max_tokens": 8192,
-            "top_k": 40
+    "gemini": {
+      "protocol": "gemini",
+      "models": [
+        {
+          "id": "gemini-2.0-flash",
+          "name": "Gemini 2.0 Flash",
+          "envKey": "GEMINI_API_KEY",
+          "baseUrl": "https://generativelanguage.googleapis.com",
+          "capabilities": {
+            "vision": true
+          },
+          "generationConfig": {
+            "timeout": 60000,
+            "maxRetries": 2,
+            "contextWindowSize": 1000000,
+            "schemaCompliance": "auto",
+            "samplingParams": {
+              "temperature": 0.4,
+              "top_p": 0.95,
+              "max_tokens": 8192,
+              "top_k": 40
+            }
           }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 ```
@@ -207,51 +230,54 @@ Most local inference servers (vLLM, Ollama, LM Studio, etc.) provide an OpenAI-c
     "LMSTUDIO_API_KEY": "lm-studio"
   },
   "modelProviders": {
-    "openai": [
-      {
-        "id": "qwen2.5-7b",
-        "name": "Qwen2.5 7B (Ollama)",
-        "envKey": "OLLAMA_API_KEY",
-        "baseUrl": "http://localhost:11434/v1",
-        "generationConfig": {
-          "timeout": 300000,
-          "maxRetries": 1,
-          "contextWindowSize": 32768,
-          "samplingParams": {
-            "temperature": 0.7,
-            "top_p": 0.9,
-            "max_tokens": 4096
+    "openai": {
+      "protocol": "openai",
+      "models": [
+        {
+          "id": "qwen2.5-7b",
+          "name": "Qwen2.5 7B (Ollama)",
+          "envKey": "OLLAMA_API_KEY",
+          "baseUrl": "http://localhost:11434/v1",
+          "generationConfig": {
+            "timeout": 300000,
+            "maxRetries": 1,
+            "contextWindowSize": 32768,
+            "samplingParams": {
+              "temperature": 0.7,
+              "top_p": 0.9,
+              "max_tokens": 4096
+            }
+          }
+        },
+        {
+          "id": "llama-3.1-8b",
+          "name": "Llama 3.1 8B (vLLM)",
+          "envKey": "VLLM_API_KEY",
+          "baseUrl": "http://localhost:8000/v1",
+          "generationConfig": {
+            "timeout": 120000,
+            "maxRetries": 2,
+            "contextWindowSize": 128000,
+            "samplingParams": {
+              "temperature": 0.6,
+              "max_tokens": 8192
+            }
+          }
+        },
+        {
+          "id": "local-model",
+          "name": "Local Model (LM Studio)",
+          "envKey": "LMSTUDIO_API_KEY",
+          "baseUrl": "http://localhost:1234/v1",
+          "generationConfig": {
+            "timeout": 60000,
+            "samplingParams": {
+              "temperature": 0.5
+            }
           }
         }
-      },
-      {
-        "id": "llama-3.1-8b",
-        "name": "Llama 3.1 8B (vLLM)",
-        "envKey": "VLLM_API_KEY",
-        "baseUrl": "http://localhost:8000/v1",
-        "generationConfig": {
-          "timeout": 120000,
-          "maxRetries": 2,
-          "contextWindowSize": 128000,
-          "samplingParams": {
-            "temperature": 0.6,
-            "max_tokens": 8192
-          }
-        }
-      },
-      {
-        "id": "local-model",
-        "name": "Local Model (LM Studio)",
-        "envKey": "LMSTUDIO_API_KEY",
-        "baseUrl": "http://localhost:1234/v1",
-        "generationConfig": {
-          "timeout": 60000,
-          "samplingParams": {
-            "temperature": 0.5
-          }
-        }
-      }
-    ]
+      ]
+    }
   }
 }
 ```
@@ -367,15 +393,18 @@ If you prefer to manually configure Coding Plan models, you can add them to your
 ```json
 {
   "modelProviders": {
-    "openai": [
-      {
-        "id": "qwen3-coder-plus",
-        "name": "qwen3-coder-plus",
-        "description": "Qwen3-Coder via Alibaba Cloud Coding Plan",
-        "envKey": "YOUR_CUSTOM_ENV_KEY",
-        "baseUrl": "https://coding.dashscope.aliyuncs.com/v1"
-      }
-    ]
+    "openai": {
+      "protocol": "openai",
+      "models": [
+        {
+          "id": "qwen3-coder-plus",
+          "name": "qwen3-coder-plus",
+          "description": "Qwen3-Coder via Alibaba Cloud Coding Plan",
+          "envKey": "YOUR_CUSTOM_ENV_KEY",
+          "baseUrl": "https://coding.dashscope.aliyuncs.com/v1"
+        }
+      ]
+    }
   }
 }
 ```
@@ -469,14 +498,17 @@ The following fields are treated as atomic objects - provider values completely 
 // modelProviders configuration
 {
   "modelProviders": {
-    "openai": [{
-      "id": "gpt-4o",
-      "envKey": "OPENAI_API_KEY",
-      "generationConfig": {
-        "timeout": 60000,
-        "samplingParams": { "temperature": 0.2 }
-      }
-    }]
+    "openai": {
+      "protocol": "openai",
+      "models": [{
+        "id": "gpt-4o",
+        "envKey": "OPENAI_API_KEY",
+        "generationConfig": {
+          "timeout": 60000,
+          "samplingParams": { "temperature": 0.2 }
+        }
+      }]
+    }
   }
 }
 ```
@@ -502,22 +534,25 @@ The optional `reasoning` field under `generationConfig` controls how aggressivel
 ```jsonc
 {
   "modelProviders": {
-    "openai": [
-      {
-        "id": "deepseek-v4-pro",
-        "name": "DeepSeek V4 Pro",
-        "baseUrl": "https://api.deepseek.com/v1",
-        "envKey": "DEEPSEEK_API_KEY",
-        "generationConfig": {
-          // The four-tier scale:
-          //   'low'    | 'medium' — server-mapped to 'high' on DeepSeek
-          //   'high'   — default reasoning intensity
-          //   'max'    — DeepSeek-specific extra-strong tier
-          // Or set `false` to disable reasoning entirely.
-          "reasoning": { "effort": "max" },
+    "openai": {
+      "protocol": "openai",
+      "models": [
+        {
+          "id": "deepseek-v4-pro",
+          "name": "DeepSeek V4 Pro",
+          "baseUrl": "https://api.deepseek.com/v1",
+          "envKey": "DEEPSEEK_API_KEY",
+          "generationConfig": {
+            // The four-tier scale:
+            //   'low'    | 'medium' — server-mapped to 'high' on DeepSeek
+            //   'high'   — default reasoning intensity
+            //   'max'    — DeepSeek-specific extra-strong tier
+            // Or set `false` to disable reasoning entirely.
+            "reasoning": { "effort": "max" },
+          },
         },
-      },
-    ],
+      ],
+    },
   },
 }
 ```

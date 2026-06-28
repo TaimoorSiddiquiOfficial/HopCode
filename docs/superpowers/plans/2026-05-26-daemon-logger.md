@@ -1,4 +1,4 @@
-﻿# `hopcode serve` Daemon File Logger — Implementation Plan
+# `hopcode serve` Daemon File Logger — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -67,7 +67,7 @@ Pure formatter. No I/O. Easy to TDD.
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -177,7 +177,7 @@ Create `packages/cli/src/serve/daemonLogger.ts` with:
 ```ts
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 

@@ -327,13 +327,24 @@ export class ApiCancelEvent implements BaseTelemetryEvent {
   model: string;
   prompt_id: string;
   auth_type?: string;
+  // Pending self-paced /loop wakeups dropped by this abort, when any. Lets a
+  // user abort that ends a loop be told apart from an ordinary cancellation.
+  // Named for wakeups (not "loops") to avoid colliding with loop_type, the
+  // unrelated repetition-detection vocabulary in this file.
+  loop_wakeups_cancelled?: number;
 
-  constructor(model: string, prompt_id: string, auth_type?: string) {
+  constructor(
+    model: string,
+    prompt_id: string,
+    auth_type?: string,
+    loop_wakeups_cancelled?: number,
+  ) {
     this['event.name'] = 'api_cancel';
     this['event.timestamp'] = new Date().toISOString();
     this.model = model;
     this.prompt_id = prompt_id;
     this.auth_type = auth_type;
+    this.loop_wakeups_cancelled = loop_wakeups_cancelled;
   }
 }
 
@@ -424,6 +435,8 @@ export enum LoopType {
   REPETITIVE_THOUGHTS = 'repetitive_thoughts',
   READ_FILE_LOOP = 'read_file_loop',
   ACTION_STAGNATION = 'action_stagnation',
+  /** Similar read-only shell inspection commands repeat with varied args. */
+  SHELL_COMMAND_STAGNATION = 'shell_command_stagnation',
   /** Same (tool, args) pair appears N times across the entire turn, not necessarily consecutively. */
   GLOBAL_TOOL_CALL_DUPLICATE = 'global_tool_call_duplicate',
   /** Two tools alternating in a fixed pattern (A B A B A B ...). */
@@ -1278,6 +1291,47 @@ export class SpeculationEvent implements BaseTelemetryEvent {
     this.duration_ms = params.duration_ms;
     this.boundary_type = params.boundary_type;
     this.had_pipelined_suggestion = params.had_pipelined_suggestion;
+  }
+}
+
+/** #4721 P-telemetry: the `workflow` keyword steered a turn toward the tool. */
+export class WorkflowKeywordEvent implements BaseTelemetryEvent {
+  'event.name': 'hopcode.workflow_keyword';
+  'event.timestamp': string;
+
+  constructor() {
+    this['event.name'] = 'hopcode.workflow_keyword';
+    this['event.timestamp'] = new Date().toISOString();
+  }
+}
+
+/** #4721 P-telemetry: a workflow run reached a terminal state. */
+export class WorkflowRunEvent implements BaseTelemetryEvent {
+  'event.name': 'hopcode.workflow_run';
+  'event.timestamp': string;
+  status: string;
+  agents_dispatched: number;
+  agents_completed: number;
+  phase_count: number;
+  tokens_spent: number;
+  duration_ms: number;
+
+  constructor(params: {
+    status: string;
+    agents_dispatched: number;
+    agents_completed: number;
+    phase_count: number;
+    tokens_spent: number;
+    duration_ms: number;
+  }) {
+    this['event.name'] = 'hopcode.workflow_run';
+    this['event.timestamp'] = new Date().toISOString();
+    this.status = params.status;
+    this.agents_dispatched = params.agents_dispatched;
+    this.agents_completed = params.agents_completed;
+    this.phase_count = params.phase_count;
+    this.tokens_spent = params.tokens_spent;
+    this.duration_ms = params.duration_ms;
   }
 }
 

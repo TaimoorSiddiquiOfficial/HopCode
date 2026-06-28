@@ -296,6 +296,15 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       extractParams: (segs) => ({ sessionId: segs[0] }),
     },
   },
+  // GET /session/:id/lsp -> _hopcode/session/lsp
+  {
+    httpMethod: 'GET',
+    pattern: /^\/session\/([^/]+)\/lsp$/,
+    mapping: {
+      method: '_hopcode/session/lsp',
+      extractParams: (segs) => ({ sessionId: segs[0] }),
+    },
+  },
 
   // ---- Granular workspace routes (_hopcode/workspace/*) ---------------------
 

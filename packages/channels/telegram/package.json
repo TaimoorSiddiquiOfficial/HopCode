@@ -15,7 +15,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "test": "vitest run",
+    "test:ci": "vitest run"
   },
   "dependencies": {
     "grammy": "^1.41.1",

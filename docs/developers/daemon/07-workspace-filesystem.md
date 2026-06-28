@@ -34,7 +34,7 @@ The HTTP file routes (`GET /file`, `GET /file/bytes`, `POST /file/write`, `POST 
 | `policy.ts`              | `MAX_READ_BYTES`, `MAX_WRITE_BYTES`, `BINARY_PROBE_BYTES`, `assertTrustedForIntent`, `detectBinary`, `enforceReadBytesSize`, `enforceReadSize`, `enforceWriteSize`, `shouldIgnore`.                                                                   |
 | `audit.ts`               | `FS_ACCESS_EVENT_TYPE`, `FS_DENIED_EVENT_TYPE`, `createAuditPublisher`, audit payload types.                                                                                                                                                          |
 | `errors.ts`              | `FsError` class, `isFsError`, `FsErrorKind` union (14 kinds), `FsErrorStatus` union (`400 / 403 / 404 / 409 / 413 / 422 / 500 / 503`).                                                                                                                |
-| `workspaceFileSystem.ts` | `createWorkspaceFileSystemFactory`, `WorkspaceFileSystem` (the orchestrator that reads/writes/lists), `WriteMode`, `ContentHash`, `FsEntry`, `FsStat`, `ListOptions`, `GlobOptions`, `ReadTextOptions`, `ReadBytesOptions`, `WriteTextAtomicOptions`. |
+| `workspace-file-system.ts` | `createWorkspaceFileSystemFactory`, `WorkspaceFileSystem` (the orchestrator that reads/writes/lists), `WriteMode`, `ContentHash`, `FsEntry`, `FsStat`, `ListOptions`, `GlobOptions`, `ReadTextOptions`, `ReadBytesOptions`, `WriteTextAtomicOptions`. |
 
 ### `FsErrorKind` taxonomy
 
@@ -239,7 +239,7 @@ flowchart LR
 - `packages/cli/src/serve/fs/policy.ts`
 - `packages/cli/src/serve/fs/errors.ts`
 - `packages/cli/src/serve/fs/audit.ts`
-- `packages/cli/src/serve/fs/workspaceFileSystem.ts`
-- `packages/cli/src/serve/bridgeFileSystemAdapter.ts`
+- `packages/cli/src/serve/fs/workspace-file-system.ts`
+- `packages/cli/src/serve/bridge-file-system-adapter.ts`
 - `packages/acp-bridge/src/bridgeFileSystem.ts`
 - HTTP route reference: [`../hopcode-serve-protocol.md`](../hopcode-serve-protocol.md).

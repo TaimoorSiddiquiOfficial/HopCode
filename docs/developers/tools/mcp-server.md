@@ -183,18 +183,8 @@ OAuth will not work in:
 
 #### Managing OAuth Authentication
 
-Use the `/mcp auth` command to manage OAuth authentication:
-
-```bash
-# List servers requiring authentication
-/mcp auth
-
-# Authenticate with a specific server
-/mcp auth serverName
-
-# Re-authenticate if tokens expire
-/mcp auth serverName
-```
+Use the `/mcp` dialog inside an interactive HopCode session to inspect MCP
+servers and manage OAuth authentication.
 
 #### OAuth Configuration Properties
 
@@ -216,6 +206,9 @@ OAuth tokens are automatically:
 - **Refreshed** when expired (if refresh tokens are available)
 - **Validated** before each connection attempt
 - **Cleaned up** when invalid or expired
+
+> [!WARNING]
+> By default, OAuth tokens are stored unencrypted on disk. On shared or multi-user machines, set `HOPCODE_CODE_FORCE_ENCRYPTED_FILE_STORAGE=true` to protect credentials.
 
 #### Authentication Provider Type
 

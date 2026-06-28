@@ -25,8 +25,8 @@ export function getMaxInlineMediaBytes(): number {
     return DEFAULT_MAX_INLINE_MEDIA_BYTES;
   }
   const parsed = Number(raw);
-  return Number.isFinite(parsed) && parsed > 0
-    ? Math.floor(parsed)
+  return Number.isInteger(parsed) && parsed > 0
+    ? parsed
     : DEFAULT_MAX_INLINE_MEDIA_BYTES;
 }
 

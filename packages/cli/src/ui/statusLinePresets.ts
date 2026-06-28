@@ -8,14 +8,14 @@ import nodePath from 'node:path';
 import { StreamingState } from './types.js';
 
 export const STATUS_LINE_PRESET_ITEM_IDS = [
+  'project-name',
+  'git-branch',
   'model-with-reasoning',
   'model',
-  'git-branch',
   'context-remaining',
   'total-input-tokens',
   'total-output-tokens',
   'current-dir',
-  'project-name',
   'pull-request-number',
   'branch-changes',
   'context-used',
@@ -84,6 +84,18 @@ export function aggregateModelTokens(metrics: {
 
 export const STATUS_LINE_PRESET_ITEMS: readonly StatusLinePresetItem[] = [
   {
+    id: 'project-name',
+    label: 'project-name',
+    description: 'Project name when available',
+    defaultSelected: true,
+  },
+  {
+    id: 'git-branch',
+    label: 'git-branch',
+    description: 'Current Git branch when available',
+    defaultSelected: true,
+  },
+  {
     id: 'model-with-reasoning',
     label: 'model-with-reasoning',
     description: 'Current model name with reasoning level when available',
@@ -95,16 +107,9 @@ export const STATUS_LINE_PRESET_ITEMS: readonly StatusLinePresetItem[] = [
     description: 'Current model name without reasoning level',
   },
   {
-    id: 'git-branch',
-    label: 'git-branch',
-    description: 'Current Git branch when available',
-    defaultSelected: true,
-  },
-  {
     id: 'context-remaining',
     label: 'context-remaining',
     description: 'Percentage of context window remaining',
-    defaultSelected: true,
   },
   {
     id: 'total-input-tokens',
@@ -120,12 +125,6 @@ export const STATUS_LINE_PRESET_ITEMS: readonly StatusLinePresetItem[] = [
     id: 'current-dir',
     label: 'current-dir',
     description: 'Current working directory',
-    defaultSelected: true,
-  },
-  {
-    id: 'project-name',
-    label: 'project-name',
-    description: 'Project name when available',
   },
   {
     id: 'pull-request-number',
@@ -262,17 +261,22 @@ export function getRunStateLabel(state: StreamingState): string {
   }
 }
 
+function stripProviderPrefix(name: string): string {
+  return name.replace(/^\[[^\]]*\]\s*/, '');
+}
+
 export function formatModelWithReasoning(
   modelDisplayName: string,
   reasoning: StatusLinePresetReasoning,
 ): string {
+  const cleanName = stripProviderPrefix(modelDisplayName);
   if (reasoning === false) {
-    return `${modelDisplayName} reasoning off`;
+    return `${cleanName} reasoning off`;
   }
   if (reasoning?.effort) {
-    return `${modelDisplayName} ${reasoning.effort}`;
+    return `${cleanName} ${reasoning.effort}`;
   }
-  return modelDisplayName;
+  return cleanName;
 }
 
 export function inferPullRequestNumber(
@@ -337,12 +341,82 @@ export function buildStatusLinePresetData(params: {
   };
 }
 
+function formatPresetItem(
+  item: StatusLinePresetItemId,
+  data: StatusLinePresetData,
+): string | undefined {
+  switch (item) {
+    case 'model-with-reasoning':
+      return formatModelWithReasoning(data.modelDisplayName, data.reasoning);
+    case 'model':
+      return stripProviderPrefix(data.modelDisplayName);
+    case 'context-remaining':
+      if (data.contextWindowSize > 0) {
+        return `Context ${formatPercent(data.remainingPercentage)} left`;
+      }
+      return undefined;
+    case 'current-dir':
+      return data.currentDir;
+    case 'context-used':
+      if (data.contextWindowSize > 0 && data.usedPercentage > 0) {
+        return `${formatTokenCount(data.contextWindowSize)} Context ${formatPercent(data.usedPercentage)} used`;
+      }
+      return undefined;
+    case 'git-branch':
+      if (data.branch) {
+        return `git:(${data.branch})`;
+      }
+      return undefined;
+    case 'project-name':
+      if (data.projectName) {
+        return `\u279c ${data.projectName}`;
+      }
+      return undefined;
+    case 'pull-request-number': {
+      const prNumber =
+        data.pullRequestNumber ?? inferPullRequestNumber(data.branch);
+      if (prNumber) {
+        return `#${prNumber}`;
+      }
+      return undefined;
+    }
+    case 'branch-changes':
+      if (data.totalLinesAdded > 0 || data.totalLinesRemoved > 0) {
+        return `+${data.totalLinesAdded} -${data.totalLinesRemoved}`;
+      }
+      return undefined;
+    case 'run-state':
+      return getRunStateLabel(data.streamingState);
+    case 'qwen-version':
+      return `v${data.version}`;
+    case 'context-window-size':
+      if (data.contextWindowSize > 0) {
+        return `${formatTokenCount(data.contextWindowSize)} window`;
+      }
+      return undefined;
+    case 'used-tokens':
+      if (data.currentUsage > 0) {
+        return `${formatTokenCount(data.currentUsage)} used`;
+      }
+      return undefined;
+    case 'total-input-tokens':
+      return `${formatTokenCount(data.totalInputTokens)} total in`;
+    case 'total-output-tokens':
+      return `${formatTokenCount(data.totalOutputTokens)} total out`;
+    case 'session-id':
+      return data.sessionId || undefined;
+    default: {
+      item satisfies never;
+      return undefined;
+    }
+  }
+}
+
 export function buildStatusLinePresetParts(
   config: StatusLinePresetConfig,
   data: StatusLinePresetData,
 ): string[] {
   const parts: string[] = [];
-
   for (const item of orderStatusLinePresetItems(config.items)) {
     switch (item) {
       case 'model-with-reasoning':
@@ -422,7 +496,6 @@ export function buildStatusLinePresetParts(
       }
     }
   }
-
   return parts;
 }
 
@@ -430,6 +503,6 @@ export function buildStatusLinePresetLines(
   config: StatusLinePresetConfig,
   data: StatusLinePresetData,
 ): string[] {
-  const line = buildStatusLinePresetParts(config, data).join(' | ');
+  const line = buildStatusLinePresetParts(config, data).join(' \u00b7 ');
   return line ? [line] : [];
 }

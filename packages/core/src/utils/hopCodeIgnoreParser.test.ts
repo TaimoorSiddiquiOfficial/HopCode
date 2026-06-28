@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -52,11 +52,31 @@ describe('HopCodeIgnoreParser', () => {
       const parser = new HopCodeIgnoreParser(projectRoot);
       expect(parser.getPatterns()).toEqual(['ignored.txt', '/ignored_dir/']);
       expect(parser.isIgnored('ignored.txt')).toBe(true);
+      expect(parser.getIgnoreFileNameForPath('ignored.txt')).toBe(
+        '.hopcodeignore',
+      );
       expect(parser.isIgnored('not_ignored.txt')).toBe(false);
+      expect(parser.getIgnoreFileNameForPath('not_ignored.txt')).toBe(
+        undefined,
+      );
       expect(parser.isIgnored(path.join('ignored_dir', 'file.txt'))).toBe(true);
       expect(parser.isIgnored(path.join('subdir', 'not_ignored.txt'))).toBe(
         false,
       );
+    });
+
+    it('should still evaluate files whose names start with two dots', async () => {
+      await createTestFile('.hopcodeignore', '..secret.log');
+
+      const parser = new HopCodeIgnoreParser(projectRoot);
+
+      expect(parser.isIgnored('..secret.log')).toBe(true);
+    });
+
+    it('should not evaluate paths outside the project root', () => {
+      const parser = new HopCodeIgnoreParser(projectRoot);
+
+      expect(parser.isIgnored(path.join('..', '..secret.log'))).toBe(false);
     });
   });
 

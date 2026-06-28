@@ -5,35 +5,17 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  detectSecondarySidebarSupport,
-  registerChatViewProviders,
-} from './chatViewRegistration.js';
+import { registerChatViewProviders } from './chatViewRegistration.js';
 
-const { registerWebviewViewProvider, executeCommand } = vi.hoisted(() => ({
+const { registerWebviewViewProvider } = vi.hoisted(() => ({
   registerWebviewViewProvider: vi.fn(() => ({ dispose: vi.fn() })),
-  executeCommand: vi.fn(),
 }));
 
 vi.mock('vscode', () => ({
   window: {
     registerWebviewViewProvider,
   },
-  commands: {
-    executeCommand,
-  },
 }));
-
-describe('detectSecondarySidebarSupport', () => {
-  it.each([
-    { version: '1.106.0', supported: true },
-    { version: '1.106.0-insider', supported: true },
-    { version: '1.94.0', supported: false },
-    { version: 'invalid', supported: false },
-  ])('returns $supported for VS Code $version', ({ version, supported }) => {
-    expect(detectSecondarySidebarSupport(version)).toBe(supported);
-  });
-});
 
 describe('registerChatViewProviders', () => {
   const context = { subscriptions: [] as Array<{ dispose: () => void }> };
@@ -41,20 +23,17 @@ describe('registerChatViewProviders', () => {
   beforeEach(() => {
     context.subscriptions = [];
     registerWebviewViewProvider.mockClear();
-    executeCommand.mockClear();
   });
 
-  it('registers sidebar and secondary hosts with retained webview context', () => {
+  it('registers the sidebar host with retained webview context', () => {
     const createProvider = vi.fn();
 
-    const supportsSecondarySidebar = registerChatViewProviders({
+    registerChatViewProviders({
       context: context as never,
       createViewProvider: createProvider,
-      vscodeVersion: '1.106.0',
     });
 
-    expect(supportsSecondarySidebar).toBe(true);
-    expect(registerWebviewViewProvider).toHaveBeenCalledTimes(2);
+    expect(registerWebviewViewProvider).toHaveBeenCalledTimes(1);
     const calls = registerWebviewViewProvider.mock.calls as unknown as Array<
       [
         string,

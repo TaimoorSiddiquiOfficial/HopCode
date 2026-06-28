@@ -10,13 +10,17 @@ import ignore_ from 'ignore';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ignore = (ignore_ as any).default || ignore_;
 import picomatch from 'picomatch';
+import { getHopCodeIgnoreFileNames } from '../hopCodeIgnoreParser.js';
+import { createDebugLogger } from '../debugLogger.js';
 
 const hasFileExtension = picomatch('**/*[*.]*');
+const debugLogger = createDebugLogger('FILE_SEARCH_IGNORE');
 
 export interface LoadIgnoreRulesOptions {
   projectRoot: string;
   useGitignore: boolean;
   useHopcodeignore: boolean;
+  customIgnoreFiles?: string[];
   ignoreDirs: string[];
 }
 
@@ -24,15 +28,21 @@ export function loadIgnoreRules(options: LoadIgnoreRulesOptions): Ignore {
   const ignorer = new Ignore();
   if (options.useGitignore) {
     const gitignorePath = path.join(options.projectRoot, '.gitignore');
-    if (fs.existsSync(gitignorePath)) {
-      ignorer.add(fs.readFileSync(gitignorePath, 'utf8'));
+    const gitignoreContent = readIgnoreFile(gitignorePath);
+    if (gitignoreContent !== undefined) {
+      ignorer.add(gitignoreContent);
     }
   }
 
   if (options.useHopcodeignore) {
-    const hopcodeignorePath = path.join(options.projectRoot, '.hopcodeignore');
-    if (fs.existsSync(hopcodeignorePath)) {
-      ignorer.add(fs.readFileSync(hopcodeignorePath, 'utf8'));
+    for (const ignoreFileName of getHopCodeIgnoreFileNames(
+      options.customIgnoreFiles,
+    )) {
+      const hopCodeIgnorePath = path.join(options.projectRoot, ignoreFileName);
+      const hopCodeIgnoreContent = readIgnoreFile(hopCodeIgnorePath);
+      if (hopCodeIgnoreContent !== undefined) {
+        ignorer.addSource(hopCodeIgnoreContent);
+      }
     }
   }
 
@@ -49,10 +59,23 @@ export function loadIgnoreRules(options: LoadIgnoreRulesOptions): Ignore {
   return ignorer;
 }
 
+function readIgnoreFile(filePath: string): string | undefined {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch (_error) {
+    const error = _error as NodeJS.ErrnoException;
+    if (error.code !== 'ENOENT') {
+      debugLogger.warn(`Failed to read ${filePath}: ${error.message}`);
+    }
+    return undefined;
+  }
+}
+
 export class Ignore {
   private readonly allPatterns: string[] = [];
   private dirIgnorer = ignore();
   private fileIgnorer = ignore();
+  private readonly sourceIgnorers: Ignore[] = [];
 
   /**
    * Adds one or more ignore patterns.
@@ -104,12 +127,20 @@ export class Ignore {
     return this;
   }
 
+  addSource(patterns: string | string[]): this {
+    const sourceIgnorer = new Ignore().add(patterns);
+    if (!sourceIgnorer.isEmpty()) {
+      this.sourceIgnorers.push(sourceIgnorer);
+    }
+    return this;
+  }
+
   /**
    * Returns a predicate that matches explicit directory ignore patterns (patterns ending with '/').
    * @returns {(dirPath: string) => boolean}
    */
   getDirectoryFilter(): (dirPath: string) => boolean {
-    return (dirPath: string) => this.dirIgnorer.ignores(dirPath);
+    return (dirPath: string) => this.isDirectoryIgnored(dirPath);
   }
 
   /**
@@ -118,7 +149,7 @@ export class Ignore {
    * @returns {(filePath: string) => boolean}
    */
   getFileFilter(): (filePath: string) => boolean {
-    return (filePath: string) => this.fileIgnorer.ignores(filePath);
+    return (filePath: string) => this.isFileIgnored(filePath);
   }
 
   /**
@@ -128,6 +159,33 @@ export class Ignore {
    * @returns A string fingerprint of the ignore patterns.
    */
   getFingerprint(): string {
-    return this.allPatterns.join('\n');
+    return JSON.stringify({
+      patterns: this.allPatterns,
+      sources: this.sourceIgnorers.map((sourceIgnorer) =>
+        sourceIgnorer.getFingerprint(),
+      ),
+    });
+  }
+
+  private isDirectoryIgnored(dirPath: string): boolean {
+    return (
+      this.dirIgnorer.ignores(dirPath) ||
+      this.sourceIgnorers.some((sourceIgnorer) =>
+        sourceIgnorer.isDirectoryIgnored(dirPath),
+      )
+    );
+  }
+
+  private isFileIgnored(filePath: string): boolean {
+    return (
+      this.fileIgnorer.ignores(filePath) ||
+      this.sourceIgnorers.some((sourceIgnorer) =>
+        sourceIgnorer.isFileIgnored(filePath),
+      )
+    );
+  }
+
+  private isEmpty(): boolean {
+    return this.allPatterns.length === 0 && this.sourceIgnorers.length === 0;
   }
 }

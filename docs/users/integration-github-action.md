@@ -1,4 +1,4 @@
-﻿# Github Actions：hopcode-action
+# Github Actions：hopcode-action
 
 ## Overview
 
@@ -96,7 +96,7 @@ This workflow acts as a central dispatcher for HopCode CLI, routing requests to 
 
 ### Issue Triage
 
-This action can be used to triage GitHub Issues automatically or on a schedule. For a detailed guide on how to set up the issue triage system, go to the [GitHub Issue Triage workflow documentation](./examples/workflows/issue-triage).
+This action can be used to triage GitHub Issues automatically or on a schedule. For a working issue triage setup, see the [automated issue triage workflow](https://github.com/QwenLM/hopcode/blob/main/.github/workflows/qwen-automated-issue-triage.yml).
 
 ### Pull Request Review
 
@@ -208,7 +208,7 @@ The HopCode CLI can be extended with additional functionality through extensions
 These extensions are installed from source from their GitHub repositories.
 
 For detailed instructions on how to set up and configure extensions, go to the
-[Extensions documentation](../developers/extensions/extension).
+[Extensions documentation](./extension/introduction.md).
 
 ## Best Practices
 

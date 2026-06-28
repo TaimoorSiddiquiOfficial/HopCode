@@ -141,6 +141,9 @@ function createMockConfig() {
     getModelsConfig: vi.fn().mockReturnValue({
       getResolvedModel: vi.fn().mockReturnValue(undefined),
     }),
+    getFileFilteringOptions: vi.fn().mockReturnValue({
+      customIgnoreFiles: ['.cursorignore'],
+    }),
   } as never;
 }
 
@@ -426,6 +429,32 @@ describe('InProcessBackend', () => {
     expect(agentContext.getWorkingDir()).toBe(agentCwd);
     expect(agentContext.getTargetDir()).toBe(agentCwd);
     expect(agentContext.getToolRegistry()).toBeDefined();
+  });
+
+  it('should pass parent custom ignore files to per-agent file service', async () => {
+    const parentConfig = createMockConfig() as unknown as {
+      getFileFilteringOptions: ReturnType<typeof vi.fn>;
+    };
+    const backendWithCustomIgnore = new InProcessBackend(parentConfig as never);
+    await backendWithCustomIgnore.init();
+
+    await backendWithCustomIgnore.spawnAgent(createSpawnConfig('agent-1'));
+
+    const MockAgentCore = AgentCore as unknown as ReturnType<typeof vi.fn>;
+    const lastCall = MockAgentCore.mock.calls.at(-1);
+    expect(lastCall).toBeDefined();
+
+    const { runtimeContext } = destructureAgentCoreCall(lastCall!);
+    const agentContext = runtimeContext as unknown as {
+      getFileService: () => {
+        gethopcodeignoreFileNamesDisplay: () => string;
+      };
+    };
+
+    expect(parentConfig.getFileFilteringOptions).toHaveBeenCalled();
+    expect(agentContext.getFileService().gethopcodeignoreFileNamesDisplay()).toBe(
+      '.hopcodeignore, .cursorignore',
+    );
   });
 
   it('should propagate runConfig limits to AgentInteractive', async () => {

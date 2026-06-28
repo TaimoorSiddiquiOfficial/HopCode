@@ -127,6 +127,18 @@ describe('createSpawnChannelFactory env policy', () => {
 
     expect(mockSpawn.mock.calls[0]?.[1]).toContain('/tmp/custom-hopcode.js');
   });
+
+  it('passes optional child args after --acp', async () => {
+    mockSpawn.mockReturnValue(createFakeChildProcess());
+
+    const factory = createSpawnChannelFactory({
+      extraArgs: ['--experimental-lsp'],
+    });
+    await factory('/tmp/project');
+
+    const args = mockSpawn.mock.calls[0]?.[1] as string[] | undefined;
+    expect(args?.slice(-2)).toEqual(['--acp', '--experimental-lsp']);
+  });
 });
 
 describe('createStderrForwarder', () => {

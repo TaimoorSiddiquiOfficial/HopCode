@@ -10,6 +10,7 @@ import { theme } from '../../../semantic-colors.js';
 import { useKeypress } from '../../../hooks/useKeypress.js';
 import { RadioButtonSelect } from '../../shared/RadioButtonSelect.js';
 import { t } from '../../../../i18n/index.js';
+import { MCPServerStatus } from '@hoptrendy/hopcode-core';
 import type { ServerDetailStepProps } from '../types.js';
 import {
   getStatusColor,
@@ -22,6 +23,7 @@ const LABEL_WIDTH = 15;
 
 type ServerAction =
   | 'view-tools'
+  | 'view-resources'
   | 'reconnect'
   | 'toggle-disable'
   | 'authenticate'
@@ -30,14 +32,28 @@ type ServerAction =
 export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
   server,
   onViewTools,
+  onViewResources,
   onReconnect,
   onDisable,
   onAuthenticate,
   onClearAuth,
   onBack,
+  isActive = true,
 }) => {
+  // 受门控（#4615）但未审批的 server 被 discovery 跳过，不会进入连接/认证流程，
+  // 审批原因优先展示。
+  const awaitingApproval =
+    !!server && !server.isDisabled && !!server.approvalState;
+  // 未连接且需要认证时，状态以"需要认证"展示，避免误导用户去排查连接问题。
+  // requiresAuth 是加载时的快照，状态被实时推到 connected 后不再适用。
+  const needsAuth =
+    !!server &&
+    !server.isDisabled &&
+    !awaitingApproval &&
+    !!server.requiresAuth &&
+    server.status !== MCPServerStatus.CONNECTED;
   const statusColor = server
-    ? server.isDisabled
+    ? server.isDisabled || awaitingApproval || needsAuth
       ? 'yellow'
       : getStatusColor(server.status)
     : 'gray';
@@ -75,7 +91,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
     // ??????/????
     result.push({
       key: 'toggle-disable',
-      label: server?.isDisabled ? t('Enable') : t('Disable'),
+      label: server.isDisabled ? t('Enable') : t('Disable'),
       value: 'toggle-disable',
     });
 
@@ -88,7 +104,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
       });
     }
 
-    // ????? OAuth ???????�????�??
+    // ????? OAuth ???????�????�??
     if (!server.isDisabled && server.hasOAuthTokens) {
       result.push({
         key: 'clear-auth',
@@ -98,7 +114,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
     }
 
     return result;
-  }, [server]);
+  }, [server, onViewResources, awaitingApproval]);
 
   useKeypress(
     (key) => {
@@ -106,7 +122,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
         onBack();
       }
     },
-    { isActive: true },
+    { isActive },
   );
 
   if (!server) {
@@ -136,7 +152,15 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
               }
             >
               {getStatusIcon(server.status)}{' '}
-              {server.isDisabled ? t('disabled') : t(server.status)}
+              {server.isDisabled
+                ? t('disabled')
+                : awaitingApproval
+                  ? server.approvalState === 'rejected'
+                    ? t('rejected — edit config to re-approve')
+                    : t('needs approval')
+                  : needsAuth
+                    ? t('needs authentication')
+                    : t(server.status)}
             </Text>
           </Box>
         </Box>
@@ -204,6 +228,28 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
           </Box>
         )}
 
+        {!server.isDisabled && server.promptCount > 0 && (
+          <Box>
+            <Box width={LABEL_WIDTH}>
+              <Text color={theme.text.primary}>{t('Prompts:')}</Text>
+            </Box>
+            <Box>
+              <Text>{server.promptCount}</Text>
+            </Box>
+          </Box>
+        )}
+
+        {!server.isDisabled && server.resourceCount > 0 && (
+          <Box>
+            <Box width={LABEL_WIDTH}>
+              <Text color={theme.text.primary}>{t('Resources:')}</Text>
+            </Box>
+            <Box>
+              <Text>{server.resourceCount}</Text>
+            </Box>
+          </Box>
+        )}
+
         {server.errorMessage && (
           <Box>
             <Box width={LABEL_WIDTH}>
@@ -222,11 +268,15 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
       <Box>
         <RadioButtonSelect<ServerAction>
           items={actions}
+          isFocused={isActive}
           showNumbers={false}
           onSelect={(value: ServerAction) => {
             switch (value) {
               case 'view-tools':
                 onViewTools();
+                break;
+              case 'view-resources':
+                onViewResources?.();
                 break;
               case 'reconnect':
                 onReconnect?.();

@@ -2691,6 +2691,36 @@ describe('OpenAIContentConverter', () => {
 
       expect(response.candidates).toEqual([]);
     });
+
+    it('keeps the estimated prompt/completion split summing to total tokens', () => {
+      // When a provider reports only total_tokens, the 70/30 estimate must
+      // still add back up to the total instead of rounding each half on its
+      // own (5 would otherwise become 4 + 2 = 6).
+      const response = converter.convertOpenAIResponseToGemini(
+        {
+          object: 'chat.completion',
+          id: 'chatcmpl-usage',
+          created: 123,
+          model: 'test-model',
+          choices: [
+            {
+              index: 0,
+              message: { role: 'assistant', content: 'hi' },
+              finish_reason: 'stop',
+              logprobs: null,
+            },
+          ],
+          usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 5 },
+        } as unknown as OpenAI.Chat.ChatCompletion,
+        requestContext,
+      );
+
+      const usage = response.usageMetadata;
+      expect(usage?.totalTokenCount).toBe(5);
+      expect(
+        (usage?.promptTokenCount ?? 0) + (usage?.candidatesTokenCount ?? 0),
+      ).toBe(5);
+    });
   });
 
   describe('OpenAI -> Gemini reasoning content', () => {
@@ -4359,6 +4389,41 @@ describe('OpenAIContentConverter', () => {
   });
 
   describe('mergeConsecutiveAssistantMessages', () => {
+    it('should preserve reasoning_content from every merged assistant turn', () => {
+      const request: GenerateContentParameters = {
+        model: 'models/test',
+        contents: [
+          {
+            role: 'model',
+            parts: [
+              { text: 'First reasoning.', thought: true },
+              { text: 'First answer.' },
+            ],
+          },
+          {
+            role: 'model',
+            parts: [
+              { text: 'Second reasoning.', thought: true },
+              { text: 'Second answer.' },
+            ],
+          },
+        ],
+      };
+
+      const messages = converter.convertGeminiRequestToOpenAI(
+        request,
+        requestContext,
+      );
+
+      expect(messages).toHaveLength(1);
+      expect(messages[0].role).toBe('assistant');
+      expect(messages[0].content).toBe('First answer.Second answer.');
+      // The reasoning of the merged-away turn must not be silently dropped.
+      expect(
+        (messages[0] as { reasoning_content?: string }).reasoning_content,
+      ).toBe('First reasoning.Second reasoning.');
+    });
+
     it('should merge two consecutive assistant messages with string content', () => {
       const request: GenerateContentParameters = {
         model: 'models/test',

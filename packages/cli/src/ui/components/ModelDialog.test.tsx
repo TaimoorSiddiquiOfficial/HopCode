@@ -7,7 +7,7 @@
 import { render, cleanup } from '@testing-library/react';
 import process from 'node:process';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ModelDialog } from './ModelDialog.js';
+import { ModelDialog, encodeAuxModelSelector } from './ModelDialog.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { DescriptiveRadioButtonSelect } from './shared/DescriptiveRadioButtonSelect.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
@@ -93,10 +93,20 @@ const renderComponent = (
     ...(contextValue ?? {}),
   } as unknown as Config;
 
+  // ModelDialog only reads historyManager off the UI state; mock just that so
+  // selection notices (e.g. the non-image-capable vision warning) are assertable.
+  const mockHistoryManager = {
+    addItem: vi.fn(),
+  } as unknown as UIState['historyManager'];
+
   const renderResult = render(
     <SettingsContext.Provider value={mockSettings}>
       <ConfigContext.Provider value={mockConfig}>
-        <ModelDialog {...combinedProps} />
+        <UIStateContext.Provider
+          value={{ historyManager: mockHistoryManager } as unknown as UIState}
+        >
+          <ModelDialog {...combinedProps} />
+        </UIStateContext.Provider>
       </ConfigContext.Provider>
     </SettingsContext.Provider>,
   );
@@ -106,6 +116,7 @@ const renderComponent = (
     props: combinedProps,
     mockConfig,
     mockSettings,
+    mockHistoryManager,
   };
 };
 
@@ -564,6 +575,171 @@ describe('<ModelDialog />', () => {
     expect(props.onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('stores authType-qualified selectors in vision model mode without switching models', async () => {
+    const switchModel = vi.fn();
+    const setVisionModel = vi.fn();
+    const { props, mockSettings } = renderComponent(
+      { isVisionModelMode: true },
+      {
+        getAuthType: vi.fn(() => AuthType.USE_ANTHROPIC),
+        getModel: vi.fn(() => 'claude-opus-4-7'),
+        switchModel,
+        getAllConfiguredModels: vi.fn(() => [
+          {
+            id: 'qwen-vl-max',
+            label: 'qwen-vl-max',
+            authType: AuthType.USE_OPENAI,
+          },
+          {
+            id: 'claude-opus-4-7',
+            label: 'claude-opus-4-7',
+            authType: AuthType.USE_ANTHROPIC,
+          },
+        ]),
+        getContentGeneratorConfig: vi.fn(() => ({
+          authType: AuthType.USE_ANTHROPIC,
+          model: 'claude-opus-4-7',
+        })),
+        isCurrentPrimaryModel: (m: { id: string; authType?: string }) =>
+          m.id === 'claude-opus-4-7' && m.authType === AuthType.USE_ANTHROPIC,
+        setVisionModel,
+      } as unknown as Partial<Config>,
+    );
+
+    const childOnSelect = mockedSelect.mock.calls[0][0].onSelect;
+    await childOnSelect(`${AuthType.USE_OPENAI}::qwen-vl-max`);
+
+    expect(mockSettings.setValue).toHaveBeenCalledWith(
+      SettingScope.User,
+      'visionModel',
+      'openai:qwen-vl-max',
+    );
+    expect(setVisionModel).toHaveBeenCalledWith('openai:qwen-vl-max');
+    expect(switchModel).not.toHaveBeenCalled();
+    expect(mockSettings.setValue).not.toHaveBeenCalledWith(
+      SettingScope.User,
+      'model.name',
+      expect.any(String),
+    );
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('warns in the history when a pinned vision model is not image-capable', async () => {
+    // qwen-plus is text-only by name default, so the pin is honored but flagged.
+    // The primary is a different model so the pin isn't rejected as the primary.
+    const setVisionModel = vi.fn();
+    const { mockHistoryManager } = renderComponent(
+      { isVisionModelMode: true },
+      {
+        getAuthType: vi.fn(() => AuthType.USE_OPENAI),
+        getModel: vi.fn(() => 'qwen3.7-max'),
+        getAllConfiguredModels: vi.fn(() => [
+          {
+            id: 'qwen-plus',
+            label: 'qwen-plus',
+            authType: AuthType.USE_OPENAI,
+          },
+        ]),
+        getContentGeneratorConfig: vi.fn(() => ({
+          authType: AuthType.USE_OPENAI,
+          model: 'qwen3.7-max',
+        })),
+        isCurrentPrimaryModel: (m: { id: string }) => m.id === 'qwen3.7-max',
+        setVisionModel,
+      } as unknown as Partial<Config>,
+    );
+
+    const childOnSelect = mockedSelect.mock.calls[0][0].onSelect;
+    await childOnSelect(`${AuthType.USE_OPENAI}::qwen-plus`);
+
+    expect(setVisionModel).toHaveBeenCalledWith('openai:qwen-plus');
+    expect(mockHistoryManager.addItem).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'success',
+        text: expect.stringContaining('not a known image-capable model'),
+      }),
+      expect.any(Number),
+    );
+  });
+
+  it('stores the plain model id in voice model mode without switching models', async () => {
+    const switchModel = vi.fn();
+    const setFastModel = vi.fn();
+    const { props, mockSettings } = renderComponent(
+      { isVoiceModelMode: true },
+      {
+        getAuthType: vi.fn(() => AuthType.USE_OPENAI),
+        getModel: vi.fn(() => 'qwen3.7-max'),
+        switchModel,
+        getAllConfiguredModels: vi.fn(() => [
+          {
+            id: 'qwen3-asr-flash',
+            label: 'qwen3-asr-flash',
+            authType: AuthType.USE_OPENAI,
+            baseUrl: 'https://dashscope.example/v1',
+          },
+          {
+            id: 'qwen3.7-max',
+            label: 'qwen3.7-max',
+            authType: AuthType.USE_OPENAI,
+          },
+        ]),
+        getContentGeneratorConfig: vi.fn(() => ({
+          authType: AuthType.USE_OPENAI,
+          model: 'qwen3.7-max',
+        })),
+        setFastModel,
+      } as unknown as Partial<Config>,
+    );
+
+    const selectProps = mockedSelect.mock.calls[0][0];
+    await selectProps.onSelect(selectProps.items[0].value);
+
+    expect(mockSettings.setValue).toHaveBeenCalledWith(
+      SettingScope.User,
+      'voiceModel',
+      'qwen3-asr-flash',
+    );
+    expect(switchModel).not.toHaveBeenCalled();
+    expect(setFastModel).not.toHaveBeenCalled();
+    expect(mockSettings.setValue).not.toHaveBeenCalledWith(
+      SettingScope.User,
+      'model.name',
+      expect.any(String),
+    );
+    expect(props.onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not store a voice model without a transcription baseUrl', async () => {
+    const switchModel = vi.fn();
+    const { props, mockSettings } = renderComponent(
+      { isVoiceModelMode: true },
+      {
+        getAuthType: vi.fn(() => AuthType.USE_OPENAI),
+        getModel: vi.fn(() => 'qwen3.7-max'),
+        switchModel,
+        getAllConfiguredModels: vi.fn(() => [
+          {
+            id: 'qwen3-coder',
+            label: 'qwen3-coder',
+            authType: AuthType.USE_OPENAI,
+          },
+        ]),
+        getContentGeneratorConfig: vi.fn(() => ({
+          authType: AuthType.USE_OPENAI,
+          model: 'qwen3.7-max',
+        })),
+      } as unknown as Partial<Config>,
+    );
+
+    const childOnSelect = mockedSelect.mock.calls[0][0].onSelect;
+    await childOnSelect(`${AuthType.USE_OPENAI}::qwen3-coder`);
+
+    expect(mockSettings.setValue).not.toHaveBeenCalled();
+    expect(switchModel).not.toHaveBeenCalled();
+    expect(props.onClose).not.toHaveBeenCalled();
+  });
+
   it('highlights the cross-auth row for a bare fast-model setting', () => {
     // `/model --fast deepseek-v4-flash` validates across all providers and
     // persists the bare model id. When the dialog re-opens, it must locate
@@ -785,5 +961,25 @@ describe('<ModelDialog />', () => {
       (m) => m.id === DEFAULT_HOPCODE_MODEL,
     );
     expect(afterChangeCall.initialIndex).toBe(expectedCoderIndex);
+  });
+});
+
+describe('encodeAuxModelSelector', () => {
+  it('encodes the "authType::modelId" key, dropping the baseUrl', () => {
+    expect(
+      encodeAuxModelSelector('openai::gpt-4o\0https://api.example.com'),
+    ).toBe('openai:gpt-4o');
+    expect(encodeAuxModelSelector('openai::gpt-4o')).toBe('openai:gpt-4o');
+  });
+
+  it('encodes the "$runtime|authType|modelId" key by positional split', () => {
+    expect(encodeAuxModelSelector('$runtime|openai|gpt-4o')).toBe(
+      'openai:gpt-4o',
+    );
+  });
+
+  it('passes a bare id (and a malformed runtime key) through unchanged', () => {
+    expect(encodeAuxModelSelector('gpt-4o')).toBe('gpt-4o');
+    expect(encodeAuxModelSelector('$runtime|openai')).toBe('$runtime|openai');
   });
 });

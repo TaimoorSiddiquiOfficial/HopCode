@@ -5,17 +5,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  createServer,
-  type IncomingMessage,
-  type ServerResponse,
-} from 'node:http';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
-import type { AddressInfo } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { TerminalCapture } from './terminal-capture.js';
+import { startFakeOpenAIServer } from '../fake-openai-server.js';
 
 const TERMINAL_COLS = 100;
 const TERMINAL_ROWS = 32;
@@ -32,12 +27,6 @@ const MARKDOWN_RESPONSE = [
   '',
   'REGRESSION_TABLE_DONE',
 ].join('\n');
-
-type FakeServer = {
-  baseUrl: string;
-  close: () => Promise<void>;
-  getRequestCount: () => number;
-};
 
 type Summary = {
   repoRoot: string;
@@ -270,7 +259,14 @@ async function main(): Promise<void> {
   }
   mkdirSync(outputDir, { recursive: true });
 
-  const fakeServer = await startFakeOpenAIServer();
+  const fakeServer = await startFakeOpenAIServer(() => ({
+    content: MARKDOWN_RESPONSE,
+    usage: {
+      prompt_tokens: 24,
+      completion_tokens: 16,
+      total_tokens: 40,
+    },
+  }));
   const homeDir = join(outputDir, 'home');
   mkdirSync(homeDir, { recursive: true });
 
@@ -340,7 +336,7 @@ async function main(): Promise<void> {
       finalScreen.includes(TABLE_NAME_SUFFIX) &&
       !finalScreen.includes(TABLE_NAME);
     const pass =
-      fakeServer.getRequestCount() > 0 &&
+      fakeServer.requests.length > 0 &&
       finalScreenWrappedTableName &&
       foregrounds.length > 0 &&
       uncoloredContinuationOccurrences === 0;
@@ -351,7 +347,7 @@ async function main(): Promise<void> {
     const summary: Summary = {
       repoRoot,
       outputDir,
-      requestCount: fakeServer.getRequestCount(),
+      requestCount: fakeServer.requests.length,
       rawBytes: raw.length,
       finalScreenLines: finalScreen.split('\n').length,
       continuationOccurrences: foregrounds.length,

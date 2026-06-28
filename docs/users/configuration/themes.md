@@ -13,12 +13,15 @@ HopCode comes with a selection of pre-defined themes, which you can list using t
   - `Default`
   - `Dracula`
   - `GitHub`
+  - `Qwen Dark`
+  - `Shades Of Purple`
 - **Light Themes:**
   - `ANSI Light`
   - `Ayu Light`
   - `Default Light`
   - `GitHub Light`
   - `Google Code`
+  - `Qwen Light`
   - `Xcode`
 
 ### Changing Themes
@@ -28,7 +31,7 @@ HopCode comes with a selection of pre-defined themes, which you can list using t
 3.  Using the arrow keys, select a theme. Some interfaces might offer a live preview or highlight as you select.
 4.  Confirm your selection to apply the theme.
 
-**Note:** If a theme is defined in your `settings.json` file (either by name or by a file path), you must remove the `"theme"` setting from the file before you can change the theme using the `/theme` command.
+**Note:** If a theme is defined in your `settings.json` file (either by name or by a file path), you must remove the `"ui.theme"` setting from the file before you can change the theme using the `/theme` command.
 
 ### Theme Persistence
 
@@ -217,7 +220,7 @@ You can define multiple custom themes by adding more entries to the `customTheme
 
 In addition to defining custom themes in `settings.json`, you can also load a theme directly from a JSON file by specifying the file path in your `settings.json`. This is useful for sharing themes or keeping them separate from your main configuration.
 
-To load a theme from a file, set the `theme` property in your `settings.json` to the path of your theme file:
+To load a theme from a file, set the `ui.theme` property in your `settings.json` to the path of your theme file:
 
 ```json
 {
@@ -253,7 +256,7 @@ The theme file must be a valid JSON file that follows the same structure as a cu
 }
 ```
 
-**Security Note:** For your safety, Gemini CLI will only load theme files that are located within your home directory. If you attempt to load a theme from outside your home directory, a warning will be displayed and the theme will not be loaded. This is to prevent loading potentially malicious theme files from untrusted sources.
+**Security Note:** For your safety, HopCode will only load theme files that are located within your home directory. If you attempt to load a theme from outside your home directory, a warning will be displayed and the theme will not be loaded. This is to prevent loading potentially malicious theme files from untrusted sources.
 
 ### Example Custom Theme
 

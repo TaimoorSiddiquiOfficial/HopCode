@@ -104,6 +104,7 @@ export function _resetCleanupFunctionsForTest(): void {
 }
 
 export async function cleanupCheckpoints() {
+  const { Storage } = await import('@hoptrendy/hopcode-core');
   const storage = new Storage(process.cwd());
   const tempDir = storage.getProjectTempDir();
   const checkpointsDir = join(tempDir, 'checkpoints');

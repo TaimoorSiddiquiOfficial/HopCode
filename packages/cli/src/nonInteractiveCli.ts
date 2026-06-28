@@ -26,6 +26,9 @@ import {
   parseAndFormatApiError,
   createDebugLogger,
   SendMessageType,
+  buildSyntheticToolResponseParts,
+  detectTurnInterruption,
+  ORPHAN_TOOL_USE_REPAIR_REASON,
   restoreWorktreeContext,
   TeamEventType,
   ApprovalMode,
@@ -87,6 +90,7 @@ function suppressedOutputBody(structuredCaptured: boolean): string {
     ? SUPPRESSED_OUTPUT_SUCCESS
     : SUPPRESSED_OUTPUT_RETRY;
 }
+
 import {
   normalizePartList,
   extractPartsFromUserMessage,
@@ -94,6 +98,8 @@ import {
   createToolProgressHandler,
   createAgentToolProgressHandler,
   computeUsageFromMetrics,
+  buildInitialSystemReminders,
+  insertAfterFunctionResponses,
 } from './utils/nonInteractiveHelpers.js';
 
 // Human-readable labels for the detectors that can fire mid-stream.
@@ -110,6 +116,8 @@ const LOOP_TYPE_LABELS: Record<LoopType, string> = {
     'the model spent too many consecutive calls reading files without making progress',
   [LoopType.ACTION_STAGNATION]:
     'the model kept calling the same tool without making progress',
+  [LoopType.SHELL_COMMAND_STAGNATION]:
+    'the model repeated similar shell inspection commands without making progress',
   [LoopType.GLOBAL_TOOL_CALL_DUPLICATE]:
     'the model repeated the same tool call across the turn, even when not back-to-back',
   [LoopType.ALTERNATING_TOOL_CALL_PATTERN]:
@@ -118,24 +126,35 @@ const LOOP_TYPE_LABELS: Record<LoopType, string> = {
     'the model exceeded the maximum number of tool calls allowed in a single turn',
 };
 
+function formatLoopDetectedMessage(loopType: LoopType | undefined): string {
+  const reason = loopType ? LOOP_TYPE_LABELS[loopType] : undefined;
+  const detail = reason ? ` (${loopType}: ${reason})` : '';
+  // The consecutive-identical guard and the per-turn cap both run before the
+  // skipLoopDetection gate, so that setting can't disable them — don't suggest
+  // it for those always-on loop types.
+  const isAlwaysOn =
+    loopType === LoopType.TURN_TOOL_CALL_CAP ||
+    loopType === LoopType.CONSECUTIVE_IDENTICAL_TOOL_CALLS ||
+    loopType === LoopType.SHELL_COMMAND_STAGNATION ||
+    loopType === LoopType.GLOBAL_TOOL_CALL_DUPLICATE;
+  const hint = isAlwaysOn
+    ? ' This is an always-on guard and cannot be disabled via `model.skipLoopDetection`.'
+    : ' Set the `model.skipLoopDetection` setting to true to disable.';
+  return `Loop detection halted the run${detail}.${hint}`;
+}
+
 function emitLoopDetectedMessage(
   config: Config,
   loopType: LoopType | undefined,
-): void {
+): string {
+  const message = formatLoopDetectedMessage(loopType);
   // In TEXT mode the adapter swallows LoopDetected, so we print here. In
   // JSON modes the adapter emits a structured result, which is enough.
   if (config.getOutputFormat() !== OutputFormat.TEXT) {
-    return;
+    return message;
   }
-  const reason = loopType ? LOOP_TYPE_LABELS[loopType] : undefined;
-  const detail = reason ? ` (${loopType}: ${reason})` : '';
-  // The turn cap runs before the skipLoopDetection gate, so that setting can't
-  // disable it — don't suggest it for TURN_TOOL_CALL_CAP.
-  const hint =
-    loopType === LoopType.TURN_TOOL_CALL_CAP
-      ? ' This is an always-on per-turn tool-call cap and cannot be disabled via `model.skipLoopDetection`.'
-      : ' Set the `model.skipLoopDetection` setting to true to disable.';
-  process.stderr.write(`Loop detection halted the run${detail}.${hint}\n`);
+  process.stderr.write(`${message}\n`);
+  return message;
 }
 
 /**
@@ -197,6 +216,16 @@ export interface RunNonInteractiveOptions {
   notificationDisplayText?: string;
   captureMonitorNotifications?: boolean;
   captureMonitorRegistrations?: boolean;
+  onResultEmitted?: () => void;
+  /**
+   * Continue the most recent unfinished turn from chat history instead of
+   * submitting `input` (which is ignored). No new user message enters the
+   * transcript: an orphaned trailing user entry is re-submitted with Retry
+   * semantics, and dangling tool calls are closed with synthesized error
+   * functionResponses sent as a ToolResult. When the last turn ended
+   * cleanly the run emits a no-op result and exits 0.
+   */
+  continueInterrupted?: boolean;
 }
 
 /**
@@ -224,6 +253,16 @@ export async function runNonInteractive(
     } else {
       adapter = new JsonOutputAdapter(config);
     }
+    const emitResult = (
+      result: Parameters<JsonOutputAdapterInterface['emitResult']>[0],
+    ) => {
+      // Fire the callback only after a successful emit. The continue caller
+      // (session.ts) uses it to mark the result as delivered and swallow any
+      // later error; if emitResult itself throws, the flag must stay unset so
+      // the error still surfaces instead of losing both result and error.
+      adapter.emitResult(result);
+      options.onResultEmitted?.();
+    };
 
     // Get readonly values once at the start
     const sessionId = config.getSessionId();
@@ -440,6 +479,10 @@ export async function runNonInteractive(
       }
     };
 
+    // First-turn SendMessageType override for continuation turns; null means
+    // the regular options.sendMessageType / UserQuery selection applies.
+    let continueSendType: SendMessageType | null = null;
+
     try {
       process.stdout.on('error', stdoutErrorHandler);
 
@@ -467,6 +510,65 @@ export async function runNonInteractive(
       let initialPartList: PartListUnion | null = extractPartsFromUserMessage(
         options.userMessage,
       );
+
+      if (options.continueInterrupted) {
+        // Read the full history, not a bounded tail: the Retry send path in
+        // client.ts strips the ENTIRE trailing user run, so detection must
+        // re-submit exactly that run or the oldest orphans get dropped. This
+        // runs once per (rare) continue request, so the full clone is fine.
+        const detection = detectTurnInterruption(
+          geminiClient.getChat().getHistory(),
+        );
+        debugLogger.info('[runNonInteractive] continueInterrupted detection', {
+          kind: detection.kind,
+          partsCount:
+            detection.kind === 'interrupted_prompt'
+              ? detection.parts.length
+              : 0,
+          danglingCallCount:
+            detection.kind === 'interrupted_turn'
+              ? detection.danglingCalls.length
+              : 0,
+        });
+        if (detection.kind === 'none') {
+          await emitNonInteractiveFinalMessage({
+            message: 'No interrupted turn to continue.',
+            isError: false,
+            adapter,
+            config,
+            startTimeMs: startTime,
+          });
+          return 0;
+        }
+        if (detection.kind === 'interrupted_prompt') {
+          // Re-submit the orphaned user content under Retry semantics. The
+          // Retry send path strips the orphaned original from history and
+          // restores it if the send never starts, so history is neither
+          // duplicated nor lost — no separate strip/restore needed here.
+          initialPartList = detection.parts;
+          continueSendType = SendMessageType.Retry;
+        } else {
+          initialPartList = buildSyntheticToolResponseParts(
+            detection.danglingCalls,
+            ORPHAN_TOOL_USE_REPAIR_REASON,
+          );
+          continueSendType = SendMessageType.ToolResult;
+        }
+
+        const reminderParts = buildInitialSystemReminders(config);
+        if (reminderParts.length > 0 && initialPartList) {
+          const continuationParts = normalizePartList(initialPartList);
+          const hasSystemReminderPart = continuationParts.some((part) =>
+            isSystemReminderContent({ role: 'user', parts: [part] }),
+          );
+          if (!hasSystemReminderPart) {
+            initialPartList = insertAfterFunctionResponses(
+              continuationParts,
+              reminderParts,
+            );
+          }
+        }
+      }
 
       if (!initialPartList) {
         let slashHandled = false;
@@ -561,13 +663,21 @@ export async function runNonInteractive(
           : [reminderPart, existing];
       };
 
-      const startupNotice = config.consumePendingStartupWorktreeNotice();
+      // Continuation turns must not prepend reminder text: a ToolResult
+      // payload's functionResponse parts have to stay at the HEAD of the
+      // user message or Anthropic-compatible backends reject the pairing.
+      const startupNotice = options.continueInterrupted
+        ? null
+        : config.consumePendingStartupWorktreeNotice();
       if (startupNotice) {
         initialPartList = withReminder(initialPartList, startupNotice);
         adapter.emitSystemMessage('worktree_started', {
           notice: startupNotice,
         });
-      } else if (config.getResumedSessionData()) {
+      } else if (
+        !options.continueInterrupted &&
+        config.getResumedSessionData()
+      ) {
         try {
           const sessionPath = config
             .getSessionService()
@@ -689,6 +799,8 @@ export async function runNonInteractive(
       // actually said instead of a static, context-free message.
       let plainTextPreview = '';
       const PLAIN_TEXT_PREVIEW_LIMIT = 200;
+      let loopDetected = false;
+      let loopDetectedMessage = formatLoopDetectedMessage(undefined);
 
       // Shared terminal block for the structured-output success
       // contract. Both the main-turn loop and the drain-turn post-loop
@@ -724,7 +836,7 @@ export async function runNonInteractive(
           outputFormat === OutputFormat.JSON
             ? uiTelemetryService.getMetrics()
             : undefined;
-        adapter.emitResult({
+        emitResult({
           isError: false,
           durationMs: Date.now() - startTime,
           apiDurationMs: totalApiDurationMs,
@@ -734,6 +846,33 @@ export async function runNonInteractive(
           structuredResult: structuredSubmission,
         });
         return 0;
+      };
+
+      const emitLoopDetectedResult = (): 1 => {
+        registry.abortAll();
+        flushQueuedNotificationsToSdk(localQueue);
+        finalizeOneShotMonitors();
+
+        if (outputFormat === OutputFormat.TEXT) {
+          return 1;
+        }
+
+        const metrics = uiTelemetryService.getMetrics();
+        const usage = computeUsageFromMetrics(metrics);
+        const stats =
+          outputFormat === OutputFormat.JSON
+            ? uiTelemetryService.getMetrics()
+            : undefined;
+        adapter.emitResult({
+          isError: true,
+          durationMs: Date.now() - startTime,
+          apiDurationMs: totalApiDurationMs,
+          numTurns: turnCount,
+          errorMessage: loopDetectedMessage,
+          usage,
+          stats,
+        });
+        return 1;
       };
 
       /**
@@ -758,15 +897,29 @@ export async function runNonInteractive(
        */
       const handledProviderToolCallIds =
         geminiClient.getHistoryFunctionResponseIds();
+      // Tracks duplicate-error responses emitted during this headless run.
+      // Once a provider id reaches this set, seeing it again is terminal for
+      // the current tool batch so we do not send partial tool responses.
+      const duplicateProviderToolCallResponseIds = new Set<string>();
+
+      type ToolCallBatchResult = {
+        responseParts: Part[];
+        repeatedDuplicateProviderToolCall: boolean;
+      };
 
       const processToolCallBatch = async (
         batchRequests: ToolCallRequestInfo[],
         setModelOverride: (override: string | undefined) => void,
-      ): Promise<Part[]> => {
+      ): Promise<ToolCallBatchResult> => {
         const toolResponseParts: Part[] = [];
         const structuredOutputActive =
           config.getJsonSchema() &&
           batchRequests.some((r) => r.name === ToolNames.STRUCTURED_OUTPUT);
+        const getProviderResponseId = (
+          request: ToolCallRequestInfo,
+        ): string | undefined =>
+          request.providerCallId ??
+          (structuredOutputActive ? undefined : request.callId || undefined);
         const seenBatchCallIds = new Set<string>();
         const duplicateBatchRequests: ToolCallRequestInfo[] = [];
         const uniqueBatchRequests = batchRequests.filter((request) => {
@@ -788,26 +941,51 @@ export async function runNonInteractive(
           }
           return true;
         });
+        const repeatedDuplicateRequest = findRepeatedDuplicateProviderToolCall(
+          [...uniqueBatchRequests, ...duplicateBatchRequests],
+          getProviderResponseId,
+          handledProviderToolCallIds,
+          duplicateProviderToolCallResponseIds,
+        );
+        if (repeatedDuplicateRequest) {
+          const providerCallId =
+            repeatedDuplicateRequest.providerCallId ??
+            repeatedDuplicateRequest.callId;
+          debugLogger.debug(
+            `[runNonInteractive] Dropping batch after repeated duplicate provider tool-call id: ${providerCallId} (tool: ${repeatedDuplicateRequest.name})`,
+          );
+          return {
+            responseParts: [],
+            repeatedDuplicateProviderToolCall: true,
+          };
+        }
+
         const respondedRequests = new Set<ToolCallRequestInfo>();
         const executableBatchRequests: ToolCallRequestInfo[] = [];
         const duplicatePendingResponses: Part[] = [];
 
         for (const requestInfo of uniqueBatchRequests) {
-          if (!requestInfo.providerCallId) {
+          const providerCallId = getProviderResponseId(requestInfo);
+          if (!providerCallId) {
             executableBatchRequests.push(requestInfo);
             continue;
           }
 
-          if (!handledProviderToolCallIds.has(requestInfo.providerCallId)) {
-            handledProviderToolCallIds.add(requestInfo.providerCallId);
+          if (!handledProviderToolCallIds.has(providerCallId)) {
+            handledProviderToolCallIds.add(providerCallId);
             executableBatchRequests.push(requestInfo);
             continue;
           }
+
+          markDuplicateProviderToolCallResponseSent(
+            providerCallId,
+            duplicateProviderToolCallResponseIds,
+          );
 
           const toolResponse =
             createDuplicateProviderToolCallResponse(requestInfo);
           debugLogger.debug(
-            `[runNonInteractive] Suppressing duplicate provider tool-call id: ${requestInfo.providerCallId} (tool: ${requestInfo.name})`,
+            `[runNonInteractive] Suppressing duplicate provider tool-call id: ${providerCallId} (tool: ${requestInfo.name})`,
           );
           respondedRequests.add(requestInfo);
           adapter.emitToolResult(requestInfo, toolResponse);
@@ -990,13 +1168,23 @@ export async function runNonInteractive(
         }
 
         for (const requestInfo of duplicateBatchRequests) {
+          const providerCallId = getProviderResponseId(requestInfo);
+          if (!providerCallId) continue;
+          markDuplicateProviderToolCallResponseSent(
+            providerCallId,
+            duplicateProviderToolCallResponseIds,
+          );
+
           const toolResponse =
             createDuplicateProviderToolCallResponse(requestInfo);
           adapter.emitToolResult(requestInfo, toolResponse);
           toolResponseParts.push(...toolResponse.responseParts);
         }
 
-        return toolResponseParts;
+        return {
+          responseParts: toolResponseParts,
+          repeatedDuplicateProviderToolCall: false,
+        };
       };
 
       while (true) {
@@ -1042,7 +1230,10 @@ export async function runNonInteractive(
 
         let sendType: SendMessageType;
         if (isFirstTurn) {
-          sendType = options.sendMessageType ?? SendMessageType.UserQuery;
+          sendType =
+            continueSendType ??
+            options.sendMessageType ??
+            SendMessageType.UserQuery;
         } else if (isTeammateTurn) {
           sendType = SendMessageType.Teammate;
         } else {
@@ -1092,7 +1283,13 @@ export async function runNonInteractive(
             plainTextPreview += String(event.value).slice(0, remaining);
           }
           if (event.type === GeminiEventType.LoopDetected) {
-            emitLoopDetectedMessage(config, event.value?.loopType);
+            if (!loopDetected) {
+              loopDetectedMessage = emitLoopDetectedMessage(
+                config,
+                event.value?.loopType,
+              );
+            }
+            loopDetected = true;
           }
           if (
             outputFormat === OutputFormat.TEXT &&
@@ -1115,6 +1312,10 @@ export async function runNonInteractive(
         adapter.finalizeAssistantMessage();
         totalApiDurationMs += Date.now() - apiStartTime;
 
+        if (loopDetected) {
+          return emitLoopDetectedResult();
+        }
+
         if (toolCallRequests.length > 0) {
           // Dispatch the per-turn tool-call batch through the shared
           // helper (see processToolCallBatch above). The helper handles
@@ -1127,12 +1328,12 @@ export async function runNonInteractive(
           // `modelOverride` so the next turn's sendMessageStream sees
           // it; the drain turn updates a per-item `itemModelOverride`
           // scoped to that drain item.
-          const toolResponseParts = await processToolCallBatch(
-            toolCallRequests,
-            (override) => {
-              modelOverride = override;
-            },
-          );
+          const {
+            responseParts: toolResponseParts,
+            repeatedDuplicateProviderToolCall,
+          } = await processToolCallBatch(toolCallRequests, (override) => {
+            modelOverride = override;
+          });
 
           if (structuredSubmission !== undefined) {
             // Single-shot terminal contract; aborts in-flight background
@@ -1141,6 +1342,16 @@ export async function runNonInteractive(
             // structured success envelope. Same helper as the drain-turn
             // post-loop branch — see emitStructuredSuccess above.
             return emitStructuredSuccess();
+          }
+          if (
+            repeatedDuplicateProviderToolCall &&
+            toolResponseParts.length === 0
+          ) {
+            loopDetectedMessage = emitLoopDetectedMessage(
+              config,
+              LoopType.GLOBAL_TOOL_CALL_DUPLICATE,
+            );
+            return emitLoopDetectedResult();
           }
           currentMessages = [{ role: 'user', parts: toolResponseParts }];
           hasUnsentToolResponse = true;
@@ -1315,7 +1526,13 @@ export async function runNonInteractive(
                   itemToolCallRequests.push(event.value);
                 }
                 if (event.type === GeminiEventType.LoopDetected) {
-                  emitLoopDetectedMessage(config, event.value?.loopType);
+                  if (!loopDetected) {
+                    loopDetectedMessage = emitLoopDetectedMessage(
+                      config,
+                      event.value?.loopType,
+                    );
+                  }
+                  loopDetected = true;
                 }
                 if (
                   outputFormat === OutputFormat.TEXT &&
@@ -1336,6 +1553,10 @@ export async function runNonInteractive(
               adapter.finalizeAssistantMessage();
               totalApiDurationMs += Date.now() - itemApiStartTime;
 
+              if (loopDetected) {
+                return;
+              }
+
               if (itemToolCallRequests.length > 0) {
                 // Same shared dispatch as the main-turn loop. The only
                 // call-site difference is `itemModelOverride` is local to
@@ -1343,7 +1564,10 @@ export async function runNonInteractive(
                 // sendMessageStream picks up the per-item override),
                 // while the main loop binds to the session-scoped
                 // `modelOverride`.
-                const itemToolResponseParts = await processToolCallBatch(
+                const {
+                  responseParts: itemToolResponseParts,
+                  repeatedDuplicateProviderToolCall,
+                } = await processToolCallBatch(
                   itemToolCallRequests,
                   (override) => {
                     itemModelOverride = override;
@@ -1353,6 +1577,17 @@ export async function runNonInteractive(
                 if (structuredSubmission !== undefined) {
                   // Stop processing further turns for this drain item;
                   // the post-drain code will emit the terminal result.
+                  return;
+                }
+                if (
+                  repeatedDuplicateProviderToolCall &&
+                  itemToolResponseParts.length === 0
+                ) {
+                  loopDetectedMessage = emitLoopDetectedMessage(
+                    config,
+                    LoopType.GLOBAL_TOOL_CALL_DUPLICATE,
+                  );
+                  loopDetected = true;
                   return;
                 }
                 itemMessages = [{ role: 'user', parts: itemToolResponseParts }];
@@ -1374,6 +1609,7 @@ export async function runNonInteractive(
             if (drainPromise) return drainPromise;
             const p = (async () => {
               while (localQueue.length > 0) {
+                if (loopDetected) return;
                 // Stop draining once a queued item's structured_output
                 // call captured the terminal contract — no point running
                 // more queued prompts that can't influence the result.
@@ -1428,6 +1664,12 @@ export async function runNonInteractive(
               });
 
               const checkCronDone = () => {
+                if (loopDetected) {
+                  abortController.signal.removeEventListener('abort', onAbort);
+                  scheduler.stop();
+                  resolve();
+                  return;
+                }
                 // A drain-turn structured_output makes the rest of the
                 // cron schedule moot: we already have a terminal result
                 // and the post-drain emit is about to fire. Stop the
@@ -1489,6 +1731,7 @@ export async function runNonInteractive(
             // through the model, but later monitor output is SDK-only.
             captureMonitorTurnsInLocalQueue = false;
             await drainLocalQueue();
+            if (loopDetected) return emitLoopDetectedResult();
             // A drain-turn structured_output captured the terminal
             // contract — bail out of the holdback loop early and let the
             // post-loop code emit the success result.
@@ -1552,7 +1795,7 @@ export async function runNonInteractive(
             const errorMessage =
               `Model produced plain text instead of calling the structured_output tool as required by --json-schema after ${turnCount} turn(s).` +
               previewSuffix;
-            adapter.emitResult({
+            emitResult({
               isError: true,
               durationMs: Date.now() - startTime,
               apiDurationMs: totalApiDurationMs,
@@ -1564,7 +1807,7 @@ export async function runNonInteractive(
             return 1;
           }
 
-          adapter.emitResult({
+          emitResult({
             isError: false,
             durationMs: Date.now() - startTime,
             apiDurationMs: totalApiDurationMs,
@@ -1633,7 +1876,7 @@ export async function runNonInteractive(
         // contract — precisely when stdout is in trouble. Best-effort emit
         // and continue to the exit handler.
         try {
-          adapter.emitResult({
+          emitResult({
             isError: true,
             durationMs: Date.now() - startTime,
             apiDurationMs: totalApiDurationMs,

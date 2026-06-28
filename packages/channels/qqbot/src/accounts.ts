@@ -1,8 +1,8 @@
-﻿/**
+/**
  * QQ Bot credential persistence.
  *
  * Reads and writes appId/appSecret to a JSON file under
- * `{qwenDir}/channels/{name}-credentials.json` with restrictive permissions.
+ * `{hopcodeDir}/channels/{name}-credentials.json` with restrictive permissions.
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';

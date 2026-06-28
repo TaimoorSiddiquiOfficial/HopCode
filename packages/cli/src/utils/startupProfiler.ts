@@ -148,15 +148,15 @@ export function initStartupProfiler(): void {
   const inSandboxChild = !!process.env['SANDBOX'];
   const outerOptIn = process.env['HOPCODE_CODE_PROFILE_STARTUP_OUTER'] === '1';
 
-  // Default behavior is unchanged: only the sandbox child collects.
-  // Outer (pre-sandbox) collection requires an explicit opt-in to avoid
-  // accidentally producing duplicate reports.
-  if (!inSandboxChild && !outerOptIn) {
+  // Non-serve outer (pre-sandbox) collection requires an explicit opt-in to
+  // avoid accidentally producing duplicate reports. Serve has no sandbox child,
+  // so the primary startup flag should collect in the current process.
+  if (!inSandboxChild && !outerOptIn && !serveCommand) {
     return;
   }
 
   enabled = true;
-  outerProcess = !inSandboxChild;
+  outerProcess = !inSandboxChild && !serveCommand;
   // Default to capturing heap snapshots at every checkpoint.
   // Disable with HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP=1 when measuring the
   // Heisenberg overhead of the heap call itself.

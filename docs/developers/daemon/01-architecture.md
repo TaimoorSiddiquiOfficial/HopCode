@@ -69,7 +69,7 @@ flowchart TB
         CAP["capabilities.ts"]
         AUTH["auth.ts"]
         FSM["fs/ (sandbox)"]
-        DSP["daemonStatusProvider.ts"]
+        DSP["daemon-status-provider.ts"]
     end
 
     subgraph br["packages/acp-bridge"]
@@ -99,7 +99,7 @@ flowchart TB
 
     subgraph adapters["Adapters"]
         WUIP["webui/src/daemon/<br/>DaemonSessionProvider.tsx"]
-        TUIA["cli/src/ui/daemon/<br/>DaemonTuiAdapter.ts"]
+        TUIA["cli/src/ui/daemon/<br/>daemon-tui-adapter.ts"]
         CHB["channels/base/<br/>DaemonChannelBridge.ts"]
         DT["channels/dingtalk"]
         WX["channels/weixin"]

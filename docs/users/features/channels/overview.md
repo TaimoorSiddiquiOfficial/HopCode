@@ -7,7 +7,7 @@ Channels let you interact with a HopCode agent from messaging platforms like Tel
 When you run `hopcode channel start`, HopCode:
 
 1. Reads channel configurations from your `settings.json`
-2. Spawns a single agent process using the [Agent Client Protocol (ACP)](../../developers/architecture)
+2. Spawns a single agent process using the [Agent Client Protocol (ACP)](../../../developers/architecture.md)
 3. Connects to each messaging platform and starts listening for messages
 4. Routes incoming messages to the agent and sends responses back to the correct chat
 

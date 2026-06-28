@@ -128,7 +128,7 @@ If you want to restrict outbound network access to an allowlist, you can run a l
 
 This is especially useful with `*-proxied` Seatbelt profiles.
 
-For a working allowlist-style proxy example, see: [Example Proxy Script](/developers/examples/proxy-script).
+For a working allowlist-style proxy example, see: [Example Proxy Script](../../developers/examples/proxy-script.md).
 
 ## Linux UID/GID handling
 
@@ -175,7 +175,7 @@ Then rebuild the sandbox image:
 HOPCODE_SANDBOX=docker BUILD_SANDBOX=1 hopcode -s
 ```
 
-For more details on customizing the sandbox, see [Customizing the sandbox environment](/developers/tools/sandbox).
+For more details on customizing the sandbox, see [Customizing the sandbox environment](../../developers/tools/sandbox.md).
 
 **Network issues**
 

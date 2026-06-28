@@ -363,18 +363,18 @@ describe('aggregateUsage', () => {
 // twice into usage_record.jsonl, permanently inflating every aggregate 2x.
 describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () => {
   let tmpHome: string;
-  let originalQwenHome: string | undefined;
+  let originalhopcodeHome: string | undefined;
 
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-history-'));
-    originalQwenHome = process.env['HOPCODE_HOME'];
+    originalhopcodeHome = process.env['HOPCODE_HOME'];
     process.env['HOPCODE_HOME'] = path.join(tmpHome, '.hopcode');
     fs.mkdirSync(process.env['HOPCODE_HOME'], { recursive: true });
   });
 
   afterEach(() => {
-    if (originalQwenHome === undefined) delete process.env['HOPCODE_HOME'];
-    else process.env['HOPCODE_HOME'] = originalQwenHome;
+    if (originalhopcodeHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = originalhopcodeHome;
     fs.rmSync(tmpHome, { recursive: true, force: true });
   });
 
