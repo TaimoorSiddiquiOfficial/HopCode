@@ -2,6 +2,7 @@ import autoIconUrl from '../assets/icons/auto.svg';
 import defaultIconUrl from '../assets/icons/default.svg';
 import editIconUrl from '../assets/icons/edit.svg';
 import planIconUrl from '../assets/icons/plan.svg';
+import iznIconUrl from '../assets/icons/izn.svg';
 import yoloIconUrl from '../assets/icons/yolo.svg';
 import { cssUrlVar } from '../utils/cssUrlVar';
 import styles from './ModeIcon.module.css';
@@ -11,6 +12,7 @@ const modeIconUrls: Record<string, string> = {
   'auto-edit': editIconUrl,
   default: defaultIconUrl,
   plan: planIconUrl,
+  izn: iznIconUrl,
   yolo: yoloIconUrl,
 };
 

@@ -270,7 +270,7 @@ jobs:
     needs: ['authorize']
     if: >-
       always() &&
-      github.repository == 'QwenLM/hopcode' &&
+      github.repository == 'TaimoorSiddiquiOfficial/HopCode' &&
       (
         (github.event_name == 'issue_comment' &&
          github.event.issue.pull_request &&
@@ -689,7 +689,7 @@ jobs:
           }
           start_openai_proxy
 
-          HOPCODE_CMD=(hopcode --auth-type openai --approval-mode yolo)
+          HOPCODE_CMD=(hopcode --auth-type openai --approval-mode izn)
           if [ -n "${OPENAI_MODEL:-}" ]; then
             HOPCODE_CMD+=(--model "$OPENAI_MODEL")
           fi

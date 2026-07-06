@@ -1,0 +1,91 @@
+name: 'Rebrand Guard'
+
+on:
+  pull_request:
+    paths:
+      - '**.ts'
+      - '**.tsx'
+      - '**.json'
+      - '**.md'
+      - '**.yml'
+      - '**.yaml'
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}'
+  cancel-in-progress: true
+
+permissions:
+  contents: 'read'
+  pull-requests: 'write'
+
+jobs:
+  scan:
+    name: 'Detect stale rebrand references'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd' # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: 'Scan for stale rebrand references'
+        run: |-
+          BLOCKLIST="QwenLM|wenzhong|@qwen/|--approval-mode yolo|approvalMode:[$']yolo[$']|yolo$|yolo\.svg|registry\.npm\.alibaba|registry\.npmmirror|registry\.npm\.taobao|hopcode-assets\.oss-"
+
+          HITS="$(git ls-files | grep -v 'node_modules/' | grep -v 'chat-Assistant-' | xargs grep -lnE "$BLOCKLIST" 2>/dev/null || true)"
+
+          if [ -n "$HITS" ]; then
+            echo "::error::Stale rebrand references found in:"
+            echo "$HITS"
+            echo ""
+            echo "--- Details ---"
+            git ls-files | grep -v 'node_modules/' | grep -v 'chat-Assistant-' | xargs grep -nE "$BLOCKLIST" 2>/dev/null || true
+            exit 1
+          fi
+
+          echo "No stale rebrand references found."
+
+      - name: 'Check version consistency'
+        run: |-
+          ROOT_VERSION="$(node --input-type=module -e "import pkg from './package.json' with { type: 'json' }; console.log(pkg.version)")"
+          echo "Root version: ${ROOT_VERSION}"
+
+          MISMATCH=""
+          while IFS= read -r pkg; do
+            PKG_VERSION="$(node --input-type=module -e "import pkg from '${pkg}' with { type: 'json' }; console.log(pkg.version)")"
+            PKG_NAME="$(node --input-type=module -e "import pkg from '${pkg}' with { type: 'json' }; console.log(pkg.name)")"
+            case "$PKG_NAME" in
+              @hoptrendy/*)
+                if [ "$PKG_VERSION" != "$ROOT_VERSION" ]; then
+                  MISMATCH="${MISMATCH}- ${PKG_NAME}@${PKG_VERSION} (expected ${ROOT_VERSION})\n"
+                fi
+                ;;
+            esac
+          done < <(find packages -mindepth 2 -maxdepth 2 -name 'package.json' -not -path '*/node_modules/*')
+
+          if [ -n "$MISMATCH" ]; then
+            echo "::warning::@hoptrendy/* package version mismatch:"
+            printf "%b" "$MISMATCH"
+          else
+            echo "All @hoptrendy/* packages match root version ${ROOT_VERSION}."
+          fi
+
+      - name: 'Post comment on PR if violations found'
+        if: |-
+          failure() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        run: |-
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --body "## ⚠️ Rebrand Guard Violation
+
+          Stale rebrand references were detected in this PR. See the workflow run for details:
+
+          [View workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          Common stale strings: \`QwenLM\`, \`wenzhong\`, \`@qwen/\`, \`--approval-mode yolo\`, \`yolo.svg\`, \`registry.npmmirror\`, \`hopcode-assets.oss-\`
+
+          **Action required**: Replace with \`TaimoorSiddiquiOfficial/HopCode\` / \`izn\` / \`@hoptrendy\` equivalents."

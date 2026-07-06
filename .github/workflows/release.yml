@@ -298,7 +298,7 @@ jobs:
     name: 'Audio Capture Prebuilds'
     needs: 'prepare'
     if: |-
-      ${{ github.repository == 'QwenLM/hopcode' }}
+      ${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' }}
     uses: './.github/workflows/audio-capture-prebuilds.yml'
 
   publish:
@@ -315,7 +315,7 @@ jobs:
         always() &&
         needs.prepare.result == 'success' &&
         (
-          github.repository != 'QwenLM/hopcode' ||
+          github.repository != 'TaimoorSiddiquiOfficial/HopCode' ||
           needs.audio_capture_prebuilds.result == 'success'
         ) &&
         (
@@ -403,7 +403,7 @@ jobs:
 
       - name: 'Download audio capture prebuilds'
         if: |-
-          ${{ github.repository == 'QwenLM/hopcode' }}
+          ${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' }}
         uses: 'actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c' # v8.0.1
         with:
           name: 'audio-capture-prebuilds'
@@ -411,7 +411,7 @@ jobs:
 
       - name: 'Build Bundle and Prepare Package'
         env:
-          HOPCODE_REQUIRE_AUDIO_CAPTURE_PREBUILD: "${{ github.repository == 'QwenLM/hopcode' && '1' || '' }}"
+          HOPCODE_REQUIRE_AUDIO_CAPTURE_PREBUILD: "${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' && '1' || '' }}"
         run: |-
           npm run bundle
           npm run prepare:package
@@ -419,7 +419,7 @@ jobs:
       - name: 'Build Standalone Archives'
         env:
           RELEASE_VERSION: '${{ needs.prepare.outputs.release_version }}'
-          HOPCODE_STANDALONE_REQUIRE_AUDIO_CAPTURE_PREBUILD: "${{ github.repository == 'QwenLM/hopcode' && '1' || '' }}"
+          HOPCODE_STANDALONE_REQUIRE_AUDIO_CAPTURE_PREBUILD: "${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' && '1' || '' }}"
         run: 'npm run package:standalone:release -- --version "${RELEASE_VERSION}" --out-dir dist/standalone'
 
       - name: 'Publish @hoptrendy/hopcode'
@@ -686,7 +686,7 @@ jobs:
           fi
 
           echo "Using ${issue_url}; dispatching autofix."
-          if ! gh workflow run qwen-autofix.yml --repo "${GH_REPO}" --ref main \
+          if ! gh workflow run hopcode-autofix.yml --repo "${GH_REPO}" --ref main \
             -f phase=issue \
             -f issue_number="${issue_number}" \
             -f dry_run=false; then
