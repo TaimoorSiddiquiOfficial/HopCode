@@ -5,6 +5,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Content } from '@google/genai';
 import { SendMessageType, type Config } from '@hoptrendy/hopcode-core';
 import { runNonInteractiveStreamJson } from './session.js';
 import type {

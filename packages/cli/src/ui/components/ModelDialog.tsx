@@ -249,7 +249,9 @@ export function ModelDialog({
       (m) =>
         !m.isRuntimeModel &&
         (m.authType !== AuthType.HOPCODE_OAUTH ||
-          authType === AuthType.HOPCODE_OAUTH),
+          authType === AuthType.HOPCODE_OAUTH) &&
+        (isFastModelMode || !m.fastOnly) &&
+        (isVoiceModelMode || !m.voiceOnly),
     );
 
     // Group registry models by authType
@@ -262,7 +264,7 @@ export function ModelDialog({
       modelsByAuthTypeMap.get(authType)!.push(model);
     }
 
-    // Fixed order: hopcode-oauth first, then others in a stable order
+    // Fixed order: qwen-oauth first, then others in a stable order
     const authTypeOrder: AuthType[] = [
       AuthType.HOPCODE_OAUTH,
       AuthType.USE_OPENAI,
@@ -314,14 +316,14 @@ export function ModelDialog({
               ? snapshotId
               : buildModelSelectionKey(t2, model.id, model.baseUrl);
 
-          const isHopCodeOAuth = t2 === AuthType.HOPCODE_OAUTH;
+          const isQwenOAuth = t2 === AuthType.HOPCODE_OAUTH;
 
           const title = (
             <Text>
               <Text
                 bold
                 color={
-                  isHopCodeOAuth
+                  isQwenOAuth
                     ? theme.status.warning
                     : isRuntime
                       ? theme.status.warning
@@ -340,7 +342,7 @@ export function ModelDialog({
               {isRuntime && (
                 <Text color={theme.status.warning}> (Runtime)</Text>
               )}
-              {isHopCodeOAuth && !isRuntime && (
+              {isQwenOAuth && !isRuntime && (
                 <Text color={theme.status.warning}> ({t('Discontinued')})</Text>
               )}
             </Text>
@@ -353,7 +355,7 @@ export function ModelDialog({
               ? `${description} (Runtime)`
               : 'Runtime model';
           }
-          if (isHopCodeOAuth && !isRuntime) {
+          if (isQwenOAuth && !isRuntime) {
             description = t('Discontinued — switch to Coding Plan or API Key');
           }
 
@@ -576,20 +578,80 @@ export function ModelDialog({
         return;
       }
 
-      // Block selection of discontinued hopcode-oauth models
+      // Vision model mode: same id encoding as fast mode (authType:modelId so
+      // duplicate ids across providers stay unambiguous; baseUrl discarded).
+      if (isVisionModelMode) {
+        const visionModel = encodeAuxModelSelector(selected);
+        // Pinning the primary itself is ignored by the bridge at runtime, so
+        // reject it here instead of persisting a dead pin and reporting success.
+        if (
+          selectedEntry &&
+          config?.isCurrentPrimaryModel(selectedEntry.model)
+        ) {
+          setErrorMessage(
+            t(
+              "'{{model}}' is the current primary model and cannot be used as the vision bridge.",
+              { model: visionModel },
+            ),
+          );
+          return;
+        }
+        // The persisted `authType:modelId` form can't distinguish two configured
+        // rows with the same id+authType but different baseUrls (e.g. two
+        // OpenAI-compatible endpoints), so the bridge could later egress images
+        // to the wrong endpoint. Reject the ambiguous pin (mirrors the voice-mode
+        // duplicate guard) instead of silently saving one of them.
+        const visionDupes = selectedEntry
+          ? availableModelEntries.filter(
+              ({ model }) =>
+                model.id === selectedEntry.model.id &&
+                model.authType === selectedEntry.model.authType,
+            )
+          : [];
+        if (visionDupes.length > 1) {
+          setErrorMessage(
+            t(
+              "Vision model '{{model}}' maps to multiple endpoints (same id and provider, different base URLs). Remove the duplicate or disambiguate before pinning it for the vision bridge.",
+              { model: visionModel },
+            ),
+          );
+          return;
+        }
+        const scope = getPersistScopeForModelSelection(settings);
+        settings.setValue(scope, 'visionModel', visionModel);
+        // Sync runtime Config so the vision bridge picks it up without a restart.
+        config?.setVisionModel(visionModel);
+        // Honor the pin even if the model isn't image-capable, but warn — the
+        // bridge will send images to it.
+        const visionWarning =
+          selectedEntry && !isImageCapable(selectedEntry.model)
+            ? `\n${t("⚠ '{{model}}' is not a known image-capable model; the vision bridge may fail on images.", { model: visionModel })}`
+            : '';
+        uiState?.historyManager.addItem(
+          {
+            type: 'success',
+            text: `${t('Vision Model')}: ${visionModel}${visionWarning}`,
+          },
+          Date.now(),
+        );
+        onClose();
+        return;
+      }
+
+      // Block selection of discontinued qwen-oauth models
       // (only block non-runtime OAuth; runtime OAuth models from existing
       //  cached tokens are still allowed to work until the server rejects them)
-      const isHopCodeOAuthSelection =
+      const isQwenOAuthSelection =
         selected.startsWith(`${AuthType.HOPCODE_OAUTH}::`) ||
         (selected.startsWith('$runtime|') &&
           selected.split('|')[1] === AuthType.HOPCODE_OAUTH);
       const isRuntimeOAuthSelection = selected.startsWith(
         `$runtime|${AuthType.HOPCODE_OAUTH}|`,
       );
-      if (isHopCodeOAuthSelection && !isRuntimeOAuthSelection) {
+      if (isQwenOAuthSelection && !isRuntimeOAuthSelection) {
         setErrorMessage(
           t(
-            'HopCode OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
+            'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',
           ),
         );
         return;

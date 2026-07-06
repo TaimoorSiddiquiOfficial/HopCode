@@ -17,7 +17,6 @@ import {
 } from './CompactToolGroupDisplay.js';
 import { InlineParallelAgentsDisplay } from './InlineParallelAgentsDisplay.js';
 import { useConfig } from '../../contexts/ConfigContext.js';
-import { useCompactMode } from '../../contexts/CompactModeContext.js';
 import type { AgentResultDisplay } from '@hoptrendy/hopcode-core';
 
 function isAgentWithPendingConfirmation(

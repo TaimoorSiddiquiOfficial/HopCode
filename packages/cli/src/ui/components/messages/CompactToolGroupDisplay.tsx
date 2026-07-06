@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -9,9 +9,8 @@ import { Box, Text } from 'ink';
 import type { IndividualToolCallDisplay } from '../../types.js';
 import { ToolCallStatus } from '../../types.js';
 import type { AnsiOutputDisplay } from '@hoptrendy/hopcode-core';
-import { SHELL_COMMAND_NAME, SHELL_NAME } from '../../constants.js';
-import { theme } from '../../semantic-colors.js';
-import { localizeToolDisplayName, t } from '../../../i18n/index.js';
+import { ToolDisplayNames } from '@hoptrendy/hopcode-core';
+import { SHELL_COMMAND_NAME } from '../../constants.js';
 import { ToolStatusIndicator } from '../shared/ToolStatusIndicator.js';
 import { ToolElapsedTime } from '../shared/ToolElapsedTime.js';
 
@@ -48,9 +47,6 @@ function getActiveTool(
   );
 }
 
-// Pull the configured shell timeout off an AnsiOutputDisplay result so
-// ToolElapsedTime can surface it inline (matches the expanded ToolMessage path).
-// Non-ansi resultDisplay → undefined → legacy quiet-then-elapsed behavior.
 function getShellTimeoutMs(
   tool: IndividualToolCallDisplay,
 ): number | undefined {

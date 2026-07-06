@@ -12,6 +12,7 @@ import {
 import {
   __resetActiveGoalStoreForTests,
   type Config,
+  uiTelemetryService,
 } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from './config/settings.js';
 import { CommandKind, type ExecutionMode } from './ui/commands/types.js';

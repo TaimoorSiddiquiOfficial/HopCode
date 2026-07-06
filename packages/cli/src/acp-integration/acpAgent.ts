@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -375,7 +375,7 @@ type QwenCoreSettingKey =
   | 'general.gitCoAuthor.pr'
   | 'general.defaultFileEncoding'
   | 'context.fileFiltering.respectGitIgnore'
-  | 'context.fileFiltering.respectQwenIgnore'
+  | 'context.fileFiltering.respectHopCodeIgnore'
   | 'context.fileFiltering.enableFuzzySearch'
   | 'memory.enableManagedAutoMemory'
   | 'memory.enableManagedAutoDream'
@@ -445,7 +445,7 @@ const HOPCODE_CORE_SETTING_DEFINITIONS = {
     values: ['utf-8', 'utf-8-bom'],
   },
   'context.fileFiltering.respectGitIgnore': { type: 'boolean' },
-  'context.fileFiltering.respectQwenIgnore': { type: 'boolean' },
+  'context.fileFiltering.respectHopCodeIgnore': { type: 'boolean' },
   'context.fileFiltering.enableFuzzySearch': { type: 'boolean' },
   'memory.enableManagedAutoMemory': { type: 'boolean' },
   'memory.enableManagedAutoDream': { type: 'boolean' },

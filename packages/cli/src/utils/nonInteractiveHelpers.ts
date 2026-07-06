@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,6 +21,7 @@ import {
   createDebugLogger,
   getArenaSystemReminder,
   getMCPServerStatus,
+  getPlanModeSystemReminder,
 } from '@hoptrendy/hopcode-core';
 import type { Part, PartListUnion } from '@google/genai';
 import type {

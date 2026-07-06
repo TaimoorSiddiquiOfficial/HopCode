@@ -64,7 +64,7 @@ export function registerDaemonStatusRoutes(
           workspace: deps.workspace,
           daemonLog: deps.daemonLog,
           startup: deps.startup,
-          HopCodeVersion: deps.HopCodeVersion,
+          hopCodeVersion: deps.HopCodeVersion,
           acpHandle: deps.getAcpHandle(),
           rateLimiter: deps.getRateLimiter(),
           getRestSseActive: deps.getRestSseActive,

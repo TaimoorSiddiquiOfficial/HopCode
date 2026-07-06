@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,6 +12,7 @@ import { useKeypress } from '../hooks/useKeypress.js';
 import { DescriptiveRadioButtonSelect } from './shared/DescriptiveRadioButtonSelect.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
 import { SettingsContext } from '../contexts/SettingsContext.js';
+import { UIStateContext, type UIState } from '../contexts/UIStateContext.js';
 import type { Config } from '@hoptrendy/hopcode-core';
 import { AuthType, DEFAULT_HOPCODE_MODEL } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
@@ -64,7 +65,7 @@ const renderComponent = (
     getModel: vi.fn(() => DEFAULT_HOPCODE_MODEL),
     setModel: vi.fn().mockResolvedValue(undefined),
     switchModel: vi.fn().mockResolvedValue(undefined),
-    getAuthType: vi.fn(() => 'hopcode-oauth'),
+    getAuthType: vi.fn(() => 'qwen-oauth'),
     getAllConfiguredModels: vi.fn(() =>
       getFilteredHopCodeModels().map((m) => ({
         id: m.id,
@@ -139,16 +140,18 @@ describe('<ModelDialog />', () => {
 
   it('passes all model options to DescriptiveRadioButtonSelect', () => {
     renderComponent();
-    // There may be multiple renders due to internal state updates; check the first call
+    expect(mockedSelect).toHaveBeenCalledTimes(1);
+
     const props = mockedSelect.mock.calls[0][0];
-    const items = props.items as Array<{ value: string }>;
-    expect(items.length).toBeGreaterThan(0);
-    // Verify the first item uses valid authType::modelId format
-    expect(props.items[0].value).toContain('::');
+    expect(props.items).toHaveLength(getFilteredHopCodeModels().length);
+    // coder-model is the only model and it has vision capability
+    expect(props.items[0].value).toBe(
+      `${AuthType.HOPCODE_OAUTH}::${DEFAULT_HOPCODE_MODEL}`,
+    );
     expect(props.showNumbers).toBe(true);
   });
 
-  it('hides discontinued hopcode-oauth models for other auth types', () => {
+  it('hides discontinued qwen-oauth models for other auth types', () => {
     renderComponent(
       {},
       {
@@ -186,8 +189,8 @@ describe('<ModelDialog />', () => {
 
     expect(mockGetModel).toHaveBeenCalled();
     // Calculate expected index dynamically based on model list
-    const hopcodeModels = getFilteredHopCodeModels();
-    const expectedIndex = hopcodeModels.findIndex(
+    const qwenModels = getFilteredHopCodeModels();
+    const expectedIndex = qwenModels.findIndex(
       (m) => m.id === DEFAULT_HOPCODE_MODEL,
     );
     expect(mockedSelect).toHaveBeenCalledWith(
@@ -223,18 +226,17 @@ describe('<ModelDialog />', () => {
     expect(mockGetModel).toHaveBeenCalled();
 
     // When getModel returns undefined, preferredModel falls back to DEFAULT_HOPCODE_MODEL
-    // which has index 0, so initialIndex should be 0. Use the last call to be resilient
-    // to internal re-render patterns.
-    const lastCall =
-      mockedSelect.mock.calls[mockedSelect.mock.calls.length - 1];
-    expect(lastCall[0]).toEqual(
+    // which has index 0, so initialIndex should be 0
+    expect(mockedSelect).toHaveBeenCalledWith(
       expect.objectContaining({
         initialIndex: 0,
       }),
+      undefined,
     );
+    expect(mockedSelect).toHaveBeenCalledTimes(1);
   });
 
-  it('blocks hopcode-oauth model selection with an error message (discontinued)', async () => {
+  it('blocks qwen-oauth model selection with an error message (discontinued)', async () => {
     const { props, mockConfig } = renderComponent(
       {},
       {
@@ -256,7 +258,7 @@ describe('<ModelDialog />', () => {
 
     await childOnSelect(`${AuthType.HOPCODE_OAUTH}::${DEFAULT_HOPCODE_MODEL}`);
 
-    // hopcode-oauth is discontinued — switchModel should NOT be called
+    // qwen-oauth is discontinued — switchModel should NOT be called
     expect(mockConfig?.switchModel).not.toHaveBeenCalled();
     // Dialog should NOT close (user stays in the dialog to see the error)
     expect(props.onClose).not.toHaveBeenCalled();
@@ -806,39 +808,70 @@ describe('<ModelDialog />', () => {
     expect(mockedSelect.mock.calls[0][0].initialIndex).toBe(deepseekIndex);
   });
 
-  it('hides hopcode-oauth when switching from another authType (discontinued)', () => {
-    const switchModel = vi.fn().mockResolvedValue(undefined);
-    const getAuthType = vi.fn(() => AuthType.USE_OPENAI);
+  it('highlights the cross-auth row for a bare vision-model setting', () => {
+    // `/model --vision qwen-vl-max` validates across all providers and persists
+    // the bare model id. When the dialog re-opens in vision mode, the
+    // preferred-entry resolution must locate that row even though the setting
+    // carries no authType prefix — otherwise the highlight falls back to the
+    // current auth's first row and Enter would silently overwrite the setting.
+    const mockSettings = {
+      isTrusted: true,
+      user: { settings: {} },
+      workspace: { settings: {} },
+      merged: { visionModel: 'qwen-vl-max' },
+      setValue: vi.fn(),
+    } as unknown as LoadedSettings;
 
-    const mockConfigWithSwitchAuthType = {
-      getAuthType,
-      getModel: vi.fn(() => 'gpt-4'),
-      getAllConfiguredModels: vi.fn(() => [
-        {
-          id: DEFAULT_HOPCODE_MODEL,
-          label: DEFAULT_HOPCODE_MODEL,
-          authType: AuthType.HOPCODE_OAUTH,
-        },
-        { id: 'gpt-4', label: 'GPT-4', authType: AuthType.USE_OPENAI },
-      ]),
-      getContentGeneratorConfig: vi.fn(() => ({
+    const allModels = [
+      {
+        id: 'claude-opus-4-7',
+        label: 'claude-opus-4-7',
+        description: '',
+        authType: AuthType.USE_ANTHROPIC,
+      },
+      {
+        id: 'qwen-vl-max',
+        label: 'qwen-vl-max',
+        description: '',
         authType: AuthType.USE_OPENAI,
-        model: 'gpt-4',
-      })),
-      switchModel,
-    };
+      },
+    ];
 
-    const { props } = renderComponent(
-      {},
-      mockConfigWithSwitchAuthType as unknown as Partial<Config>,
+    render(
+      <SettingsContext.Provider value={mockSettings}>
+        <ConfigContext.Provider
+          value={
+            {
+              getModel: vi.fn(() => 'claude-opus-4-7'),
+              getAuthType: vi.fn(() => AuthType.USE_ANTHROPIC),
+              getAllConfiguredModels: vi.fn(() => allModels),
+              getContentGeneratorConfig: vi.fn(() => ({
+                authType: AuthType.USE_ANTHROPIC,
+                model: 'claude-opus-4-7',
+              })),
+              getModelsConfig: vi.fn(() => ({
+                getGenerationConfig: vi.fn(() => ({ baseUrl: undefined })),
+              })),
+              getActiveRuntimeModelSnapshot: vi.fn(() => undefined),
+              getUsageStatisticsEnabled: vi.fn(() => false),
+              getSessionId: vi.fn(() => 'session'),
+              getDebugMode: vi.fn(() => false),
+              getUseModelRouter: vi.fn(() => false),
+              getProxy: vi.fn(() => undefined),
+            } as unknown as Config
+          }
+        >
+          <ModelDialog onClose={vi.fn()} isVisionModelMode={true} />
+        </ConfigContext.Provider>
+      </SettingsContext.Provider>,
     );
 
     const items = mockedSelect.mock.calls[0][0].items;
-
-    expect(items).toHaveLength(1);
-    expect(items[0].value).toBe(`${AuthType.USE_OPENAI}::gpt-4`);
-    expect(switchModel).not.toHaveBeenCalled();
-    expect(props.onClose).not.toHaveBeenCalled();
+    const visionIndex = items.findIndex((item) =>
+      String(item.value).includes('qwen-vl-max'),
+    );
+    expect(visionIndex).toBeGreaterThanOrEqual(0);
+    expect(mockedSelect.mock.calls[0][0].initialIndex).toBe(visionIndex);
   });
 
   it('passes onHighlight to DescriptiveRadioButtonSelect', () => {
@@ -882,7 +915,7 @@ describe('<ModelDialog />', () => {
 
   it('updates initialIndex when config context changes', () => {
     const mockGetModel = vi.fn(() => DEFAULT_HOPCODE_MODEL);
-    const mockGetAuthType = vi.fn(() => 'hopcode-oauth');
+    const mockGetAuthType = vi.fn(() => 'qwen-oauth');
     const mockGetModelsConfig = vi.fn(() => ({
       getGenerationConfig: vi.fn(() => ({ baseUrl: undefined })),
     }));
@@ -920,10 +953,8 @@ describe('<ModelDialog />', () => {
       </SettingsContext.Provider>,
     );
 
-    // DEFAULT_HOPCODE_MODEL (coder-model) should be at index 0
-    // Use first call to verify initial state
-    const firstSelectCall = mockedSelect.mock.calls[0]?.[0];
-    expect(firstSelectCall?.initialIndex).toBe(0);
+    // DEFAULT_HOPCODE_MODEL (coder-model) is at index 0
+    expect(mockedSelect.mock.calls[0][0].initialIndex).toBe(0);
 
     mockGetModel.mockReturnValue(DEFAULT_HOPCODE_MODEL);
     const newMockConfig = {
@@ -951,16 +982,13 @@ describe('<ModelDialog />', () => {
     );
 
     // Should be called at least twice: initial render + re-render after context change
-    // Use the last call to verify the final state
-    const callCount = mockedSelect.mock.calls.length;
-    expect(callCount).toBeGreaterThanOrEqual(2);
-    const afterChangeCall = mockedSelect.mock.calls[callCount - 1][0];
+    expect(mockedSelect).toHaveBeenCalledTimes(2);
     // Calculate expected index for DEFAULT_HOPCODE_MODEL dynamically
-    const hopcodeModels = getFilteredHopCodeModels();
-    const expectedCoderIndex = hopcodeModels.findIndex(
+    const qwenModels = getFilteredHopCodeModels();
+    const expectedCoderIndex = qwenModels.findIndex(
       (m) => m.id === DEFAULT_HOPCODE_MODEL,
     );
-    expect(afterChangeCall.initialIndex).toBe(expectedCoderIndex);
+    expect(mockedSelect.mock.calls[1][0].initialIndex).toBe(expectedCoderIndex);
   });
 });
 

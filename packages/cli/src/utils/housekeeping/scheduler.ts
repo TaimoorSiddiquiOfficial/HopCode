@@ -11,6 +11,7 @@ import {
   Storage,
   type Config,
   createDebugLogger,
+  getSubagentsRootDir,
 } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import {
@@ -30,7 +31,7 @@ const RECURRING_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const RECENT_INTERACTION_MS = 60 * 1000;
 
 // Catch-up: if the marker is older than this, the user has either not run
-// hopcode for a while or every session has been < 10 min — either way we have
+// qwen for a while or every session has been < 10 min — either way we have
 // a backlog to sweep, so shorten the first-pass delay. 7 days is "long
 // enough that occasional short sessions don't trigger it, short enough that
 // the typical sporadic user still gets periodic cleanup".
@@ -83,12 +84,12 @@ async function needsCatchUp(markerPath: string): Promise<boolean> {
   }
 }
 
-function getSubagentMarkerPath(hopcodeDir: string, projectDir: string): string {
+function getSubagentMarkerPath(qwenDir: string, projectDir: string): string {
   const projectKey = createHash('sha256')
     .update(projectDir)
     .digest('hex')
     .slice(0, 16);
-  return join(hopcodeDir, `${SUBAGENT_MARKER}-${projectKey}`);
+  return join(qwenDir, `${SUBAGENT_MARKER}-${projectKey}`);
 }
 
 async function runPass(
@@ -152,13 +153,13 @@ async function runHousekeeping(
   // active session uses a brand-new sessionId/dir, so it's never aliased
   // against any sweep target. Not a bug — slightly conservative is fine.
   const currentSessionId = config.getSessionId();
-  const hopcodeDir = Storage.getGlobalHopCodeDir();
+  const qwenDir = Storage.getGlobalHopCodeDir();
 
   await runThrottledOnce(
     {
       name: 'file-history-cleanup',
-      markerPath: join(hopcodeDir, FILE_HISTORY_MARKER),
-      lockPath: join(hopcodeDir, FILE_HISTORY_MARKER + '.lock'),
+      markerPath: join(qwenDir, FILE_HISTORY_MARKER),
+      lockPath: join(qwenDir, FILE_HISTORY_MARKER + '.lock'),
     },
     async () => {
       const r = await cleanupOldFileHistoryBackups({
@@ -177,7 +178,7 @@ async function runHousekeeping(
   // optional chain keeps housekeeping best-effort if a caller doesn't.
   const projectDir = config.storage?.getProjectDir?.();
   if (projectDir) {
-    const markerPath = getSubagentMarkerPath(hopcodeDir, projectDir);
+    const markerPath = getSubagentMarkerPath(qwenDir, projectDir);
     await runThrottledOnce(
       {
         name: 'subagent-cleanup',

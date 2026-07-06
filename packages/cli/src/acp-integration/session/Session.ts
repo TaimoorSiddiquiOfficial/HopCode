@@ -28,8 +28,6 @@ import type {
   GoalTerminalEvent,
   ToolCallRequestInfo,
   ToolCallResponseInfo,
-  DEFAULT_TOKEN_LIMIT,
-  parsePositiveIntegerEnv,
 } from '@hoptrendy/hopcode-core';
 import {
   AuthType,
@@ -108,6 +106,8 @@ import {
   sessionIdContext,
   dedupeToolCallsById,
   getProviderToolCallId,
+  DEFAULT_TOKEN_LIMIT,
+  parsePositiveIntegerEnv,
 } from '@hoptrendy/hopcode-core';
 import { NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE } from '@hoptrendy/acp-bridge/bridgeErrors';
 // Single source of truth shared with the daemon-side answerer (BridgeClient),

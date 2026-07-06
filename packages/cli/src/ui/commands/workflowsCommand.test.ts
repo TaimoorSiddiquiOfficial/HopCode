@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2026 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -11,7 +11,7 @@ import path from 'node:path';
 import { workflowsCommand } from './workflowsCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
-import type { WorkflowTask } from '@hoptrendy/hopcode-core';
+import type { WorkflowTask, WorkflowSnapshot } from '@hoptrendy/hopcode-core';
 
 function entry(overrides: Partial<WorkflowTask> = {}): WorkflowTask {
   return {

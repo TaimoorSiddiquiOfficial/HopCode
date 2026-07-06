@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,6 +24,20 @@ import type {
   ServeWorkspacePreflightStatus,
   DaemonStatusProvider,
 } from '@hoptrendy/acp-bridge';
+import type { WorkspaceTrustStatus } from '../../config/trustedFolders.js';
+import type {
+  PermissionRuleType,
+  PermissionSettingsScope,
+  QwenPermissionSettings,
+} from '../../config/permission-settings.js';
+import type {
+  SettingScope,
+  EnvReloadResult,
+  LoadedSettings,
+} from '../../config/settings.js';
+import type { WorkspaceVoiceStatus } from '../../services/voice-service.js';
+import type { VoiceMode } from '../../services/voice-settings.js';
+import type { WorkspaceProvidersStatusProvider } from '../workspace-providers-status.js';
 
 // ---------------------------------------------------------------------------
 // WorkspaceRequestContext
@@ -40,7 +54,7 @@ import type {
  * workspace-scoped routes that have no session context.
  */
 export interface WorkspaceRequestContext {
-  /** Daemon-stamped client identity (from X-HopCode-Client-Id header). */
+  /** Daemon-stamped client identity (from X-Qwen-Client-Id header). */
   originatorClientId?: string;
   /** ACP session id for cross-correlating audit + session events. */
   sessionId?: string;
@@ -166,7 +180,7 @@ export interface DaemonWorkspaceService {
     enabled: boolean,
   ): Promise<{ toolName: string; enabled: boolean }>;
 
-  /** Scaffold (init) a HOPCODE.md file in the workspace. */
+  /** Scaffold (init) a QWEN.md file in the workspace. */
   initWorkspace(
     ctx: WorkspaceRequestContext,
     opts: { force?: boolean },
@@ -293,7 +307,7 @@ export interface DaemonWorkspaceServiceDeps {
   /** Canonical absolute path of the bound workspace. */
   boundWorkspace: string;
 
-  /** Context filename (e.g. 'HOPCODE.md') from workspace settings. */
+  /** Context filename (e.g. 'QWEN.md') from workspace settings. */
   contextFilename: string;
 
   /**

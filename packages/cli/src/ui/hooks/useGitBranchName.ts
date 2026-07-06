@@ -1,14 +1,11 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { useState, useEffect } from 'react';
-import { isCommandAvailable, execCommand } from '@hoptrendy/hopcode-core';
-import fs from 'node:fs';
-import fsPromises from 'node:fs/promises';
-import path from 'node:path';
+import { resolveBranchName, watchRepoBranch } from '@hoptrendy/hopcode-core';
 
 /**
  * Tracks the current git branch (or a short commit hash when detached) for

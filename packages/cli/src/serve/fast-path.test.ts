@@ -177,17 +177,20 @@ afterEach(() => {
   if (originalSystemSettingsPath === undefined) {
     delete process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'];
   } else {
-    process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'] = originalSystemSettingsPath;
+    process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'] =
+      originalSystemSettingsPath;
   }
   if (originalSystemDefaultsPath === undefined) {
     delete process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'];
   } else {
-    process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'] = originalSystemDefaultsPath;
+    process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'] =
+      originalSystemDefaultsPath;
   }
   if (originalTrustedFoldersPath === undefined) {
     delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
   } else {
-    process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = originalTrustedFoldersPath;
+    process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] =
+      originalTrustedFoldersPath;
   }
   if (originalReferencedToken === undefined) {
     delete process.env['FAST_PATH_REFERENCED_TOKEN'];
@@ -281,7 +284,10 @@ describe('CLI entry import boundary', () => {
   });
 
   it('keeps runHopCodeServe from statically loading the full server and ACP runtime', () => {
-    const runServeSource = readFileSync('src/serve/run-hopcode-serve.ts', 'utf8');
+    const runServeSource = readFileSync(
+      'src/serve/run-hopcode-serve.ts',
+      'utf8',
+    );
 
     expect(runServeSource).not.toMatch(/from ['"]\.\/server\.js['"]/);
     expect(runServeSource).not.toMatch(/from ['"]\.\/web-shell-static\.js['"]/);
@@ -603,7 +609,7 @@ describe('serve fast path environment bootstrap', () => {
         process.env['HOPCODE_HOME'] = hopcodeHome;
       }
 
-      expect(getGlobalhopcodeDirLite()).toBe(Storage.getGlobalhopcodeDir());
+      expect(getGlobalhopcodeDirLite()).toBe(Storage.getGlobalHopCodeDir());
     }
   });
 
@@ -813,7 +819,9 @@ describe('serve fast path environment bootstrap', () => {
     );
     writeFileSync(
       join(hopcodeHome, '.env'),
-      ['HOPCODE_SERVER_TOKEN=from-home-env', 'HOPCODE_SERVE_RATE_LIMIT=1'].join('\n'),
+      ['HOPCODE_SERVER_TOKEN=from-home-env', 'HOPCODE_SERVE_RATE_LIMIT=1'].join(
+        '\n',
+      ),
     );
 
     await bootstrapServeFastPathEnvironment(tempWorkspace);
@@ -1165,7 +1173,10 @@ describe('serve fast path environment bootstrap', () => {
       process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'],
       JSON.stringify({ [tempWorkspace]: TrustLevel.TRUST_FOLDER }),
     );
-    writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=trusted\n');
+    writeFileSync(
+      join(tempWorkspace, '.env'),
+      'HOPCODE_SERVER_TOKEN=trusted\n',
+    );
 
     const settings = loadServeFastPathSettings(tempWorkspace);
     writeFileSync(
@@ -1201,7 +1212,10 @@ describe('serve fast path environment bootstrap', () => {
         [childWorkspace]: TrustLevel.DO_NOT_TRUST,
       }),
     );
-    writeFileSync(join(childWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=trusted\n');
+    writeFileSync(
+      join(childWorkspace, '.env'),
+      'HOPCODE_SERVER_TOKEN=trusted\n',
+    );
 
     await bootstrapServeFastPathEnvironment(childWorkspace);
 
@@ -1228,7 +1242,10 @@ describe('serve fast path environment bootstrap', () => {
         [join(tempWorkspace, 'marker')]: TrustLevel.TRUST_PARENT,
       }),
     );
-    writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=trusted\n');
+    writeFileSync(
+      join(tempWorkspace, '.env'),
+      'HOPCODE_SERVER_TOKEN=trusted\n',
+    );
 
     await bootstrapServeFastPathEnvironment(tempWorkspace);
 

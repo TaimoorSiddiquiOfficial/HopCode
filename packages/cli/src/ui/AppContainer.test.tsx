@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -242,7 +242,7 @@ describe('AppContainer State Management', () => {
       isAuthenticating: false,
       pendingAuthType: undefined,
       externalAuthState: null,
-      qwenAuthState: {
+      hopCodeAuthState: {
         deviceAuth: null,
         authStatus: 'idle',
         authMessage: null,
@@ -253,7 +253,7 @@ describe('AppContainer State Management', () => {
         isAuthenticating: false,
         pendingAuthType: undefined,
         externalAuthState: null,
-        qwenAuthState: {
+        hopCodeAuthState: {
           deviceAuth: null,
           authStatus: 'idle',
           authMessage: null,
@@ -3028,7 +3028,7 @@ describe('AppContainer State Management', () => {
         isAuthenticating: true,
         pendingAuthType: undefined,
         externalAuthState: null,
-        qwenAuthState: {
+        hopCodeAuthState: {
           deviceAuth: null,
           authStatus: 'idle',
           authMessage: null,
@@ -3039,7 +3039,7 @@ describe('AppContainer State Management', () => {
           isAuthenticating: true,
           pendingAuthType: undefined,
           externalAuthState: null,
-          qwenAuthState: {
+          hopCodeAuthState: {
             deviceAuth: null,
             authStatus: 'idle',
             authMessage: null,

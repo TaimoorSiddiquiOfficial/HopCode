@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -17,8 +17,14 @@ import { SettingsContext } from '../../contexts/SettingsContext.js';
 import { ShellFocusContext } from '../../contexts/ShellFocusContext.js';
 import { LoadedSettings } from '../../../config/settings.js';
 import type { UIState } from '../../contexts/UIStateContext.js';
-import type { Config, Extension } from '@hoptrendy/hopcode-core';
-import { ExtensionUpdateState } from '../../state/extensions.js';
+import type {
+  Config,
+  Extension,
+  DiscoveredPlugin,
+  ExtensionSource,
+} from '@hoptrendy/hopcode-core';
+import { mcpServerRequiresOAuth } from '@hoptrendy/hopcode-core';
+import type { ExtensionUpdateState } from '../../state/extensions.js';
 
 // The Installed tab reads real user/workspace settings from disk when MCP
 // servers exist; stub loadSettings to keep these tests hermetic.
@@ -38,8 +44,8 @@ const mockExtension = (name: string, isActive = true): Extension =>
   ({
     id: name,
     name,
-    version,
-    path: `/home/user/.hopcode/extensions/${name}`,
+    version: '1.0.0',
+    path: `/home/user/.qwen/extensions/${name}`,
     isActive,
     installMetadata: { type: 'git', source: `github:user/${name}` },
     mcpServers: {},

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Code
+ * Copyright 2025 Qwen Code
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -68,7 +68,9 @@ vi.mock('../utils/restoreGoal.js', () => ({
   restoreGoalFromHistory: vi.fn(() => ({ restored: false })),
 }));
 
-vi.mock('@hoptrendy/hopcode-core', () => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+  const original =
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   class SessionService {
     constructor(_cwd: string) {}
     async loadSession(_sessionId: string) {
@@ -279,7 +281,7 @@ describe('useResumeCommand', () => {
 
     let resumePromise: Promise<void> | undefined;
     act(() => {
-      // Start resume but do not await it yet ΓÇö we want to assert the dialog
+      // Start resume but do not await it yet — we want to assert the dialog
       // closes immediately before the async session load completes.
       resumePromise = result.current.handleResume('session-2');
     });

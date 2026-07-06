@@ -11,7 +11,7 @@ import {
   getExtensionDescription,
   type Extension,
 } from '@hoptrendy/hopcode-core';
-import { loadSettings } from '../../config/settings.js';
+import { loadSettings, SettingScope } from '../../config/settings.js';
 import {
   requestConsentOrFail,
   requestConsentNonInteractive,

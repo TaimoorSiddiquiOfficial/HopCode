@@ -6,7 +6,6 @@
 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
-import { Storage } from '@hoptrendy/hopcode-core';
 
 const cleanupFunctions: Array<(() => void) | (() => Promise<void>)> = [];
 

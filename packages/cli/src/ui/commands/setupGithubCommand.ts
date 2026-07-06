@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -15,17 +15,8 @@ import type { SlashCommand, SlashCommandActionReturn } from './types.js';
 import { CommandKind } from './types.js';
 import { getUrlOpenCommand } from '../../ui/utils/commandUtils.js';
 import { t } from '../../i18n/index.js';
-import { createDebugLogger } from '@hoptrendy/hopcode-core';
 
-const debugLogger = createDebugLogger('SETUP_GITHUB');
-
-export const GITHUB_WORKFLOW_PATHS = [
-  'hopcode-dispatch/hopcode-dispatch.yml',
-  'hopcode-assistant/hopcode-invoke.yml',
-  'issue-triage/hopcode-triage.yml',
-  'issue-triage/hopcode-scheduled-triage.yml',
-  'pr-review/hopcode-review.yml',
-];
+export { GITHUB_WORKFLOW_PATHS };
 
 // Generate OS-specific commands to open the GitHub pages needed for setup.
 function getOpenUrlsCommands(readmeUrl: string, secretsUrl?: string): string[] {
@@ -41,44 +32,9 @@ function getOpenUrlsCommands(readmeUrl: string, secretsUrl?: string): string[] {
   return commands;
 }
 
-// Add HopCode specific entries to .gitignore file
+// Add Qwen Code specific entries to .gitignore file
 export async function updateGitignore(gitRepoRoot: string): Promise<void> {
-  const gitignoreEntries = ['.hopcode/', 'gha-creds-*.json'];
-
-  const gitignorePath = path.join(gitRepoRoot, '.gitignore');
-  try {
-    // Check if .gitignore exists and read its content
-    let existingContent = '';
-    let fileExists = true;
-    try {
-      existingContent = await fs.promises.readFile(gitignorePath, 'utf8');
-    } catch (_error) {
-      // File doesn't exist
-      fileExists = false;
-    }
-
-    if (!fileExists) {
-      // Create new .gitignore file with the entries
-      const contentToWrite = gitignoreEntries.join('\n') + '\n';
-      await fs.promises.writeFile(gitignorePath, contentToWrite);
-    } else {
-      // Check which entries are missing
-      const missingEntries = gitignoreEntries.filter(
-        (entry) =>
-          !existingContent
-            .split(/\r?\n/)
-            .some((line) => line.split('#')[0].trim() === entry),
-      );
-
-      if (missingEntries.length > 0) {
-        const contentToAdd = '\n' + missingEntries.join('\n') + '\n';
-        await fs.promises.appendFile(gitignorePath, contentToAdd);
-      }
-    }
-  } catch (error) {
-    debugLogger.debug('Failed to update .gitignore:', error);
-    // Continue without failing the whole command
-  }
+  await updateGitignoreWithStatus(gitRepoRoot);
 }
 
 export const setupGithubCommand: SlashCommand = {
@@ -103,75 +59,10 @@ export const setupGithubCommand: SlashCommand = {
     }
 
     const proxy = context?.services?.config?.getProxy();
-    const releaseTag = await getLatestGitHubRelease(proxy);
-    const readmeUrl = `https://github.com/TaimoorSiddiquiOfficial/HopCode/blob/${releaseTag}/docs/github-actions/README.md#quick-start`;
-
-    // Create the .github/workflows directory to download the files into
-    const githubWorkflowsDir = path.join(gitRepoRoot, '.github', 'workflows');
-    try {
-      await fs.promises.mkdir(githubWorkflowsDir, { recursive: true });
-    } catch (_error) {
-      debugLogger.debug(
-        `Failed to create ${githubWorkflowsDir} directory:`,
-        _error,
-      );
-      throw new Error(
-        `Unable to create ${githubWorkflowsDir} directory. Do you have file permissions in the current directory?`,
-      );
-    }
-
-    // Download each workflow in parallel - there aren't enough files to warrant
-    // a full workerpool model here.
-    const downloads = [];
-    for (const workflow of GITHUB_WORKFLOW_PATHS) {
-      downloads.push(
-        (async () => {
-          const endpoint = `https://raw.githubusercontent.com/TaimoorSiddiquiOfficial/HopCode/${releaseTag}/examples/workflows/${workflow}`;
-          const response = await fetch(endpoint, {
-            method: 'GET',
-            dispatcher: proxy ? new ProxyAgent(proxy) : undefined,
-            signal: AbortSignal.any([
-              AbortSignal.timeout(30_000),
-              abortController.signal,
-            ]),
-          } as RequestInit);
-
-          if (!response.ok) {
-            throw new Error(
-              `Invalid response code downloading ${endpoint}: ${response.status} - ${response.statusText}`,
-            );
-          }
-          const body = response.body;
-          if (!body) {
-            throw new Error(
-              `Empty body while downloading ${endpoint}: ${response.status} - ${response.statusText}`,
-            );
-          }
-
-          const destination = path.resolve(
-            githubWorkflowsDir,
-            path.basename(workflow),
-          );
-
-          const fileStream = fs.createWriteStream(destination, {
-            mode: 0o644, // -rw-r--r--, user(rw), group(r), other(r)
-            flags: 'w', // write and overwrite
-            flush: true,
-          });
-
-          await body.pipeTo(Writable.toWeb(fileStream));
-        })(),
-      );
-    }
-
-    // Wait for all downloads to complete
-    await Promise.all(downloads).finally(() => {
-      // Stop existing downloads
-      abortController.abort();
-    });
-
-    // Add entries to .gitignore file
-    await updateGitignore(gitRepoRoot);
+    const result = await setupGithub({
+      proxy,
+      abortSignal: abortController.signal,
+    }).finally(() => abortController.abort());
 
     // Print out a message
     const commands = [];
@@ -187,7 +78,7 @@ export const setupGithubCommand: SlashCommand = {
       toolName: 'run_shell_command',
       toolArgs: {
         description:
-          'Setting up GitHub Actions to triage issues and review PRs with HopCode.',
+          'Setting up GitHub Actions to triage issues and review PRs with Qwen.',
         command,
         is_background: false,
       },

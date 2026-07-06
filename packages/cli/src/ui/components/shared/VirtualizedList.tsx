@@ -20,6 +20,7 @@ import { useAnimatedScrollbar } from '../../hooks/useAnimatedScrollbar.js';
 import { StaticRender } from './StaticRender.js';
 import { type DOMElement, Box, Text, useBoxMetrics } from 'ink';
 import { createDebugLogger } from '@hoptrendy/hopcode-core';
+import { measureElementPosition } from '../../utils/measure-element-position.js';
 
 const debugLogger = createDebugLogger('VIRTUALIZED_LIST');
 

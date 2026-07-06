@@ -35,24 +35,7 @@ import {
   MAX_READ_BYTES,
   type WorkspaceFileSystemFactory,
 } from '../fs/index.js';
-import {
-  isPermissionRuleType,
-  normalizePermissionRules,
-  PermissionRulesValidationError,
-  readPermissionRuleSet,
-} from '../../config/permission-settings.js';
-import { loadSettings } from '../../config/settings.js';
 import { WorkspaceVoiceError } from '../../services/voice-service.js';
-import { SetupGithubError, setupGithub } from '../../services/setup-github.js';
-import {
-  createSetupGithubFileOps,
-  resolveSetupGithubProxy,
-  sanitizeSetupGithubMessage,
-  sanitizeSetupGithubResult,
-  setupGithubEventData,
-} from '../routes/workspace-setup-github.js';
-import { parseWorkspaceVoiceUpdateParams } from '../routes/workspace-voice.js';
-import { MAX_TRUST_REASON_LENGTH } from '../validation-limits.js';
 import type { DeviceFlowRegistry } from '../auth/device-flow.js';
 import { collectWorkspaceMemoryStatus } from '../workspace-memory.js';
 import {
@@ -68,10 +51,7 @@ import type {
   DaemonWorkspaceService,
   WorkspaceRequestContext,
 } from '../workspace-service/types.js';
-import {
-  WorkspacePermissionRulesSessionRequiredError,
-  WorkspaceSettingsPartialPersistError,
-} from '../workspace-service/types.js';
+import { WorkspaceSettingsPartialPersistError } from '../workspace-service/types.js';
 import type { AcpConnection } from './connection-registry.js';
 import {
   HOPCODE_META_KEY,

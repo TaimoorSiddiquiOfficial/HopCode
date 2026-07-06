@@ -14,6 +14,15 @@ interface GitCommandOptions {
   cwd?: string;
 }
 
+function runGitSync(args: string[], opts: GitCommandOptions = {}): string {
+  return childProcess
+    .execFileSync('git', args, {
+      encoding: 'utf-8',
+      ...(opts.cwd ? { cwd: opts.cwd } : {}),
+    })
+    .trim();
+}
+
 async function runGit(
   args: string[],
   opts: GitCommandOptions = {},
@@ -80,6 +89,27 @@ export const getGitRepoRootAsync = async (
   return gitRepoRoot;
 };
 
+export const isGitHubRepository = (opts: GitCommandOptions = {}): boolean => {
+  try {
+    const remotes = runGitSync(['remote', '-v'], opts);
+    return remotes.split('\n').some((line) => {
+      const remoteUrl = line.trim().split(/\s+/)[1];
+      return remoteUrl ? isGitHubRemoteUrl(remoteUrl) : false;
+    });
+  } catch (_error) {
+    debugLogger.debug(`Failed to get git remote:`, _error);
+    return false;
+  }
+};
+
+export const getGitRepoRoot = (opts: GitCommandOptions = {}): string => {
+  const gitRepoRoot = runGitSync(['rev-parse', '--show-toplevel'], opts);
+  if (!gitRepoRoot) {
+    throw new Error(`Git repo returned empty value`);
+  }
+  return gitRepoRoot;
+};
+
 /**
  * getLatestGitHubRelease returns the release tag as a string.
  * @returns string of the release tag (e.g. "v1.2.3").
@@ -131,6 +161,13 @@ export async function getGitHubRepoInfoAsync(
   return parseGitHubRepoInfo(
     await runGit(['remote', 'get-url', 'origin'], opts),
   );
+}
+
+export function getGitHubRepoInfo(opts: GitCommandOptions = {}): {
+  owner: string;
+  repo: string;
+} {
+  return parseGitHubRepoInfo(runGitSync(['remote', 'get-url', 'origin'], opts));
 }
 
 function parseGitHubRepoInfo(remoteUrl: string): {

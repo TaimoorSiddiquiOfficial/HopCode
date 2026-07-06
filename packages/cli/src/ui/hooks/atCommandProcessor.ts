@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import type { PartListUnion } from '@google/genai';
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Part, PartListUnion } from '@google/genai';
+import type { Config, Extension } from '@hoptrendy/hopcode-core';
 import {
   getErrorMessage,
   isNodeError,
@@ -15,6 +15,10 @@ import {
   isSubpath,
   unescapePath,
   readManyFiles,
+  shouldRunVisionBridge,
+  emptyMcpResourceText,
+  formatMcpResourceContents,
+  summarizeMcpResource,
 } from '@hoptrendy/hopcode-core';
 import type {
   HistoryItemToolGroup,
@@ -194,7 +198,7 @@ export async function resolveAtCommandQuery({
   const contentLabelsForDisplay: string[] = [];
   const ignoredByReason: Record<string, string[]> = {
     git: [],
-    hopcode: [],
+    qwen: [],
     both: [],
   };
 
@@ -286,23 +290,23 @@ export async function resolveAtCommandQuery({
         respectGitIgnore: true,
         respectHopCodeIgnore: false,
       });
-    const hopcodeIgnored =
+    const qwenIgnored =
       respectFileIgnore.respectHopCodeIgnore &&
       fileDiscovery.shouldIgnoreFile(pathName, {
         respectGitIgnore: false,
         respectHopCodeIgnore: true,
       });
 
-    if (gitIgnored || hopcodeIgnored) {
+    if (gitIgnored || qwenIgnored) {
       const reason =
-        gitIgnored && hopcodeIgnored ? 'both' : gitIgnored ? 'git' : 'hopcode';
+        gitIgnored && qwenIgnored ? 'both' : gitIgnored ? 'git' : 'qwen';
       ignoredByReason[reason].push(pathName);
       const reasonText =
         reason === 'both'
-          ? 'ignored by both git and hopcode'
+          ? 'ignored by both git and qwen'
           : reason === 'git'
             ? 'git-ignored'
-            : 'hopcode-ignored';
+            : 'qwen-ignored';
       onDebugMessage(`Path ${pathName} is ${reasonText} and will be skipped.`);
       continue;
     }
@@ -391,7 +395,7 @@ export async function resolveAtCommandQuery({
   // Inform user about ignored paths
   const totalIgnored =
     ignoredByReason['git'].length +
-    ignoredByReason['hopcode'].length +
+    ignoredByReason['qwen'].length +
     ignoredByReason['both'].length;
 
   if (totalIgnored > 0) {
@@ -399,10 +403,8 @@ export async function resolveAtCommandQuery({
     if (ignoredByReason['git'].length) {
       messages.push(`Git-ignored: ${ignoredByReason['git'].join(', ')}`);
     }
-    if (ignoredByReason['hopcode'].length) {
-      messages.push(
-        `HopCode-ignored: ${ignoredByReason['hopcode'].join(', ')}`,
-      );
+    if (ignoredByReason['qwen'].length) {
+      messages.push(`Qwen-ignored: ${ignoredByReason['qwen'].join(', ')}`);
     }
     if (ignoredByReason['both'].length) {
       messages.push(`Ignored by both: ${ignoredByReason['both'].join(', ')}`);

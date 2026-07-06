@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,9 +20,8 @@
  */
 
 import type { ReactNode } from 'react';
-import { useCallback } from 'react';
-import { Box, Text } from 'ink';
-import chalk from 'chalk';
+import { useCallback, useInsertionEffect, useRef } from 'react';
+import { Box, Text, type DOMElement, useBoxMetrics, useCursor } from 'ink';
 import type { TextBuffer } from './shared/text-buffer.js';
 import type { Key } from '../hooks/useKeypress.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -125,6 +124,65 @@ export function defaultRenderLine({
   );
 }
 
+// ─── Helpers ────────────────────────────────────────────────
+
+export type PhysicalCursorState = {
+  hasMeasured: boolean;
+  showCursor: boolean;
+  cursorVisualRow: number;
+  cursorVisualCol: number;
+  scrollVisualRow: number;
+  linesToRender: string[];
+  prefixWidth: number;
+};
+
+export function getAbsolutePosition(
+  node: DOMElement | null,
+): { top: number; left: number } | undefined {
+  if (!node) return undefined;
+
+  let top = 0;
+  let left = 0;
+  let current: DOMElement | undefined = node;
+  while (current) {
+    const layout = current.yogaNode?.getComputedLayout();
+    if (layout) {
+      top += layout.top;
+      left += layout.left;
+    }
+    current = current.parentNode;
+  }
+
+  return { top, left };
+}
+
+export function getPhysicalCursorPosition(
+  node: DOMElement | null,
+  {
+    hasMeasured,
+    showCursor,
+    cursorVisualRow,
+    cursorVisualCol,
+    scrollVisualRow,
+    linesToRender,
+    prefixWidth,
+  }: PhysicalCursorState,
+): { x: number; y: number } | undefined {
+  if (!showCursor || !hasMeasured) return undefined;
+
+  const position = getAbsolutePosition(node);
+  if (!position) return undefined;
+
+  const relativeRow = cursorVisualRow - scrollVisualRow;
+  const lineText = linesToRender[relativeRow] || '';
+  const textBeforeCursor = cpSlice(lineText, 0, cursorVisualCol);
+  const physicalCol = stringWidth(textBeforeCursor);
+  return {
+    x: position.left + prefixWidth + physicalCol,
+    y: position.top + relativeRow + 1,
+  };
+}
+
 // ─── Component ──────────────────────────────────────────────
 
 export const BaseTextInput = ({
@@ -134,6 +192,7 @@ export const BaseTextInput = ({
   showCursor = true,
   placeholder,
   prefix,
+  prefixWidth = 2,
   borderColor,
   topRightLabel,
   isActive = true,
@@ -252,6 +311,25 @@ export const BaseTextInput = ({
   const [cursorVisualRow, cursorVisualCol] = buffer.visualCursor;
   const scrollVisualRow = buffer.visualScrollRow;
 
+  // ── Physical cursor positioning for IME ──
+  const boxRef = useRef<DOMElement | null>(null);
+  const { hasMeasured } = useBoxMetrics(boxRef);
+  const { setCursorPosition } = useCursor();
+  const cursorPosition = getPhysicalCursorPosition(boxRef.current, {
+    hasMeasured,
+    showCursor,
+    cursorVisualRow,
+    cursorVisualCol,
+    scrollVisualRow,
+    linesToRender,
+    prefixWidth,
+  });
+
+  useInsertionEffect(() => {
+    setCursorPosition(cursorPosition);
+    return () => setCursorPosition(undefined);
+  }, [setCursorPosition, cursorPosition]);
+
   const resolvedBorderColor = borderColor ?? theme.border.focused;
   const resolvedPrefix = prefix ?? (
     <Text color={theme.text.accent}>{'> '}</Text>
@@ -267,7 +345,7 @@ export const BaseTextInput = ({
     : '─'.repeat(columns);
 
   return (
-    <Box flexDirection="column">
+    <Box ref={boxRef} flexDirection="column">
       <Text color={resolvedBorderColor} wrap="truncate-end">
         {topBorderLine}
       </Text>

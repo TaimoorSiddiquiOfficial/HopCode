@@ -400,17 +400,17 @@ async function emitHeadlessYoloWarning(
 ) {
   if (!settings) return;
   try {
-    const { HEADLESS_YOLO_NO_SANDBOX_WARNING } = await import(
+    const { HEADLESS_IZN_NO_SANDBOX_WARNING } = await import(
       '../utils/headlessSafetyWarnings.js'
     );
-    const suppress = process.env['HOPCODE_CODE_SUPPRESS_YOLO_WARNING'];
+    const suppress = process.env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'];
     if (
-      settings.tools?.approvalMode === 'yolo' &&
+      settings.tools?.approvalMode === 'izn' &&
       !settings.tools?.sandbox &&
       !process.env['SANDBOX'] &&
       !isTruthyEnv(suppress)
     ) {
-      writeStderrLine(HEADLESS_YOLO_NO_SANDBOX_WARNING);
+      writeStderrLine(HEADLESS_IZN_NO_SANDBOX_WARNING);
     }
   } catch {
     // Keep the warning best-effort, matching the yargs serve handler.

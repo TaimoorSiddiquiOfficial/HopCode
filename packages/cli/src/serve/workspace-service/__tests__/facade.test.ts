@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Qwen Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -56,7 +56,7 @@ vi.mock('@hoptrendy/hopcode-core', () => {
     ApprovalMode: {
       DEFAULT: 'default',
       AUTO_EDIT: 'autoEdit',
-      YOLO: 'yolo',
+      IZN: 'izn',
     },
     DEFAULT_STOP_HOOK_BLOCK_CAP: 5,
     DEFAULT_TOOL_OUTPUT_BATCH_BUDGET: 100_000,
@@ -90,6 +90,21 @@ vi.mock('../../../utils/stdioHelpers.js', () => ({
 
 const { createDaemonWorkspaceService } = await import('../index.js');
 import { SessionNotFoundError } from '@hoptrendy/acp-bridge/bridgeErrors';
+import {
+  resetHomeEnvBootstrapForTesting,
+  SettingScope,
+  SETTINGS_DIRECTORY_NAME,
+} from '../../../config/settings.js';
+import {
+  resetTrustedFoldersForTesting,
+  TRUSTED_FOLDERS_FILENAME,
+  TrustLevel,
+} from '../../../config/trustedFolders.js';
+import { WorkspaceVoiceError } from '../../../services/voice-service.js';
+import {
+  WorkspacePermissionRulesSessionRequiredError,
+  WorkspaceSettingsPartialPersistError,
+} from '../types.js';
 import type {
   DaemonWorkspaceServiceDeps,
   WorkspaceRequestContext,
@@ -104,7 +119,7 @@ function makeDeps(
 ): DaemonWorkspaceServiceDeps {
   return {
     boundWorkspace: '/workspace',
-    contextFilename: 'HOPCODE.md',
+    contextFilename: 'QWEN.md',
     persistDisabledTools: vi.fn().mockResolvedValue(undefined),
     queryWorkspaceStatus: vi
       .fn()
@@ -132,7 +147,7 @@ function makeCtx(
   };
 }
 
-async function withIsolatedhopcodeHome<T>(fn: () => Promise<T>): Promise<T> {
+async function withIsolatedQwenHome<T>(fn: () => Promise<T>): Promise<T> {
   return withIsolatedWorkspace(() => fn());
 }
 
@@ -147,13 +162,13 @@ async function withIsolatedWorkspace<T>(
   const scratch = await fs.mkdtemp(path.join(os.tmpdir(), 'facade-ws-'));
   const home = path.join(scratch, 'home');
   const workspace = path.join(scratch, 'workspace');
-  const originalhopcodeHome = process.env['HOPCODE_HOME'];
+  const originalQwenHome = process.env['QWEN_HOME'];
   const originalTrustedFoldersPath =
-    process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
+    process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'];
   await fs.mkdir(home, { recursive: true });
   await fs.mkdir(workspace, { recursive: true });
-  process.env['HOPCODE_HOME'] = home;
-  process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = path.join(
+  process.env['QWEN_HOME'] = home;
+  process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'] = path.join(
     home,
     TRUSTED_FOLDERS_FILENAME,
   );
@@ -163,15 +178,15 @@ async function withIsolatedWorkspace<T>(
     return await fn({ home, workspace });
   } finally {
     await fs.rm(scratch, { recursive: true, force: true });
-    if (originalhopcodeHome === undefined) {
-      delete process.env['HOPCODE_HOME'];
+    if (originalQwenHome === undefined) {
+      delete process.env['QWEN_HOME'];
     } else {
-      process.env['HOPCODE_HOME'] = originalhopcodeHome;
+      process.env['QWEN_HOME'] = originalQwenHome;
     }
     if (originalTrustedFoldersPath === undefined) {
-      delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
+      delete process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'];
     } else {
-      process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] =
+      process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'] =
         originalTrustedFoldersPath;
     }
     resetHomeEnvBootstrapForTesting();
@@ -208,7 +223,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('persists voice settings through batch persistence and publishes events', async () => {
-      await withIsolatedhopcodeHome(async () => {
+      await withIsolatedQwenHome(async () => {
         const persistSettings = vi.fn(async () => {});
         const publishWorkspaceEvent = vi.fn();
         const svc = createDaemonWorkspaceService(
@@ -252,7 +267,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('rejects invalid voice settings before persisting', async () => {
-      await withIsolatedhopcodeHome(async () => {
+      await withIsolatedQwenHome(async () => {
         const persistSettings = vi.fn(async () => {});
         const publishWorkspaceEvent = vi.fn();
         const svc = createDaemonWorkspaceService(
@@ -274,7 +289,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('does not publish fallback voice writes when a later write fails', async () => {
-      await withIsolatedhopcodeHome(async () => {
+      await withIsolatedQwenHome(async () => {
         const persistSetting = vi.fn(
           async (
             _workspace: string,
@@ -358,7 +373,7 @@ describe('createDaemonWorkspaceService', () => {
           rules: { allow: [], ask: [], deny: [] },
         },
         workspace: {
-          path: '/workspace/.hopcode/settings.json',
+          path: '/workspace/.qwen/settings.json',
           rules: { allow: ['Shell(*)'], ask: [], deny: [] },
         },
         merged: { allow: ['Shell(*)'], ask: [], deny: [] },
@@ -397,7 +412,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('rejects permission updates when ACP has no live session', async () => {
-      await withIsolatedhopcodeHome(async () => {
+      await withIsolatedQwenHome(async () => {
         const invokeWorkspaceCommand = vi
           .fn()
           .mockRejectedValue(new SessionNotFoundError('session-1'));
@@ -566,7 +581,7 @@ describe('createDaemonWorkspaceService', () => {
       await svc.getWorkspaceMcpStatus(makeCtx());
 
       expect(queryWorkspaceStatus).toHaveBeenCalledWith(
-        'hopcode/status/workspace/mcp',
+        'qwen/status/workspace/mcp',
         expect.any(Function),
       );
     });
@@ -602,7 +617,7 @@ describe('createDaemonWorkspaceService', () => {
       await svc.getWorkspaceSkillsStatus(makeCtx());
 
       expect(queryWorkspaceStatus).toHaveBeenCalledWith(
-        'hopcode/status/workspace/skills',
+        'qwen/status/workspace/skills',
         expect.any(Function),
       );
     });
@@ -672,7 +687,7 @@ describe('createDaemonWorkspaceService', () => {
       await svc.getWorkspaceProvidersStatus(makeCtx());
 
       expect(queryWorkspaceStatus).toHaveBeenCalledWith(
-        'hopcode/status/workspace/providers',
+        'qwen/status/workspace/providers',
         expect.any(Function),
       );
     });
@@ -744,7 +759,7 @@ describe('createDaemonWorkspaceService', () => {
       await svc.getWorkspacePreflightStatus(makeCtx());
 
       expect(queryWorkspaceStatus).toHaveBeenCalledWith(
-        'hopcode/status/workspace/preflight',
+        'qwen/status/workspace/preflight',
         expect.any(Function),
       );
     });
@@ -988,7 +1003,7 @@ describe('createDaemonWorkspaceService', () => {
       await svc.restartMcpServer(makeCtx(), 'myServer');
 
       expect(invokeWorkspaceCommand).toHaveBeenCalledWith(
-        'hopcode/control/workspace/mcp/restart',
+        'qwen/control/workspace/mcp/restart',
         { serverName: 'myServer' },
         { timeoutMs: 300_000 },
       );
@@ -1007,7 +1022,7 @@ describe('createDaemonWorkspaceService', () => {
       await svc.restartMcpServer(makeCtx(), 'poolServer', { entryIndex: 3 });
 
       expect(invokeWorkspaceCommand).toHaveBeenCalledWith(
-        'hopcode/control/workspace/mcp/restart',
+        'qwen/control/workspace/mcp/restart',
         { serverName: 'poolServer', entryIndex: 3 },
         { timeoutMs: 300_000 },
       );
@@ -1210,7 +1225,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
           publishWorkspaceEvent,
         }),
       );
@@ -1221,7 +1236,7 @@ describe('createDaemonWorkspaceService', () => {
       );
 
       expect(result.action).toBe('created');
-      expect(result.path).toBe(path.join(tmpDir, 'HOPCODE.md'));
+      expect(result.path).toBe(path.join(tmpDir, 'QWEN.md'));
       const stat = await fs.stat(result.path);
       expect(stat.isFile()).toBe(true);
     });
@@ -1231,7 +1246,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
           publishWorkspaceEvent,
         }),
       );
@@ -1240,19 +1255,19 @@ describe('createDaemonWorkspaceService', () => {
 
       expect(publishWorkspaceEvent).toHaveBeenCalledWith({
         type: 'workspace_initialized',
-        data: { path: path.join(tmpDir, 'HOPCODE.md'), action: 'created' },
+        data: { path: path.join(tmpDir, 'QWEN.md'), action: 'created' },
         originatorClientId: 'c-9',
       });
     });
 
     it('returns noop when file exists but is whitespace-only', async () => {
-      const target = path.join(tmpDir, 'HOPCODE.md');
+      const target = path.join(tmpDir, 'QWEN.md');
       await fs.writeFile(target, '   \n  ', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
@@ -1262,13 +1277,13 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('throws when file has content and force is not set', async () => {
-      const target = path.join(tmpDir, 'HOPCODE.md');
+      const target = path.join(tmpDir, 'QWEN.md');
       await fs.writeFile(target, '# Hello', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
@@ -1278,13 +1293,13 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('overwrites existing file when force=true', async () => {
-      const target = path.join(tmpDir, 'HOPCODE.md');
+      const target = path.join(tmpDir, 'QWEN.md');
       await fs.writeFile(target, '# Existing content', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
@@ -1310,14 +1325,14 @@ describe('createDaemonWorkspaceService', () => {
 
     it('throws when target is a symlink', async () => {
       const realFile = path.join(tmpDir, 'real.md');
-      const linkFile = path.join(tmpDir, 'HOPCODE.md');
+      const linkFile = path.join(tmpDir, 'QWEN.md');
       await fs.writeFile(realFile, '', 'utf8');
       await fs.symlink(realFile, linkFile);
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
@@ -1325,7 +1340,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('throws when target is a non-regular file', async () => {
-      const target = path.join(tmpDir, 'HOPCODE.md');
+      const target = path.join(tmpDir, 'QWEN.md');
       await fs.writeFile(target, '', 'utf8');
 
       const origLstat = fs.lstat;
@@ -1344,7 +1359,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
@@ -1361,13 +1376,13 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
       // Create the file between the readFile ENOENT and the open('wx')
       // by pre-creating it — the 'wx' flag throws EEXIST atomically.
-      await fs.writeFile(path.join(tmpDir, 'HOPCODE.md'), '# content', 'utf8');
+      await fs.writeFile(path.join(tmpDir, 'QWEN.md'), '# content', 'utf8');
 
       // Since the file has content and force is not set, it throws
       // WorkspaceInitConflictError (not the race). To test the EEXIST
@@ -1382,7 +1397,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
@@ -1392,10 +1407,7 @@ describe('createDaemonWorkspaceService', () => {
           filePath: Parameters<typeof origOpen>[0],
           flags?: Parameters<typeof origOpen>[1],
         ) => {
-          if (
-            String(flags) === 'wx' &&
-            String(filePath).endsWith('HOPCODE.md')
-          ) {
+          if (String(flags) === 'wx' && String(filePath).endsWith('QWEN.md')) {
             const err = new Error('EEXIST') as NodeJS.ErrnoException;
             err.code = 'EEXIST';
             throw err;
@@ -1414,13 +1426,13 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('throws WorkspaceInitSymlinkError when overwrite open hits ELOOP', async () => {
-      const target = path.join(tmpDir, 'HOPCODE.md');
+      const target = path.join(tmpDir, 'QWEN.md');
       await fs.writeFile(target, '# existing content', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
@@ -1432,7 +1444,7 @@ describe('createDaemonWorkspaceService', () => {
         ) => {
           if (
             typeof flags === 'number' &&
-            String(filePath).endsWith('HOPCODE.md')
+            String(filePath).endsWith('QWEN.md')
           ) {
             const err = new Error('ELOOP') as NodeJS.ErrnoException;
             err.code = 'ELOOP';
@@ -1452,13 +1464,13 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('throws WorkspaceInitRaceError when overwrite open hits ENOENT', async () => {
-      const target = path.join(tmpDir, 'HOPCODE.md');
+      const target = path.join(tmpDir, 'QWEN.md');
       await fs.writeFile(target, '# existing content', 'utf8');
 
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'HOPCODE.md',
+          contextFilename: 'QWEN.md',
         }),
       );
 
@@ -1470,7 +1482,7 @@ describe('createDaemonWorkspaceService', () => {
         ) => {
           if (
             typeof flags === 'number' &&
-            String(filePath).endsWith('HOPCODE.md')
+            String(filePath).endsWith('QWEN.md')
           ) {
             const err = new Error('ENOENT') as NodeJS.ErrnoException;
             err.code = 'ENOENT';
@@ -1497,7 +1509,7 @@ describe('createDaemonWorkspaceService', () => {
       const svc = createDaemonWorkspaceService(
         makeDeps({
           boundWorkspace: tmpDir,
-          contextFilename: 'docs/HOPCODE.md',
+          contextFilename: 'docs/QWEN.md',
         }),
       );
 

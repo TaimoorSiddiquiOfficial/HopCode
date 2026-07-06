@@ -9,6 +9,7 @@ import {
   type Config,
   type ModelProvidersConfig,
   type ProviderModelConfig,
+  type ProviderProtocolConfig,
 } from '@hoptrendy/hopcode-core';
 import { loadEnvironment, loadSettings, type Settings } from './settings.js';
 import { collectProviderModelsForProtocol } from '../utils/modelConfigUtils.js';

@@ -69,7 +69,11 @@ import {
   readWorktreeSessionMarker,
   isSessionRuntimeActive,
 } from '@hoptrendy/hopcode-core';
-import { buildResumedHistoryItems } from './utils/resumeHistoryUtils.js';
+import {
+  applyCollapsePolicyAndSummary,
+  buildResumedHistoryItems,
+  expandCollapsedHistory,
+} from './utils/resumeHistoryUtils.js';
 import { loadLowlight } from './utils/lowlightLoader.js';
 import {
   getStickyTodos,
@@ -751,7 +755,7 @@ export const AppContainer = (props: AppContainerProps) => {
    *    (all servers ready or failed) or `STARTUP_PROFILE_FINALIZE_CAP_MS`
    *    elapses (so a hung server doesn't keep the profile open forever).
    *
-   * In legacy blocking mode (`HOPCODE_LEGACY_MCP_BLOCKING=1`) MCP
+   * In legacy blocking mode (`QWEN_CODE_LEGACY_MCP_BLOCKING=1`) MCP
    * discovery already completed inside `config.initialize()`, so this
    * effect observes `MCPDiscoveryState.COMPLETED` immediately and finalizes
    * without waiting.
@@ -803,7 +807,7 @@ export const AppContainer = (props: AppContainerProps) => {
     // `acpAgent.ts`) which warn to stderr when MCP discovery completes with
     // failed servers. The interactive path can't use stderr (it would
     // collide with Ink's rendered output), so we route through
-    // `debugLogger.warn` so it shows up under `HOPCODE_DEBUG=1` and in
+    // `debugLogger.warn` so it shows up under `QWEN_CODE_DEBUG=1` and in
     // the debug log file — matching the channel `setTools()` errors above
     // use. The MCP status footer pill already surfaces failures
     // continuously in the UI; this log is the actionable-on-debug record
@@ -1427,7 +1431,7 @@ export const AppContainer = (props: AppContainerProps) => {
           // Anchor at the repo top-level (captured at enter time) rather
           // than the current targetDir — when the CLI was launched from
           // a monorepo subdirectory, `config.getTargetDir()` is that
-          // subdir but the worktree lives at `<repoRoot>/.hopcode/worktrees/`,
+          // subdir but the worktree lives at `<repoRoot>/.qwen/worktrees/`,
           // so a service rooted at the subdir would never find it. (PR
           // #4174 review finding 3252368637.)
           const svc = new GitWorktreeService(activeWorktree.originalCwd);
@@ -3109,7 +3113,7 @@ export const AppContainer = (props: AppContainerProps) => {
       const name = entry.meta?.name ?? entry.runId;
       const verb = entry.status === 'failed' ? 'failed' : 'completed';
       sendNotification(
-        { message: `Workflow '${name}' ${verb}`, title: 'HopCode' },
+        { message: `Workflow '${name}' ${verb}`, title: 'Qwen Code' },
         terminal,
         workflowBellEnabled,
       );

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 HopCode
+ * Copyright 2026 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -20,7 +20,7 @@ export const STATUS_LINE_PRESET_ITEM_IDS = [
   'branch-changes',
   'context-used',
   'run-state',
-  'hopcode-version',
+  'qwen-version',
   'context-window-size',
   'used-tokens',
   'session-id',
@@ -148,9 +148,9 @@ export const STATUS_LINE_PRESET_ITEMS: readonly StatusLinePresetItem[] = [
     description: 'Compact session run-state text',
   },
   {
-    id: 'hopcode-version',
-    label: 'hopcode-version',
-    description: 'HopCode application version',
+    id: 'qwen-version',
+    label: 'qwen-version',
+    description: 'Qwen Code application version',
   },
   {
     id: 'context-window-size',
@@ -418,82 +418,9 @@ export function buildStatusLinePresetParts(
 ): string[] {
   const parts: string[] = [];
   for (const item of orderStatusLinePresetItems(config.items)) {
-    switch (item) {
-      case 'model-with-reasoning':
-        parts.push(
-          formatModelWithReasoning(data.modelDisplayName, data.reasoning),
-        );
-        break;
-      case 'model':
-        parts.push(data.modelDisplayName);
-        break;
-      case 'context-remaining':
-        if (data.contextWindowSize > 0) {
-          parts.push(`Context ${formatPercent(data.remainingPercentage)} left`);
-        }
-        break;
-      case 'current-dir':
-        parts.push(data.currentDir);
-        break;
-      case 'context-used':
-        if (data.contextWindowSize > 0 && data.usedPercentage > 0) {
-          parts.push(`Context ${formatPercent(data.usedPercentage)} used`);
-        }
-        break;
-      case 'git-branch':
-        if (data.branch) {
-          parts.push(data.branch);
-        }
-        break;
-      case 'project-name':
-        if (data.projectName) {
-          parts.push(data.projectName);
-        }
-        break;
-      case 'pull-request-number': {
-        const prNumber =
-          data.pullRequestNumber ?? inferPullRequestNumber(data.branch);
-        if (prNumber) {
-          parts.push(`#${prNumber}`);
-        }
-        break;
-      }
-      case 'branch-changes':
-        if (data.totalLinesAdded > 0 || data.totalLinesRemoved > 0) {
-          parts.push(`+${data.totalLinesAdded} -${data.totalLinesRemoved}`);
-        }
-        break;
-      case 'run-state':
-        parts.push(getRunStateLabel(data.streamingState));
-        break;
-      case 'hopcode-version':
-        parts.push(`v${data.version}`);
-        break;
-      case 'context-window-size':
-        if (data.contextWindowSize > 0) {
-          parts.push(`${formatTokenCount(data.contextWindowSize)} window`);
-        }
-        break;
-      case 'used-tokens':
-        if (data.currentUsage > 0) {
-          parts.push(`${formatTokenCount(data.currentUsage)} used`);
-        }
-        break;
-      case 'total-input-tokens':
-        parts.push(`${formatTokenCount(data.totalInputTokens)} total in`);
-        break;
-      case 'total-output-tokens':
-        parts.push(`${formatTokenCount(data.totalOutputTokens)} total out`);
-        break;
-      case 'session-id':
-        if (data.sessionId) {
-          parts.push(data.sessionId);
-        }
-        break;
-      default: {
-        item satisfies never;
-        break;
-      }
+    const text = formatPresetItem(item, data);
+    if (text) {
+      parts.push(text);
     }
   }
   return parts;

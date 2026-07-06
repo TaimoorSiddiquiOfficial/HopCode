@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 HopCode
+ * Copyright 2025 Qwen Code
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,7 +10,10 @@ import {
   type Config,
   type SessionListItem,
 } from '@hoptrendy/hopcode-core';
-import { buildResumedHistoryItems } from '../utils/resumeHistoryUtils.js';
+import {
+  buildResumedHistoryItems,
+  applyCollapsePolicyAndSummary,
+} from '../utils/resumeHistoryUtils.js';
 import { restoreGoalFromHistory } from '../utils/restoreGoal.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import { MessageType, type HistoryItemWithoutId } from '../types.js';

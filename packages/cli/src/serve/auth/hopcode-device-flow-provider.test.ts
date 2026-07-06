@@ -31,7 +31,7 @@ import {
   type IHopCodeOAuth2Client,
 } from '@hoptrendy/hopcode-core';
 import { HopCodeOAuthDeviceFlowProvider } from './hopcode-device-flow-provider.js';
-import { brandSecret } from './deviceFlow.js';
+import { brandSecret } from './device-flow.js';
 
 function fakeClient(
   overrides: Partial<IHopCodeOAuth2Client> = {},

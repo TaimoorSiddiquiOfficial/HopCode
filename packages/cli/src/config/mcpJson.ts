@@ -6,7 +6,10 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { MCPServerConfig } from '@hoptrendy/hopcode-core';
+import {
+  type MCPServerConfig,
+  normalizeClaudeMcpServer,
+} from '@hoptrendy/hopcode-core';
 import stripJsonComments from 'strip-json-comments';
 
 /** Project-scoped MCP config filename, read from the workspace root. */

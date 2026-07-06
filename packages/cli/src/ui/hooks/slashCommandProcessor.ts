@@ -26,6 +26,10 @@ import {
   ToolConfirmationOutcome,
   IdeClient,
   type SessionListItem,
+  addMCPStatusChangeListener,
+  removeMCPStatusChangeListener,
+  MCPServerStatus,
+  recordSkillInvocation,
 } from '@hoptrendy/hopcode-core';
 import { useSessionStats } from '../contexts/SessionContext.js';
 import type {
@@ -886,13 +890,9 @@ export const useSlashCommandProcessor = (
                     case 'help':
                       actions.openHelpDialog();
                       return { type: 'handled' };
-                    case 'manage-models':
-                      actions.openModelDialog();
-                      return { type: 'handled' };
                     default: {
-                      const unhandled: never = result.dialog;
                       throw new Error(
-                        `Unhandled slash command result: ${unhandled}`,
+                        `Unhandled slash command result: ${String(result.dialog)}`,
                       );
                     }
                   }
@@ -1039,12 +1039,6 @@ export const useSlashCommandProcessor = (
                     invocationItemId,
                   );
                 }
-                case 'startImmediateSubagent': {
-                  // Handled by the caller (AppContainer) which starts the
-                  // subagent prompt. The slash command processor itself
-                  // does not own the prompt loop.
-                  return result;
-                }
                 case 'stream_messages': {
                   // stream_messages is only used in ACP/Zed integration mode
                   // and should not be returned in interactive UI mode
@@ -1053,9 +1047,8 @@ export const useSlashCommandProcessor = (
                   );
                 }
                 default: {
-                  const unhandled: never = result;
                   throw new Error(
-                    `Unhandled slash command result: ${unhandled}`,
+                    `Unhandled slash command result: ${String((result as { type?: unknown }).type)}`,
                   );
                 }
               }

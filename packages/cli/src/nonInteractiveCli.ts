@@ -34,6 +34,9 @@ import {
   ApprovalMode,
   ToolConfirmationOutcome,
   createDuplicateProviderToolCallResponse,
+  findRepeatedDuplicateProviderToolCall,
+  isSystemReminderContent,
+  markDuplicateProviderToolCallResponseSent,
 } from '@hoptrendy/hopcode-core';
 import type { Content, Part, PartListUnion } from '@google/genai';
 import type { CLIUserMessage, PermissionMode } from './nonInteractive/types.js';

@@ -12,7 +12,6 @@ import {
   resolveConfigPathLite,
 } from '../config/storage-paths-lite.js';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
-import { Storage, updateSymlink } from '@hoptrendy/hopcode-core';
 
 export type DaemonLogLevel = 'INFO' | 'WARN' | 'ERROR';
 

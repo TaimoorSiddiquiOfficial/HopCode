@@ -17,22 +17,14 @@ import { act } from 'react';
 import { renderHook } from '@testing-library/react';
 import { resolveBranchName, watchRepoBranch } from '@hoptrendy/hopcode-core';
 import { useGitBranchName } from './useGitBranchName.js';
-import { fs, vol } from 'memfs'; // For mocking fs
-import fsPromises from 'node:fs/promises';
-import path from 'node:path';
-import { isCommandAvailable, execCommand } from '@hoptrendy/hopcode-core';
 
-// Mock @hoptrendy/hopcode-core
-vi.mock('@hoptrendy/hopcode-core', async () => {
-  const original = await vi.importActual<
-    typeof import('@hoptrendy/hopcode-core')
-  >('@hoptrendy/hopcode-core');
-  return {
-    ...original,
-    execCommand: vi.fn(),
-    isCommandAvailable: vi.fn(),
-  };
-});
+// The hook is a thin wrapper over core's gitDirect helpers; the direct-read
+// logic itself is covered by core's gitDirect.test.ts. Here we mock those two
+// functions and exercise the hook's wiring and lifecycle.
+vi.mock('@hoptrendy/hopcode-core', () => ({
+  resolveBranchName: vi.fn(),
+  watchRepoBranch: vi.fn(),
+}));
 
 const mockResolve = resolveBranchName as Mock;
 const mockWatch = watchRepoBranch as Mock;

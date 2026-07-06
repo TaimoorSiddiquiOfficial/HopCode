@@ -13,7 +13,10 @@ import {
   SessionStartSource,
   computeUniqueBranchTitle,
 } from '@hoptrendy/hopcode-core';
-import { buildResumedHistoryItems } from '../utils/resumeHistoryUtils.js';
+import {
+  applyCollapsePolicyAndSummary,
+  buildResumedHistoryItems,
+} from '../utils/resumeHistoryUtils.js';
 import { restoreGoalFromHistory } from '../utils/restoreGoal.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import type { LoadedSettings } from '../../config/settings.js';

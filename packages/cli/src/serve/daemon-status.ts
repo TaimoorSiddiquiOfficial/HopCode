@@ -299,28 +299,6 @@ export async function buildDaemonStatusResponse(
   };
 }
 
-function cloneStartup(startup: DaemonStartupSnapshot): DaemonStartupSnapshot {
-  return {
-    processStartedAt: startup.processStartedAt,
-    ...(startup.listenerReadyAt
-      ? { listenerReadyAt: startup.listenerReadyAt }
-      : {}),
-    ...(startup.processToListenMs !== undefined
-      ? { processToListenMs: startup.processToListenMs }
-      : {}),
-    ...(startup.runHopCodeServeToListenMs !== undefined
-      ? { runHopCodeServeToListenMs: startup.runHopCodeServeToListenMs }
-      : {}),
-    preheat: {
-      status: startup.preheat.status,
-      ...(startup.preheat.durationMs !== undefined
-        ? { durationMs: startup.preheat.durationMs }
-        : {}),
-      ...(startup.preheat.error ? { error: startup.preheat.error } : {}),
-    },
-  };
-}
-
 async function buildFullStatus(
   input: BuildDaemonStatusOptions,
   bridgeSnapshot: BridgeDaemonStatusSnapshot,

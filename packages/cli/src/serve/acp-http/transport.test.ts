@@ -6,11 +6,8 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import express from 'express';
-import { promises as fs } from 'node:fs';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import * as os from 'node:os';
-import * as path from 'node:path';
 import WebSocket from 'ws';
 import type { HttpAcpBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
 import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
@@ -21,12 +18,13 @@ import {
   SessionShellDisabledError,
 } from '@hoptrendy/acp-bridge/bridgeErrors';
 import { SessionService } from '@hoptrendy/hopcode-core';
+import type {
+  ResolvedPath,
+  WorkspaceFileSystem,
+  WorkspaceFileSystemFactory,
+} from '../fs/index.js';
 import type { DaemonWorkspaceService } from '../workspace-service/types.js';
 import { mountAcpHttp } from './index.js';
-import {
-  MAX_TRUST_REASON_LENGTH,
-  MAX_VOICE_MODEL_LENGTH,
-} from '../validation-limits.js';
 
 const stdioMocks = vi.hoisted(() => ({
   writeStderrLine: vi.fn(),
@@ -335,11 +333,6 @@ function emptyRules() {
   return { allow: [], ask: [], deny: [] };
 }
 
-async function writeJson(file: string, value: unknown): Promise<void> {
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.writeFile(file, JSON.stringify(value, null, 2), 'utf8');
-}
-
 // A minimal fake workspace service for dispatch tests.
 const fakeWorkspace = {
   async getWorkspaceMcpStatus() {
@@ -471,19 +464,6 @@ function makeGlobFsFactory(glob: WorkspaceFileSystem['glob']) {
 
 function resolvedPath(value: string): ResolvedPath {
   return value as ResolvedPath;
-}
-
-function makeFileFsFactory(
-  overrides: Partial<Record<keyof WorkspaceFileSystem, unknown>>,
-) {
-  return {
-    assertCanWrite: () => {},
-    forRequest: () =>
-      ({
-        resolve: vi.fn(async (input: string) => resolvedPath(`/ws/${input}`)),
-        ...overrides,
-      }) as unknown as WorkspaceFileSystem,
-  } satisfies WorkspaceFileSystemFactory;
 }
 
 // ── SSE client helper ────────────────────────────────────────────────

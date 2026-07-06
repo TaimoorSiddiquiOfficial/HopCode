@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright 2025 HopCode Team
+ * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AuthDialog } from './AuthDialog.js';
 import { LoadedSettings } from '../../config/settings.js';
+import type { Settings } from '../../config/settingsSchema.js';
 import type { Config } from '@hoptrendy/hopcode-core';
 import { AuthType } from '@hoptrendy/hopcode-core';
 import { renderWithProviders } from '../../test-utils/render.js';
@@ -440,7 +441,7 @@ describe('AuthDialog', { timeout: 15000 }, () => {
 
   describe('HOPCODE_DEFAULT_AUTH_TYPE environment variable', () => {
     it('should select the auth type specified by HOPCODE_DEFAULT_AUTH_TYPE', () => {
-      // HOPCODE_OAUTH is the only valid AuthType that can be selected via env var
+      // QWEN_OAUTH is the only valid AuthType that can be selected via env var
       // API-KEY is not an AuthType enum value, so it cannot be selected this way
       process.env['HOPCODE_DEFAULT_AUTH_TYPE'] = AuthType.HOPCODE_OAUTH;
 
@@ -479,7 +480,7 @@ describe('AuthDialog', { timeout: 15000 }, () => {
 
       const { lastFrame } = renderAuthDialog(settings);
 
-      // HOPCODE OAuth no longer has a UI entry; the dialog falls back to the
+      // QWEN OAuth no longer has a UI entry; the dialog falls back to the
       // default Alibaba ModelStudio option.
       expect(lastFrame()).toContain('Alibaba ModelStudio');
     });
@@ -1528,7 +1529,7 @@ describe('AuthDialog Custom API Key Wizard', { timeout: 15000 }, () => {
         stdin,
         lastFrame,
         'sk-test-key-12345',
-        'hopcode/qwen3-coder,gpt-4.1',
+        'qwen/qwen3-coder,gpt-4.1',
       );
       await pressEnterAndWaitFor(
         stdin,
@@ -1541,8 +1542,8 @@ describe('AuthDialog Custom API Key Wizard', { timeout: 15000 }, () => {
           const frame = lastFrame();
           expect(frame).toContain('Custom Provider · Step 6/6 · Review');
           expect(frame).toContain('The following JSON will be saved');
-          expect(frame).toContain('HOPCODE_CUSTOM_API_KEY_');
-          expect(frame).toContain('hopcode/qwen3-coder');
+          expect(frame).toContain('QWEN_CUSTOM_API_KEY_');
+          expect(frame).toContain('qwen/qwen3-coder');
           expect(frame).toContain('gpt-4.1');
           expect(frame).toContain('Enter to save');
         },

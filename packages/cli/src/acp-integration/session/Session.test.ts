@@ -2118,7 +2118,7 @@ describe('Session', () => {
       });
 
       it('stops an ACP prompt after a repeated duplicate provider id without sending an empty follow-up', async () => {
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         vi.mocked(mockChat.getHistoryFunctionResponseIds)
           .mockReturnValueOnce(new Set<string>())
           .mockReturnValue(new Set(['shell_1']));
@@ -2216,7 +2216,7 @@ describe('Session', () => {
       });
 
       it('clears duplicate provider id tracking between ACP prompts', async () => {
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         vi.mocked(mockChat.getHistoryFunctionResponseIds).mockReturnValue(
           new Set(['shell_1']),
         );
