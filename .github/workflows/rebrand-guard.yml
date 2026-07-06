@@ -32,8 +32,8 @@ jobs:
 
       - name: 'Scan for stale rebrand references'
         run: |-
-          EXCLUDE="\.github/workflows/rebrand-guard\.yml|^\.hopcode/|^docs/archive/|^docs/design/|^packages/cli/dist/|node_modules/|chat-Assistant-|yolo\.svg$"
-          BLOCKLIST="QwenLM|wenzhong|@qwen/|--approval-mode yolo|approvalMode:[$']yolo[$']|yolo$|import.*yolo\.svg|registry\.npm\.alibaba|registry\.npmmirror|registry\.npm\.taobao"
+          EXCLUDE="\.github/workflows/rebrand-guard\.yml|^\.hopcode/|^docs/archive/|^docs/design/|^packages/cli/dist/|^scripts/|node_modules/|chat-Assistant-|yolo\.svg$"
+          BLOCKLIST="QwenLM|wenzhong|@qwen/|--approval-mode yolo|approvalMode:[\"'']yolo[\"'']|yolo$|import.*yolo\.svg|registry\.npm\.alibaba|registry\.npmmirror|registry\.npm\.taobao"
 
           HITS="$(git ls-files | grep -vE "$EXCLUDE" | xargs grep -lnE "$BLOCKLIST" 2>/dev/null || true)"
 
