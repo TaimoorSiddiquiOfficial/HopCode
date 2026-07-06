@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
@@ -162,7 +162,7 @@ describe('createNativeAudioRecorder', () => {
     const recorder = createNativeAudioRecorder({
       loadBackend: () => {
         throw new Error(
-          "Cannot find package '@hopcode/audio-capture' imported from /qwen/dist/cli.js",
+          "Cannot find package '@hoptrendy/audio-capture' imported from /qwen/dist/cli.js",
         );
       },
     });
@@ -177,7 +177,7 @@ describe('createNativeAudioRecorder', () => {
     'explains mirror registry installs for %s native package errors',
     async (code) => {
       const error = Object.assign(
-        new Error('missing @hopcode/audio-capture dependency'),
+        new Error('missing @hoptrendy/audio-capture dependency'),
         { code },
       );
       const recorder = createNativeAudioRecorder({
@@ -189,15 +189,13 @@ describe('createNativeAudioRecorder', () => {
       await expect(recorder.start()).rejects.toThrow(
         /mirror or private registry/,
       );
-      await expect(recorder.start()).rejects.toThrow(
-        /@hopcode\/audio-capture/,
-      );
+      await expect(recorder.start()).rejects.toThrow(/@hopcode\/audio-capture/);
     },
   );
 
   it('does not rewrite wrapped native addon load failures as missing packages', async () => {
     const loadError = new Error(
-      "Native audio capture addon could not be loaded. Reinstall @hopcode/audio-capture, or use the SoX fallback. (Cannot find module 'node-gyp-build')",
+      "Native audio capture addon could not be loaded. Reinstall @hoptrendy/audio-capture, or use the SoX fallback. (Cannot find module 'node-gyp-build')",
     );
     const recorder = createNativeAudioRecorder({
       loadBackend: () => {
@@ -210,7 +208,7 @@ describe('createNativeAudioRecorder', () => {
 
   it('does not explain native start failures as missing packages', async () => {
     const startError = new Error(
-      "Cannot find package '@hopcode/audio-capture' while starting",
+      "Cannot find package '@hoptrendy/audio-capture' while starting",
     );
     const backend = {
       startRecording: vi.fn(() => {

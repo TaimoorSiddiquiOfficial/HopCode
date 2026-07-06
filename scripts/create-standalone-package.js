@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 
 /**
  * @license
@@ -301,10 +301,10 @@ function copyRuntimeAssets(packageRoot, outDir) {
   );
 }
 
-// Bundle the @hopcode/audio-capture native addon (compiled JS + only this
+// Bundle the @hoptrendy/audio-capture native addon (compiled JS + only this
 // target's prebuild + its runtime dep node-gyp-build) into lib/node_modules so
 // streaming voice works in standalone installs. The addon is esbuild-external
-// and resolved at runtime via import('@hopcode/audio-capture') from
+// and resolved at runtime via import('@hoptrendy/audio-capture') from
 // lib/cli.js, so lib/node_modules is where Node looks. Without it, standalone
 // users fall back to SoX/arecord (batch only) — #5502 follow-up #5590.
 function copyNativeAddon(packageRoot, target) {

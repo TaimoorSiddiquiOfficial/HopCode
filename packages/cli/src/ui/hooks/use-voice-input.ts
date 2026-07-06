@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
@@ -321,7 +321,7 @@ export function useVoiceInput({
           }
           if (recorder.supportsStreaming?.() === false) {
             throw new Error(
-              'Streaming voice transcription requires native audio capture. Install/rebuild @hopcode/audio-capture or switch voiceModel to qwen3-asr-flash for batch transcription.',
+              'Streaming voice transcription requires native audio capture. Install/rebuild @hoptrendy/audio-capture or switch voiceModel to qwen3-asr-flash for batch transcription.',
             );
           }
           const streamPromise = openStream!({

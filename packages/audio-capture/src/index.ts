@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
@@ -63,7 +63,7 @@ function loadBinding(): NativeBinding {
   } catch (error) {
     throw new Error(
       'Native audio capture addon could not be loaded. Reinstall ' +
-        '@hopcode/audio-capture, or run "npm run build" in packages/audio-capture. ' +
+        '@hoptrendy/audio-capture, or run "npm run build" in packages/audio-capture. ' +
         `(${error instanceof Error ? error.message : String(error)})`,
     );
   }

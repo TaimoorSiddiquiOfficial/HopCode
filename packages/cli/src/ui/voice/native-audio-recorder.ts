@@ -1,10 +1,10 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { NativeAudioCaptureBackend } from '@hopcode/audio-capture';
+import type { NativeAudioCaptureBackend } from '@hoptrendy/audio-capture';
 import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import type {
   RecordedVoiceAudio,
@@ -15,7 +15,7 @@ import type {
 // Native silence detection sets a flag we poll for; older addons lack it.
 const SILENCE_POLL_INTERVAL_MS = 200;
 const debugLogger = createDebugLogger('VOICE_NATIVE_RECORDER');
-const AUDIO_CAPTURE_PACKAGE = '@hopcode/audio-capture';
+const AUDIO_CAPTURE_PACKAGE = '@hoptrendy/audio-capture';
 
 interface NativeAudioRecorderOptions {
   loadBackend?: () =>
@@ -130,7 +130,7 @@ class NativeAudioRecorder implements VoiceRecorder {
 
 async function loadDefaultBackend(): Promise<NativeAudioCaptureBackend> {
   const { createNativeAudioCaptureBackend } = await import(
-    '@hopcode/audio-capture'
+    '@hoptrendy/audio-capture'
   );
   return createNativeAudioCaptureBackend();
 }

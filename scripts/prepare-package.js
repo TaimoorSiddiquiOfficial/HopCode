@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -369,12 +369,12 @@ if (isServeCommand()) {
       'web-shell',
     ],
     ...(bundleNativeAudioCapture
-      ? { bundledDependencies: ['@hopcode/audio-capture'] }
+      ? { bundledDependencies: ['@hoptrendy/audio-capture'] }
       : {}),
     config: rootPackageJson.config,
     dependencies: {},
     optionalDependencies: {
-      '@hopcode/audio-capture': rootPackageJson.version,
+      '@hoptrendy/audio-capture': rootPackageJson.version,
       '@lydell/node-pty': '1.2.0-beta.10',
       '@lydell/node-pty-darwin-arm64': '1.2.0-beta.10',
       '@lydell/node-pty-darwin-x64': '1.2.0-beta.10',

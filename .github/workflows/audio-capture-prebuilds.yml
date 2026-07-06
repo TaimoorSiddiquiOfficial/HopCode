@@ -1,6 +1,6 @@
-name: 'Audio Capture Prebuilds'
+﻿name: 'Audio Capture Prebuilds'
 
-# Cross-compiles the @hopcode/audio-capture native addon (miniaudio + N-API)
+# Cross-compiles the @hoptrendy/audio-capture native addon (miniaudio + N-API)
 # into prebuilds/<platform>-<arch>/*.node for every supported target, then
 # bundles them into a single `audio-capture-prebuilds` artifact.
 #

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -65,10 +65,10 @@ describe('package asset scripts', () => {
 
     expect(distPackageJson.files).toContain('examples');
     expect(distPackageJson.bundledDependencies).toContain(
-      '@hopcode/audio-capture',
+      '@hoptrendy/audio-capture',
     );
     expect(distPackageJson.optionalDependencies).toMatchObject({
-      '@hopcode/audio-capture': rootPackageJson.version,
+      '@hoptrendy/audio-capture': rootPackageJson.version,
     });
     expect(
       existsSync(
@@ -190,13 +190,7 @@ describe('package asset scripts', () => {
     expect(distPackageJson.bundledDependencies).toBeUndefined();
     expect(
       existsSync(
-        path.join(
-          rootDir,
-          'dist',
-          'node_modules',
-          '@hopcode',
-          'audio-capture',
-        ),
+        path.join(rootDir, 'dist', 'node_modules', '@hopcode', 'audio-capture'),
       ),
     ).toBe(false);
   });
@@ -220,13 +214,7 @@ describe('package asset scripts', () => {
     expect(distPackageJson.bundledDependencies).toBeUndefined();
     expect(
       existsSync(
-        path.join(
-          rootDir,
-          'dist',
-          'node_modules',
-          '@hopcode',
-          'audio-capture',
-        ),
+        path.join(rootDir, 'dist', 'node_modules', '@hopcode', 'audio-capture'),
       ),
     ).toBe(false);
   });
@@ -298,13 +286,7 @@ describe('package asset scripts', () => {
     expect(distPackageJson.bundledDependencies).toBeUndefined();
     expect(
       existsSync(
-        path.join(
-          rootDir,
-          'dist',
-          'node_modules',
-          '@hopcode',
-          'audio-capture',
-        ),
+        path.join(rootDir, 'dist', 'node_modules', '@hopcode', 'audio-capture'),
       ),
     ).toBe(false);
   });
@@ -342,13 +324,7 @@ describe('package asset scripts', () => {
     expect(distPackageJson.bundledDependencies).toBeUndefined();
     expect(
       existsSync(
-        path.join(
-          rootDir,
-          'dist',
-          'node_modules',
-          '@hopcode',
-          'audio-capture',
-        ),
+        path.join(rootDir, 'dist', 'node_modules', '@hopcode', 'audio-capture'),
       ),
     ).toBe(false);
   });
@@ -402,7 +378,7 @@ describe('package asset scripts', () => {
       'packages/audio-capture/package.json',
       JSON.stringify(
         {
-          name: '@hopcode/audio-capture',
+          name: '@hoptrendy/audio-capture',
           version: '0.17.0',
           type: 'module',
           main: 'dist/index.js',

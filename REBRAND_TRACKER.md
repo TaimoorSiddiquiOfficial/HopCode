@@ -1,4 +1,4 @@
-# Rebrand Tracker — HopCode fork from QwenLM/qwen-code
+﻿# Rebrand Tracker — HopCode fork from QwenLM/qwen-code
 
 ## Completed
 
@@ -10,7 +10,7 @@
 - [x] Triage workflow node-version: 20 → 22.x (uses .nvmrc)
 - [x] release.yml repo guards: QwenLM/hopcode → TaimoorSiddiquiOfficial/HopCode (4 locations)
 - [x] qwen-autofix.yml → hopcode-autofix.yml in release.yml notify_failure
-- [x] @hopcode/audio-capture version: 0.19.3 → 0.30.4
+- [x] @hoptrendy/audio-capture version: 0.19.3 → 0.30.4
 - [x] yolo.svg → izn.svg (+ backward-compat alias in ModeIcon.tsx)
 - [x] Rebrand guard workflow: .github/workflows/rebrand-guard.yml
 
