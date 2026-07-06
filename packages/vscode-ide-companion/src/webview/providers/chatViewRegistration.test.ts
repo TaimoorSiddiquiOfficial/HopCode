@@ -7,14 +7,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { registerChatViewProviders } from './chatViewRegistration.js';
 
-const { registerWebviewViewProvider } = vi.hoisted(() => ({
+const { registerWebviewViewProvider, executeCommand } = vi.hoisted(() => ({
   registerWebviewViewProvider: vi.fn(() => ({ dispose: vi.fn() })),
+  executeCommand: vi.fn(),
 }));
 
 vi.mock('vscode', () => ({
   window: {
     registerWebviewViewProvider,
   },
+  commands: {
+    executeCommand,
+  },
+  version: '1.106.0',
 }));
 
 describe('registerChatViewProviders', () => {
@@ -23,6 +28,7 @@ describe('registerChatViewProviders', () => {
   beforeEach(() => {
     context.subscriptions = [];
     registerWebviewViewProvider.mockClear();
+    executeCommand.mockClear();
   });
 
   it('registers the sidebar host with retained webview context', () => {

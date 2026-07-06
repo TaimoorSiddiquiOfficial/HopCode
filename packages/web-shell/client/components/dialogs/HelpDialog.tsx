@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import type { CommandInfo } from '../../adapters/types';
 import { useI18n } from '../../i18n';
 import styles from './HelpDialog.module.css';
@@ -15,7 +15,6 @@ const TABS: Array<{ id: HelpTab; labelKey: string }> = [
   { id: 'custom-commands', labelKey: 'help.tab.custom' },
 ];
 
-const DOCS_URL = 'https://taimoorsiddiquiofficial.github.io/hopcode-docs/';
 const BUILT_IN_COMMANDS = new Set([
   'about',
   'agents',
@@ -129,47 +128,6 @@ function filterCommands(
       );
     })
     .sort((a, b) => a.name.localeCompare(b.name));
-  const builtIn = visible.filter((command) =>
-    BUILT_IN_COMMANDS.has(command.name),
-  );
-  const custom = visible.filter(
-    (command) => !BUILT_IN_COMMANDS.has(command.name),
-  );
-
-  if (customOnly) {
-    return custom.length
-      ? [
-          {
-            key: 'custom',
-            title: t('help.customGroup'),
-            commands: custom,
-          },
-        ]
-      : [];
-  }
-
-  return builtIn.length
-    ? [{ key: 'built-in', title: t('help.builtIn'), commands: builtIn }]
-    : [];
-}
-
-function HelpTabs({ activeTab }: { activeTab: HelpTab }) {
-  const { t } = useI18n();
-  return (
-    <div className={styles.tabs}>
-      <span className={styles.brand}>HopCode</span>
-      {TABS.map((tab) => (
-        <span
-          key={tab.id}
-          className={`${styles.tab} ${
-            tab.id === activeTab ? styles.tabActive : ''
-          }`}
-        >
-          {t(tab.labelKey)}
-        </span>
-      ))}
-    </div>
-  );
 }
 
 function GeneralHelp() {

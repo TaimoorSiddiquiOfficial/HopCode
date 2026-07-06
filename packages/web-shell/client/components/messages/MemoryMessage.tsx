@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   useMemory,
   type DaemonContextFileScope,
   type DaemonWorkspaceMemoryFile,
 } from '@hoptrendy/webui/daemon-react-sdk';
-import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
 import { useI18n } from '../../i18n';
 import styles from './MemoryMessage.module.css';
 
@@ -69,14 +68,14 @@ export function MemoryMessage({
         scope: 'workspace',
         title: t('memory.project'),
         description: t('memory.project.desc'),
-        fallbackPath: 'QWEN.md',
+        fallbackPath: 'HOPCODE.md',
         file: workspaceFile,
       },
       {
         scope: 'global',
         title: t('memory.global'),
         description: t('memory.global.desc'),
-        fallbackPath: '~/.hopcode/QWEN.md',
+        fallbackPath: '~/.hopcode/HOPCODE.md',
         file: globalFile,
       },
     ];
@@ -162,27 +161,10 @@ export function MemoryMessage({
     loadContent(entry, 'view');
   };
 
-  const items = useMemo<MemoryItem[]>(
-    () => [
-      {
-        label: t('memory.global'),
-        value: 'global',
-        description: describeFile(globalFile, '~/.hopcode/HOPCODE.md', t),
-        file: globalFile,
-      },
-      {
-        label: t('memory.project'),
-        value: 'workspace',
-        description: describeFile(workspaceFile, 'HOPCODE.md', t),
-        file: workspaceFile,
-      },
-      {
-        label: t('memory.autoFolder'),
-        value: 'managed',
-      },
-    ],
-    [globalFile, t, workspaceFile],
-  );
+  const handleEdit = () => {
+    if (!selectedEntry) return;
+    loadContent(selectedEntry, 'edit');
+  };
 
   const handleSave = () => {
     if (!selectedEntry) return;

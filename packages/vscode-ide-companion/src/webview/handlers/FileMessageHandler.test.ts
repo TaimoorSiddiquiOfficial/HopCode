@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -245,7 +245,7 @@ describe('FileMessageHandler', () => {
     vscodeMock.window.showTextDocument.mockResolvedValue({});
 
     const handler = new FileMessageHandler(
-      {} as QwenAgentManager,
+      {} as HopCodeAgentManager,
       {} as ConversationStore,
       null,
       vi.fn(),
@@ -271,7 +271,7 @@ describe('FileMessageHandler', () => {
     vscodeMock.window.showTextDocument.mockResolvedValue({});
 
     const handler = new FileMessageHandler(
-      {} as QwenAgentManager,
+      {} as HopCodeAgentManager,
       {} as ConversationStore,
       null,
       vi.fn(),
@@ -298,7 +298,7 @@ describe('FileMessageHandler', () => {
     vscodeMock.window.showTextDocument.mockResolvedValue(editor);
 
     const handler = new FileMessageHandler(
-      {} as QwenAgentManager,
+      {} as HopCodeAgentManager,
       {} as ConversationStore,
       null,
       vi.fn(),

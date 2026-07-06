@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { dp } from './dialogStyles';
-import {
-  useMcp,
-  type DaemonWorkspaceMcpServerStatus,
-  type DaemonWorkspaceMcpToolStatus,
-  type DaemonWorkspaceMcpToolsStatus,
+﻿import { useCallback, useEffect, useMemo, useState } from 'react';
+import type {
+  DaemonWorkspaceActions,
+  DaemonWorkspaceMcpServerStatus,
+  DaemonWorkspaceMcpToolStatus,
+  DaemonWorkspaceMcpToolsStatus,
+  DaemonWorkspaceMcpResourceStatus,
+  DaemonWorkspaceMcpResourcesStatus,
 } from '@hoptrendy/webui/daemon-react-sdk';
-import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
+import { useMcp } from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../../i18n';
 import { trimDialogLabel } from '../../utils/dialogLabels';
 import type { SerializedMcpStatusMessage } from '../messages/McpStatusMessage';

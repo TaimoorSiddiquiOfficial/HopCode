@@ -8,8 +8,10 @@ import * as vscode from 'vscode';
 import type { DiffManager } from '../diff-manager.js';
 import type { WebViewProvider } from '../webview/providers/WebViewProvider.js';
 import { getErrorMessage } from '../utils/errorMessage.js';
-import { shouldResolveAgainstWorkspace } from '../utils/file-path.js';
-import { CHAT_VIEW_ID_SIDEBAR } from '../constants/viewIds.js';
+import {
+  CHAT_VIEW_ID_SIDEBAR,
+  CHAT_VIEW_ID_SECONDARY,
+} from '../constants/viewIds.js';
 
 type Logger = (message: string) => void;
 
@@ -26,7 +28,7 @@ export const showLogsCommand = 'hopcode.showLogs';
  * Register all HopCode chat-related commands.
  *
  * `openChat` and `newConversation` always open an editor tab, while
- * `focusChat` focuses the Activity Bar chat view.
+ * `focusChat` focuses the secondary sidebar (preferred) or primary sidebar.
  *
  * @param context - VS Code extension context for subscription management
  * @param log - Logger function for debug output
@@ -34,6 +36,7 @@ export const showLogsCommand = 'hopcode.showLogs';
  * @param getWebViewProviders - Returns all active editor-tab WebView providers
  * @param createWebViewProvider - Factory to create a new editor-tab WebView provider
  * @param outputChannel - Optional output channel for the showLogs command
+ * @param supportsSecondarySidebar - Whether the running VS Code supports secondary sidebar
  */
 export function registerNewCommands(
   context: vscode.ExtensionContext,
@@ -42,6 +45,7 @@ export function registerNewCommands(
   getWebViewProviders: () => WebViewProvider[],
   createWebViewProvider: () => WebViewProvider,
   outputChannel?: vscode.OutputChannel,
+  supportsSecondarySidebar = true,
 ): void {
   const disposables: vscode.Disposable[] = [];
 
@@ -64,7 +68,7 @@ export function registerNewCommands(
       async (args: { path: string; oldText: string; newText: string }) => {
         try {
           let absolutePath = args.path;
-          if (shouldResolveAgainstWorkspace(args.path)) {
+          if (!args.path.startsWith('/') && !args.path.match(/^[a-zA-Z]:/)) {
             const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
             if (workspaceFolder) {
               absolutePath = vscode.Uri.joinPath(
@@ -109,10 +113,15 @@ export function registerNewCommands(
     }),
   );
 
-  // Focus Chat: bring the Activity Bar chat view to front.
+  // Focus Chat: bring the active chat view to front.
+  // Use secondary sidebar when supported; fall back to primary sidebar.
   disposables.push(
     vscode.commands.registerCommand(focusChatCommand, async () => {
-      await vscode.commands.executeCommand(`${CHAT_VIEW_ID_SIDEBAR}.focus`);
+      if (supportsSecondarySidebar) {
+        await vscode.commands.executeCommand(`${CHAT_VIEW_ID_SECONDARY}.focus`);
+      } else {
+        await vscode.commands.executeCommand(`${CHAT_VIEW_ID_SIDEBAR}.focus`);
+      }
     }),
   );
 

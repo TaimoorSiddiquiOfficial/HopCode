@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   DaemonWorkspaceActions,
   DaemonWorkspaceMcpServerStatus,
   DaemonWorkspaceMcpToolStatus,
   DaemonWorkspaceMcpToolsStatus,
+  DaemonWorkspaceMcpResourcesStatus,
 } from '@hoptrendy/webui/daemon-react-sdk';
 import { useMcp } from '@hoptrendy/webui/daemon-react-sdk';
 import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';

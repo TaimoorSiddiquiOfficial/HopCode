@@ -12,6 +12,7 @@ import type {
   AuthType,
   ChatCompressionSettings,
   ModelProvidersConfig,
+  ProviderProtocolConfig,
 } from '@hoptrendy/hopcode-core';
 import {
   ApprovalMode,

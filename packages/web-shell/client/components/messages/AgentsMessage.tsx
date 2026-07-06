@@ -1,4 +1,4 @@
-import {
+﻿import {
   useState,
   useEffect,
   useCallback,
@@ -305,340 +305,7 @@ export function AgentsMessage({
     handleClose,
     t,
   ]);
-
-  // ── Create: total steps ──
-  const createTotalSteps = createMethod === 'manual' ? 8 : 6;
-  const createToolsStep = createMethod === 'manual' ? 6 : 4;
-  const createColorStep = createMethod === 'manual' ? 7 : 5;
-
-  // ── Keyboard handler ──
-  useDelayedGlobalKeyDown(
-    (e: KeyboardEvent) => {
-      if (closed || inputFocused) return;
-      if (e.defaultPrevented) return;
-
-      const claim = () => {
-        e.preventDefault();
-        e.stopPropagation();
-      };
-
-      // ── Menu mode ──
-      if (topMode === 'menu') {
-        if (e.key === 'ArrowDown' || e.key === 'j') {
-          claim();
-          setMenuIdx((i) => Math.min(i + 1, 1));
-        } else if (e.key === 'ArrowUp' || e.key === 'k') {
-          claim();
-          setMenuIdx((i) => Math.max(i - 1, 0));
-        } else if (e.key === 'Enter' || e.key === ' ') {
-          claim();
-          if (menuIdx === 0) {
-            setTopMode('manage');
-          } else {
-            setTopMode('create');
-          }
-        } else if (e.key === 'Escape') {
-          claim();
-          handleClose();
-        }
-        return;
-      }
-
-      // ── Manage mode ──
-      if (topMode === 'manage') {
-        if (e.key === 'Escape') {
-          claim();
-          if (manageStack.length <= 1) {
-            if (mode === 'manage') handleClose();
-            else {
-              setTopMode('menu');
-              setMenuIdx(0);
-            }
-          } else {
-            managePop();
-          }
-          return;
-        }
-
-        if (manageStep === 'agent-selection') {
-          const total = flatAgents.length;
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setSelectedAgentIdx((i) => Math.min(i + 1, total - 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setSelectedAgentIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            if (total > 0) managePush('action-selection');
-          }
-          return;
-        }
-
-        if (manageStep === 'action-selection') {
-          const agent = flatAgents[selectedAgentIdx];
-          const isReadOnly = agent ? !canModifyAgent(agent) : true;
-          const actions = isReadOnly
-            ? ['view', 'back']
-            : ['view', 'edit', 'delete', 'back'];
-          const total = actions.length;
-
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setManageSelIdx((i) => Math.min(i + 1, total - 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setManageSelIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            const action = actions[manageSelIdx];
-            if (action === 'view') managePush('agent-viewer');
-            else if (action === 'edit') managePush('edit-options');
-            else if (action === 'delete') managePush('delete-confirmation');
-            else if (action === 'back') managePop();
-          }
-          return;
-        }
-
-        if (manageStep === 'agent-viewer') {
-          // View is display-only, Esc handled above
-          return;
-        }
-
-        if (manageStep === 'edit-options') {
-          const editActions = ['tools', 'color', 'back'];
-          const total = editActions.length;
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setManageSelIdx((i) => Math.min(i + 1, total - 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setManageSelIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            const action = editActions[manageSelIdx];
-            if (action === 'tools') {
-              managePush('edit-tools');
-              setManageSelIdx(
-                resolveToolCategoryIndex(toolCategories, selectedAgent?.tools),
-              );
-            } else if (action === 'color') managePush('edit-color');
-            else if (action === 'back') managePop();
-          }
-          return;
-        }
-
-        if (manageStep === 'edit-tools') {
-          const total = toolCategories.length;
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setManageSelIdx((i) => Math.min(i + 1, total - 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setManageSelIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            if (!busy)
-              handleUpdateTools(toolCategories[manageSelIdx]?.tools ?? []);
-          }
-          return;
-        }
-
-        if (manageStep === 'edit-color') {
-          const total = COLOR_OPTIONS.length;
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setManageSelIdx((i) => Math.min(i + 1, total - 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setManageSelIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            if (!busy) handleUpdateColor(COLOR_OPTIONS[manageSelIdx]!.value);
-          }
-          return;
-        }
-
-        if (manageStep === 'delete-confirmation') {
-          if (e.key === 'y' || e.key === 'Enter') {
-            claim();
-            if (!busy) handleDelete();
-          } else if (e.key === 'n') {
-            claim();
-            managePop();
-          }
-          return;
-        }
-
-        return;
-      }
-
-      // ── Create mode ──
-      if (topMode === 'create') {
-        if (createGenerating) {
-          if (e.key === 'Escape') {
-            claim();
-            generationRunRef.current += 1;
-            setCreateGenerating(false);
-            setInputFocused(true);
-          }
-          return;
-        }
-        if (e.key === 'Escape') {
-          claim();
-          if (createStep <= 1) {
-            if (
-              mode === 'create' ||
-              mode === 'create-user' ||
-              mode === 'create-project'
-            ) {
-              handleClose();
-            } else {
-              setTopMode('menu');
-              setMenuIdx(1);
-            }
-          } else {
-            setCreateStep((s) => s - 1);
-            setCreateSelIdx(0);
-          }
-          return;
-        }
-
-        // Step 1: Location
-        if (createStep === 1) {
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setCreateSelIdx((i) => Math.min(i + 1, 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setCreateSelIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            setCreateScope(createSelIdx === 0 ? 'workspace' : 'global');
-            setCreateStep(2);
-            setCreateSelIdx(0);
-          }
-          return;
-        }
-
-        // Step 2: Generation method
-        if (createStep === 2) {
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setCreateSelIdx((i) => Math.min(i + 1, 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setCreateSelIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            setCreateMethod(createSelIdx === 0 ? 'hopcode' : 'manual');
-            setCreateStep(3);
-            setCreateSelIdx(0);
-            setInputFocused(true);
-          }
-          return;
-        }
-
-        // Steps 3-5 (manual: name, prompt, description) require text input
-        if (createMethod === 'manual' && createStep >= 3 && createStep <= 5) {
-          // Focus should be on input, but if not, focus it
-          setInputFocused(true);
-          return;
-        }
-
-        // qwen description step (text input)
-        if (createMethod === 'hopcode' && createStep === 3) {
-          setInputFocused(true);
-          return;
-        }
-
-        // Tool selection
-        if (createStep === createToolsStep) {
-          const total = toolCategories.length;
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setCreateSelIdx((i) => Math.min(i + 1, total - 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setCreateSelIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            setCreateTools(toolCategories[createSelIdx]?.tools ?? []);
-            setCreateStep((s) => s + 1);
-            setCreateSelIdx(0);
-          }
-          return;
-        }
-
-        // Color selection
-        if (createStep === createColorStep) {
-          const total = COLOR_OPTIONS.length;
-          if (e.key === 'ArrowDown' || e.key === 'j') {
-            claim();
-            setCreateSelIdx((i) => Math.min(i + 1, total - 1));
-          } else if (e.key === 'ArrowUp' || e.key === 'k') {
-            claim();
-            setCreateSelIdx((i) => Math.max(i - 1, 0));
-          } else if (e.key === 'Enter' || e.key === ' ') {
-            claim();
-            setCreateColor(COLOR_OPTIONS[createSelIdx]!.value);
-            setCreateStep((s) => s + 1);
-            setCreateSelIdx(0);
-          }
-          return;
-        }
-
-        // Final confirmation step
-        const isFinalStep =
-          (createMethod === 'manual' && createStep === createTotalSteps) ||
-          (createMethod === 'hopcode' && createStep === createTotalSteps);
-        if (isFinalStep) {
-          if (
-            e.key === 'Enter' ||
-            e.key === ' ' ||
-            e.key === 's' ||
-            e.key === 'e'
-          ) {
-            claim();
-            if (!busy) handleCreateSave();
-          }
-          return;
-        }
-      }
-    },
-    [
-      closed,
-      inputFocused,
-      topMode,
-      mode,
-      menuIdx,
-      manageStack,
-      manageStep,
-      flatAgents,
-      selectedAgentIdx,
-      manageSelIdx,
-      busy,
-      createGenerating,
-      createStep,
-      createSelIdx,
-      createMethod,
-      createScope,
-      createTotalSteps,
-      createToolsStep,
-      createColorStep,
-      toolCategories,
-      handleClose,
-      managePush,
-      managePop,
-      handleDelete,
-      handleUpdateColor,
-      handleUpdateTools,
-      handleCreateSave,
-      selectedAgent?.tools,
-    ],
-  );
-
-  // ── Text input key handler ──
+  // ── Create helpers ──
   const handleGenerateAgent = useCallback(async () => {
     const description = createDesc.trim();
     if (!description || createGenerating) return;
@@ -670,25 +337,18 @@ export function AgentsMessage({
     }
   }, [createDesc, createGenerating, createMethod, generateAgent, t]);
 
-  const handleInputKeyDown = useCallback(
-    (e: React.KeyboardEvent, field: 'name' | 'desc' | 'prompt') => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (field === 'name' && createName.trim()) {
-          setCreateStep(4);
-          setInputFocused(true);
-        } else if (field === 'prompt' && createPrompt.trim()) {
-          setCreateStep(5);
-          setInputFocused(true);
-        } else if (field === 'desc' && createDesc.trim()) {
-          if (createMethod === 'hopcode') {
-            void handleGenerateAgent();
-            return;
-          }
-          setCreateStep(createMethod === 'manual' ? 6 : 4);
-          setCreateSelIdx(0);
-          setInputFocused(false);
+  const handleInputNext = useCallback(
+    (field: 'name' | 'desc' | 'prompt') => {
+      if (field === 'name' && createName.trim()) {
+        setCreateStep(4);
+        setInputFocused(true);
+      } else if (field === 'prompt' && createPrompt.trim()) {
+        setCreateStep(5);
+        setInputFocused(true);
+      } else if (field === 'desc' && createDesc.trim()) {
+        if (createMethod === 'hopcode') {
+          void handleGenerateAgent();
+          return;
         }
         setCreateStep(createMethod === 'manual' ? 6 : 4);
         setCreateSelIdx(0);
@@ -821,9 +481,6 @@ export function AgentsMessage({
           onSelectMethod={(idx) => {
             setCreateSelIdx(idx);
             setCreateMethod(idx === 0 ? 'hopcode' : 'manual');
-            setCreateStep(3);
-            setCreateSelIdx(0);
-            setInputFocused(true);
           }}
           onSelectTools={(idx) => {
             setCreateSelIdx(idx);
@@ -1091,7 +748,6 @@ function CreateView({
   t,
 }: {
   step: number;
-  totalSteps: number;
   method: 'manual' | 'hopcode';
   scope: 'workspace' | 'global';
   name: string;
@@ -1320,13 +976,9 @@ function CreateView({
     );
   }
 
-  // Qwen description step
   if (method === 'hopcode' && step === 3) {
-    return (
+    body = (
       <>
-        <div className={styles.stepHeader}>
-          {stepTitle(t('agent.create.describeAgent'))}
-        </div>
         <div className={styles.text}>{t('agent.create.hopcodeHint')}</div>
         {generating ? (
           <>

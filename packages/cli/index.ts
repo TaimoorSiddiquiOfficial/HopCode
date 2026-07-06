@@ -18,10 +18,6 @@ import { initCpuProfiler } from './src/utils/cpuProfiler.js';
 initCpuProfiler();
 
 import './src/gemini.js';
-import { main } from './src/gemini.js';
-import { FatalError } from '@hoptrendy/hopcode-core';
-import { AlreadyReportedError } from './src/utils/errors.js';
-import { writeStderrLine } from './src/utils/stdioHelpers.js';
 
 // --- Global Entry Point ---
 

@@ -19,6 +19,8 @@ import type {
   ModelMetrics,
   ModelMetricsCore,
   ToolCallStats,
+  SkillCallStats,
+  SkillMetrics,
 } from '@hoptrendy/hopcode-core';
 import { uiTelemetryService } from '@hoptrendy/hopcode-core';
 

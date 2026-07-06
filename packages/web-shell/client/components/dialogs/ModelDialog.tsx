@@ -1,7 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { dp } from './dialogStyles';
+﻿import { useEffect, useMemo, useRef } from 'react';
 import { useConnection } from '@hoptrendy/webui/daemon-react-sdk';
-import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
 import { useI18n } from '../../i18n';
 import styles from './ModelDialog.module.css';
 
