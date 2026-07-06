@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/web-shell",
-  "version": "0.30.4",
+  "version": "0.30.5",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
