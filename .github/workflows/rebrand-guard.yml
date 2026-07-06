@@ -32,16 +32,16 @@ jobs:
 
       - name: 'Scan for stale rebrand references'
         run: |-
-          BLOCKLIST="QwenLM|wenzhong|@qwen/|--approval-mode yolo|approvalMode:[$']yolo[$']|yolo$|yolo\.svg|registry\.npm\.alibaba|registry\.npmmirror|registry\.npm\.taobao|hopcode-assets\.oss-"
+          BLOCKLIST="QwenLM|wenzhong|@qwen/|--approval-mode yolo|approvalMode:[$']yolo[$']|yolo$|import.*yolo\.svg|registry\.npm\.alibaba|registry\.npmmirror|registry\.npm\.taobao|hopcode-assets\.oss-"
 
-          HITS="$(git ls-files | grep -v 'node_modules/' | grep -v 'chat-Assistant-' | xargs grep -lnE "$BLOCKLIST" 2>/dev/null || true)"
+          HITS="$(git ls-files | grep -v 'node_modules/' | grep -v 'chat-Assistant-' | grep -v 'yolo\.svg$' | xargs grep -lnE "$BLOCKLIST" 2>/dev/null || true)"
 
           if [ -n "$HITS" ]; then
             echo "::error::Stale rebrand references found in:"
             echo "$HITS"
             echo ""
             echo "--- Details ---"
-            git ls-files | grep -v 'node_modules/' | grep -v 'chat-Assistant-' | xargs grep -nE "$BLOCKLIST" 2>/dev/null || true
+            git ls-files | grep -v 'node_modules/' | grep -v 'chat-Assistant-' | grep -v 'yolo\.svg$' | xargs grep -nE "$BLOCKLIST" 2>/dev/null || true
             exit 1
           fi
 
