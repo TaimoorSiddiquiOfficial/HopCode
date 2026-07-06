@@ -55,8 +55,8 @@ jobs:
 
           MISMATCH=""
           while IFS= read -r pkg; do
-            PKG_VERSION="$(node --input-type=module -e "import pkg from '${pkg}' with { type: 'json' }; console.log(pkg.version)")"
-            PKG_NAME="$(node --input-type=module -e "import pkg from '${pkg}' with { type: 'json' }; console.log(pkg.name)")"
+            PKG_VERSION="$(node --input-type=module -e "import pkg from './${pkg}' with { type: 'json' }; console.log(pkg.version)")"
+            PKG_NAME="$(node --input-type=module -e "import pkg from './${pkg}' with { type: 'json' }; console.log(pkg.name)")"
             case "$PKG_NAME" in
               @hoptrendy/*)
                 if [ "$PKG_VERSION" != "$ROOT_VERSION" ]; then
