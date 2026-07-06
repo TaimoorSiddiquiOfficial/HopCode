@@ -96,7 +96,7 @@ This workflow acts as a central dispatcher for HopCode CLI, routing requests to 
 
 ### Issue Triage
 
-This action can be used to triage GitHub Issues automatically or on a schedule. For a working issue triage setup, see the [automated issue triage workflow](https://github.com/QwenLM/hopcode/blob/main/.github/workflows/qwen-automated-issue-triage.yml).
+This action can be used to triage GitHub Issues automatically or on a schedule. For a working issue triage setup, see the [automated issue triage workflow](https://github.com/TaimoorSiddiquiOfficial/HopCode/blob/main/.github/workflows/hopcode-automated-issue-triage.yml).
 
 ### Pull Request Review
 
