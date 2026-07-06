@@ -10,7 +10,7 @@ import {
   isDebugLoggingDegraded,
   isBareMode,
   logUserPrompt,
-  HOPCODE_CODE_SIMPLE_ENV_VAR,
+  HOPCODE_SIMPLE_ENV_VAR,
   Storage,
   SessionService,
   setStartupEventSink,
@@ -70,7 +70,7 @@ import { getStartupWarnings } from './utils/startupWarnings.js';
 import { getUserStartupWarnings } from './utils/userStartupWarnings.js';
 import { initializeWarningHandler } from './utils/warningHandler.js';
 import { writeStderrLine } from './utils/stdioHelpers.js';
-import { getHeadlessYoloSafetyWarning } from './utils/headlessSafetyWarnings.js';
+import { getHeadlessIznSafetyWarning } from './utils/headlessSafetyWarnings.js';
 import { preconnectApi } from './utils/apiPreconnect.js';
 import { initializeLlmOutputLanguage } from './utils/languageUtils.js';
 
@@ -211,7 +211,7 @@ export async function main() {
   initializeWarningHandler();
 
   if (process.argv.includes('--bare')) {
-    process.env[HOPCODE_CODE_SIMPLE_ENV_VAR] = '1';
+    process.env[HOPCODE_SIMPLE_ENV_VAR] = '1';
   }
 
   // Run before yargs parses subcommands — handlers like `channel status`/`stop`
@@ -222,7 +222,7 @@ export async function main() {
   profileCheckpoint('after_parse_arguments');
 
   if (isBareMode(argv.bare)) {
-    process.env[HOPCODE_CODE_SIMPLE_ENV_VAR] = '1';
+    process.env[HOPCODE_SIMPLE_ENV_VAR] = '1';
   }
 
   // Load user settings — bare mode uses minimal config, normal mode loads full.
@@ -898,7 +898,7 @@ export async function main() {
     // because the user is at the keyboard and the TUI shows approval
     // state directly. See issue #4103.
     if (!config.isInteractive()) {
-      const yoloWarning = getHeadlessYoloSafetyWarning(config);
+      const yoloWarning = getHeadlessIznSafetyWarning(config);
       if (yoloWarning) writeStderrLine(yoloWarning);
     }
 

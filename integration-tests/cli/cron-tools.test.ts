@@ -22,7 +22,7 @@ describe('cron-tools', () => {
     if (rig) {
       await rig.cleanup();
     }
-    delete process.env['HOPCODE_CODE_DISABLE_CRON'];
+    delete process.env['HOPCODE_DISABLE_CRON'];
   });
 
   it('should have cron tools registered by default', async () => {
@@ -45,7 +45,7 @@ describe('cron-tools', () => {
       rig = new TestRig();
       await rig.setup('cron-tools-disabled-env-var');
 
-      process.env['HOPCODE_CODE_DISABLE_CRON'] = '1';
+      process.env['HOPCODE_DISABLE_CRON'] = '1';
 
       const result = await rig.run(
         'Try to create a cron job with cron_create using cron "*/5 * * * *", prompt "disabled test", and recurring true. If you cannot call that tool, say so briefly.',

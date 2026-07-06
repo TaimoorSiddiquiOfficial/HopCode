@@ -22,7 +22,7 @@ import {
   TooManyActiveDeviceFlowsError,
   UnsupportedDeviceFlowProviderError,
   UpstreamDeviceFlowError,
-} from '../auth/deviceFlow.js';
+} from '../auth/device-flow.js';
 import type { HttpAcpBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
 import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
 import {

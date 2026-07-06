@@ -125,6 +125,15 @@ export const RetryCountdownMessage: React.FC<StatusTextProps> = ({ text }) => (
   />
 );
 
+export const VisionNoticeMessage: React.FC<StatusTextProps> = ({ text }) => (
+  <StatusMessage
+    text={'🔎 ' + text}
+    prefix="?"
+    prefixColor={theme.text.secondary}
+    textColor={theme.text.secondary}
+  />
+);
+
 // Mirrors Claude Code's away-summary rendering: a `?` prefix in a fixed
 // 2-column gutter, then bold "recap: " label and italic content, all
 // dim-colored. Rendered as a regular history item so it scrolls with

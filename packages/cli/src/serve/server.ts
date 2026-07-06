@@ -47,16 +47,16 @@ import type {
 } from './auth/deviceFlow.js';
 import { mapDomainErrorToErrorKind } from '@hoptrendy/acp-bridge';
 import { HopCodeOAuthDeviceFlowProvider } from './auth/hopcode-device-flow-provider.js';
-import { createBridgeFileSystemAdapter } from './bridgeFileSystemAdapter.js';
-import { createDaemonStatusProvider } from './daemonStatusProvider.js';
-import { isServeDebugMode } from './debugMode.js';
+import { createBridgeFileSystemAdapter } from './bridge-file-system-adapter.js';
+import { createDaemonStatusProvider } from './daemon-status-provider.js';
+import { isServeDebugMode } from './debug-mode.js';
 import { SUPPORTED_LANGUAGES } from '../i18n/index.js';
-import { isLoopbackBind } from './loopbackBinds.js';
-import { mountAcpHttp, type AcpHttpHandle } from './acpHttp/index.js';
+import { isLoopbackBind } from './loopback-binds.js';
+import { mountAcpHttp, type AcpHttpHandle } from './acp-http/index.js';
 import {
   buildDaemonStatusResponse,
   parseDaemonStatusDetail,
-} from './daemonStatus.js';
+} from './daemon-status.js';
 import {
   canonicalizeWorkspace,
   createAcpSessionBridge,
@@ -131,15 +131,11 @@ import { registerWorkspaceLifecycleRoutes } from './routes/workspace-lifecycle.j
 import { registerWorkspaceMcpControlRoutes } from './routes/workspace-mcp-control.js';
 import { registerWorkspaceToolsRoutes } from './routes/workspace-tools.js';
 
-export {
-  createDefaultFsAuditEmit,
-  resolveBridgeFsFactory,
-} from './server/fs-factory.js';
+export { resolveBridgeFsFactory } from './server/fs-factory.js';
 export {
   PromptDeadlineExceededError,
   resolvePromptDeadlineMs,
 } from './server/prompt-deadline.js';
-export { detectFromLoopback } from './server/request-helpers.js';
 export {
   InvalidCursorError,
   listWorkspaceSessionsForResponse,

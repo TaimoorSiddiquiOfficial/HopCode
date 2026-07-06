@@ -6,7 +6,7 @@ Scheduled tasks let HopCode re-run a prompt automatically on an interval. Use th
 
 Tasks are session-scoped: they live in the current HopCode process and are gone when you exit. Nothing is written to disk.
 
-> **Tip:** Scheduled tasks are enabled by default. To disable them, set `experimental.cron: false` in your [settings](../configuration/settings.md), or set `HOPCODE_CODE_DISABLE_CRON=1` in your environment.
+> **Tip:** Scheduled tasks are enabled by default. To disable them, set `experimental.cron: false` in your [settings](../configuration/settings.md), or set `HOPCODE_DISABLE_CRON=1` in your environment.
 
 ## Schedule a recurring prompt with /loop
 

@@ -76,7 +76,7 @@ export class InteractiveSession {
    * @example
    * ```ts
    * const session = await InteractiveSession.start({
-   *   env: { HOPCODE_CODE_DISABLE_CRON: '1' },
+   *   env: { HOPCODE_DISABLE_CRON: '1' },
    *   args: ['--approval-mode', 'izn'],
    * });
    * ```

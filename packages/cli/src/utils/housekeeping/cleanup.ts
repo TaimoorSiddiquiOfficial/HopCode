@@ -56,7 +56,7 @@ export function getCutoffDate(cleanupPeriodDays: number): Date {
 // file-history backups and subagent transcripts use the `<root>/<sessionId>/`
 // layout, so the same age-based sweep serves both.
 async function sweepOldSessionDirs(
-  root: string,
+  _root: string,
   opts: CleanupOptions,
 ): Promise<CleanupResult> {
   const result: CleanupResult = { removed: 0, errors: 0 };
