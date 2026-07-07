@@ -1,6 +1,6 @@
-{
+﻿{
   "name": "@hoptrendy/audio-capture",
-  "version": "0.30.5",
+  "version": "0.30.6",
   "description": "Native microphone capture backend for HopCode voice input",
   "type": "module",
   "main": "dist/index.js",

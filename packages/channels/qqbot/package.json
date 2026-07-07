@@ -1,6 +1,6 @@
-{
+﻿{
   "name": "@hoptrendy/channel-qqbot",
-  "version": "0.30.5",
+  "version": "0.30.6",
   "description": "QQ Bot (QQ机器人) channel adapter for HopCode",
   "type": "module",
   "main": "dist/index.js",
