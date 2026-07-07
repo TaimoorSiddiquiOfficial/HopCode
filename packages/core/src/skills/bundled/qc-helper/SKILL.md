@@ -67,6 +67,13 @@ Use this index to locate the right document for the user's question. Load only t
 | Scheduled tasks (cron/loop)                | `docs/features/scheduled-tasks.md` |
 | Worktree                                   | `docs/features/worktree.md`        |
 
+### Daemon Mode
+
+| Topic                             | Doc Path                          |
+| --------------------------------- | --------------------------------- |
+| qwen serve (daemon mode overview) | `docs/qwen-serve.md`              |
+| Local launch templates            | `docs/qwen-serve-deploy-local.md` |
+
 ### IDE Integration
 
 | Topic                   | Doc Path                                     |

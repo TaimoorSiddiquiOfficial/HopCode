@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 hopcode Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -75,7 +75,7 @@ export class BridgeChannelClosedError extends Error {
 }
 
 /**
- * Raised by `defaultSpawnChannelFactory` when neither `HOPCODE_CLI_ENTRY` nor
+ * Raised by `defaultSpawnChannelFactory` when neither `QWEN_CLI_ENTRY` nor
  * `process.argv[1]` resolves to a path that can be re-spawned for the ACP
  * child. Replaces a generic `new Error(...)` so `mapDomainErrorToErrorKind`
  * can return `'missing_binary'` via `instanceof` rather than regex-matching
@@ -86,9 +86,9 @@ export class MissingCliEntryError extends Error {
   constructor() {
     super(
       'Cannot determine CLI entry path for spawning the ACP child: ' +
-        'process.argv[1] is empty and HOPCODE_CLI_ENTRY is unset. ' +
-        'Set HOPCODE_CLI_ENTRY to the absolute path of the hopcode entry ' +
-        'script (e.g. `export HOPCODE_CLI_ENTRY=$(which hopcode)`) to override.',
+        'process.argv[1] is empty and QWEN_CLI_ENTRY is unset. ' +
+        'Set QWEN_CLI_ENTRY to the absolute path of the qwen entry ' +
+        'script (e.g. `export QWEN_CLI_ENTRY=$(which qwen)`) to override.',
     );
     this.name = 'MissingCliEntryError';
   }
@@ -108,12 +108,15 @@ export const SERVE_STATUS_EXT_METHODS = {
   sessionContextUsage: 'hopcode/status/session/context_usage',
   sessionSupportedCommands: 'hopcode/status/session/supported_commands',
   sessionTasks: 'hopcode/status/session/tasks',
-  sessionLspStatus: 'hopcode/status/session/lsp',
   sessionStats: 'hopcode/status/session/stats',
+  sessionLspStatus: 'hopcode/status/session/lsp',
   sessionRewindSnapshots: 'hopcode/status/session/rewind_snapshots',
   workspaceHooks: 'hopcode/status/workspace/hooks',
   sessionHooks: 'hopcode/status/session/hooks',
   workspaceExtensions: 'hopcode/status/workspace/extensions',
+  // Process-wide rss/cpu of this ACP child, self-reported to the daemon for
+  // the Daemon Status resource charts (workspace-scoped; no sessionId).
+  workspaceResource: 'hopcode/status/workspace/resource',
 } as const;
 
 /**
@@ -125,28 +128,43 @@ export const SERVE_STATUS_EXT_METHODS = {
  */
 export const SERVE_CONTROL_EXT_METHODS = {
   sessionClose: 'hopcode/control/session/close',
-  sessionCd: 'hopcode/control/session/cd',
-  sessionTitle: 'hopcode/control/session/title',
   sessionApprovalMode: 'hopcode/control/session/approval_mode',
   sessionBranch: 'hopcode/control/session/branch',
-  sessionContinue: 'hopcode/control/session/continue',
   sessionForkAgent: 'hopcode/control/session/fork_agent',
   sessionRecap: 'hopcode/control/session/recap',
   sessionBtw: 'hopcode/control/session/btw',
   sessionShellHistory: 'hopcode/control/session/shell_history',
   sessionLanguage: 'hopcode/control/session/language',
   sessionRewind: 'hopcode/control/session/rewind',
+  sessionContinue: 'hopcode/control/session/continue',
+  sessionTitle: 'hopcode/control/session/title',
   workspaceMcpRestart: 'hopcode/control/workspace/mcp/restart',
   workspaceMcpManage: 'hopcode/control/workspace/mcp/manage',
   workspaceAgentGenerate: 'hopcode/control/workspace/agents/generate',
+  workspaceMemoryRememberAvailability:
+    'hopcode/control/workspace/memory/remember/availability',
+  workspaceMemoryRemember: 'hopcode/control/workspace/memory/remember',
+  workspaceMemoryForget: 'hopcode/control/workspace/memory/forget',
+  workspaceMemoryDream: 'hopcode/control/workspace/memory/dream',
   // Runtime MCP server mutation ext-methods
   sessionTaskCancel: 'hopcode/control/session/task/cancel',
   sessionGoalClear: 'hopcode/control/session/goal/clear',
   workspaceMcpRuntimeAdd: 'hopcode/control/workspace/mcp/runtime-add',
   workspaceMcpRuntimeRemove: 'hopcode/control/workspace/mcp/runtime-remove',
-  workspaceExtensionsRefresh:
-    'hopcode/control/workspace/extensions/refresh',
   workspaceReload: 'hopcode/control/workspace/reload',
+  workspaceExtensionsRefresh: 'hopcode/control/workspace/extensions/refresh',
+  /**
+   * Reverse tool channel (issue #5626, Phase 2). Unlike every other entry
+   * here — which the PARENT serve process calls DOWN into the `qwen --acp`
+   * child — this one is called by the CHILD UP into the parent: a
+   * client-hosted (extension) MCP server's `sendSdkMcpMessage` round-trips a
+   * JSON-RPC `mcp_message` from the child's `McpClientManager` back to the
+   * parent's `ClientMcpRegistrar`, which pushes it down the daemon WS to the
+   * client and returns the correlated response. Params: `{ server, payload }`;
+   * result: `{ payload }`.
+   */
+  clientMcpMessage: 'hopcode/control/client_mcp/message',
+  sessionCd: 'hopcode/control/session/cd',
 } as const;
 
 export type ServeStatus =
@@ -231,7 +249,7 @@ export interface ServeWorkspaceMcpServerStatus extends ServeStatusCell {
    * Pool-mode workspaces can hold multiple
    * `PoolEntry` instances under the same `name` when sessions inject
    * different fingerprints (e.g. per-session OAuth headers). Absent on
-   * older daemons and on daemons with `HOPCODE_SERVE_NO_MCP_POOL=1`;
+   * older daemons and on daemons with `QWEN_SERVE_NO_MCP_POOL=1`;
    * present (≥1) when the pool advertises `mcp_workspace_pool`.
    * Operators use this to render an "N entries" badge or drill into
    * `entrySummary` for the per-entry breakdown.
@@ -282,7 +300,7 @@ export interface ServeMcpBudgetStatusCell extends ServeStatusCell {
    * — so the budget caps live MCP clients **per session**, not
    * per-workspace. The snapshot reflects the bootstrap session's
    * view; concurrent sessions each enforce their own copy of the
-   * cap independently. See `hopcode-serve-protocol.md` "The budget feature v1
+   * cap independently. See `qwen-serve-protocol.md` "The budget feature v1
    * scope: per-session" for the operator-facing rationale.
    *
    * Future PRs:
@@ -404,6 +422,7 @@ export interface ServeWorkspaceProviderCurrent {
   modelId?: string;
   baseUrl?: string;
   fastModelId?: string;
+  visionModelId?: string;
 }
 
 export interface ServeWorkspaceProviderModel {
@@ -437,6 +456,7 @@ export interface ServeWorkspaceProvidersStatus {
   initialized: boolean;
   acpChannelLive?: boolean;
   current?: ServeWorkspaceProviderCurrent;
+  approvalMode?: string;
   providers: ServeWorkspaceProviderStatus[];
   errors?: ServeStatusCell[];
 }
@@ -563,6 +583,20 @@ export interface ServeSessionAgentTaskStatus {
   stats?: { totalTokens: number; toolUses: number; durationMs: number };
   recentActivities?: Array<{ name: string; description: string; at: number }>;
   prompt?: string;
+  /**
+   * `id` of the agent task that spawned this one; absent for agents
+   * launched by the top-level session. Mirrors `AgentTask.parentAgentId`
+   * (a `null` there serializes as absent here). Lets clients render the
+   * roster as a tree.
+   */
+  parentAgentId?: string;
+  /**
+   * Display name (`subagentType`) of the spawning agent, captured at
+   * registration time so it survives the parent's eviction. Display-only.
+   */
+  parentName?: string;
+  /** Launch depth (0-based; 0 = spawned by the top-level session). */
+  depth?: number;
 }
 
 export interface ServeSessionShellTaskStatus {
@@ -690,7 +724,7 @@ export interface ServeWorkspaceMemoryFile {
   path: string;
   /**
    * 'workspace' for files under the bound workspace tree, 'global' for
-   * `~/.hopcode/HOPCODE.md` style entries. Helps adapters render scope chips.
+   * `~/.qwen/QWEN.md` style entries. Helps adapters render scope chips.
    */
   scope: ServeContextFileScope;
   /** Size in bytes of the file's serialized contents on disk. */
@@ -705,11 +739,11 @@ export interface ServeWorkspaceMemoryStatus {
   /** Total bytes across all hierarchical files (sum of `files[].bytes`). */
   totalBytes: number;
   /**
-   * Number of merged HOPCODE.md / AGENTS.md files the loader pulled in.
+   * Number of merged QWEN.md / AGENTS.md files the loader pulled in.
    * Mirrors `LoadServerHierarchicalMemoryResponse.fileCount`.
    */
   fileCount: number;
-  /** Baseline path-rule count from `.hopcode/rules/`. */
+  /** Baseline path-rule count from `.qwen/rules/`. */
   ruleCount: number;
   errors?: ServeStatusCell[];
 }
@@ -723,7 +757,7 @@ export interface ServeWorkspaceMemoryStatus {
  * the daemon-scoped `SubagentManager` runs against a stub `Config`
  * whose `getActiveExtensions()` returns `[]`, and session-level
  * subagents live in a runtime-only cache no CRUD route reads.
- * Mirrors `DaemonAgentLevel` in `@hoptrendy/sdk` so route + SDK
+ * Mirrors `DaemonAgentLevel` in `@qwen-code/sdk` so route + SDK
  * consumers see the same forward-compat union.
  */
 export type ServeAgentLevel =
@@ -902,7 +936,7 @@ export const IDLE_HOOK_EVENTS: Record<HookEventName, ServeHookEventMeta> = {
     description: 'When a new session is started',
     matcherKind: 'sessionTrigger',
   },
-  Stop: { description: 'Right before HopCode concludes its response' },
+  Stop: { description: 'Right before Qwen Code concludes its response' },
   SubagentStart: {
     description: 'When a subagent is started',
     matcherKind: 'agentType',
@@ -955,7 +989,7 @@ export type ServeExtensionInstallType =
   | 'npm'
   | 'archive-url';
 
-export type ServeExtensionOriginSource = 'HopCode' | 'Claude' | 'Gemini';
+export type ServeExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
 
 export interface ServeExtensionCapabilities {
   mcpServerCount: number;
@@ -993,6 +1027,7 @@ export interface ServeExtensionEntry {
   id: string;
   name: string;
   displayName?: string;
+  description?: string;
   version: string;
   isActive: boolean;
   path: string;

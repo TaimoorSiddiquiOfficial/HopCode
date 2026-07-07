@@ -1660,6 +1660,36 @@ describe('standalone release packaging', () => {
     }
   });
 
+  it('requires the standalone cli-entry wrapper in dist', () => {
+    const createdDist = ensureMinimalDist({ includeCliEntry: false });
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+
+    try {
+      expect(() =>
+        execFileSync(
+          'node',
+          [
+            'scripts/create-standalone-package.js',
+            '--target',
+            'win-x64',
+            '--node-archive',
+            createFakeWindowsNodeArchive(tmpDir),
+            '--out-dir',
+            path.join(tmpDir, 'out'),
+            '--version',
+            '0.0.0-test',
+          ],
+          { stdio: 'pipe' },
+        ),
+      ).toThrow(
+        /Required dist asset missing: .*cli-entry\.js[\s\S]*npm run prepare:package/,
+      );
+    } finally {
+      rmSync(tmpDir, { recursive: true, force: true });
+      restoreMinimalDist(createdDist);
+    }
+  });
+
   it('packages a win-x64 standalone archive', () => {
     const createdDist = ensureMinimalDist();
     const tmpDir = mkdtempSync(path.join(tmpdir(), 'hopcode-package-test-'));
@@ -1694,9 +1724,63 @@ describe('standalone release packaging', () => {
       expect(
         existsSync(path.join(extractDir, 'hopcode', 'node', 'node.exe')),
       ).toBe(true);
+      const shim = readScript(
+        path.join(extractDir, 'qwen-code', 'bin', 'qwen.cmd'),
+      );
+      expect(shim).toContain('if "%~1"=="serve" goto serve');
+      expect(shim).toContain(
+        '"%ROOT%\\node\\node.exe" --expose-gc "%ROOT%\\lib\\cli.js" %*',
+      );
+      expect(shim).toContain(
+        '"%ROOT%\\node\\node.exe" "%ROOT%\\lib\\cli-entry.js" %*',
+      );
+      expect((shim.match(/exit \/b %ERRORLEVEL%/g) || []).length).toBe(2);
       expect(readScript(path.join(outDir, 'SHA256SUMS'))).toContain(
         'hopcode-win-x64.zip',
       );
+    } finally {
+      rmSync(tmpDir, { recursive: true, force: true });
+      restoreMinimalDist(createdDist);
+    }
+  }, 30_000);
+
+  it('skips npm-only artifacts staged in dist', () => {
+    const createdDist = ensureMinimalDist({
+      includeNpmPackageArtifacts: true,
+    });
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+
+    try {
+      const outDir = path.join(tmpDir, 'out');
+      execFileSync(
+        'node',
+        [
+          'scripts/create-standalone-package.js',
+          '--target',
+          'win-x64',
+          '--node-archive',
+          createFakeWindowsNodeArchive(tmpDir),
+          '--out-dir',
+          outDir,
+          '--version',
+          '0.0.0-test',
+        ],
+        { stdio: 'pipe' },
+      );
+
+      const extractDir = path.join(tmpDir, 'extract');
+      mkdirSync(extractDir, { recursive: true });
+      extractZipForTest(path.join(outDir, 'qwen-code-win-x64.zip'), extractDir);
+
+      expect(
+        existsSync(path.join(extractDir, 'qwen-code', 'lib', 'cli-entry.js')),
+      ).toBe(true);
+      expect(
+        existsSync(path.join(extractDir, 'qwen-code', 'lib', 'postinstall.js')),
+      ).toBe(false);
+      expect(
+        existsSync(path.join(extractDir, 'qwen-code', 'lib', 'patches')),
+      ).toBe(false);
     } finally {
       rmSync(tmpDir, { recursive: true, force: true });
       restoreMinimalDist(createdDist);
@@ -1796,6 +1880,40 @@ describe('standalone release packaging', () => {
       restoreMinimalDist(createdDist);
     }
   });
+
+  itOnUnix(
+    'packages a Unix standalone archive with a serve fast path shim',
+    () => {
+      const createdDist = ensureMinimalDist();
+      const tmpDir = mkdtempSync(path.join(tmpdir(), 'qwen-package-test-'));
+
+      try {
+        const archive = packageFakeStandalone(tmpDir);
+        const extractDir = path.join(tmpDir, 'extract');
+        mkdirSync(extractDir, { recursive: true });
+        execFileSync('tar', ['-xzf', archive, '-C', extractDir], {
+          stdio: 'ignore',
+        });
+
+        expect(
+          existsSync(path.join(extractDir, 'qwen-code', 'lib', 'cli-entry.js')),
+        ).toBe(true);
+        const shim = readScript(
+          path.join(extractDir, 'qwen-code', 'bin', 'qwen'),
+        );
+        expect(shim).toContain('if [ "${1:-}" = "serve" ]; then');
+        expect(shim).toContain(
+          'exec "$ROOT/node/bin/node" "$ROOT/lib/cli-entry.js" "$@"',
+        );
+        expect(shim).toContain(
+          'exec "$ROOT/node/bin/node" --expose-gc "$ROOT/lib/cli.js" "$@"',
+        );
+      } finally {
+        restoreMinimalDist(createdDist);
+        rmSync(tmpDir, { recursive: true, force: true });
+      }
+    },
+  );
 
   itOnUnix('does not package audio-capture test artifacts', () => {
     const createdDist = ensureMinimalDist();
@@ -3995,7 +4113,10 @@ describe('Windows PowerShell uninstaller end-to-end', () => {
   });
 });
 
-function ensureMinimalDist() {
+function ensureMinimalDist({
+  includeCliEntry = true,
+  includeNpmPackageArtifacts = false,
+} = {}) {
   const distPath = path.resolve('dist');
   const backupPath = existsSync(distPath)
     ? path.join(

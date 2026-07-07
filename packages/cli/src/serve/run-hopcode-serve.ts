@@ -4,14 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { X509Certificate } from 'node:crypto';
 import * as fs from 'node:fs';
 import type { Server } from 'node:http';
+import * as https from 'node:https';
 import * as path from 'node:path';
-import { performance } from 'node:perf_hooks';
+import * as os from 'node:os';
+import { monitorEventLoopDelay, performance } from 'node:perf_hooks';
 import express, {
   type Application,
   type NextFunction,
   type Request,
+  type RequestHandler,
   type Response,
 } from 'express';
 import { writeStderrLine, writeStdoutLine } from '../utils/stdioHelpers.js';
@@ -31,7 +35,9 @@ import type {
   TelemetrySettings,
 } from '@hoptrendy/hopcode-core';
 import { createBridgeFileSystemAdapter } from './bridge-file-system-adapter.js';
+import { PathMutexRegistry } from './fs/path-mutex-registry.js';
 import { isLoopbackBind } from './loopback-binds.js';
+import { RUNTIME_STARTUP_CANCELLED_MESSAGE } from './runtime-startup-errors.js';
 import { resolveWebShellDir } from './web-shell-resolver.js';
 import {
   allowOriginCors,
@@ -44,6 +50,7 @@ import {
   createPermissionAuditPublisher,
   PermissionAuditRing,
 } from './permission-audit.js';
+import { ClientMcpSenderRegistry } from './acp-http/client-mcp-sender-registry.js';
 import {
   initDaemonLogger,
   resolveDaemonLogBaseDir,
@@ -72,19 +79,63 @@ import {
   parseDaemonStatusDetail,
   positiveFiniteOrNull,
   type DaemonStatusIssue,
+  type DaemonPerfSnapshot,
   type DaemonStartupSnapshot,
   type DaemonStatusResponse,
 } from './daemon-status.js';
+import { DaemonMetricsRing, computeCpuPercent } from './daemon-metrics-ring.js';
+import { createLargePipeFrameObserver } from './large-pipe-frame-observer.js';
+import type {
+  ChannelWorkerSupervisor,
+  CreateChannelWorkerSupervisorOptions,
+} from './channel-worker-supervisor.js';
+import { QWEN_SERVER_TOKEN_ENV } from './channel-worker-env.js';
+import { channelSelectionNames } from './channel-selection.js';
 import {
   finalizeStartupProfile,
   profileCheckpoint,
 } from '../utils/startupProfiler.js';
+import type { ServiceInfo } from '../commands/channel/pidfile.js';
+import { findCliEntryPath } from '../commands/channel/cli-entry-path.js';
 
 const HOPCODE_SERVER_TOKEN_ENV = 'HOPCODE_SERVER_TOKEN';
 const HOPCODE_SERVE_PROMPT_DEADLINE_MS_ENV = 'HOPCODE_SERVE_PROMPT_DEADLINE_MS';
 const HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV =
   'HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS';
 const SHUTDOWN_FORCE_CLOSE_MS = 5_000;
+
+function daemonPipeDirection(
+  direction: NdJsonMessageObservation['direction'],
+): 'inbound' | 'outbound' {
+  switch (direction) {
+    case 'sent':
+      return 'outbound';
+    case 'received':
+      return 'inbound';
+    default: {
+      const exhaustive: never = direction;
+      return exhaustive;
+    }
+  }
+}
+
+// Daemon Status metrics ring: seal one bucket every SAMPLE_MS and retain
+// CAPACITY of them (5s × 180 ≈ 15 min of history), matching the dashboard's
+// own 5s poll so each poll surfaces roughly one fresh bucket.
+const DAEMON_METRICS_SAMPLE_MS = 5_000;
+const DAEMON_METRICS_CAPACITY = 180;
+
+// `process.cpuUsage()` can throw in restricted containers that lack the
+// syscall; return null so the sampler can skip the delta (and leave its
+// baseline untouched) rather than treating a failed read as zero usage —
+// which would turn the next successful read's since-start total into a spike.
+function safeCpuUsage(): NodeJS.CpuUsage | null {
+  try {
+    return process.cpuUsage();
+  } catch {
+    return null;
+  }
+}
 const DEFAULT_RUNTIME_STARTUP_TIMEOUT_MS = 120_000;
 const RUNTIME_STARTUP_TIMEOUT_ENV = 'HOPCODE_SERVE_RUNTIME_STARTUP_TIMEOUT_MS';
 const MAX_EVENT_RING_SIZE = 1_000_000;
@@ -94,6 +145,11 @@ const DEFAULT_EVENT_RING_SIZE = 8000;
 const DEFAULT_SESSION_IDLE_TIMEOUT_MS = 30 * 60_000;
 const WORKSPACE_SETTING_SCOPE =
   'Workspace' as import('../config/settings.js').SettingScope;
+
+type RunQwenServeOptions = Omit<ServeOptions, 'token' | 'workspace'> & {
+  token?: string;
+  workspace?: string | string[];
+};
 type WorkspaceSettingsWrite =
   import('./workspace-service/types.js').WorkspaceSettingsWrite;
 
@@ -149,6 +205,35 @@ function parseDeadlineEnv(
     );
   }
   return parsed;
+}
+
+function envFlagDisabled(raw: string | undefined): boolean {
+  if (raw === undefined) return false;
+  const normalized = raw.trim().toLowerCase();
+  return normalized === '0' || normalized === 'false';
+}
+
+function resolveSingleWorkspaceInput(workspace: unknown): string {
+  if (Array.isArray(workspace)) {
+    if (workspace.length === 0) return process.cwd();
+    if (workspace.length > 1) {
+      throw new Error(
+        'Multiple --workspace values are not supported yet. ' +
+          'Multi-workspace serve is not enabled; pass one --workspace.',
+      );
+    }
+    return String(workspace[0]);
+  }
+  if (workspace === undefined) return process.cwd();
+  return String(workspace);
+}
+
+function hasChromeExtensionOrigin(origins: readonly string[] | undefined) {
+  return (
+    origins?.some((origin) =>
+      origin.trim().toLowerCase().startsWith('chrome-extension://'),
+    ) === true
+  );
 }
 
 function createDaemonTelemetryRuntimeConfig(
@@ -309,6 +394,22 @@ function formatHostForUrl(host: string): string {
   return host;
 }
 
+export function formatChannelWorkerDaemonUrl(
+  host: string,
+  port: number,
+): string {
+  const normalized = host.trim().toLowerCase();
+  if (
+    normalized === '' ||
+    normalized === '0.0.0.0' ||
+    normalized === '::' ||
+    normalized === '[::]'
+  ) {
+    return `http://127.0.0.1:${port}`;
+  }
+  return `http://${formatHostForUrl(host)}:${port}`;
+}
+
 /**
  * Pull the `context.fileName` snapshot out of merged settings into a
  * typed string, falling back to `undefined` when the value is missing
@@ -395,6 +496,74 @@ type SettingsRuntime = typeof import('../config/settings.js');
 type LoadedSettingsAdapterRuntime =
   typeof import('../config/loadedSettingsAdapter.js');
 type TrustedFoldersRuntime = typeof import('../config/trustedFolders.js');
+type ChannelServicePidfile = {
+  readServiceInfo(): ServiceInfo | null;
+  writeServeServiceInfo(opts: {
+    channels: string[];
+    servePid?: number;
+    workerPid?: number;
+  }): void;
+  reserveServeServiceInfo(opts: {
+    channels: string[];
+    servePid?: number;
+  }): void;
+  removeServiceInfo(): void;
+  removeServeServiceInfo?(servePid?: number): boolean;
+};
+type ChannelWorkerRuntime = {
+  createChannelWorkerSupervisor(
+    opts: CreateChannelWorkerSupervisorOptions,
+  ): ChannelWorkerSupervisor;
+  channelServicePidfile: ChannelServicePidfile;
+};
+
+let channelWorkerRuntimePromise: Promise<ChannelWorkerRuntime> | undefined;
+async function loadChannelWorkerRuntime(): Promise<ChannelWorkerRuntime> {
+  channelWorkerRuntimePromise ??= Promise.all([
+    import('./channel-worker-supervisor.js'),
+    import('../commands/channel/pidfile.js'),
+  ])
+    .then(([supervisor, pidfile]) => ({
+      createChannelWorkerSupervisor: supervisor.createChannelWorkerSupervisor,
+      channelServicePidfile: pidfile,
+    }))
+    .catch((err: unknown) => {
+      channelWorkerRuntimePromise = undefined;
+      throw err;
+    });
+  return channelWorkerRuntimePromise;
+}
+
+function createDisabledChannelWorkerSupervisor(): ChannelWorkerSupervisor {
+  const snapshot = {
+    enabled: false,
+    state: 'disabled' as const,
+    channels: [],
+  };
+  return {
+    async start() {},
+    async stop() {},
+    killAllSync() {},
+    snapshot: () => ({ ...snapshot, channels: [] }),
+  };
+}
+
+function writeServeChannelReservation(
+  channelServicePidfile: ChannelServicePidfile,
+  channels: string[],
+): void {
+  channelServicePidfile.reserveServeServiceInfo({
+    channels,
+    servePid: process.pid,
+  });
+}
+
+function channelServicePidfileConflictError(info: ServiceInfo): Error {
+  const owner = info.owner === 'serve' ? 'qwen serve' : 'qwen channel start';
+  return new Error(
+    `Channel service is already running under ${owner} (PID ${info.pid}). Stop it before starting qwen serve --channel.`,
+  );
+}
 
 function normalizeInstallModelIds(
   req: ServeAuthProviderInstallRequest,
@@ -487,10 +656,20 @@ export interface runHopCodeServeDeps {
    */
   resolveOnListen?: boolean;
   /**
+   * Internal serve fast-path mode: keep bootstrap /health responsive before
+   * starting the heavier runtime graph. A fallback timer still starts runtime
+   * when no health probe arrives. Only applies with resolveOnListen.
+   */
+  deferRuntimeUntilFirstHealth?: boolean;
+  /**
    * Bounds background runtime mounting after the listener is ready. Defaults to
    * HOPCODE_SERVE_RUNTIME_STARTUP_TIMEOUT_MS, then 120s. Use 0 to disable.
    */
   runtimeStartupTimeoutMs?: number;
+  channelWorkerSupervisorFactory?: (
+    opts: CreateChannelWorkerSupervisorOptions,
+  ) => ChannelWorkerSupervisor;
+  channelServicePidfile?: ChannelServicePidfile;
 }
 
 function shouldPreheatBridge(deps: runHopCodeServeDeps): boolean {
@@ -564,6 +743,7 @@ async function loadServeRuntimeModules() {
     workspaceTypesModule,
     daemonStatusProviderModule,
     workspaceProvidersStatusModule,
+    workspaceSkillsStatusModule,
   ] = await Promise.all([
     import('./server.js'),
     import('@hoptrendy/acp-bridge/bridge'),
@@ -572,10 +752,13 @@ async function loadServeRuntimeModules() {
     import('./workspace-service/types.js'),
     import('./daemon-status-provider.js'),
     import('./workspace-providers-status.js'),
+    import('./workspace-skills-status.js'),
   ]);
   return {
     createServeApp: serverModule.createServeApp,
     getActiveSseCount: serverModule.getActiveSseCount,
+    resolveBoundWorkspacesFromIdeEnv:
+      serverModule.resolveBoundWorkspacesFromIdeEnv,
     resolveBridgeFsFactory: serverModule.resolveBridgeFsFactory,
     createAcpSessionBridge: bridgeModule.createAcpSessionBridge,
     createSpawnChannelFactory: spawnChannelModule.createSpawnChannelFactory,
@@ -586,6 +769,8 @@ async function loadServeRuntimeModules() {
       daemonStatusProviderModule.createDaemonStatusProvider,
     createWorkspaceProvidersStatusProvider:
       workspaceProvidersStatusModule.createWorkspaceProvidersStatusProvider,
+    createWorkspaceSkillsStatusProvider:
+      workspaceSkillsStatusModule.createWorkspaceSkillsStatusProvider,
   };
 }
 
@@ -634,6 +819,10 @@ function currentServeFeaturesForrunHopCodeServe(
     sessionShellCommandEnabled,
     rateLimit: opts.rateLimit === true,
     reloadAvailable: true,
+    // Advertise the same WS feature flags as the runtime path (serve-features.ts)
+    // so the bootstrap `/capabilities` window doesn't briefly under-report them.
+    clientMcpOverWsEnabled: opts.clientMcpOverWs === true,
+    cdpTunnelOverWsEnabled: opts.cdpTunnelOverWs === true,
   });
 }
 
@@ -707,12 +896,35 @@ function installSameOriginOriginStrip(
       const port = getPort();
       if (port !== cachedStripPort) {
         cachedStripPort = port;
+        // Both schemes: under `--tls-cert/--tls-key` the loopback web
+        // shell is served over https, so its same-origin requests carry
+        // an `https://` Origin. Loopback hosts are trusted as same-origin
+        // regardless of scheme, so listing both is safe even on plain HTTP
+        // (the https entries simply never match without TLS).
         cachedSelfOrigins = new Set([
           `http://127.0.0.1:${port}`,
           `http://localhost:${port}`,
           `http://[::1]:${port}`,
           `http://host.docker.internal:${port}`,
+          `https://127.0.0.1:${port}`,
+          `https://localhost:${port}`,
+          `https://[::1]:${port}`,
+          `https://host.docker.internal:${port}`,
         ]);
+        // RFC 7230 §5.4: browsers omit the port in the Origin header when
+        // it matches the scheme default (http→80, https→443). Accept the
+        // port-less forms so the origin check doesn't fail on port 443.
+        if (port === 80 || port === 443) {
+          for (const host of [
+            '127.0.0.1',
+            'localhost',
+            '[::1]',
+            'host.docker.internal',
+          ]) {
+            cachedSelfOrigins.add(`http://${host}`);
+            cachedSelfOrigins.add(`https://${host}`);
+          }
+        }
       }
       if (cachedSelfOrigins.has(origin)) {
         delete req.headers.origin;
@@ -789,6 +1001,15 @@ export async function waitForRuntimeStartingForShutdown(
   });
 }
 
+const BOOTSTRAP_HEALTH_PATH = '/health';
+const BOOTSTRAP_CAPABILITIES_PATH = '/capabilities';
+const BOOTSTRAP_DAEMON_STATUS_PATH = '/daemon/status';
+const BOOTSTRAP_SERVE_PATHS = new Set([
+  BOOTSTRAP_HEALTH_PATH,
+  BOOTSTRAP_CAPABILITIES_PATH,
+  BOOTSTRAP_DAEMON_STATUS_PATH,
+]);
+
 function createBootstrapServeApp(input: {
   opts: ServeOptions;
   getPort: () => number;
@@ -799,6 +1020,10 @@ function createBootstrapServeApp(input: {
   sessionShellCommandEnabled: boolean;
   permissionPolicy: PermissionPolicy | undefined;
   getRuntimeError: () => string | undefined;
+  getChannelWorkerSnapshot: () => ReturnType<
+    ChannelWorkerSupervisor['snapshot']
+  >;
+  onHealthServed?: () => void;
 }): Application {
   const {
     opts,
@@ -810,6 +1035,8 @@ function createBootstrapServeApp(input: {
     sessionShellCommandEnabled,
     permissionPolicy,
     getRuntimeError,
+    getChannelWorkerSnapshot,
+    onHealthServed,
   } = input;
   const app = express();
 
@@ -831,21 +1058,24 @@ function createBootstrapServeApp(input: {
       return;
     }
 
+    if (onHealthServed) {
+      res.once('finish', onHealthServed);
+    }
     res.status(200).json({ status: 'ok' });
   };
   const loopback = isLoopbackBind(opts.hostname);
   const exposeHealthPreAuth = loopback && !opts.requireAuth;
   if (exposeHealthPreAuth) {
-    app.get('/health', healthHandler);
+    app.get(BOOTSTRAP_HEALTH_PATH, healthHandler);
   }
 
   app.use(bearerAuth(opts.token));
 
   if (!exposeHealthPreAuth) {
-    app.get('/health', healthHandler);
+    app.get(BOOTSTRAP_HEALTH_PATH, healthHandler);
   }
 
-  app.get('/capabilities', (_req: Request, res: Response): void => {
+  app.get(BOOTSTRAP_CAPABILITIES_PATH, (_req: Request, res: Response): void => {
     res.status(200).json(
       createBootstrapCapabilities({
         opts,
@@ -857,7 +1087,7 @@ function createBootstrapServeApp(input: {
     );
   });
 
-  app.get('/daemon/status', (req: Request, res: Response): void => {
+  app.get(BOOTSTRAP_DAEMON_STATUS_PATH, (req: Request, res: Response): void => {
     const detail = parseDaemonStatusDetail(req.query['detail']);
     if (!detail.ok || !detail.detail) {
       res.status(400).json({
@@ -867,6 +1097,7 @@ function createBootstrapServeApp(input: {
       return;
     }
     const runtimeError = getRuntimeError();
+    const channelWorker = getChannelWorkerSnapshot();
     const runtimeFailed = runtimeError !== undefined;
     const issue: DaemonStatusIssue = runtimeError
       ? {
@@ -940,6 +1171,7 @@ function createBootstrapServeApp(input: {
           policy: permissionPolicy ?? 'first-responder',
         },
         channel: { live: false },
+        channelWorker,
         transport: {
           restSseActive: 0,
           acp: {
@@ -959,6 +1191,13 @@ function createBootstrapServeApp(input: {
             mutation: 0,
             read: 0,
           },
+        },
+        activity: {
+          activePrompts: 0,
+          pendingPrompts: 0,
+          queuedPrompts: 0,
+          lastActivityAt: null,
+          idleSinceMs: null,
         },
         process: process.memoryUsage(),
       },
@@ -996,18 +1235,90 @@ function createBootstrapServeApp(input: {
 function createDelegatingServeApp(
   bootstrapApp: Application,
   getRuntimeApp: () => Application | undefined,
+  options: {
+    waitForDeferredRuntimeRoutes?: boolean;
+    startRuntime?: () => void;
+    runtimeReady?: Promise<void>;
+    authenticateDeferredRuntimeRequest?: RequestHandler;
+  } = {},
 ): Application {
   const app = express();
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const target = getRuntimeApp() ?? bootstrapApp;
-    const handler = target as unknown as (
-      req: Request,
-      res: Response,
-      next: NextFunction,
-    ) => void;
-    handler(req, res, next);
+    const dispatch = async (): Promise<void> => {
+      let target = getRuntimeApp();
+      if (
+        !target &&
+        options.waitForDeferredRuntimeRoutes === true &&
+        !isBootstrapServeRoute(req) &&
+        !isCorsPreflightRequest(req) &&
+        options.startRuntime &&
+        options.runtimeReady
+      ) {
+        if (
+          options.authenticateDeferredRuntimeRequest &&
+          !runSynchronousRequestGate(
+            options.authenticateDeferredRuntimeRequest,
+            req,
+            res,
+            next,
+          )
+        ) {
+          return;
+        }
+        options.startRuntime();
+        try {
+          await options.runtimeReady;
+        } catch {
+          // Fall through to the bootstrap app so it can report the startup error.
+        }
+        target = getRuntimeApp();
+      }
+      const handler = (target ?? bootstrapApp) as unknown as (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+      ) => void;
+      handler(req, res, next);
+    };
+    void dispatch().catch(next);
   });
   return app;
+}
+
+function isBootstrapServeRoute(req: Request): boolean {
+  const path =
+    req.path.length > 1 && req.path.endsWith('/')
+      ? req.path.slice(0, -1)
+      : req.path;
+  return BOOTSTRAP_SERVE_PATHS.has(path);
+}
+
+function isCorsPreflightRequest(req: Request): boolean {
+  return (
+    req.method === 'OPTIONS' &&
+    Boolean(req.headers.origin) &&
+    Boolean(
+      req.headers['access-control-request-method'] ||
+        req.headers['access-control-request-headers'],
+    )
+  );
+}
+
+function runSynchronousRequestGate(
+  handler: RequestHandler,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): boolean {
+  let passed = false;
+  handler(req, res, (err?: unknown) => {
+    if (err) {
+      next(err);
+      return;
+    }
+    passed = true;
+  });
+  return passed;
 }
 
 /**
@@ -1077,11 +1388,97 @@ export async function runHopCodeServe(
       HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV,
       process.env[HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV],
     );
+  const clientMcpOverWsEnv = process.env[QWEN_SERVE_CLIENT_MCP_OVER_WS_ENV];
+  const cdpTunnelOverWsEnv = process.env[QWEN_SERVE_CDP_TUNNEL_OVER_WS_ENV];
+  const chromeExtensionOriginAllowed = hasChromeExtensionOrigin(
+    optsIn.allowOrigins,
+  );
+  const rawWorkspace = resolveSingleWorkspaceInput(optsIn.workspace);
   const opts: ServeOptions = {
     ...optsIn,
     token,
     promptDeadlineMs,
     writerIdleTimeoutMs,
+    workspace: rawWorkspace,
+    clientMcpOverWs:
+      optsIn.clientMcpOverWs ??
+      (!envFlagDisabled(clientMcpOverWsEnv) &&
+        clientMcpOverWsEnv !== undefined),
+    cdpTunnelOverWs:
+      optsIn.cdpTunnelOverWs ??
+      (!envFlagDisabled(cdpTunnelOverWsEnv) &&
+        (cdpTunnelOverWsEnv !== undefined || chromeExtensionOriginAllowed)),
+  };
+  const channelRuntime = opts.channelSelection
+    ? await loadChannelWorkerRuntime()
+    : undefined;
+  const channelServicePidfile =
+    deps.channelServicePidfile ?? channelRuntime?.channelServicePidfile;
+  let channelPidfileReserved = false;
+  const removeCurrentServePidfile = (): void => {
+    if (!opts.channelSelection || !channelServicePidfile) return;
+    if (!channelPidfileReserved) return;
+    if (channelServicePidfile.removeServeServiceInfo) {
+      if (channelServicePidfile.removeServeServiceInfo(process.pid)) {
+        channelPidfileReserved = false;
+      }
+      return;
+    }
+    const info = channelServicePidfile.readServiceInfo();
+    if (
+      info?.owner === 'serve' &&
+      info.pid === process.pid &&
+      info.servePid === process.pid
+    ) {
+      channelServicePidfile.removeServiceInfo();
+      channelPidfileReserved = false;
+    }
+  };
+  const reserveChannelServicePidfile = (): void => {
+    if (!opts.channelSelection) return;
+    if (!channelServicePidfile) {
+      throw new Error('Channel service pidfile runtime is not available.');
+    }
+    const channelPidfileNames = channelSelectionNames(opts.channelSelection);
+    const existingChannelService = channelServicePidfile.readServiceInfo();
+    if (existingChannelService) {
+      throw channelServicePidfileConflictError(existingChannelService);
+    }
+    try {
+      writeServeChannelReservation(channelServicePidfile, channelPidfileNames);
+      channelPidfileReserved = true;
+    } catch (err) {
+      if (err && typeof err === 'object' && 'code' in err) {
+        const code = (err as { code?: unknown }).code;
+        if (code === 'EEXIST') {
+          const info = channelServicePidfile.readServiceInfo();
+          if (info) {
+            throw channelServicePidfileConflictError(info);
+          }
+          try {
+            writeServeChannelReservation(
+              channelServicePidfile,
+              channelPidfileNames,
+            );
+            channelPidfileReserved = true;
+            return;
+          } catch (retryErr) {
+            if (
+              retryErr &&
+              typeof retryErr === 'object' &&
+              'code' in retryErr &&
+              (retryErr as { code?: unknown }).code === 'EEXIST'
+            ) {
+              throw new Error(
+                'Channel service is already starting. Retry after the current startup finishes.',
+              );
+            }
+            throw retryErr;
+          }
+        }
+      }
+      throw err;
+    }
   };
   validateRateLimitOptions(opts);
 
@@ -1099,6 +1496,72 @@ export async function runHopCodeServe(
         `combination. Use --port for the port, e.g. ` +
         `"--hostname ${host} --port ${port}".`,
     );
+  }
+
+  // TLS is both-or-nothing: a cert without a key (or vice versa) can't
+  // start an HTTPS listener, so fail loud at boot instead of silently
+  // falling back to plain HTTP — the operator asked for TLS and a silent
+  // downgrade would serve the web shell over an insecure transport they
+  // believe is encrypted.
+  let tlsOptions: { cert: Buffer; key: Buffer } | undefined;
+  if ((opts.tlsCert && !opts.tlsKey) || (!opts.tlsCert && opts.tlsKey)) {
+    throw new Error(
+      `--tls-cert and --tls-key must be provided together (got only ` +
+        `--tls-${opts.tlsCert ? 'cert' : 'key'}).`,
+    );
+  }
+  if (opts.tlsCert && opts.tlsKey) {
+    let cert: Buffer;
+    let key: Buffer;
+    try {
+      cert = fs.readFileSync(opts.tlsCert);
+    } catch (err) {
+      throw new Error(
+        `Failed to read --tls-cert "${opts.tlsCert}": ` +
+          `${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+    try {
+      key = fs.readFileSync(opts.tlsKey);
+    } catch (err) {
+      throw new Error(
+        `Failed to read --tls-key "${opts.tlsKey}": ` +
+          `${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+    // Fail loud at boot on an expired (or unparseable) certificate. Node's
+    // https.createServer happily starts with an expired cert, then every TLS
+    // handshake is rejected client-side (NET::ERR_CERT_DATE_INVALID) while
+    // /health stays green — a silent outage that's hard to diagnose. Surface
+    // it here with an actionable message instead.
+    let x509: X509Certificate;
+    try {
+      x509 = new X509Certificate(cert);
+    } catch (err) {
+      throw new Error(
+        `--tls-cert "${opts.tlsCert}" is not a valid certificate: ` +
+          `${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+    const now = Date.now();
+    if (new Date(x509.validTo).getTime() < now) {
+      throw new Error(
+        `--tls-cert "${opts.tlsCert}" expired on ${x509.validTo}. ` +
+          `Renew the certificate and restart.`,
+      );
+    }
+    // Symmetric to the expiry guard: a cert whose validity window hasn't
+    // started yet (notBefore > now, e.g. clock skew or a freshly minted
+    // cert) also boots cleanly but fails every handshake client-side with
+    // NET::ERR_CERT_DATE_INVALID. Fail loud here too.
+    if (new Date(x509.validFrom).getTime() > now) {
+      throw new Error(
+        `--tls-cert "${opts.tlsCert}" is not yet valid (validFrom: ` +
+          `${x509.validFrom}). Check the certificate's notBefore date or ` +
+          `the system clock.`,
+      );
+    }
+    tlsOptions = { cert, key };
   }
 
   if (!isLoopbackBind(opts.hostname) && !token) {
@@ -1176,7 +1639,6 @@ export async function runHopCodeServe(
   // multiple daemon processes, not intra-daemon routing.
   //
   // Boot-loud validation: absolute path, exists, is a directory.
-  const rawWorkspace = opts.workspace ?? process.cwd();
   if (!path.isAbsolute(rawWorkspace)) {
     throw new Error(
       `Invalid --workspace "${rawWorkspace}": must be an absolute path.`,
@@ -1456,16 +1918,57 @@ export async function runHopCodeServe(
   let runtimeApp: Application | undefined;
   let runtimeAppForCleanup: Application | undefined;
   let bridgeRef: AcpSessionBridge | undefined = deps.bridge;
+  let daemonEventLoopMonitor:
+    | ReturnType<CoreRuntime['startEventLoopLagMonitor']>
+    | undefined;
+  // Daemon Status metrics-ring sampler: a fixed-cadence timer that seals a
+  // bucket plus the window-scoped event-loop histogram it resets each seal.
+  // Torn down together with the event-loop monitor on runtime restart/stop.
+  let daemonMetricsSampler: { dispose(): void } | undefined;
   let runtimeStartupError: string | undefined;
   let runtimeStarting: Promise<void> | undefined;
   let markRuntimeReady!: () => void;
   let markRuntimeFailed!: (err: Error) => void;
   let runtimeStartupSettled = false;
+  let startRuntimeAfterHealth: (() => void) | undefined;
+  let startRuntimeForRequest: (() => void) | undefined;
+  const deferRuntimeUntilFirstHealth =
+    deps.resolveOnListen === true && deps.deferRuntimeUntilFirstHealth === true;
   const runtimeReady = new Promise<void>((resolve, reject) => {
     markRuntimeReady = resolve;
     markRuntimeFailed = reject;
   });
   void runtimeReady.catch(() => {});
+  const disposeDaemonEventLoopMonitor = (): void => {
+    daemonEventLoopMonitor?.dispose();
+    daemonEventLoopMonitor = undefined;
+    daemonMetricsSampler?.dispose();
+    daemonMetricsSampler = undefined;
+  };
+  let channelWorker: ChannelWorkerSupervisor =
+    createDisabledChannelWorkerSupervisor();
+  const getChannelWorkerSnapshot = () => channelWorker.snapshot();
+  const writeChannelWorkerPidfile = (
+    snapshot = channelWorker.snapshot(),
+    options: { clearWorkerPid?: boolean } = {},
+  ): void => {
+    if (!opts.channelSelection || !channelServicePidfile) return;
+    try {
+      channelServicePidfile.writeServeServiceInfo({
+        channels: snapshot.channels,
+        servePid: process.pid,
+        ...(!options.clearWorkerPid && snapshot.pid !== undefined
+          ? { workerPid: snapshot.pid }
+          : {}),
+      });
+    } catch (err) {
+      daemonLog.warn(
+        `failed to write channel worker pidfile metadata: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      );
+    }
+  };
 
   const handleBridge =
     deps.bridge ??
@@ -1535,7 +2038,7 @@ export async function runHopCodeServe(
       createDaemonTelemetryRuntimeConfig(
         daemonTelemetrySettings,
         resolvedCliVersion,
-        `daemon:${daemonWorkspaceHash}:${process.pid}`,
+        `daemon:${process.pid}`,
         {
           otlpEndpoint: core.DEFAULT_OTLP_ENDPOINT,
           telemetryTarget: core.DEFAULT_TELEMETRY_TARGET,
@@ -1543,6 +2046,62 @@ export async function runHopCodeServe(
       ),
     );
     core.initializeDaemonMetrics();
+    daemonEventLoopMonitor?.dispose();
+    daemonEventLoopMonitor = core.startEventLoopLagMonitor({
+      onNewMaxStall: (maxMs) => {
+        daemonLog.warn('daemon event loop stall detected', { maxMs });
+      },
+    });
+    const currentDaemonEventLoopMonitor = daemonEventLoopMonitor;
+    core.registerDaemonEventLoopLagGauge(() =>
+      currentDaemonEventLoopMonitor.snapshot(),
+    );
+    // Daemon Status metrics ring (time-series charts). Bounded so ~15 min of
+    // per-interval history survives dialog close / page reload — the point of
+    // doing this in the daemon rather than accumulating in the browser. Fed from
+    // the telemetry middleware (request rate/latency), the bridge telemetry
+    // hooks (queue-wait/duration, token burn, LLM round-trip), the pipe recorder
+    // (IPC bytes), and the sampler's gauge reads (CPU / memory / connections /
+    // pending prompts / event-loop lag). Declared before `recordPipeMessage` so
+    // that recorder can fold pipe bytes straight in.
+    const metricsRing = new DaemonMetricsRing({
+      capacity: DAEMON_METRICS_CAPACITY,
+    });
+    const pipeStats: DaemonPerfSnapshot['pipe'] = {
+      inbound: { count: 0, totalBytes: 0, maxBytes: 0 },
+      outbound: { count: 0, totalBytes: 0, maxBytes: 0 },
+    };
+    const promptQueueWaitStats = {
+      count: 0,
+      totalMs: 0,
+      maxMs: 0,
+      lastMs: null as number | null,
+    };
+    const recordPipeMessage = (
+      direction: keyof DaemonPerfSnapshot['pipe'],
+      bytes: number,
+    ): void => {
+      const stats = pipeStats[direction];
+      stats.count += 1;
+      stats.totalBytes += bytes;
+      stats.maxBytes = Math.max(stats.maxBytes, bytes);
+      core.recordDaemonPipeMessage(direction, bytes);
+      metricsRing.recordPipe(direction, bytes);
+    };
+    const observeLargePipeFrame = createLargePipeFrameObserver({
+      daemonLog,
+      emitTelemetryLog: core.emitDaemonLog,
+    });
+    const recordPromptQueueWait = (durationMs: number): void => {
+      promptQueueWaitStats.count += 1;
+      promptQueueWaitStats.totalMs += durationMs;
+      promptQueueWaitStats.maxMs = Math.max(
+        promptQueueWaitStats.maxMs,
+        durationMs,
+      );
+      promptQueueWaitStats.lastMs = durationMs;
+      core.recordDaemonPromptQueueWait(durationMs);
+    };
     const daemonTelemetry = core.createDaemonBridgeTelemetry();
     daemonTelemetry.metrics = {
       sessionLifecycle(action) {
@@ -1576,9 +2135,26 @@ export async function runHopCodeServe(
           },
         );
       },
-      promptQueueWait: core.recordDaemonPromptQueueWait,
-      promptDuration: core.recordDaemonPromptDuration,
+      promptQueueWait(durationMs) {
+        recordPromptQueueWait(durationMs);
+        metricsRing.recordPromptQueueWait(durationMs);
+      },
+      promptDuration(durationMs) {
+        core.recordDaemonPromptDuration(durationMs);
+        metricsRing.recordPromptDuration(durationMs);
+      },
       cancelled: core.recordDaemonCancel,
+      // Per-round model token usage + LLM round-trip time sniffed off
+      // `agent_message_chunk._meta` (`usage` + `durationMs`) at the bridge's
+      // single session/update fan-in. Increments (not cumulative), so the ring
+      // sums tokens per window (token-burn chart) and pools the round-trip times
+      // for the LLM-latency percentiles.
+      tokenUsage(inputTokens, outputTokens, durationMs) {
+        metricsRing.recordTokens(inputTokens, outputTokens);
+        if (typeof durationMs === 'number') {
+          metricsRing.recordLlmDuration(durationMs);
+        }
+      },
     };
     // Allocate the audit ring + publisher in the daemon host (here)
     // rather than inside the bridge factory, because the ring is the
@@ -1589,15 +2165,60 @@ export async function runHopCodeServe(
     });
     const customIgnoreFiles =
       runtimeBootSettings?.merged.context?.fileFiltering?.customIgnoreFiles;
-    const fsFactory = runtime.resolveBridgeFsFactory({
+    const boundWorkspaces = runtime.resolveBoundWorkspacesFromIdeEnv(
       boundWorkspace,
+      undefined,
+      (workspace: string, index: number) => {
+        if (index === 0) return true;
+        if (!runtimeBootSettings) {
+          daemonLog.warn(
+            'excluding secondary workspace root because trust settings are unavailable',
+            { workspace },
+          );
+          return false;
+        }
+        const trustedSecondary =
+          settingsRuntime.trustedFolders.getWorkspaceTrustStatus(
+            runtimeBootSettings.merged,
+            workspace,
+          ).effective.state === 'trusted';
+        if (!trustedSecondary) {
+          daemonLog.warn(
+            'excluding untrusted secondary workspace root from file-system access',
+            { workspace },
+          );
+        }
+        return trustedSecondary;
+      },
+    );
+    daemonLog.info('daemon workspace roots initialized', {
+      primary: boundWorkspaces[0],
+      secondary: boundWorkspaces.slice(1),
+      ideEnvPresent: !!process.env['QWEN_CODE_IDE_WORKSPACE_PATH'],
+    });
+    const sharedPathLocks = new PathMutexRegistry();
+    const fsFactory = runtime.resolveBridgeFsFactory({
+      // Secondary roots share a write-capable factory only after their own
+      // folder trust check passes; untrusted secondary roots stay outside.
+      boundWorkspaces,
       injected: deps.fsFactory,
       trusted: trustedWorkspace,
       emit: deps.fsAuditEmit,
+      pathLocks: sharedPathLocks,
       ...(customIgnoreFiles !== undefined ? { customIgnoreFiles } : {}),
     });
     const channelFactory = runtime.createSpawnChannelFactory({
       onDiagnosticLine: diagnosticSink,
+      pipeHooks: {
+        onMessageSent: (bytes) => recordPipeMessage('outbound', bytes),
+        onMessageReceived: (bytes) => recordPipeMessage('inbound', bytes),
+        onMessageObserved: ({ direction, bytes, message }) =>
+          observeLargePipeFrame({
+            direction: daemonPipeDirection(direction),
+            bytes,
+            message,
+          }),
+      },
       ...(opts.experimentalLsp === true
         ? { extraArgs: ['--experimental-lsp'] }
         : {}),
@@ -1605,6 +2226,14 @@ export async function runHopCodeServe(
     const statusProvider = runtime.createDaemonStatusProvider();
     const workspaceProvidersStatusProvider =
       runtime.createWorkspaceProvidersStatusProvider();
+    const workspaceSkillsStatusProvider =
+      runtime.createWorkspaceSkillsStatusProvider();
+    // Reverse tool channel (issue #5626, Phase 2). ONE sender registry shared
+    // between the bridge (which answers the ACP child's `client_mcp/message`
+    // ext-method via `clientMcpSender`) and the WS provider in `createServeApp`
+    // (which registers a per-connection `ClientMcpRegistrar`'s sender on
+    // `mcp_register`). Inert unless `opts.clientMcpOverWs` is on.
+    const clientMcpSenderRegistry = new ClientMcpSenderRegistry();
     const persistDisabledToolsFn = (
       workspace: string,
       toolName: string,
@@ -1680,6 +2309,9 @@ export async function runHopCodeServe(
     const bridge =
       deps.bridge ??
       runtime.createAcpSessionBridge({
+        // Reverse tool channel: let `BridgeClient.extMethod` reach the WS
+        // connection that hosts a named client MCP server (#5626).
+        clientMcpSender: clientMcpSenderRegistry.lookup,
         maxSessions: opts.maxSessions,
         ...(opts.maxPendingPromptsPerSession !== undefined
           ? { maxPendingPromptsPerSession: opts.maxPendingPromptsPerSession }
@@ -1726,6 +2358,7 @@ export async function runHopCodeServe(
       contextFilename: contextFilenameForInit ?? 'QWEN.md',
       statusProvider,
       workspaceProvidersStatusProvider,
+      workspaceSkillsStatusProvider,
       isChannelLive: () => bridge.isChannelLive(),
       persistDisabledTools: persistDisabledToolsFn,
       persistSetting: persistSettingFn,
@@ -1755,15 +2388,180 @@ export async function runHopCodeServe(
       heapUsed: () => process.memoryUsage().heapUsed,
     });
 
+    // Start the metrics-ring sampler now that `bridge` exists: seal a bucket
+    // every DAEMON_METRICS_SAMPLE_MS, reading memory / active sessions+prompts
+    // and a window-scoped event-loop lag p99 (its own histogram, reset each
+    // seal so the charted lag is per-interval, not the since-start average the
+    // shared monitor reports). `unref()` so sampling never keeps the process
+    // alive; torn down by `disposeDaemonEventLoopMonitor`.
+    // Retire any prior sampler before building a new one so a runtime rebuild
+    // (buildRuntime re-entry) can't leak the old interval + histogram —
+    // symmetric with the `daemonEventLoopMonitor?.dispose()` above.
+    daemonMetricsSampler?.dispose();
+    const metricsLoopDelay = monitorEventLoopDelay({ resolution: 20 });
+    metricsLoopDelay.enable();
+    // Delta state for the cumulative counters. CPU% = delta CPU-µs over delta
+    // wall-ms, normalized by core count (same formula as memoryPressureMonitor);
+    // clamped to [0,100] to absorb non-monotonic cpuUsage on some VMs and
+    // CPU-bursting. Rate-limit rejects are diffed against the prior total.
+    const cpuCoreCount = os.availableParallelism?.() ?? os.cpus().length ?? 1;
+    let prevCpu = safeCpuUsage();
+    let prevCpuAt = Date.now();
+    // undefined until the first tick sets the baseline, so the first sealed
+    // window reports 0 rejects instead of the entire since-start backlog as a
+    // y-axis-flattening spike.
+    let prevRateRejected: number | undefined;
+    const metricsSamplerTimer = setInterval(() => {
+      const nowMs = Date.now();
+      // Read the window lag BEFORE the try: a tick that throws is exactly when
+      // the daemon is overloaded and lag is most diagnostic, so the catch path
+      // must chart the real accumulated lag, not a misleading 0.
+      const eventLoopLagP99Ms = metricsLoopDelay.percentile(99) / 1_000_000;
+      try {
+        const mem = process.memoryUsage();
+        // CPU%: computeCpuPercent returns 0 (and we leave the baseline
+        // untouched) when cpuUsage() throws, so a transient failure can't turn
+        // the next successful read's since-start total into one giant spike.
+        const cpu = safeCpuUsage();
+        const cpuPercent = computeCpuPercent(
+          prevCpu,
+          cpu,
+          nowMs - prevCpuAt,
+          cpuCoreCount,
+        );
+        if (cpu) {
+          prevCpu = cpu;
+          prevCpuAt = nowMs;
+        }
+        // Connections + rate limiter live on `app` (the createServeApp const
+        // just below); read lazily — the first tick is ≥5s out, so the forward
+        // reference is assigned by call time. Guard with `?.` (ACP HTTP and the
+        // limiter are both toggleable).
+        const acp = (
+          app.locals?.['acpHandle'] as AcpHttpHandle | undefined
+        )?.registry.getSnapshot();
+        const hits = getRateLimiter(app)?.getHitCounts();
+        const rejectedTotal = hits
+          ? hits.prompt + hits.mutation + hits.read
+          : 0;
+        const rateLimitRejected =
+          prevRateRejected === undefined
+            ? 0
+            : Math.max(0, rejectedTotal - prevRateRejected);
+        prevRateRejected = rejectedTotal;
+        // ACP child resource: read this tick's cached snapshot synchronously
+        // and kick an async refresh for the next tick, keeping the sampler
+        // sync. Optional-chained: an injected bridge (RunQwenServeDeps.bridge)
+        // built against the older contract may not implement these hooks.
+        const child = bridge.getChildResourceSnapshot?.();
+        // Only poll the child's resources when someone is watching: the
+        // staleness guard already drops the reading to 0 when idle, so gating
+        // avoids a 5s RPC round-trip (pipe + child CPU) for a chart nobody has
+        // open.
+        if (runtime.getActiveSseCount() > 0 || (acp?.wsStreams ?? 0) > 0) {
+          void bridge.refreshChildResource?.();
+        }
+        metricsRing.sample(nowMs, {
+          cpuPercent,
+          rssBytes: mem.rss,
+          heapUsedBytes: mem.heapUsed,
+          activeSessions: bridge.sessionCount,
+          activePrompts: bridge.activePromptCount,
+          queuedPrompts: bridge.pendingPromptTotal ?? 0,
+          eventLoopLagP99Ms,
+          sseConnections: runtime.getActiveSseCount(),
+          wsConnections: acp?.wsStreams ?? 0,
+          acpConnections: acp?.connectionCount ?? 0,
+          rateLimitRejected,
+          childCpuPercent: child?.cpuPercent ?? 0,
+          childRssBytes: child?.rssBytes ?? 0,
+        });
+      } catch (err) {
+        // A gauge getter threw (e.g. process.memoryUsage() in a restricted
+        // container, or a bridge getter mid-teardown). Never let it surface as
+        // an uncaughtException that takes down the daemon; seal a zeroed bucket
+        // so the timeline stays contiguous rather than silently gapping.
+        daemonLog.warn(
+          `metrics sampler tick failed: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+        try {
+          metricsRing.sample(nowMs, {
+            cpuPercent: 0,
+            rssBytes: 0,
+            heapUsedBytes: 0,
+            activeSessions: 0,
+            activePrompts: 0,
+            queuedPrompts: 0,
+            eventLoopLagP99Ms,
+            sseConnections: 0,
+            wsConnections: 0,
+            acpConnections: 0,
+            rateLimitRejected: 0,
+            childCpuPercent: 0,
+            childRssBytes: 0,
+          });
+        } catch {
+          // The ring is pure data; a throw here is unexpected, but never let
+          // the fallback path crash the timer either.
+        }
+      } finally {
+        // Reset the window histogram AFTER sampling (or after a failed tick) so
+        // a thrown tick can't permanently discard event-loop lag — which would
+        // otherwise leave the chart reading a healthy 0ms while the daemon was
+        // actually stalling.
+        metricsLoopDelay.reset();
+      }
+    }, DAEMON_METRICS_SAMPLE_MS);
+    metricsSamplerTimer.unref();
+    daemonMetricsSampler = {
+      dispose(): void {
+        clearInterval(metricsSamplerTimer);
+        metricsLoopDelay.disable();
+      },
+    };
+
     const app = runtime.createServeApp(opts, () => actualPort, {
       bridge,
       webShellDir,
       boundWorkspace,
       HopCodeVersion: resolvedCliVersion,
       startup,
-      fsFactory,
+      fsFactory: runtime.resolveBridgeFsFactory({
+        // REST routes still return primary-relative paths, so keep their
+        // filesystem boundary primary-only until responses carry root IDs.
+        boundWorkspaces: [boundWorkspace],
+        trusted: trustedWorkspace,
+        emit: deps.fsAuditEmit,
+        pathLocks: sharedPathLocks,
+        ...(customIgnoreFiles !== undefined ? { customIgnoreFiles } : {}),
+      }),
       daemonLog,
+      getChannelWorkerSnapshot,
+      getPerfSnapshot: () => ({
+        eventLoop: currentDaemonEventLoopMonitor.snapshot(),
+        promptQueueWait: {
+          count: promptQueueWaitStats.count,
+          meanMs:
+            promptQueueWaitStats.count === 0
+              ? 0
+              : promptQueueWaitStats.totalMs / promptQueueWaitStats.count,
+          maxMs: promptQueueWaitStats.maxMs,
+          lastMs: promptQueueWaitStats.lastMs,
+        },
+        pipe: {
+          inbound: { ...pipeStats.inbound },
+          outbound: { ...pipeStats.outbound },
+        },
+      }),
+      getMetricsSeries: () => metricsRing.snapshot(),
+      recordDaemonRequest: (durationMs, statusCode) =>
+        metricsRing.recordRequest(durationMs, statusCode),
       workspace: workspaceService,
+      // Reverse tool channel (#5626): the SAME registry wired into `bridge` above,
+      // so the WS provider and the child-answering bridge share one sender map.
+      clientMcpSenderRegistry,
       persistDisabledTools: persistDisabledToolsFn,
       persistSetting: persistSettingFn,
       persistSettings: persistSettingsFn,
@@ -1820,8 +2618,10 @@ export async function runHopCodeServe(
     runtimeAppForCleanup = runtime.app;
     runtimeApp = runtime.app;
     bridgeRef = runtime.bridge;
-    runtimeStartupSettled = true;
-    markRuntimeReady();
+    if (!opts.channelSelection) {
+      runtimeStartupSettled = true;
+      markRuntimeReady();
+    }
   }
 
   cliVersion ??= await cliVersionPromise;
@@ -1836,9 +2636,19 @@ export async function runHopCodeServe(
     sessionShellCommandEnabled,
     permissionPolicy,
     getRuntimeError: () => runtimeStartupError,
+    getChannelWorkerSnapshot,
+    onHealthServed: deferRuntimeUntilFirstHealth
+      ? () => startRuntimeAfterHealth?.()
+      : undefined,
   });
   const app =
-    runtimeApp ?? createDelegatingServeApp(bootstrapApp, () => runtimeApp);
+    runtimeApp ??
+    createDelegatingServeApp(bootstrapApp, () => runtimeApp, {
+      waitForDeferredRuntimeRoutes: deferRuntimeUntilFirstHealth,
+      startRuntime: () => startRuntimeForRequest?.(),
+      runtimeReady,
+      authenticateDeferredRuntimeRequest: bearerAuth(opts.token),
+    });
 
   // Node's `app.listen()` wants the unbracketed IPv6 literal (`::1`) but
   // operators conventionally type `[::1]` (or copy/paste from URLs that
@@ -1888,15 +2698,22 @@ export async function runHopCodeServe(
     );
   }
 
+  reserveChannelServicePidfile();
+
   return await new Promise<RunHandle>((resolve, reject) => {
-    const server = app.listen(opts.port, listenHostname, () => {
+    // When TLS is configured, wrap the Express app in an HTTPS listener
+    // (`https.Server extends http.Server`, so everything downstream —
+    // `server.maxConnections`, `server.address()`, `attachServer(server)`,
+    // graceful close — is unchanged). Otherwise `app.listen()` keeps the
+    // existing plain-HTTP path bit-for-bit.
+    const onListening = () => {
       startup.listenerReadyAt = new Date().toISOString();
       startup.processToListenMs = Math.round(process.uptime() * 1000);
       startup.runHopCodeServeToListenMs = Math.round(
         performance.now() - runStartedAt,
       );
       profileCheckpoint('serve_listener_ready');
-      finalizeStartupProfile(daemonLog.getDaemonId() || 'serve');
+      finalizeStartupProfile(`serve-${process.pid}`);
 
       // Listener-level connection cap, set inside the listen callback
       // because Node only exposes the underlying `Server` after
@@ -1925,7 +2742,61 @@ export async function runHopCodeServe(
       // else: leave unset (Node's default = unlimited at this layer).
       const addr = server.address();
       actualPort = typeof addr === 'object' && addr ? addr.port : opts.port;
-      const url = `http://${formatHostForUrl(opts.hostname)}:${actualPort}`;
+      const scheme = tlsOptions ? 'https' : 'http';
+      const url = `${scheme}://${formatHostForUrl(opts.hostname)}:${actualPort}`;
+      try {
+        if (opts.channelSelection) {
+          const createSupervisor =
+            deps.channelWorkerSupervisorFactory ??
+            channelRuntime?.createChannelWorkerSupervisor;
+          if (!createSupervisor) {
+            throw new Error(
+              'Channel worker supervisor runtime is not available.',
+            );
+          }
+          channelWorker = createSupervisor({
+            cliEntryPath: findCliEntryPath(),
+            daemonUrl: formatChannelWorkerDaemonUrl(opts.hostname, actualPort),
+            ...(token ? { daemonToken: token } : {}),
+            workspace: boundWorkspace,
+            selection: opts.channelSelection,
+            onReady: (snapshot) => {
+              writeChannelWorkerPidfile(snapshot);
+            },
+            onLog: ({ stream, line }) => {
+              const message = `channel worker ${stream}: ${line}`;
+              if (stream === 'stderr') {
+                daemonLog.warn(message);
+              } else {
+                daemonLog.info(message);
+              }
+            },
+            onExit: (snapshot) => {
+              daemonLog.warn(
+                `channel worker exited (state=${snapshot.state}, pid=${snapshot.pid ?? 'unknown'}, ` +
+                  `code=${snapshot.exitCode ?? 'null'}, signal=${snapshot.signal ?? 'null'}, ` +
+                  `error=${snapshot.error ?? 'none'}, restartCount=${snapshot.restartCount ?? 0}, ` +
+                  `nextRestartAt=${snapshot.nextRestartAt ?? 'none'}, ` +
+                  `staleHeartbeatAt=${snapshot.staleHeartbeatAt ?? 'none'})`,
+              );
+              writeChannelWorkerPidfile(snapshot, { clearWorkerPid: true });
+            },
+          });
+        }
+      } catch (err) {
+        removeCurrentServePidfile();
+        const error = err instanceof Error ? err : new Error(String(err));
+        server.close((closeErr) => {
+          if (closeErr) {
+            daemonLog.error(
+              'server close after channel worker setup error failed',
+              closeErr,
+            );
+          }
+          reject(error);
+        });
+        return;
+      }
       writeStdoutLine(
         `hopcode serve listening on ${url} (mode=${opts.mode}, ` +
           `workspace=${boundWorkspace})`,
@@ -1953,6 +2824,12 @@ export async function runHopCodeServe(
         writeStderrLine(
           `hopcode serve: bearer auth disabled (loopback default). Set ${HOPCODE_SERVER_TOKEN_ENV} to enable.`,
         );
+        if (opts.clientMcpOverWs === true) {
+          writeStderrLine(
+            `qwen serve: client-hosted MCP tools are accepted over the WebSocket without auth. ` +
+              `Set ${QWEN_SERVE_CLIENT_MCP_OVER_WS_ENV}=0 to disable.`,
+          );
+        }
       } else if (opts.requireAuth) {
         // The boot check above guarantees `token` is set whenever
         // `--require-auth` is on, so this branch only fires alongside
@@ -1965,10 +2842,11 @@ export async function runHopCodeServe(
             'on every route, including loopback /health).',
         );
       }
-
       let shuttingDown = false;
       let closePromise: Promise<void> | undefined;
       let runtimeStartupTimer: NodeJS.Timeout | undefined;
+      let runtimeStartAfterHealthTimer: NodeJS.Timeout | undefined;
+      let runtimeStartFallbackTimer: NodeJS.Timeout | undefined;
       const runtimeStartupTimeoutMs = resolveRuntimeStartupTimeoutMs(
         deps.runtimeStartupTimeoutMs,
       );
@@ -1976,6 +2854,31 @@ export async function runHopCodeServe(
         if (!runtimeStartupTimer) return;
         clearTimeout(runtimeStartupTimer);
         runtimeStartupTimer = undefined;
+      };
+      const clearRuntimeStartFallbackTimer = (): void => {
+        if (!runtimeStartFallbackTimer) return;
+        clearTimeout(runtimeStartFallbackTimer);
+        runtimeStartFallbackTimer = undefined;
+      };
+      const clearRuntimeStartAfterHealthTimer = (): void => {
+        if (!runtimeStartAfterHealthTimer) return;
+        clearTimeout(runtimeStartAfterHealthTimer);
+        runtimeStartAfterHealthTimer = undefined;
+      };
+      const cancelDeferredRuntimeStartup = (): void => {
+        if (
+          !deferRuntimeUntilFirstHealth ||
+          runtimeStarting ||
+          runtimeStartupSettled
+        )
+          return;
+        daemonLog.info(
+          'deferred runtime: cancelled, server closed before startup',
+        );
+        runtimeStartupSettled = true;
+        const error = new Error(RUNTIME_STARTUP_CANCELLED_MESSAGE);
+        runtimeStartupError = error.message;
+        markRuntimeFailed(error);
       };
       const shutdownBridgeAfterFailedStartup = async (
         bridge: AcpSessionBridge | undefined,
@@ -1993,6 +2896,14 @@ export async function runHopCodeServe(
             bridgeRef = undefined;
           }
         }
+      };
+      const stopChannelWorkerAfterFailedStartup = async (): Promise<void> => {
+        await channelWorker.stop().catch((stopErr) => {
+          daemonLog.error(
+            'channel worker stop after runtime startup error failed',
+            stopErr instanceof Error ? stopErr : null,
+          );
+        });
       };
       const failRuntimeStartup = async (
         err: unknown,
@@ -2016,8 +2927,33 @@ export async function runHopCodeServe(
         }
         writeStderrLine(`hopcode serve: runtime startup failed: ${message}`);
         daemonLog.error('runtime startup failed', error);
-        markRuntimeFailed(error);
+        await stopChannelWorkerAfterFailedStartup();
+        disposeDaemonEventLoopMonitor();
+        removeCurrentServePidfile();
         await shutdownBridgeAfterFailedStartup(bridgeForCleanup ?? bridgeRef);
+        markRuntimeFailed(error);
+      };
+      const armRuntimeStartupTimer = (): void => {
+        if (runtimeStartupTimeoutMs <= 0 || runtimeStartupTimer) return;
+        runtimeStartupTimer = setTimeout(() => {
+          void failRuntimeStartup(
+            new Error(
+              `Daemon runtime startup timed out after ${runtimeStartupTimeoutMs}ms.`,
+            ),
+          );
+        }, runtimeStartupTimeoutMs);
+        runtimeStartupTimer.unref();
+      };
+      const completeRuntimeStartup = async (): Promise<void> => {
+        if (runtimeStartupSettled) return;
+        if (opts.channelSelection) {
+          await channelWorker.start();
+          if (runtimeStartupSettled) return;
+        }
+        if (runtimeStartupSettled) return;
+        runtimeStartupSettled = true;
+        clearRuntimeStartupTimer();
+        markRuntimeReady();
       };
       const startBridgePreheat = (bridge: AcpSessionBridge): void => {
         startup.preheat.status = 'running';
@@ -2044,6 +2980,9 @@ export async function runHopCodeServe(
       };
       const startRuntime = (): void => {
         if (runtimeStarting) return;
+        armRuntimeStartupTimer();
+        clearRuntimeStartAfterHealthTimer();
+        clearRuntimeStartFallbackTimer();
         runtimeStarting = buildRuntime()
           .then(async (runtime) => {
             if (runtimeStartupSettled) {
@@ -2067,21 +3006,40 @@ export async function runHopCodeServe(
             if (shouldPreheat) {
               startBridgePreheat(runtime.bridge);
             }
-            runtimeStartupSettled = true;
-            clearRuntimeStartupTimer();
-            markRuntimeReady();
+            await completeRuntimeStartup();
           })
           .catch((err) => failRuntimeStartup(err));
-        if (runtimeStartupTimeoutMs > 0) {
-          runtimeStartupTimer = setTimeout(() => {
-            void failRuntimeStartup(
-              new Error(
-                `Daemon runtime startup timed out after ${runtimeStartupTimeoutMs}ms.`,
-              ),
-            );
-          }, runtimeStartupTimeoutMs);
-          runtimeStartupTimer.unref();
+      };
+      startRuntimeForRequest = startRuntime;
+      const scheduleRuntimeStartFallback = (): void => {
+        if (shuttingDown || runtimeStarting || runtimeStartFallbackTimer)
+          return;
+        daemonLog.info(
+          `deferred runtime: scheduling fallback start in ${FAST_PATH_RUNTIME_START_FALLBACK_MS}ms`,
+        );
+        runtimeStartFallbackTimer = setTimeout(() => {
+          runtimeStartFallbackTimer = undefined;
+          if (shuttingDown) return;
+          daemonLog.info('deferred runtime: fallback timer fired, starting');
+          startRuntime();
+        }, FAST_PATH_RUNTIME_START_FALLBACK_MS);
+        runtimeStartFallbackTimer.unref();
+      };
+      startRuntimeAfterHealth = (): void => {
+        if (shuttingDown || runtimeStarting || runtimeStartAfterHealthTimer) {
+          return;
         }
+        clearRuntimeStartFallbackTimer();
+        daemonLog.info(
+          `deferred runtime: health served, scheduling start in ${FAST_PATH_RUNTIME_START_AFTER_HEALTH_MS}ms`,
+        );
+        runtimeStartAfterHealthTimer = setTimeout(() => {
+          runtimeStartAfterHealthTimer = undefined;
+          if (shuttingDown) return;
+          daemonLog.info('deferred runtime: health timer fired, starting');
+          startRuntime();
+        }, FAST_PATH_RUNTIME_START_AFTER_HEALTH_MS);
+        runtimeStartAfterHealthTimer.unref();
       };
 
       // Forward declaration so handle.close can detach the listener after
@@ -2101,7 +3059,9 @@ export async function runHopCodeServe(
           // `hopcode` processes in the operator's `ps` output.
           daemonLog.warn(`received ${signal} during drain — forcing exit`);
           try {
+            channelWorker.killAllSync();
             bridgeRef?.killAllSync();
+            removeCurrentServePidfile();
           } catch (err) {
             daemonLog.error(
               'force-kill error',
@@ -2123,6 +3083,11 @@ export async function runHopCodeServe(
           process.exit(1);
         }
       };
+      const onUncaughtExceptionMonitor = () => {
+        if (process.listenerCount('uncaughtException') === 0) {
+          removeCurrentServePidfile();
+        }
+      };
 
       const handle: RunHandle = {
         server,
@@ -2140,12 +3105,14 @@ export async function runHopCodeServe(
           if (closePromise) return closePromise;
           closePromise = new Promise<void>((res, rej) => {
             shuttingDown = true;
+            clearRuntimeStartAfterHealthTimer();
+            clearRuntimeStartFallbackTimer();
+            cancelDeferredRuntimeStartup();
             // NOTE: the SIGINT/SIGTERM handlers stay attached during the
-            // drain. Their `if (shuttingDown) return` guard makes a second
-            // signal a no-op. Detaching them up front would leave Node's
-            // default signal behavior in charge — a second SIGTERM mid-drain
-            // would terminate the process and orphan agent children. We
-            // detach AFTER drain completes (`finish` below).
+            // drain so a second signal can take the explicit force-exit path
+            // above. Detaching them up front would leave Node's default signal
+            // behavior in charge and could orphan agent children. We detach
+            // AFTER drain completes (`finish` below).
 
             // Two-phase shutdown:
             //   1. `bridge.shutdown()` — tears down agent children with
@@ -2179,6 +3146,10 @@ export async function runHopCodeServe(
               settled = true;
               process.removeListener('SIGINT', onSignal);
               process.removeListener('SIGTERM', onSignal);
+              process.removeListener(
+                'uncaughtExceptionMonitor',
+                onUncaughtExceptionMonitor,
+              );
               void (
                 coreRuntimePromise
                   ? coreRuntimePromise.then((core) => core.shutdownTelemetry())
@@ -2266,6 +3237,16 @@ export async function runHopCodeServe(
                   rl.setDraining(true);
                   rl.dispose();
                 }
+                disposeDaemonEventLoopMonitor();
+                // The worker owns daemon-backed sessions; disconnect it before
+                // tearing down the ACP bridge it is attached to.
+                await channelWorker.stop().catch((err) => {
+                  daemonLog.error(
+                    'channel worker stop error',
+                    err instanceof Error ? err : null,
+                  );
+                });
+                removeCurrentServePidfile();
                 const bridgeForShutdown = bridgeRef;
                 if (bridgeForShutdown) {
                   await bridgeForShutdown.shutdown().catch((err) => {
@@ -2329,6 +3310,7 @@ export async function runHopCodeServe(
 
       process.on('SIGINT', onSignal);
       process.on('SIGTERM', onSignal);
+      process.on('uncaughtExceptionMonitor', onUncaughtExceptionMonitor);
 
       // Swap the boot-error listener for a runtime-error one
       // before resolving. `server.once('error', reject)` at the
@@ -2348,6 +3330,14 @@ export async function runHopCodeServe(
         if (shouldPreheat) {
           startBridgePreheat(bridgeRef);
         }
+        if (opts.channelSelection && !runtimeStartupSettled) {
+          armRuntimeStartupTimer();
+          runtimeStarting = completeRuntimeStartup().catch((err) =>
+            failRuntimeStartup(err, bridgeRef),
+          );
+        }
+      } else if (deferRuntimeUntilFirstHealth) {
+        scheduleRuntimeStartFallback();
       } else {
         startRuntime();
       }
@@ -2372,7 +3362,33 @@ export async function runHopCodeServe(
           },
         );
       }
+    };
+    let server: Server;
+    if (tlsOptions) {
+      let httpsServer: https.Server;
+      try {
+        httpsServer = https.createServer(tlsOptions, app);
+      } catch (err) {
+        // createSecureContext throws a raw OpenSSL string (e.g.
+        // "error:0B080074:...key values mismatch") when cert/key don't pair.
+        // Wrap it so the operator gets the same actionable framing as the
+        // --tls-cert/--tls-key read errors above.
+        reject(
+          new Error(
+            `--tls-cert "${opts.tlsCert}" and --tls-key "${opts.tlsKey}" ` +
+              `could not be loaded (do they match?): ` +
+              `${err instanceof Error ? err.message : String(err)}`,
+          ),
+        );
+        return;
+      }
+      server = httpsServer.listen(opts.port, listenHostname, onListening);
+    } else {
+      server = app.listen(opts.port, listenHostname, onListening);
+    }
+    server.once('error', (err) => {
+      removeCurrentServePidfile();
+      reject(err);
     });
-    server.once('error', reject);
   });
 }

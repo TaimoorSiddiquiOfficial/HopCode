@@ -115,16 +115,20 @@ function buildApp(opts: {
   bridge: AcpSessionBridge;
   boundWorkspace: string;
   strictNoToken?: boolean;
+  collectStatus?: Parameters<
+    typeof mountWorkspaceMemoryRoutes
+  >[1]['collectStatus'];
 }) {
   const app = express();
   app.use(express.json({ limit: '10mb' }));
   const mutate = createMutationGate({
-    tokenConfigured: !opts.strictNoToken,
+    tokenConfigured: opts.strictNoToken !== true,
     requireAuth: false,
   });
   mountWorkspaceMemoryRoutes(app, {
     bridge: opts.bridge,
     boundWorkspace: opts.boundWorkspace,
+    ...(opts.collectStatus ? { collectStatus: opts.collectStatus } : {}),
     mutate,
     parseClientId: (req, res) => {
       const raw = req.get('x-hopcode-client-id');
@@ -156,6 +160,10 @@ function buildApp(opts: {
   return app;
 }
 
+function resetContextFilenames(): void {
+  setGeminiMdFilename([DEFAULT_CONTEXT_FILENAME, AGENT_CONTEXT_FILENAME]);
+}
+
 describe('workspace memory routes', () => {
   let tmp: string;
   let workspace: string;
@@ -170,6 +178,7 @@ describe('workspace memory routes', () => {
     getGlobalHopCodeDirSpy = vi
       .spyOn(Storage, 'getGlobalHopCodeDir')
       .mockReturnValue(globalDir);
+    resetContextFilenames();
   });
 
   afterEach(async () => {
@@ -451,13 +460,10 @@ describe('workspace memory routes', () => {
         .mockImplementation(() => {
           throw new Error('boom');
         });
-      try {
-        const res = await request(app).get('/workspace/memory');
-        expect(res.status).toBe(500);
-        expect(res.body.code).toBe('memory_discovery_failed');
-      } finally {
-        failGlobal.mockRestore();
-      }
+      void failGlobal;
+      const res = await request(app).get('/workspace/memory');
+      expect(res.status).toBe(500);
+      expect(res.body.code).toBe('memory_discovery_failed');
     });
 
     it('stamps originatorClientId on the memory_changed event for known clients', async () => {

@@ -490,6 +490,7 @@ export class HopCodeLogger {
       properties: {
         prompt_id: event.prompt_id,
         prompt_length: event.prompt_length,
+        ...(event.model ? { model: event.model } : {}),
       },
     });
 

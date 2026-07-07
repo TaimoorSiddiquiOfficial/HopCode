@@ -82,6 +82,23 @@ curl http://127.0.0.1:4170/daemon/status
 The `workspaceCwd` field surfaces the bound workspace so clients can pre-flight check + omit `cwd` on `POST /session`.
 The `limits.maxPendingPromptsPerSession` field advertises the active per-session prompt admission cap; `null` means the cap is disabled.
 
+### Run channels from the daemon
+
+```bash
+# Start one configured channel under qwen serve
+qwen serve --channel telegram
+
+# Start several configured channels under one daemon-owned worker
+qwen serve --channel telegram --channel feishu
+
+# Start all configured channels
+qwen serve --channel all
+```
+
+This mode is experimental and daemon-managed. It does not replace the standalone `qwen channel start` command: standalone channels still use the ACP-backed `AcpBridge` service. With `qwen serve --channel`, the daemon launches one channel worker process after the HTTP runtime is ready. If the worker exits after startup, the daemon keeps running and `GET /daemon/status` reports a `channel_worker_exited` warning. Automatic worker restart is deferred.
+
+The daemon is bound to one workspace, so every selected channel's `cwd` must resolve to the daemon workspace. `--channel all` cannot be combined with named channels.
+
 The daemon also exposes read-only runtime snapshots for client UIs and
 operators: `GET /daemon/status`, `GET /workspace/mcp`,
 `GET /workspace/skills`, `GET /workspace/providers`, `GET /workspace/env`,
@@ -241,6 +258,38 @@ curl -H "Authorization: Bearer $HOPCODE_SERVER_TOKEN" http://your-host:4170/capa
 ```
 
 The token comparison is constant-time (SHA-256 + `crypto.timingSafeEqual`); 401 responses are uniform across "missing header", "wrong scheme", and "wrong token" so a side-channel can't distinguish.
+
+## HTTPS / TLS (for mobile / cross-device access)
+
+By default the daemon serves plain HTTP. That's fine on `localhost`, but a phone or tablet hitting a LAN IP (`https://192.168.x.x:4170`) is **not** a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts) over `http://` — so browsers block `getUserMedia` (voice input), WebRTC, and other secure-context-only APIs. Pass `--tls-cert` + `--tls-key` to serve the Web Shell over HTTPS and unlock them:
+
+```bash
+# 1. Install a local CA and trust it (one-time). The mobile device must
+#    also trust this CA — mkcert prints where the root cert lives.
+mkcert -install
+
+# 2. Generate a cert for your machine's LAN IP. Add localhost / 127.0.0.1 to
+#    the SANs too: with `--open`, the daemon rewrites the browser URL to
+#    127.0.0.1, so a cert scoped to only the LAN IP would be rejected with
+#    ERR_CERT_COMMON_NAME_INVALID. (mkcert names the output after all hosts.)
+mkcert 192.168.1.100 localhost 127.0.0.1
+
+# 3. Start the daemon over HTTPS. Non-loopback binds still require a token,
+#    and the browser Origin must be allowed through CORS.
+qwen serve \
+  --hostname 0.0.0.0 \
+  --token "$(openssl rand -hex 32)" \
+  --tls-cert "./192.168.1.100+2.pem" \
+  --tls-key "./192.168.1.100+2-key.pem" \
+  --allow-origin "https://192.168.1.100:4170"
+# → qwen serve listening on https://0.0.0.0:4170
+```
+
+Notes:
+
+- **Both flags or neither** — boot fails if only one is given (a cert with no key can't start an HTTPS listener).
+- **TLS is orthogonal to auth** — HTTPS encrypts the transport; the bearer token still gates every API route. Non-loopback binds require a token with or without TLS.
+- **Scope is TLS termination only** — no auto-generation, no ACME / Let's Encrypt. This is a LAN / dev convenience; for internet-facing deployments terminate TLS at a reverse proxy (see the threat model below).
 
 ## CLI flags
 

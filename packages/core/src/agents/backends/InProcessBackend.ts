@@ -1,18 +1,20 @@
 /**
  * @license
- * Copyright 2026 HopCode Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * @fileoverview InProcessBackend � Backend implementation that runs agents
+ * @fileoverview InProcessBackend â€” Backend implementation that runs agents
  * in the current process using AgentInteractive instead of PTY subprocesses.
  *
  * This enables Arena to work without tmux or any external terminal multiplexer.
  */
 
+import path from 'node:path';
 import { createDebugLogger } from '../../utils/debugLogger.js';
-import type { Config } from '../../config/config.js';
+import { ApprovalMode, Config } from '../../config/config.js';
+import { Storage } from '../../config/storage.js';
 import { type ContentGenerator } from '../../core/contentGenerator.js';
 import type { RuntimeContentGeneratorView } from '../runtime/agent-context.js';
 import type { ToolRegistry } from '../../tools/tool-registry.js';
@@ -24,6 +26,8 @@ import { AgentCore } from '../runtime/agent-core.js';
 import { AgentEventEmitter } from '../runtime/agent-events.js';
 import { ContextState } from '../runtime/agent-headless.js';
 import { AgentInteractive } from '../runtime/agent-interactive.js';
+import { createDenialState } from '../../permissions/denialTracking.js';
+import { runWithTeammateIdentity } from '../team/identity.js';
 import type {
   Backend,
   AgentSpawnConfig,
@@ -52,15 +56,17 @@ export class InProcessBackend implements Backend {
   // dispose just that agent's registry (releasing tool listeners on
   // shared managers like SkillManager / SubagentManager) without
   // waiting for backend shutdown. The previous flat-array form leaked
-  // listeners — every spawn-then-stop cycle accumulated another stale
+  // listeners â€” every spawn-then-stop cycle accumulated another stale
   // SkillTool listener on the parent SkillManager, and
   // `notifyChangeListeners` (now parallel via Promise.allSettled)
   // still pays a per-listener round trip even when the underlying
   // subagent no longer exists.
   private readonly agentRegistries: Map<string, ToolRegistry> = new Map();
+  private readonly agentApprovalCleanups = new Map<string, () => void>();
   private readonly agentOrder: string[] = [];
   private activeAgentId: string | null = null;
   private exitCallback: AgentExitCallback | null = null;
+  private autoApprovalOverrideCount = 0;
   /** Whether cleanup() has been called */
   private cleanedUp = false;
 
@@ -68,7 +74,7 @@ export class InProcessBackend implements Backend {
     this.runtimeContext = runtimeContext;
   }
 
-  // --- Backend Interface -------------------------------------
+  // â”€â”€â”€ Backend Interface â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async init(): Promise<void> {
     debugLogger.info('InProcessBackend initialized');
@@ -88,17 +94,28 @@ export class InProcessBackend implements Backend {
 
     const { promptConfig, modelConfig, runConfig, toolConfig } =
       inProcessConfig.runtimeConfig;
+    const runInContext = createRunInContext(inProcessConfig);
+    const runWithContext = <T>(fn: () => T): T =>
+      runInContext ? runInContext(fn) : fn();
 
     const eventEmitter = new AgentEventEmitter();
 
     // Build a per-agent runtime context with isolated working directory,
     // target directory, workspace context, tool registry, and (optionally)
     // a dedicated ContentGenerator for per-agent auth isolation.
-    const perAgent = await createPerAgentConfig(
-      this.runtimeContext,
-      config.cwd,
-      inProcessConfig.runtimeConfig.modelConfig.model,
-      inProcessConfig.authOverrides,
+    const perAgent = await runWithContext(() =>
+      createPerAgentConfig(
+        this.runtimeContext,
+        config.agentId,
+        config.cwd,
+        inProcessConfig.runtimeConfig.modelConfig.model,
+        inProcessConfig.authOverrides,
+        inProcessConfig.approvalMode,
+        {
+          acquireAutoApprovalOverride: () => this.acquireAutoApprovalOverride(),
+          releaseAutoApprovalOverride: () => this.releaseAutoApprovalOverride(),
+        },
+      ),
     );
     const agentContext = perAgent.config;
     if (perAgent.contentGenerator) {
@@ -109,6 +126,7 @@ export class InProcessBackend implements Backend {
     }
 
     this.agentRegistries.set(config.agentId, agentContext.getToolRegistry());
+    this.agentApprovalCleanups.set(config.agentId, perAgent.cleanup);
 
     const core = new AgentCore(
       inProcessConfig.agentName,
@@ -131,12 +149,29 @@ export class InProcessBackend implements Backend {
         maxTimeMinutesPerMessage: runConfig.max_time_minutes,
         completeOnIdle: inProcessConfig.completeOnIdle,
         chatHistory: inProcessConfig.chatHistory,
+        runInContext,
       },
       core,
     );
 
     this.agents.set(config.agentId, interactive);
     this.agentOrder.push(config.agentId);
+
+    // Route owned monitor notifications into this agent's message queue.
+    // AgentInteractive frames every tool body under the agent identity, so a
+    // `monitor` started by this agent is stamped with its ownerAgentId â€” and
+    // MonitorRegistry.dispatchNotification routes owned monitors ONLY
+    // through agentNotificationCallbacks, with no session fallback. Without
+    // this registration (the in-process analogue of AgentTool's
+    // registerOwnedMonitorNotifications) those notifications are silently
+    // dropped and a start-only Monitor can never report back to the agent.
+    // enqueueMessage self-wakes the message pump, so no lifecycle callback
+    // is needed. Unregistered in releaseAgentResources.
+    this.runtimeContext
+      .getMonitorRegistry()
+      .setAgentNotificationCallback(config.agentId, (_displayText, modelText) =>
+        interactive.enqueueMessage(modelText),
+      );
 
     // Set first agent as active
     if (this.activeAgentId === null) {
@@ -145,9 +180,9 @@ export class InProcessBackend implements Backend {
 
     try {
       const context = new ContextState();
-      await interactive.start(context);
+      await runWithContext(() => interactive.start(context));
 
-      // Watch for completion and fire exit callback � but only for
+      // Watch for completion and fire exit callback â€” but only for
       // truly terminal statuses. IDLE means the agent is still alive
       // and can accept follow-up messages.
       void interactive.waitForCompletion().then(() => {
@@ -161,6 +196,7 @@ export class InProcessBackend implements Backend {
             : status === AgentStatus.FAILED
               ? 1
               : null;
+        this.releaseAgentResources(config.agentId);
         this.exitCallback?.(config.agentId, exitCode, null);
       });
 
@@ -170,6 +206,16 @@ export class InProcessBackend implements Backend {
         `Failed to start in-process agent "${config.agentId}":`,
         error,
       );
+      this.releaseAgentResources(config.agentId);
+      this.agents.delete(config.agentId);
+      this.agentContentGenerators.delete(config.agentId);
+      const index = this.agentOrder.indexOf(config.agentId);
+      if (index >= 0) {
+        this.agentOrder.splice(index, 1);
+      }
+      if (this.activeAgentId === config.agentId) {
+        this.activeAgentId = this.agentOrder[0] ?? null;
+      }
       this.exitCallback?.(config.agentId, 1, null);
     }
   }
@@ -180,26 +226,19 @@ export class InProcessBackend implements Backend {
       agent.abort();
       debugLogger.info(`Stopped agent: ${agentId}`);
     }
-    // Release this agent's per-agent tool registry — including its
-    // SkillTool's listener registration on the shared SkillManager —
+    // Release this agent's per-agent tool registry â€” including its
+    // SkillTool's listener registration on the shared SkillManager â€”
     // immediately, instead of accumulating until backend cleanup() at
     // process exit. Fire-and-forget the async stop(); errors are
     // already logged inside.
     const registry = this.agentRegistries.get(agentId);
-    if (registry) {
-      this.agentRegistries.delete(agentId);
-      void registry.stop().catch((error) => {
-        debugLogger.error(
-          `Failed to stop tool registry for agent "${agentId}":`,
-          error,
-        );
-      });
-    }
+    this.releaseAgentResources(agentId, registry);
   }
 
   stopAll(): void {
-    for (const agent of this.agents.values()) {
+    for (const [agentId, agent] of this.agents.entries()) {
       agent.abort();
+      this.releaseAgentResources(agentId);
     }
     debugLogger.info('Stopped all in-process agents');
   }
@@ -232,6 +271,10 @@ export class InProcessBackend implements Backend {
       await registry.stop().catch(() => {});
     }
     this.agentRegistries.clear();
+    for (const cleanup of this.agentApprovalCleanups.values()) {
+      cleanup();
+    }
+    this.agentApprovalCleanups.clear();
 
     this.agents.clear();
     this.agentContentGenerators.clear();
@@ -270,7 +313,7 @@ export class InProcessBackend implements Backend {
     return result === 'done';
   }
 
-  // --- Navigation --------------------------------------------
+  // â”€â”€â”€ Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   switchTo(agentId: string): void {
     if (this.agents.has(agentId)) {
@@ -290,7 +333,7 @@ export class InProcessBackend implements Backend {
     return this.activeAgentId;
   }
 
-  // --- Screen Capture (no-op for in-process) -----------------
+  // â”€â”€â”€ Screen Capture (no-op for in-process) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   getActiveSnapshot(): AnsiOutput | null {
     return null;
@@ -307,7 +350,7 @@ export class InProcessBackend implements Backend {
     return 0;
   }
 
-  // --- Input -------------------------------------------------
+  // â”€â”€â”€ Input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   forwardInput(data: string): boolean {
     if (!this.activeAgentId) return false;
@@ -322,19 +365,19 @@ export class InProcessBackend implements Backend {
     return true;
   }
 
-  // --- Resize (no-op) ---------------------------------------
+  // â”€â”€â”€ Resize (no-op) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   resizeAll(_cols: number, _rows: number): void {
     // No terminals to resize in-process
   }
 
-  // --- External Session --------------------------------------
+  // â”€â”€â”€ External Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   getAttachHint(): string | null {
     return null;
   }
 
-  // --- Extra: Direct Access ----------------------------------
+  // â”€â”€â”€ Extra: Direct Access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /**
    * Get an AgentInteractive instance by agent ID.
@@ -356,7 +399,7 @@ export class InProcessBackend implements Backend {
     return this.agentContentGenerators.get(agentId);
   }
 
-  // ─── Private ───────────────────────────────────────────────
+  // â”€â”€â”€ Private â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   private navigate(direction: 1 | -1): string | null {
     if (this.agentOrder.length === 0) return null;
@@ -370,16 +413,70 @@ export class InProcessBackend implements Backend {
       this.agentOrder.length;
     return this.agentOrder[nextIndex] ?? null;
   }
+
+  private releaseAgentResources(
+    agentId: string,
+    registry = this.agentRegistries.get(agentId),
+  ): void {
+    // Tear down monitor routing registered in spawnAgent: stop any monitors
+    // the agent left running and drop its notification callback. Safe to
+    // run twice (the terminal watcher and stopAgent both funnel here).
+    const monitorRegistry = this.runtimeContext.getMonitorRegistry();
+    monitorRegistry.cancelRunningForOwner(agentId, { notify: false });
+    monitorRegistry.setAgentNotificationCallback(agentId, undefined);
+
+    const cleanup = this.agentApprovalCleanups.get(agentId);
+    if (cleanup) {
+      this.agentApprovalCleanups.delete(agentId);
+      cleanup();
+    }
+
+    if (registry) {
+      this.agentRegistries.delete(agentId);
+      void registry.stop().catch((error) => {
+        debugLogger.error(
+          `Failed to stop tool registry for agent "${agentId}":`,
+          error,
+        );
+      });
+    }
+  }
+
+  private acquireAutoApprovalOverride(): boolean {
+    if (this.runtimeContext.getApprovalMode() === ApprovalMode.AUTO) {
+      return false;
+    }
+    if (this.autoApprovalOverrideCount === 0) {
+      this.runtimeContext
+        .getPermissionManager?.()
+        ?.stripDangerousRulesForAutoMode();
+    }
+    this.autoApprovalOverrideCount++;
+    return true;
+  }
+
+  private releaseAutoApprovalOverride(): void {
+    if (this.autoApprovalOverrideCount === 0) {
+      return;
+    }
+    this.autoApprovalOverrideCount--;
+    if (
+      this.autoApprovalOverrideCount === 0 &&
+      this.runtimeContext.getApprovalMode() !== ApprovalMode.AUTO
+    ) {
+      this.runtimeContext.getPermissionManager?.()?.restoreDangerousRules();
+    }
+  }
 }
 
 /**
  * Create a per-agent Config that delegates to the shared base Config but
  * overrides key methods to provide per-agent isolation:
  *
- * - `getWorkingDir()` / `getTargetDir()` ? agent's worktree cwd
- * - `getWorkspaceContext()` ? WorkspaceContext rooted at agent's cwd
- * - `getFileService()` ? FileDiscoveryService rooted at agent's cwd
- * - `getToolRegistry()` ? per-agent tool registry with core tools bound to
+ * - `getWorkingDir()` / `getTargetDir()` â†’ agent's worktree cwd
+ * - `getWorkspaceContext()` â†’ WorkspaceContext rooted at agent's cwd
+ * - `getFileService()` â†’ FileDiscoveryService rooted at agent's cwd
+ * - `getToolRegistry()` â†’ per-agent tool registry with core tools bound to
  *   the agent Config
  *
  * When `authOverrides` is provided, also returns a `runtimeView` describing
@@ -389,72 +486,232 @@ export class InProcessBackend implements Backend {
  */
 async function createPerAgentConfig(
   base: Config,
+  agentId: string,
   cwd: string,
   modelId?: string,
   authOverrides?: InProcessSpawnConfig['authOverrides'],
+  approvalMode?: ApprovalMode,
+  approvalModeHooks?: ApprovalModeOverrideHooks,
 ): Promise<{
   config: Config;
   contentGenerator?: ContentGenerator;
   runtimeView?: RuntimeContentGeneratorView;
+  cleanup: () => void;
 }> {
-  const agentWorkspace = new WorkspaceContext(cwd);
-  const agentFileService = new FileDiscoveryService(cwd);
-
-  // Create the base override with workspace and file service by delegating
-  // through a new object prototype. This mirrors the existing worktree
-  // override pattern in workflow-orchestrator.ts and avoids depending on
-  // a `createConfigOverride` helper that no longer exists post-merge.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const override: any = Object.create(base);
-  override.cwd = cwd;
-  override.targetDir = cwd;
-  override.getCwd = () => cwd;
-  override.getWorkingDir = () => cwd;
-  override.getTargetDir = () => cwd;
-  override.getProjectRoot = () => cwd;
-  override.workspaceContext = agentWorkspace;
-  override.getWorkspaceContext = () => agentWorkspace;
-  override.fileDiscoveryService = agentFileService;
-  override.getFileService = () => agentFileService;
-
+  let override = Object.create(base) as any;
   let dedicatedContentGenerator: ContentGenerator | undefined;
   let runtimeView: RuntimeContentGeneratorView | undefined;
+  let cleanup = () => {};
 
-  // Create tool registry - needs to be done after override creation
-  const agentRegistry: ToolRegistry = await override.createToolRegistry(
-    undefined,
-    { skipDiscovery: true, forSubAgent: true },
-  );
-  agentRegistry.copyDiscoveredToolsFrom(base.getToolRegistry());
-
-  override.getToolRegistry = () => agentRegistry;
-
-  if (authOverrides?.authType) {
-    try {
-      runtimeView = await createRuntimeContentGeneratorView(
-        base,
-        override as Config,
-        modelId,
-        authOverrides,
-      );
-      dedicatedContentGenerator = runtimeView.contentGenerator;
-
-      debugLogger.info(
-        `Created per-agent ContentGenerator: authType=${authOverrides.authType}, model=${runtimeView.contentGeneratorConfig.model}`,
-      );
-    } catch (error) {
-      debugLogger.error(
-        'Failed to create per-agent ContentGenerator, falling back to parent:',
-        error,
-      );
-    }
+  if (approvalMode !== undefined) {
+    const handle = createApprovalModeConfigOverride(
+      base,
+      approvalMode,
+      approvalModeHooks,
+    );
+    override = handle.config as unknown as Record<string, unknown>;
+    cleanup = handle.cleanup;
   }
 
-  return {
-    config: override,
-    contentGenerator:
-      dedicatedContentGenerator ??
-      (authOverrides?.authType ? undefined : base.getContentGenerator()),
-    runtimeView,
+  let agentRegistry: ToolRegistry | undefined;
+  try {
+    override.getWorkingDir = () => cwd;
+    override.getTargetDir = () => cwd;
+    override.getProjectRoot = () => cwd;
+    override.getPlanFilePath = () => {
+      const sessionId = Storage.sanitizePlanSessionId(base.getSessionId());
+      const scopedAgentId = Storage.sanitizePlanSessionId(agentId);
+      return path.join(base.getPlansDir(), `${sessionId}-${scopedAgentId}.md`);
+    };
+
+    const agentWorkspace = new WorkspaceContext(cwd);
+    override.getWorkspaceContext = () => agentWorkspace;
+
+    const agentFileService = new FileDiscoveryService(
+      cwd,
+      base.getFileFilteringOptions().customIgnoreFiles,
+    );
+    override.getFileService = () => agentFileService;
+
+    const registry = await override.createToolRegistry(undefined, {
+      skipDiscovery: true,
+      forSubAgent: true,
+    });
+    agentRegistry = registry;
+    registry.copyDiscoveredToolsFrom(base.getToolRegistry());
+    override.getToolRegistry = () => registry;
+
+    if (authOverrides?.authType) {
+      try {
+        runtimeView = await createRuntimeContentGeneratorView(
+          base,
+          override as Config,
+          modelId,
+          authOverrides,
+        );
+        dedicatedContentGenerator = runtimeView.contentGenerator;
+
+        debugLogger.info(
+          `Created per-agent ContentGenerator: authType=${authOverrides.authType}, model=${runtimeView.contentGeneratorConfig.model}`,
+        );
+      } catch (error) {
+        debugLogger.error(
+          'Failed to create per-agent ContentGenerator, falling back to parent:',
+          error,
+        );
+      }
+    }
+
+    return {
+      config: override as Config,
+      contentGenerator:
+        dedicatedContentGenerator ??
+        (authOverrides?.authType ? undefined : base.getContentGenerator()),
+      runtimeView,
+      cleanup,
+    };
+  } catch (error) {
+    cleanup();
+    if (agentRegistry) {
+      void agentRegistry.stop().catch((stopError) => {
+        debugLogger.error(
+          'Failed to stop partially created agent tool registry:',
+          stopError,
+        );
+      });
+    }
+    throw error;
+  }
+}
+
+interface ApprovalModeOverrideHooks {
+  acquireAutoApprovalOverride(): boolean;
+  releaseAutoApprovalOverride(): void;
+}
+
+function createApprovalModeConfigOverride(
+  base: Config,
+  mode: ApprovalMode,
+  hooks?: ApprovalModeOverrideHooks,
+): { config: Config; cleanup: () => void } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const override = Object.create(base) as any;
+  const baseApprovalMode = base.getApprovalMode();
+  const initialMode = getTrustedInitialApprovalMode(base, mode);
+  let autoOverrideAcquired = false;
+  const acquireAutoOverride = () => {
+    if (autoOverrideAcquired || base.getApprovalMode() === ApprovalMode.AUTO) {
+      return;
+    }
+    if (hooks) {
+      autoOverrideAcquired = hooks.acquireAutoApprovalOverride();
+      return;
+    }
+    base.getPermissionManager?.()?.stripDangerousRulesForAutoMode();
+    autoOverrideAcquired = true;
   };
+  const releaseAutoOverride = () => {
+    if (!autoOverrideAcquired) {
+      return;
+    }
+    if (hooks) {
+      hooks.releaseAutoApprovalOverride();
+    } else if (base.getApprovalMode() !== ApprovalMode.AUTO) {
+      base.getPermissionManager?.()?.restoreDangerousRules();
+    }
+    autoOverrideAcquired = false;
+  };
+
+  override.approvalMode = initialMode;
+  override.getApprovalMode = Config.prototype.getApprovalMode;
+  override.prePlanMode =
+    initialMode === ApprovalMode.PLAN
+      ? baseApprovalMode === ApprovalMode.PLAN
+        ? base.getPrePlanMode()
+        : baseApprovalMode
+      : undefined;
+  const basePlanGateState =
+    initialMode === ApprovalMode.PLAN ? base.getPlanGateState() : undefined;
+  override.planGateState = basePlanGateState
+    ? {
+        ...basePlanGateState,
+        lastFindings: [...basePlanGateState.lastFindings],
+      }
+    : undefined;
+
+  override.setApprovalMode = (
+    nextMode: ApprovalMode,
+    options?: Parameters<Config['setApprovalMode']>[1],
+  ) => {
+    const beforeMode = (override as Config).getApprovalMode();
+    const hadOwnPermissionManager = Object.prototype.hasOwnProperty.call(
+      override,
+      'permissionManager',
+    );
+    const ownPermissionManager = override.permissionManager;
+    override.permissionManager = null;
+    try {
+      Config.prototype.setApprovalMode.call(
+        override as Config,
+        nextMode,
+        options,
+      );
+    } finally {
+      if (hadOwnPermissionManager) {
+        override.permissionManager = ownPermissionManager;
+      } else {
+        delete override.permissionManager;
+      }
+    }
+
+    const afterMode = (override as Config).getApprovalMode();
+    if (beforeMode !== ApprovalMode.AUTO && afterMode === ApprovalMode.AUTO) {
+      acquireAutoOverride();
+    } else if (
+      beforeMode === ApprovalMode.AUTO &&
+      afterMode !== ApprovalMode.AUTO
+    ) {
+      releaseAutoOverride();
+    }
+  };
+  override.planGateEntryCounter = override.planGateState?.entryId ?? 0;
+  override.autoModeDenialState = createDenialState();
+
+  const cleanup = () => {
+    releaseAutoOverride();
+  };
+
+  if (
+    initialMode === ApprovalMode.AUTO &&
+    base.getApprovalMode() !== ApprovalMode.AUTO
+  ) {
+    acquireAutoOverride();
+  }
+
+  return { config: override as Config, cleanup };
+}
+
+function getTrustedInitialApprovalMode(
+  base: Config,
+  mode: ApprovalMode,
+): ApprovalMode {
+  if (
+    !base.isTrustedFolder() &&
+    mode !== ApprovalMode.DEFAULT &&
+    mode !== ApprovalMode.PLAN
+  ) {
+    return ApprovalMode.DEFAULT;
+  }
+  return mode;
+}
+
+function createRunInContext(
+  inProcessConfig: InProcessSpawnConfig,
+): AgentInteractive['config']['runInContext'] {
+  const identity = inProcessConfig.teammateIdentity;
+  if (!identity) {
+    return undefined;
+  }
+  return <T>(fn: () => T): T => runWithTeammateIdentity(identity, fn);
 }

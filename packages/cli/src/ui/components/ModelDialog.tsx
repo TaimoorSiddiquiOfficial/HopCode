@@ -14,6 +14,7 @@ import {
   logModelSlashCommand,
   MAINLINE_CODER_MODEL,
   isImageCapable,
+  parseVisionModelSetting,
   resolveModelId,
   type AvailableModel as CoreAvailableModel,
   type ContentGeneratorConfig,
@@ -100,12 +101,36 @@ export function encodeAuxModelSelector(selected: string): string {
   return selected;
 }
 
+function encodeVisionModelSelector(selected: string): string {
+  if (!selected.includes('::')) {
+    return encodeAuxModelSelector(selected);
+  }
+  const parsed = parseModelSelectionKey(selected);
+  const selector = `${parsed.authType}:${parsed.modelId}`;
+  return parsed.baseUrl ? `${selector}\0${parsed.baseUrl}` : selector;
+}
+
 interface ModelDialogProps {
   onClose: () => void;
   isFastModelMode?: boolean;
   isVoiceModelMode?: boolean;
   isVisionModelMode?: boolean;
+  availableTerminalHeight?: number;
 }
+
+const MAX_MODEL_ITEMS_TO_SHOW = 10;
+// Non-list dialog chrome to reserve when capping visible model rows: outer
+// round border (2) + outer padding (2) + title (1) + gap before the list (1)
+// + highlighted-entry detail panel (divider + up to 4 detail rows, ~6) +
+// footer gap and hint text (2). The list intentionally omits the ▲/▼ scroll
+// indicators other list dialogs enable: they are two always-rendered chrome
+// rows, and in a height-capped dialog those rows are better spent on two
+// more entries — the entry numbering already shows where the visible window
+// sits in the list. Adjust this whenever the surrounding layout changes, and
+// re-verify with an E2E height sweep rather than guessing.
+const MODEL_DIALOG_FIXED_ROWS = 14;
+const MODEL_OPTION_ROW_HEIGHT = 1;
+const MODEL_OPTION_ROW_HEIGHT_WITH_DESCRIPTION = 2;
 
 function maskApiKey(apiKey: string | undefined): string {
   if (!apiKey) return `(${t('not set')})`;
@@ -229,6 +254,7 @@ export function ModelDialog({
   isFastModelMode,
   isVoiceModelMode,
   isVisionModelMode,
+  availableTerminalHeight,
 }: ModelDialogProps): React.JSX.Element {
   const config = useContext(ConfigContext);
   const uiState = useContext(UIStateContext);
@@ -369,6 +395,34 @@ export function ModelDialog({
       ),
     [availableModelEntries],
   );
+  const modelOptionRowHeight = MODEL_OPTIONS.some(
+    ({ description }) =>
+      typeof description !== 'string' || description.trim().length > 0,
+  )
+    ? MODEL_OPTION_ROW_HEIGHT_WITH_DESCRIPTION
+    : MODEL_OPTION_ROW_HEIGHT;
+  // The error box adds its own marginTop plus one row per line (errorPrefix +
+  // blank line from the "\n\n" join + the underlying error's own lines), plus
+  // a buffer since the error Text wraps and long lines can span extra rows on
+  // narrow terminals.
+  const errorMessageRows = errorMessage
+    ? 2 + errorMessage.split('\n').length
+    : 0;
+  const maxModelItemsToShow =
+    availableTerminalHeight === undefined
+      ? MAX_MODEL_ITEMS_TO_SHOW
+      : Math.max(
+          1,
+          Math.min(
+            MAX_MODEL_ITEMS_TO_SHOW,
+            Math.floor(
+              (availableTerminalHeight -
+                MODEL_DIALOG_FIXED_ROWS -
+                errorMessageRows) /
+                modelOptionRowHeight,
+            ),
+          ),
+        );
 
   // In fast model mode, default to the currently configured fast model
   const fastModelSetting = settings?.merged?.fastModel as string | undefined;
@@ -376,6 +430,7 @@ export function ModelDialog({
   const visionModelSetting = settings?.merged?.visionModel as
     | string
     | undefined;
+  const parsedVisionModelValue = parseVisionModelSetting(visionModelSetting);
   const parsedFastModelSetting = useMemo(() => {
     if (!isFastModelMode) return undefined;
     try {
@@ -387,11 +442,11 @@ export function ModelDialog({
   const parsedVisionModelSetting = useMemo(() => {
     if (!isVisionModelMode) return undefined;
     try {
-      return resolveModelId(visionModelSetting);
+      return resolveModelId(parsedVisionModelValue?.selector);
     } catch {
       return undefined;
     }
-  }, [visionModelSetting, isVisionModelMode]);
+  }, [parsedVisionModelValue?.selector, isVisionModelMode]);
   const preferredModelId =
     isFastModelMode && parsedFastModelSetting
       ? parsedFastModelSetting.modelId
@@ -433,16 +488,22 @@ export function ModelDialog({
       : undefined;
   // Like fast mode, the vision setting may persist as a bare id (cross-provider)
   // or an authType:modelId selector — highlight whichever row owns it.
+  const matchesVisionModelBaseUrl = (model: CoreAvailableModel): boolean =>
+    !parsedVisionModelValue?.baseUrl ||
+    model.baseUrl === parsedVisionModelValue.baseUrl;
   const preferredVisionModelEntry =
     isVisionModelMode && parsedVisionModelSetting
       ? parsedVisionModelSetting.authType
         ? availableModelEntries.find(
             ({ authType: t2, model }) =>
               t2 === parsedVisionModelSetting.authType &&
-              model.id === parsedVisionModelSetting.modelId,
+              model.id === parsedVisionModelSetting.modelId &&
+              matchesVisionModelBaseUrl(model),
           )
         : availableModelEntries.find(
-            ({ model }) => model.id === parsedVisionModelSetting.modelId,
+            ({ model }) =>
+              model.id === parsedVisionModelSetting.modelId &&
+              matchesVisionModelBaseUrl(model),
           )
       : undefined;
   const preferredKey = activeRuntimeSnapshot
@@ -578,10 +639,12 @@ export function ModelDialog({
         return;
       }
 
-      // Vision model mode: same id encoding as fast mode (authType:modelId so
-      // duplicate ids across providers stay unambiguous; baseUrl discarded).
+      // Vision model mode: keep the selected row's baseUrl when present so
+      // same-provider OpenAI-compatible endpoints with the same id stay distinct.
       if (isVisionModelMode) {
-        const visionModel = encodeAuxModelSelector(selected);
+        const visionModel = encodeVisionModelSelector(selected);
+        const visionModelDisplay =
+          parseVisionModelSetting(visionModel)?.selector ?? visionModel;
         // Pinning the primary itself is ignored by the bridge at runtime, so
         // reject it here instead of persisting a dead pin and reporting success.
         if (
@@ -591,28 +654,7 @@ export function ModelDialog({
           setErrorMessage(
             t(
               "'{{model}}' is the current primary model and cannot be used as the vision bridge.",
-              { model: visionModel },
-            ),
-          );
-          return;
-        }
-        // The persisted `authType:modelId` form can't distinguish two configured
-        // rows with the same id+authType but different baseUrls (e.g. two
-        // OpenAI-compatible endpoints), so the bridge could later egress images
-        // to the wrong endpoint. Reject the ambiguous pin (mirrors the voice-mode
-        // duplicate guard) instead of silently saving one of them.
-        const visionDupes = selectedEntry
-          ? availableModelEntries.filter(
-              ({ model }) =>
-                model.id === selectedEntry.model.id &&
-                model.authType === selectedEntry.model.authType,
-            )
-          : [];
-        if (visionDupes.length > 1) {
-          setErrorMessage(
-            t(
-              "Vision model '{{model}}' maps to multiple endpoints (same id and provider, different base URLs). Remove the duplicate or disambiguate before pinning it for the vision bridge.",
-              { model: visionModel },
+              { model: visionModelDisplay },
             ),
           );
           return;
@@ -625,12 +667,12 @@ export function ModelDialog({
         // bridge will send images to it.
         const visionWarning =
           selectedEntry && !isImageCapable(selectedEntry.model)
-            ? `\n${t("⚠ '{{model}}' is not a known image-capable model; the vision bridge may fail on images.", { model: visionModel })}`
+            ? `\n${t("⚠ '{{model}}' is not a known image-capable model; the vision bridge may fail on images.", { model: visionModelDisplay })}`
             : '';
         uiState?.historyManager.addItem(
           {
             type: 'success',
-            text: `${t('Vision Model')}: ${visionModel}${visionWarning}`,
+            text: `${t('Vision Model')}: ${visionModelDisplay}${visionWarning}`,
           },
           Date.now(),
         );
@@ -804,6 +846,7 @@ export function ModelDialog({
             onHighlight={handleHighlight}
             initialIndex={initialIndex}
             showNumbers={true}
+            maxItemsToShow={maxModelItemsToShow}
           />
         </Box>
       )}

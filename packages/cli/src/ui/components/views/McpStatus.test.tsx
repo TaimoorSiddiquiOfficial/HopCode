@@ -5,7 +5,7 @@
  */
 
 import { render } from 'ink-testing-library';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { McpStatus } from './McpStatus.js';
 import { MCPServerStatus } from '@hoptrendy/hopcode-core';
 import { MessageType } from '../../types.js';
@@ -156,7 +156,11 @@ describe('McpStatus', () => {
 
   it('renders correctly with a connecting server', () => {
     const { lastFrame } = render(
-      <McpStatus {...baseProps} connectingServers={['server-1']} />,
+      <McpStatus
+        {...baseProps}
+        serverStatus={() => MCPServerStatus.CONNECTING}
+        connectingServers={['server-1']}
+      />,
     );
     expect(lastFrame()).toMatchSnapshot();
   });

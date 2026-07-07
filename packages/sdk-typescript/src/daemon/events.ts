@@ -8,18 +8,29 @@ import type {
   DaemonEvent,
   DaemonErrorKind,
   DaemonMcpTransport,
+  DaemonSessionArtifactChange,
   PermissionOutcome,
 } from './types.js';
 // Single source of truth: the daemon publisher owns the wire literal in
 // acp-bridge's dependency-free `daemonEventTypes` module. We re-export it so the
-// validator/reducer below, and the browser consumer via `@hoptrendy/sdk/daemon`,
-// share the exact same value — a rename can't silently break browser-side dedup.
+// validator/reducer below, and the browser consumer via `@qwen-code/sdk/daemon`,
+// share the exact same value â€” a rename can't silently break browser-side dedup.
 // The build-time devDep on acp-bridge inlines the value into the published bundle
 // (same lightweight mechanism as `@hoptrendy/acp-bridge/mcpTimeouts`). A `const`
 // keeps its literal type, so it still narrows in `switch (event.type)` and works
 // as a `typeof`-d type argument.
-import { MID_TURN_MESSAGE_INJECTED_EVENT } from '@hoptrendy/acp-bridge/daemonEventTypes';
-export { MID_TURN_MESSAGE_INJECTED_EVENT };
+import {
+  MID_TURN_MESSAGE_INJECTED_EVENT,
+  PENDING_PROMPT_ADDED_EVENT,
+  PENDING_PROMPT_STARTED_EVENT,
+  PENDING_PROMPT_COMPLETED_EVENT,
+} from '@hoptrendy/acp-bridge/daemonEventTypes';
+export {
+  MID_TURN_MESSAGE_INJECTED_EVENT,
+  PENDING_PROMPT_ADDED_EVENT,
+  PENDING_PROMPT_STARTED_EVENT,
+  PENDING_PROMPT_COMPLETED_EVENT,
+};
 
 export const DAEMON_KNOWN_EVENT_TYPE_VALUES = [
   'session_update',
@@ -31,7 +42,11 @@ export const DAEMON_KNOWN_EVENT_TYPE_VALUES = [
   'session_died',
   'session_closed',
   'session_metadata_updated',
+  'artifact_changed',
   MID_TURN_MESSAGE_INJECTED_EVENT,
+  PENDING_PROMPT_ADDED_EVENT,
+  PENDING_PROMPT_STARTED_EVENT,
+  PENDING_PROMPT_COMPLETED_EVENT,
   'client_evicted',
   'slow_client_warning',
   'stream_error',
@@ -39,7 +54,7 @@ export const DAEMON_KNOWN_EVENT_TYPE_VALUES = [
   // past the ring's earliest available id (events were evicted
   // before reconnect). The reducer treats this as "your accumulated
   // state is stale; call `loadSession` and reseed view state before
-  // applying any further deltas". Does NOT close the stream — the
+  // applying any further deltas". Does NOT close the stream â€” the
   // daemon continues replaying surviving ring frames and live
   // frames, but the reducer auto-skips them until the consumer
   // reseeds state. Synthetic (no `id`) so it doesn't burn a slot
@@ -53,7 +68,7 @@ export const DAEMON_KNOWN_EVENT_TYPE_VALUES = [
   'mcp_budget_warning',
   'mcp_child_refused_batch',
   // Workspace-level mutation signals fanned out through every active
-  // session's bus. Non-terminal — informational for adapters that want
+  // session's bus. Non-terminal â€” informational for adapters that want
   // to render "memory just changed" / "agent X updated" toasts.
   // Read-after-write remains the correctness contract.
   'memory_changed',
@@ -94,7 +109,7 @@ export const DAEMON_KNOWN_EVENT_TYPE_VALUES = [
   // `permission_forbidden` fires under `designated` (originator
   // mismatch), `consensus` (anonymous voter or not-in-snapshot), and
   // `local-only` (remote voter). Pre-flight on the
-  // `permission_mediation` capability tag before relying on either —
+  // `permission_mediation` capability tag before relying on either â€”
   // older daemons omit both event types.
   'permission_partial_vote',
   'permission_forbidden',
@@ -267,12 +282,18 @@ export interface DaemonSessionMetadataUpdatedData {
   [key: string]: unknown;
 }
 
+export interface DaemonArtifactChangedData {
+  sessionId: string;
+  change: DaemonSessionArtifactChange;
+  [key: string]: unknown;
+}
+
 /**
  * `mid_turn_message_injected` payload. Emitted when the daemon drains
  * browser-queued mid-turn messages into the running turn (web-shell mid-turn
  * drain). It is a transient dedupe signal, not a transcript item: consumers
  * move these messages out of their pending queue so they aren't resent as the
- * next turn. They are not rendered from this event — the message already reached
+ * next turn. They are not rendered from this event â€” the message already reached
  * the model mid-turn, and the persisted transcript shows it on reload.
  */
 export interface DaemonMidTurnMessageInjectedData {
@@ -280,7 +301,7 @@ export interface DaemonMidTurnMessageInjectedData {
   messages: string[];
   /**
    * Trusted client id that queued these messages, so a consumer dedupes only its
-   * OWN pending queue — a peer attached to the same session must not drop a
+   * OWN pending queue â€” a peer attached to the same session must not drop a
    * coincidentally-equal entry it didn't queue. Absent for anonymous pushes.
    *
    * CONTRACT: a consumer that dedupes on this event MUST compare this id against
@@ -289,7 +310,7 @@ export interface DaemonMidTurnMessageInjectedData {
    * NOT route by originator, so a consumer that dedupes unconditionally will drop
    * another client's coincidentally-equal pending message (double delivery).
    *
-   * IMPORTANT — wire location: unlike the permission/settings events (which the
+   * IMPORTANT â€” wire location: unlike the permission/settings events (which the
    * session reducer's `mergeOriginator` step copies from the envelope INTO
    * `data`), this event is NOT reduced, so the daemon leaves the id ONLY on the
    * SSE envelope (`event.originatorClientId`) and never populates it here. A raw
@@ -305,6 +326,11 @@ export interface DaemonMidTurnMessageInjectedData {
 export interface DaemonClientEvictedData {
   reason: string;
   droppedAfter?: number;
+  queueSize?: number;
+  maxQueued?: number;
+  queuedBytes?: number;
+  maxQueuedBytes?: number;
+  eventBytes?: number;
   [key: string]: unknown;
 }
 
@@ -319,6 +345,12 @@ export interface DaemonSlowClientWarningData {
    * `Last-Event-ID` or detach + drain.
    */
   lastEventId: number;
+  /** Approximate serialized bytes queued for this subscriber's live backlog. */
+  queuedBytes?: number;
+  /** Per-subscriber serialized-byte backlog cap. */
+  maxQueuedBytes?: number;
+  /** Which backlog threshold caused the warning. */
+  threshold?: 'frames' | 'bytes' | 'frames_and_bytes';
   [key: string]: unknown;
 }
 
@@ -350,7 +382,7 @@ export interface DaemonStateResyncRequiredData {
    * - `'ring_evicted'`: consumer's `Last-Event-ID` fell behind the ring's
    *   earliest surviving id (same-epoch gap).
    * - `'epoch_reset'`: consumer's `Last-Event-ID` is past the bus
-   *   high-water — its cursor is from a previous bus epoch (daemon
+   *   high-water â€” its cursor is from a previous bus epoch (daemon
    *   restart rebuilt the EventBus). The whole fresh ring is replayed.
    * Reserved for future causes (e.g. `'schema_version_bump'`).
    */
@@ -442,17 +474,33 @@ export interface DaemonMcpChildRefusedBatchData {
 
 /**
  * A `POST /workspace/memory` write completed successfully. `scope`
- * records which file was touched (workspace HOPCODE.md vs global
- * ~/.hopcode/HOPCODE.md), `mode` is the requested write mode, and
+ * records which file was touched (workspace QWEN.md vs global
+ * ~/.qwen/QWEN.md), `mode` is the requested write mode, and
  * `bytesWritten` is the size of the file post-write.
  */
-export interface DaemonMemoryChangedData {
+export interface DaemonFileMemoryChangedData {
   scope: 'workspace' | 'global';
   filePath: string;
   mode: 'append' | 'replace';
   bytesWritten: number;
   [key: string]: unknown;
 }
+
+export interface DaemonManagedMemoryChangedData {
+  scope: 'managed';
+  source:
+    | 'workspace_memory_remember'
+    | 'workspace_memory_forget'
+    | 'workspace_memory_dream'
+    | (string & {});
+  taskId: string;
+  touchedScopes: Array<'user' | 'project'>;
+  [key: string]: unknown;
+}
+
+export type DaemonMemoryChangedData =
+  | DaemonFileMemoryChangedData
+  | DaemonManagedMemoryChangedData;
 
 /**
  * A workspace agent CRUD mutation completed successfully. `change`
@@ -469,9 +517,9 @@ export interface DaemonAgentChangedData {
 
 /** Auth device-flow event payloads. */
 
-/** Provider id. Open string union for forward-compatible providers; `hopcode-oauth`
+/** Provider id. Open string union for forward-compatible providers; `qwen-oauth`
  *  is the only value v1 currently emits. */
-export type DaemonAuthDeviceFlowProviderId = 'hopcode-oauth' | (string & {});
+export type DaemonAuthDeviceFlowProviderId = 'qwen-oauth' | (string & {});
 
 export type DaemonAuthDeviceFlowStatus =
   | 'pending'
@@ -686,7 +734,7 @@ export interface DaemonMcpServerRestartRefusedData {
 /**
  * Daemon assist push: a follow-up suggestion generated by the ACP child
  * after an end_turn completes. `suggestion` is already post-filter
- * (`getFilterReason()===null`) and non-empty — the wire never carries
+ * (`getFilterReason()===null`) and non-empty â€” the wire never carries
  * rejected suggestions. `promptId` correlates with the just-completed
  * turn (`<sessionId>########<turn>` shape) so clients can suppress
  * stale events that race a fresh user prompt.
@@ -844,10 +892,49 @@ export type DaemonSessionMetadataUpdatedEvent = DaemonEventEnvelope<
   'session_metadata_updated',
   DaemonSessionMetadataUpdatedData
 >;
+export type DaemonArtifactChangedEvent = DaemonEventEnvelope<
+  'artifact_changed',
+  DaemonArtifactChangedData
+>;
 export type DaemonMidTurnMessageInjectedEvent = DaemonEventEnvelope<
   typeof MID_TURN_MESSAGE_INJECTED_EVENT,
   DaemonMidTurnMessageInjectedData
 >;
+export interface DaemonPendingPromptAddedData {
+  sessionId: string;
+  promptId: string;
+  text: string;
+  queuedAt: number;
+  [key: string]: unknown;
+}
+export interface DaemonPendingPromptStartedData {
+  sessionId: string;
+  promptId: string;
+  text: string;
+  [key: string]: unknown;
+}
+export interface DaemonPendingPromptCompletedData {
+  sessionId: string;
+  promptId: string;
+  state: 'completed' | 'removed';
+  [key: string]: unknown;
+}
+export type DaemonPendingPromptAddedEvent = DaemonEventEnvelope<
+  typeof PENDING_PROMPT_ADDED_EVENT,
+  DaemonPendingPromptAddedData
+>;
+export type DaemonPendingPromptStartedEvent = DaemonEventEnvelope<
+  typeof PENDING_PROMPT_STARTED_EVENT,
+  DaemonPendingPromptStartedData
+>;
+export type DaemonPendingPromptCompletedEvent = DaemonEventEnvelope<
+  typeof PENDING_PROMPT_COMPLETED_EVENT,
+  DaemonPendingPromptCompletedData
+>;
+export type DaemonPendingPromptEvent =
+  | DaemonPendingPromptAddedEvent
+  | DaemonPendingPromptStartedEvent
+  | DaemonPendingPromptCompletedEvent;
 export type DaemonClientEvictedEvent = DaemonEventEnvelope<
   'client_evicted',
   DaemonClientEvictedData
@@ -988,7 +1075,9 @@ export type DaemonSessionEvent =
   | DaemonSessionDiedEvent
   | DaemonSessionClosedEvent
   | DaemonSessionMetadataUpdatedEvent
+  | DaemonArtifactChangedEvent
   | DaemonMidTurnMessageInjectedEvent
+  | DaemonPendingPromptEvent
   | DaemonSessionBranchedEvent;
 
 export type DaemonControlEvent =
@@ -1038,7 +1127,7 @@ export type DaemonWorkspaceMutationEvent =
   | DaemonExtensionsChangedEvent;
 
 /**
- * Daemon assist push events — non-terminal UX hints emitted by the ACP
+ * Daemon assist push events â€” non-terminal UX hints emitted by the ACP
  * child on the per-session SSE bus. Today only `followup_suggestion`
  * (server-side ghost-text suggestion after each end_turn); the union
  * is reserved for future assist events (e.g. server-side speculation
@@ -1089,7 +1178,7 @@ export interface DaemonSessionViewState {
   lastUnmatchedPermissionResolutionId?: string;
   /**
    * Count of `slow_client_warning` frames this stream has observed.
-   * Non-terminal — warnings precede eviction but don't themselves
+   * Non-terminal â€” warnings precede eviction but don't themselves
    * close the stream. Adapters tap this counter to surface "your
    * stream is lagging" UI before `client_evicted` arrives.
    */
@@ -1161,7 +1250,7 @@ export interface DaemonSessionViewState {
   /**
    * Workspace-scoped -- every session bus receives
    * `workspace_initialized` events. `lastWorkspaceInit` records the
-   * most recent envelope so adapters can render a "HOPCODE.md was just
+   * most recent envelope so adapters can render a "QWEN.md was just
    * scaffolded by another client" notice without polling.
    */
   workspaceInitCount: number;
@@ -1202,7 +1291,7 @@ export interface DaemonSessionViewState {
    * Set to true when the reducer observes a `state_resync_required`
    * frame from the daemon
    * (consumer reconnected with `Last-Event-ID` past the daemon's
-   * ring eviction point — events between last-delivered and ring-
+   * ring eviction point â€” events between last-delivered and ring-
    * head were lost, so the accumulated view state is stale relative
    * to the daemon's truth).
    *
@@ -1262,11 +1351,11 @@ const MAX_FORBIDDEN_VOTES_PER_SESSION = 32;
  * Event types that the reducer still processes when `awaitingResync`
  * is true. Two categories:
  *
- *   - **`state_resync_required` itself** — so the reducer can update
+ *   - **`state_resync_required` itself** â€” so the reducer can update
  *     `lastResyncRequired` / `resyncRequiredCount` for *subsequent*
  *     resync frames (rare but possible: a consumer that reconnects
  *     past the ring twice in succession).
- *   - **Terminal lifecycle frames** — `session_died` / `session_closed`
+ *   - **Terminal lifecycle frames** â€” `session_died` / `session_closed`
  *     / `client_evicted` / `stream_error`. Critical end-of-stream
  *     signals that don't depend on prior state being current. UIs
  *     must still see "this session died" even if they were in resync
@@ -1285,7 +1374,7 @@ const RESYNC_PASSTHROUGH_TYPES = new Set<KnownDaemonEvent['type']>([
   'client_evicted',
   'stream_error',
   // A5 (#4511): the snapshot is a full-state authoritative frame, not a
-  // delta, so it is safe to apply during resync — and it is exactly what
+  // delta, so it is safe to apply during resync â€” and it is exactly what
   // lets a client that reconnected past the ring recover currentModelId /
   // approvalMode without waiting for the next loadSession.
   'session_snapshot',
@@ -1437,9 +1526,25 @@ export function asKnownDaemonEvent(
       return isSessionMetadataUpdatedData(event.data)
         ? (event as DaemonSessionMetadataUpdatedEvent)
         : undefined;
+    case 'artifact_changed':
+      return isArtifactChangedData(event.data)
+        ? (event as DaemonArtifactChangedEvent)
+        : undefined;
     case MID_TURN_MESSAGE_INJECTED_EVENT:
       return isMidTurnMessageInjectedData(event.data)
         ? (event as DaemonMidTurnMessageInjectedEvent)
+        : undefined;
+    case PENDING_PROMPT_ADDED_EVENT:
+      return isPendingPromptAddedData(event.data)
+        ? (event as DaemonPendingPromptAddedEvent)
+        : undefined;
+    case PENDING_PROMPT_STARTED_EVENT:
+      return isPendingPromptStartedData(event.data)
+        ? (event as DaemonPendingPromptStartedEvent)
+        : undefined;
+    case PENDING_PROMPT_COMPLETED_EVENT:
+      return isPendingPromptCompletedData(event.data)
+        ? (event as DaemonPendingPromptCompletedEvent)
         : undefined;
     case 'client_evicted':
       return isClientEvictedData(event.data)
@@ -1809,7 +1914,7 @@ export function reduceDaemonSessionEvent(
       // view state as stale; subsequent non-terminal deltas are
       // auto-skipped at the top-of-reducer gate above until consumer
       // recovery via `loadSession` + `createDaemonSessionViewState`.
-      // `alive` and `terminalEvent` are NOT touched — the stream is
+      // `alive` and `terminalEvent` are NOT touched â€” the stream is
       // still healthy; only the consumer's local accumulation is
       // suspect. `pendingPermissions` is intentionally preserved
       // (cleared by `loadSession`-driven recovery, not by the
@@ -1843,7 +1948,7 @@ export function reduceDaemonSessionEvent(
     case 'memory_changed':
       // Non-terminal: adapters render a "memory just changed" hint and
       // re-fetch `GET /workspace/memory` to get the canonical state. We
-      // don't append to a list — the latest event is enough since the
+      // don't append to a list â€” the latest event is enough since the
       // route's read-after-write contract is the source of truth.
       return {
         ...base,
@@ -1851,7 +1956,7 @@ export function reduceDaemonSessionEvent(
         lastWorkspaceMutationType: 'memory_changed',
       };
     case 'agent_changed':
-      // Same shape as `memory_changed` — non-terminal hint that
+      // Same shape as `memory_changed` â€” non-terminal hint that
       // triggers a `GET /workspace/agents` re-fetch.
       return {
         ...base,
@@ -1896,8 +2001,8 @@ export function reduceDaemonSessionEvent(
     case 'trust_change_requested':
       return base;
     case 'workspace_initialized':
-      // Workspace-scoped fan-out. Non-terminal — just records that a
-      // HOPCODE.md scaffold was performed.
+      // Workspace-scoped fan-out. Non-terminal â€” just records that a
+      // QWEN.md scaffold was performed.
       return {
         ...base,
         workspaceInitCount: base.workspaceInitCount + 1,
@@ -1919,7 +2024,7 @@ export function reduceDaemonSessionEvent(
       };
     case 'followup_suggestion':
       // Daemon assist push: latest suggestion replaces any prior one
-      // for this session. Best-effort UX hint — non-terminal,
+      // for this session. Best-effort UX hint â€” non-terminal,
       // doesn't touch `alive` / `pendingPermissions`. Clients
       // self-invalidate on next sendPrompt (no wire round-trip), so
       // we don't emit "cleared" events on prompt boundaries.
@@ -1944,7 +2049,11 @@ export function reduceDaemonSessionEvent(
     case 'mcp_server_removed':
     case 'settings_reloaded':
     case 'extensions_changed':
+    case 'artifact_changed':
     case MID_TURN_MESSAGE_INJECTED_EVENT:
+    case PENDING_PROMPT_ADDED_EVENT:
+    case PENDING_PROMPT_STARTED_EVENT:
+    case PENDING_PROMPT_COMPLETED_EVENT:
       return base;
     case 'session_rewound':
       return {
@@ -2119,8 +2228,8 @@ export function reduceDaemonAuthEvent(
     }
     case 'auth_device_flow_failed': {
       // The daemon's status machine reserves 'expired' for the time-based
-      // path (now >= expiresAt). Upstream RFC 8628 errors — including
-      // `expired_token` — go to 'error' with `errorKind` carrying the
+      // path (now >= expiresAt). Upstream RFC 8628 errors â€” including
+      // `expired_token` â€” go to 'error' with `errorKind` carrying the
       // distinction. Earlier drafts collapsed `errorKind: 'expired_token'`
       // to status 'expired', which gave SDK consumers a different
       // status than the daemon's GET endpoint reported. Code-reviewer
@@ -2376,6 +2485,22 @@ function isSessionMetadataUpdatedData(
   );
 }
 
+function isArtifactChangedData(
+  value: unknown,
+): value is DaemonArtifactChangedData {
+  if (!isRecord(value) || !isNonEmptyString(value['sessionId'])) {
+    return false;
+  }
+  const change = value['change'];
+  if (!isRecord(change) || !isNonEmptyString(change['artifactId'])) {
+    return false;
+  }
+  return (
+    isNonEmptyString(change['action']) &&
+    (change['reason'] === undefined || isNonEmptyString(change['reason']))
+  );
+}
+
 function isMidTurnMessageInjectedData(
   value: unknown,
 ): value is DaemonMidTurnMessageInjectedData {
@@ -2387,11 +2512,50 @@ function isMidTurnMessageInjectedData(
   );
 }
 
+function isPendingPromptAddedData(
+  value: unknown,
+): value is DaemonPendingPromptAddedData {
+  return (
+    isRecord(value) &&
+    isNonEmptyString(value['sessionId']) &&
+    isNonEmptyString(value['promptId']) &&
+    typeof value['text'] === 'string' &&
+    typeof value['queuedAt'] === 'number'
+  );
+}
+
+function isPendingPromptStartedData(
+  value: unknown,
+): value is DaemonPendingPromptStartedData {
+  return (
+    isRecord(value) &&
+    isNonEmptyString(value['sessionId']) &&
+    isNonEmptyString(value['promptId']) &&
+    typeof value['text'] === 'string'
+  );
+}
+
+function isPendingPromptCompletedData(
+  value: unknown,
+): value is DaemonPendingPromptCompletedData {
+  return (
+    isRecord(value) &&
+    isNonEmptyString(value['sessionId']) &&
+    isNonEmptyString(value['promptId']) &&
+    (value['state'] === 'completed' || value['state'] === 'removed')
+  );
+}
+
 function isClientEvictedData(value: unknown): value is DaemonClientEvictedData {
   return (
     isRecord(value) &&
     isNonEmptyString(value['reason']) &&
-    isOptionalNumber(value['droppedAfter'])
+    isOptionalNumber(value['droppedAfter']) &&
+    isOptionalNumber(value['queueSize']) &&
+    isOptionalNumber(value['maxQueued']) &&
+    isOptionalNumber(value['queuedBytes']) &&
+    isOptionalNumber(value['maxQueuedBytes']) &&
+    isOptionalNumber(value['eventBytes'])
   );
 }
 
@@ -2410,14 +2574,21 @@ function isSlowClientWarningData(
   value: unknown,
 ): value is DaemonSlowClientWarningData {
   // Mirror the sibling predicates' finite-number guard
-  // (`isOptionalNumber` → `isFiniteNumber`): `typeof NaN === 'number'`
+  // (`isOptionalNumber` â†’ `isFiniteNumber`): `typeof NaN === 'number'`
   // and `typeof Infinity === 'number'` both pass a bare `typeof`
   // check but would be schema garbage for a queue-size measurement.
+  if (!isRecord(value)) return false;
+  const threshold = value['threshold'];
   return (
-    isRecord(value) &&
     isFiniteNumber(value['queueSize']) &&
     isFiniteNumber(value['maxQueued']) &&
-    isFiniteNumber(value['lastEventId'])
+    isFiniteNumber(value['lastEventId']) &&
+    isOptionalNumber(value['queuedBytes']) &&
+    isOptionalNumber(value['maxQueuedBytes']) &&
+    (threshold === undefined ||
+      threshold === 'frames' ||
+      threshold === 'bytes' ||
+      threshold === 'frames_and_bytes')
   );
 }
 
@@ -2476,7 +2647,7 @@ function isMcpChildRefusedBatchData(
     isFiniteNumber(value['budget']) &&
     isFiniteNumber(value['liveCount']) &&
     isFiniteNumber(value['reservedCount']) &&
-    // `mode` is a literal `'enforce'` — `warn` mode never refuses, so
+    // `mode` is a literal `'enforce'` â€” `warn` mode never refuses, so
     // `'warn'`-tagged refusal payloads are protocol garbage. Reject
     // them so the reducer sees the raw event under the
     // `unrecognizedKnownEventCount` branch instead of silently
@@ -2488,6 +2659,15 @@ function isMcpChildRefusedBatchData(
 function isMemoryChangedData(value: unknown): value is DaemonMemoryChangedData {
   if (!isRecord(value)) return false;
   const scope = value['scope'];
+  if (scope === 'managed') {
+    const touchedScopes = value['touchedScopes'];
+    return (
+      isNonEmptyString(value['source']) &&
+      isNonEmptyString(value['taskId']) &&
+      Array.isArray(touchedScopes) &&
+      touchedScopes.every((s) => s === 'user' || s === 'project')
+    );
+  }
   const mode = value['mode'];
   return (
     (scope === 'workspace' || scope === 'global') &&
@@ -2563,7 +2743,7 @@ function isAuthDeviceFlowErrorKind(
 ): value is DaemonAuthDeviceFlowErrorKind {
   // Forward-compat: accept ANY non-empty string. The earlier closed
   // allowlist would silently drop a daemon-emitted `failed` event with
-  // a future errorKind (e.g. `rate_limited`) — `asKnownDaemonEvent`
+  // a future errorKind (e.g. `rate_limited`) â€” `asKnownDaemonEvent`
   // would treat it as malformed and `reduceDaemonAuthEvent` never
   // transitions the flow's status, leaving SDK consumers stuck on
   // `pending`. The known literals still narrow
@@ -2708,7 +2888,7 @@ function isMcpServerRestartRefusedData(
 function isFollowupSuggestionData(
   value: unknown,
 ): value is DaemonFollowupSuggestionData {
-  // `suggestion` must be a non-empty string — the daemon filters
+  // `suggestion` must be a non-empty string â€” the daemon filters
   // rejected suggestions server-side and only emits when accepted,
   // so an empty suggestion on the wire is protocol garbage. Reject
   // it via the unrecognized counter rather than overwriting view
