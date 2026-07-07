@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@hoptrendy/channel-feishu",
   "version": "0.30.6",
   "description": "Feishu (Lark) channel adapter for HopCode",

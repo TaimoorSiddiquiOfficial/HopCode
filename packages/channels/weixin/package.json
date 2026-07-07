@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@hoptrendy/channel-weixin",
   "version": "0.30.6",
   "description": "WeChat (Weixin) channel adapter for HopCode",

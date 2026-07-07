@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@hoptrendy/sdk",
   "version": "0.30.6",
   "description": "TypeScript SDK for programmatic access to hopcode CLI",
