@@ -566,7 +566,7 @@ export const InstalledTab = ({
           // Disable: add to excluded + disconnect.
           const excluded =
             settings.forScope(targetScope).settings.mcp?.excluded ?? [];
-          if (!excluded.includes(item.name)) {
+          if (!matchesAnyServerPattern(item.name, excluded)) {
             settings.setValue(targetScope, 'mcp.excluded', [
               ...excluded,
               item.name,

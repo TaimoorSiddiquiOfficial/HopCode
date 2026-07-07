@@ -7,9 +7,12 @@
 import type {
   BackgroundTaskStatus,
   Config,
+  CronJob,
+  CronScheduler,
   ToolCallRequestInfo,
 } from '@hoptrendy/hopcode-core';
 import { isSlashCommand } from './ui/utils/commandUtils.js';
+import { isInlineModelOverrideAllowed } from './utils/acpModelUtils.js';
 import type { LoadedSettings } from './config/settings.js';
 import {
   executeToolCall,
@@ -25,6 +28,8 @@ import {
   uiTelemetryService,
   parseAndFormatApiError,
   createDebugLogger,
+  detectAutonomousSentinel,
+  detectLoopSentinel,
   SendMessageType,
   buildSyntheticToolResponseParts,
   detectTurnInterruption,
@@ -69,6 +74,13 @@ const debugLogger = createDebugLogger('NON_INTERACTIVE_CLI');
  * slow agent can't block exit indefinitely.
  */
 const STRUCTURED_SHUTDOWN_HOLDBACK_MS = 500;
+
+function isHeadlessLoopSentinel(prompt: string): boolean {
+  return (
+    detectLoopSentinel(prompt) !== null ||
+    detectAutonomousSentinel(prompt) !== null
+  );
+}
 
 /**
  * Body of the synthesised `tool_result` for a `tool_use` block that was
@@ -127,23 +139,75 @@ const LOOP_TYPE_LABELS: Record<LoopType, string> = {
     'the model alternated between the same two tool calls in a repeating pattern',
   [LoopType.TURN_TOOL_CALL_CAP]:
     'the model exceeded the maximum number of tool calls allowed in a single turn',
+  [LoopType.INVALID_TOOL_PARAMS_STAGNATION]:
+    'the model repeatedly sent invalid tool parameters without correcting them',
 };
 
 function formatLoopDetectedMessage(loopType: LoopType | undefined): string {
   const reason = loopType ? LOOP_TYPE_LABELS[loopType] : undefined;
   const detail = reason ? ` (${loopType}: ${reason})` : '';
-  // The consecutive-identical guard and the per-turn cap both run before the
-  // skipLoopDetection gate, so that setting can't disable them — don't suggest
-  // it for those always-on loop types.
+  // The always-on guards run before the skipLoopDetection gate, so that
+  // setting can't disable them — don't suggest it for those loop types. The
+  // per-turn cap is also always-on but has its own knob, so it gets a
+  // dedicated hint instead of membership in this list.
   const isAlwaysOn =
-    loopType === LoopType.TURN_TOOL_CALL_CAP ||
     loopType === LoopType.CONSECUTIVE_IDENTICAL_TOOL_CALLS ||
     loopType === LoopType.SHELL_COMMAND_STAGNATION ||
-    loopType === LoopType.GLOBAL_TOOL_CALL_DUPLICATE;
-  const hint = isAlwaysOn
-    ? ' This is an always-on guard and cannot be disabled via `model.skipLoopDetection`.'
-    : ' Set the `model.skipLoopDetection` setting to true to disable.';
+    loopType === LoopType.GLOBAL_TOOL_CALL_DUPLICATE ||
+    loopType === LoopType.INVALID_TOOL_PARAMS_STAGNATION;
+  const hint =
+    loopType === LoopType.TURN_TOOL_CALL_CAP
+      ? ' Raise the `model.maxToolCallsPerTurn` setting to allow longer turns, or set it to 0 to disable the cap.'
+      : isAlwaysOn
+        ? ' This is an always-on guard and cannot be disabled via `model.skipLoopDetection`.'
+        : ' Set the `model.skipLoopDetection` setting to true to disable.';
   return `Loop detection halted the run${detail}.${hint}`;
+}
+
+/**
+ * Headless handling for fired loop sentinels. loop.md and autonomous sentinel
+ * expansion is interactive-only for now, so a bare sentinel can't be turned into
+ * a real prompt here — the tick is skipped (no-op) rather than sent to the model
+ * as empty content. Returns true when `job` was a sentinel so the caller skips
+ * enqueuing it.
+ *
+ * A recurring SESSION (non-durable) loop.md job would otherwise stay in
+ * `scheduler.sessionSize` and re-fire every interval, pinning the headless run
+ * open forever (the hold-open resolves only when sessionSize hits zero); delete
+ * it so the run can terminate. Durable jobs are left untouched here — they
+ * persist for a future owning session and never count toward sessionSize — and
+ * a one-shot job is already removed before it fires.
+ *
+ * Note: a DURABLE loop.md sentinel never even reaches this callback in headless,
+ * because `setSkipDurableFire` filters it at the scheduler before any fire or
+ * lastFiredAt persist (otherwise the tick would be marked fired while the work
+ * is skipped — silent loss). This guard's durable branch is kept defensive.
+ */
+export function skipHeadlessLoopSentinel(
+  scheduler: CronScheduler,
+  job: CronJob,
+): boolean {
+  if (!isHeadlessLoopSentinel(job.prompt)) {
+    return false;
+  }
+  if (job.recurring && !job.durable) {
+    // A user created this recurring loop.md cron via /loop in interactive mode;
+    // deleting it here is otherwise silent, so leave a trace of why it vanished
+    // from `cron list` when the same workspace is later run headless.
+    debugLogger.debug(
+      'skipHeadlessLoopSentinel: cleaning up recurring session loop.md cron in headless mode',
+      { jobId: job.id },
+    );
+    // delete() removes the in-memory job synchronously before any await, so the
+    // sessionSize check that follows this call sees it gone; the returned promise
+    // has no on-disk work for a session job. Fire-and-forget, but swallow a
+    // rejection so a future async delete() can't surface as an unhandled
+    // rejection (fatal under Node's --unhandled-rejections=throw).
+    void scheduler.delete(job.id).catch(() => {
+      /* session job: nothing to clean up on a delete failure */
+    });
+  }
+  return true;
 }
 
 function emitLoopDetectedMessage(
@@ -513,6 +577,10 @@ export async function runNonInteractive(
       let initialPartList: PartListUnion | null = extractPartsFromUserMessage(
         options.userMessage,
       );
+      // Per-turn model override captured from an inline `/model <id> <prompt>`
+      // slash command; seeds the loop-scoped `modelOverride` below so the
+      // submitted prompt runs on the chosen model without a session switch.
+      let inlineModelOverride: string | undefined;
 
       if (options.continueInterrupted) {
         // Read the full history, not a bounded tail: the Retry send path in
@@ -586,6 +654,26 @@ export async function runNonInteractive(
             case 'submit_prompt':
               // A slash command can replace the prompt entirely; fall back to @-command processing otherwise.
               initialPartList = slashCommandResult.content;
+              // Re-validate provider identity rather than trust the producer:
+              // any slash command can set `modelOverride`, so the consumer
+              // enforces that it names a model on the active provider before
+              // redirecting API calls to it.
+              if (
+                slashCommandResult.modelOverride !== undefined &&
+                isInlineModelOverrideAllowed(
+                  config,
+                  slashCommandResult.modelOverride,
+                )
+              ) {
+                inlineModelOverride = slashCommandResult.modelOverride;
+                debugLogger.debug(
+                  `[runNonInteractive] inline model override captured: ${inlineModelOverride}`,
+                );
+              } else if (slashCommandResult.modelOverride !== undefined) {
+                debugLogger.warn(
+                  `[runNonInteractive] ignoring model override '${slashCommandResult.modelOverride}': not a model on the active provider`,
+                );
+              }
               slashHandled = true;
               break;
             case 'message': {
@@ -789,7 +877,21 @@ export async function runNonInteractive(
 
       let isFirstTurn = true;
       let hasUnsentToolResponse = false;
-      let modelOverride: string | undefined;
+      let modelOverride: string | undefined = inlineModelOverride;
+      // An explicit inline `/model <id> <prompt>` override wins for the whole
+      // turn: while active, skill-tool `modelOverride` writes (including the
+      // undefined-clears case) are skipped so they cannot silently revert the
+      // submitted prompt to the session model mid-turn. Unlike useGeminiStream's
+      // ref-based `applyModelOverride`/`clearModelOverride` helpers, this is a
+      // run-scoped const — non-interactive mode is single-turn, so there is no
+      // retry-clearing or skill-tool takeover to guard against, just the
+      // within-turn precedence above.
+      const inlineModelOverrideActive = inlineModelOverride !== undefined;
+      if (inlineModelOverrideActive) {
+        debugLogger.debug(
+          `[runNonInteractive] inline model override active for turn: ${inlineModelOverride}`,
+        );
+      }
       // Session-scoped because the synthetic `structured_output` tool can
       // be invoked from EITHER the main assistant-turn loop or from a
       // drain-turn (queued notification / cron prompt); whichever fires
@@ -1277,6 +1379,9 @@ export async function runNonInteractive(
           if (event.type === GeminiEventType.ToolCallRequest) {
             toolCallRequests.push(event.value);
           }
+          if (event.type === GeminiEventType.ModelFallback) {
+            toolCallRequests.length = 0;
+          }
           if (
             event.type === GeminiEventType.Content &&
             plainTextPreview.length < PLAIN_TEXT_PREVIEW_LIMIT
@@ -1335,7 +1440,9 @@ export async function runNonInteractive(
             responseParts: toolResponseParts,
             repeatedDuplicateProviderToolCall,
           } = await processToolCallBatch(toolCallRequests, (override) => {
-            modelOverride = override;
+            if (!inlineModelOverrideActive) {
+              modelOverride = override;
+            }
           });
 
           if (structuredSubmission !== undefined) {
@@ -1700,7 +1807,16 @@ export async function runNonInteractive(
                 reject(err);
               };
 
-              scheduler.start((job: { prompt: string; cronExpr?: string }) => {
+              scheduler.start((job: CronJob) => {
+                // A bare loop sentinel can't expand in a headless run, so the
+                // tick is skipped. skipHeadlessLoopSentinel also deletes a
+                // recurring session job so it stops re-firing and sessionSize
+                // can fall to zero — otherwise checkCronDone never resolves and
+                // the run hangs. Full headless loop support is a follow-up.
+                if (skipHeadlessLoopSentinel(scheduler, job)) {
+                  checkCronDone();
+                  return;
+                }
                 const label = job.prompt.slice(0, 40);
                 localQueue.push({
                   displayText: `${job.cronExpr === '@wakeup' ? 'Loop' : 'Cron'}: ${label}`,

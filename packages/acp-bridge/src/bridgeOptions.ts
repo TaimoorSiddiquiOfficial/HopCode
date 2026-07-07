@@ -378,3 +378,17 @@ export interface BridgeOptions {
     enabled: boolean,
   ) => Promise<void>;
 }
+
+/**
+ * Looks up the JSON-RPC sender for a client-hosted MCP server by name. Returns
+ * `undefined` when no client currently advertises `serverName`. The returned
+ * callback delivers `payload` to the client-hosted server and resolves with the
+ * correlated JSON-RPC response. `payload` is typed `unknown` to keep this
+ * package free of an MCP-SDK dependency; the serve layer passes a
+ * `JSONRPCMessage`.
+ */
+export type ClientMcpMessageSender = (
+  serverName: string,
+) =>
+  | ((payload: unknown) => Promise<unknown>)
+  | undefined;

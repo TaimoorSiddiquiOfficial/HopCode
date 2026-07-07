@@ -21,6 +21,10 @@ export interface DialogCloseOptions {
     scope: SettingScope,
   ) => void;
 
+  // Reasoning effort dialog
+  isEffortDialogOpen: boolean;
+  handleEffortSelect: (effort: ReasoningEffort | undefined) => void;
+
   // Auth dialog
   isAuthDialogOpen: boolean;
   closeAuthDialog: () => void;
@@ -95,6 +99,12 @@ export function useDialogClose(options: DialogCloseOptions) {
     if (options.isApprovalModeDialogOpen) {
       // Mimic ESC behavior: onSelect(undefined, selectedScope) - keeps current mode
       options.handleApprovalModeSelect(undefined, SettingScope.User);
+      return true;
+    }
+
+    if (options.isEffortDialogOpen) {
+      // Mimic ESC behavior: onSelect(undefined) - keeps the current effort.
+      options.handleEffortSelect(undefined);
       return true;
     }
 

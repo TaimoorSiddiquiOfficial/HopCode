@@ -4,7 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { existsSync, readFileSync } from 'node:fs';
+import {
+  chmodSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -62,6 +71,32 @@ describe('hopcode resolve workflow', () => {
     expect(workflow).not.toContain('authorize-resolve:');
     expect(workflow).toContain(
       "github.event.comment.body == '@hopcode /resolve'",
+    );
+  });
+
+  it('cancels in-flight lifecycle reviews when the PR closes', () => {
+    const concurrencyStart = workflow.indexOf('\nconcurrency:');
+    const concurrency = workflow.slice(
+      concurrencyStart,
+      workflow.indexOf('\njobs:', concurrencyStart),
+    );
+
+    expect(workflow).toContain("- 'closed'");
+    expect(concurrency).toContain("github.event.action == 'closed'");
+    expect(concurrency).toContain(
+      "format('qwen-pr-review-pr-{0}', github.event.pull_request.number)",
+    );
+  });
+
+  it('keeps synchronize cancellation expression simple for workflow-level concurrency', () => {
+    const concurrencyStart = workflow.indexOf('\nconcurrency:');
+    const concurrency = workflow.slice(
+      concurrencyStart,
+      workflow.indexOf('\njobs:', concurrencyStart),
+    );
+
+    expect(concurrency).toContain(
+      "cancel-in-progress: \"${{ github.event_name == 'pull_request_target' && (github.event.action == 'synchronize' || github.event.action == 'closed') }}\"",
     );
   });
 
@@ -125,6 +160,156 @@ describe('hopcode resolve workflow', () => {
     expect(agentStep).toContain("HOPCODE_HOME: '${{ runner.temp }}/hopcode-home'");
   });
 
+  it('allows maintainers to extend review timeout from /review comments', () => {
+    const contextStep = step(reviewJob, 'Resolve PR context');
+    const runStep = step(reviewJob, 'Run review');
+
+    expect(reviewJob).toContain('timeout-minutes: 200');
+    expect(contextStep).toContain('DEFAULT_TIMEOUT_MINUTES=120');
+    expect(contextStep).toContain('case "$token" in');
+    expect(contextStep).toContain('--timeout=*)');
+    expect(contextStep).toContain('TIMEOUT_MINUTES="${token#--timeout=}"');
+    expect(contextStep).toContain('timeout=*)');
+    expect(contextStep).toContain('TIMEOUT_MINUTES="${token#timeout=}"');
+    expect(runStep).toContain('if [ "${#TIMEOUT_MINUTES}" -gt 3 ]; then');
+    expect(runStep).toContain('timeout_minutes must not exceed 180 minutes');
+    expect(runStep).toContain('QWEN_TIMEOUT="$TIMEOUT_MINUTES"');
+    expect(runStep).not.toContain('QWEN_TIMEOUT=$((TIMEOUT_MINUTES - 5))');
+  });
+
+  it('tells maintainers how to retry timed-out reviews with more time', () => {
+    const runStep = step(reviewJob, 'Run review');
+    const fallbackStep = step(reviewJob, 'Post fallback comment on failure');
+
+    expect(runStep).toContain('failure_kind=$kind');
+    expect(runStep).toContain(
+      'fail "Qwen review timed out after ${QWEN_TIMEOUT} minutes." 1 "timeout"',
+    );
+    expect(runStep).toContain('[ "$qwen_status" -eq 137 ]');
+    expect(fallbackStep).toContain('FAILURE_KIND:');
+    expect(fallbackStep).toContain('TIMEOUT_MINUTES:');
+    expect(fallbackStep).toContain('@qwen-code /review --timeout=180');
+    expect(fallbackStep).toContain(
+      'This run already used the maximum 180 minute timeout.',
+    );
+    expect(fallbackStep).toContain('**Qwen Code review timed out.**');
+    expect(fallbackStep).not.toContain(
+      '_Qwen Code review did not complete successfully:',
+    );
+  });
+
+  it('skips stale automatic review runs before invoking qwen', () => {
+    const runStep = step(reviewJob, 'Run review');
+    const staleHeadCheck = runStep.slice(
+      runStep.indexOf(
+        'if [ "${{ github.event_name }}" = "pull_request_target" ]; then',
+      ),
+      runStep.indexOf('PROMPT="/review ${REVIEW_URL}"'),
+    );
+
+    expect(staleHeadCheck).toContain(
+      'EVENT_HEAD_SHA="${{ github.event.pull_request.head.sha }}"',
+    );
+    expect(runStep).toContain(
+      'PR_DATA="$(gh pr view "$PR_NUMBER" --repo "$REPO" --json state,headRefOid --jq \'[.state, .headRefOid] | @tsv\')"',
+    );
+    expect(runStep).toContain(
+      'IFS=$\'\\t\' read -r PR_STATE CURRENT_HEAD_SHA <<< "$PR_DATA"',
+    );
+    expect(staleHeadCheck).toContain(
+      'Skipping stale review run: event head ${EVENT_HEAD_SHA} is no longer current',
+    );
+    expect(staleHeadCheck).toContain('exit 0');
+  });
+
+  it('guards PR review publication against closed or stale PRs', () => {
+    const runStep = step(reviewJob, 'Run review');
+    const fallbackStep = step(reviewJob, 'Post fallback comment on failure');
+
+    expect(runStep).toContain('guard_pr_write()');
+    expect(runStep).toContain(
+      'Blocked PR write: PR #${pr_number} is ${state}.',
+    );
+    expect(runStep).toContain(
+      'Blocked PR write: PR #${pr_number} moved from ${expected_head} to ${current_head}.',
+    );
+    expect(runStep).toContain('repos/*/pulls/*/reviews');
+    expect(runStep).toContain('repos/*/pulls/*/comments');
+    expect(runStep).toContain('repos/*/issues/*/comments');
+    expect(runStep).toContain('repos/*/issues/comments/*');
+    expect(runStep).toContain('QWEN_CI_REVIEW_REPO="$REPO"');
+    expect(runStep).toContain('QWEN_CI_REVIEW_PR_NUMBER="$PR_NUMBER"');
+    expect(runStep).toContain(
+      'QWEN_CI_REVIEW_EXPECTED_HEAD_SHA="$EXPECTED_HEAD_SHA"',
+    );
+    expect(runStep).toContain(
+      'echo "expected_head_sha=$EXPECTED_HEAD_SHA" >> "$GITHUB_OUTPUT"',
+    );
+    expect(fallbackStep).toContain('EXPECTED_HEAD_SHA:');
+    expect(fallbackStep).toContain(
+      'Skipping fallback comment: PR #${PR_NUMBER} is ${pr_state}.',
+    );
+    expect(fallbackStep).toContain(
+      'Skipping fallback comment: PR #${PR_NUMBER} moved from ${EXPECTED_HEAD_SHA} to ${current_head}.',
+    );
+  });
+
+  it('blocks wrapped gh review writes when the PR is closed or stale', () => {
+    const runStep = step(reviewJob, 'Run review');
+    const closedReview = runReviewGhWrapper(
+      runStep,
+      ['api', 'repos/owner/repo/pulls/123/reviews', '--input', 'review.json'],
+      'CLOSED',
+      'head-a',
+    );
+    expect(closedReview.status).toBe(90);
+    expect(closedReview.stderr).toContain(
+      'Blocked PR write: PR #123 is CLOSED',
+    );
+    expect(closedReview.ghLog).toBe('');
+
+    const staleSummary = runReviewGhWrapper(
+      runStep,
+      [
+        'api',
+        'repos/owner/repo/issues/comments/456',
+        '--method',
+        'PATCH',
+        '--input',
+        'summary.json',
+      ],
+      'OPEN',
+      'head-b',
+    );
+    expect(staleSummary.status).toBe(90);
+    expect(staleSummary.stderr).toContain(
+      'Blocked PR write: PR #123 moved from head-a to head-b',
+    );
+    expect(staleSummary.ghLog).toBe('');
+  });
+
+  it('allows wrapped gh review writes when the PR is still current', () => {
+    const runStep = step(reviewJob, 'Run review');
+    const currentSummary = runReviewGhWrapper(
+      runStep,
+      [
+        'api',
+        'repos/owner/repo/issues/123/comments',
+        '--method',
+        'POST',
+        '--input',
+        'summary.json',
+      ],
+      'OPEN',
+      'head-a',
+    );
+
+    expect(currentSummary.status).toBe(0);
+    expect(currentSummary.ghLog).toContain(
+      'api repos/owner/repo/issues/123/comments --method POST --input summary.json',
+    );
+  });
+
   // Whole-file `toContain` cannot tell which job a guard lives on. Slice the
   // resolve-pr job so these assertions fail if a future edit drops a guard
   // specifically from the credentialed conflict-resolution path. Bound the slice
@@ -139,6 +324,56 @@ describe('hopcode resolve workflow', () => {
       ? workflow.slice(resolveJobStart)
       : workflow.slice(resolveJobStart, resolveJobStart + 1 + nextJob);
   const reviewJob = job(workflow, 'review-pr');
+  const delayAutomaticReviewJob = job(workflow, 'delay-automatic-review');
+  const authorizeJob = job(workflow, 'authorize');
+  const precheckJob = job(workflow, 'precheck-pr');
+
+  it('keeps closed PR events from running precheck or authorize jobs', () => {
+    expect(precheckJob).toContain("github.event.action != 'closed'");
+    expect(authorizeJob).toContain("github.event.action != 'closed'");
+  });
+
+  it('keeps automatic review jobs cancellable by concurrency', () => {
+    for (const lifecycleJob of [
+      authorizeJob,
+      delayAutomaticReviewJob,
+      reviewJob,
+    ]) {
+      expect(lifecycleJob).toContain('!cancelled() &&');
+      expect(lifecycleJob).not.toContain('\n      always() &&');
+    }
+  });
+
+  it('does not require fork PR authors to have write permission for automatic review', () => {
+    const authorizeStep = step(
+      authorizeJob,
+      'Check principal write permission',
+    );
+
+    expect(authorizeJob).toContain(
+      "needs.precheck-pr.outputs.decision == 'allow_triage'",
+    );
+    expect(authorizeStep).toMatch(
+      /if \[ "\$PR_ACTION" = "review_requested" \]; then\s+principal="\$SENDER"/,
+    );
+    const reviewRequestedBranch = authorizeStep.slice(
+      authorizeStep.indexOf('if [ "$PR_ACTION" = "review_requested" ]; then'),
+      authorizeStep.indexOf('else'),
+    );
+    expect(reviewRequestedBranch).toContain('principal="$SENDER"');
+    expect(reviewRequestedBranch).not.toContain(
+      'echo "should_review=true" >> "$GITHUB_OUTPUT"',
+    );
+    expect(reviewRequestedBranch).not.toContain('exit 0');
+    expect(authorizeStep).toContain('pull_request_target)');
+    expect(authorizeStep).toContain(
+      'Automatic PR review allowed for PR #${PR_NUMBER} after same-repo/precheck gate.',
+    );
+    expect(authorizeStep).toContain(
+      'echo "should_review=true" >> "$GITHUB_OUTPUT"',
+    );
+    expect(authorizeStep).not.toContain('principal="$PR_AUTHOR"');
+  });
 
   it('keeps the authorization and scope guards on resolve-pr', () => {
     // /resolve must require write+ permission before any credentialed push.

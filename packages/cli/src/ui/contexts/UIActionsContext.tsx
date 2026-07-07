@@ -37,6 +37,7 @@ export interface UIActions {
     mode: ApprovalMode | undefined,
     scope: SettingScope,
   ) => void;
+  handleEffortSelect: (effort: ReasoningEffort | undefined) => void;
   auth: AuthController['actions'];
   handleEditorSelect: (
     editorType: EditorType | undefined,

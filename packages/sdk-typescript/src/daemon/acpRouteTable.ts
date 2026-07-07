@@ -16,17 +16,67 @@ import { isRecord } from './acpTransportUtils.js';
 
 export interface RouteMapping {
   method: string;
-  /** Extract JSON-RPC params from URL path segments + request body. */
+  /**
+   * Extract JSON-RPC params from URL path segments, request body, and — for the
+   * REST-style query-backed helpers (`/file?path=…&maxBytes=…`, `/stat`,
+   * `/list`, `/glob`, `context-usage?detail=…`) — the URL query string. The
+   * daemon's ACP handlers are strictly typed (e.g. `maxBytes` must be a
+   * `number`, `detail` must be the boolean `true`), so query values — which
+   * arrive as strings — are coerced to the expected type here via
+   * `strParam`/`numParam`/`boolParam`.
+   */
   extractParams: (
     segments: string[],
     body: unknown,
     httpMethod: string,
+    query?: URLSearchParams,
   ) => Record<string, unknown>;
   /**
    * True for notifications (no response expected). The transport will
    * NOT wait for a JSON-RPC response from the server.
    */
   notification?: boolean;
+}
+
+/** A string query param, omitted when absent. */
+function strParam(
+  q: URLSearchParams | undefined,
+  name: string,
+): Record<string, string> {
+  const v = q?.get(name);
+  return v == null ? {} : { [name]: v };
+}
+
+/**
+ * A numeric query param coerced to a `number`, omitted when absent. The daemon's
+ * ACP handlers require a real number (a query string's `"123"` would be
+ * rejected). An unparseable value forwards as `NaN`, which the daemon rejects
+ * the same way it would a malformed REST query.
+ *
+ * An empty value (`?maxBytes=`) is treated as ABSENT, not `0`: `Number('')` is
+ * `0`, a plausible-but-unintended value the handler would otherwise honor.
+ */
+function numParam(
+  q: URLSearchParams | undefined,
+  name: string,
+): Record<string, number> {
+  const v = q?.get(name);
+  return v == null || v === '' ? {} : { [name]: Number(v) };
+}
+
+/** A boolean query param (`?detail=true`), omitted when absent. */
+function boolParam(
+  q: URLSearchParams | undefined,
+  name: string,
+): Record<string, boolean> {
+  const v = q?.get(name);
+  // Treat an empty value (`?detail=`) as absent, mirroring `numParam`, so we
+  // don't forward `{ detail: false }` for a param the caller never set.
+  return v == null || v === '' ? {} : { [name]: v === 'true' };
+}
+
+function bodyRecord(body: unknown): Record<string, unknown> {
+  return isRecord(body) ? body : {};
 }
 
 export interface RouteEntry {
@@ -67,8 +117,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: 'session/prompt',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -98,8 +148,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: 'session/load',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -110,8 +160,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: 'session/resume',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -122,9 +172,9 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: 'session/permission',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
         requestId: segs[1],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -135,8 +185,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: 'session/permission',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         requestId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -147,8 +197,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: 'session/set_model',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -180,8 +230,20 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/session/update_metadata',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
+      }),
+    },
+  },
+  // PATCH /session/:id/organization → _qwen/session/update_organization
+  {
+    httpMethod: 'PATCH',
+    pattern: /^\/session\/([^/]+)\/organization$/,
+    mapping: {
+      method: '_qwen/session/update_organization',
+      extractParams: (segs, body) => ({
+        ...bodyRecord(body),
+        sessionId: segs[0],
       }),
     },
   },
@@ -192,8 +254,41 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/session/heartbeat',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
+      }),
+    },
+  },
+  // GET /session/:id/artifacts → _qwen/session/artifacts
+  {
+    httpMethod: 'GET',
+    pattern: /^\/session\/([^/]+)\/artifacts$/,
+    mapping: {
+      method: '_qwen/session/artifacts',
+      extractParams: (segs) => ({ sessionId: segs[0] }),
+    },
+  },
+  // POST /session/:id/artifacts → _qwen/session/artifacts/add
+  {
+    httpMethod: 'POST',
+    pattern: /^\/session\/([^/]+)\/artifacts$/,
+    mapping: {
+      method: '_qwen/session/artifacts/add',
+      extractParams: (segs, body) => ({
+        ...bodyRecord(body),
+        sessionId: segs[0],
+      }),
+    },
+  },
+  // DELETE /session/:id/artifacts/:artifactId → _qwen/session/artifacts/remove
+  {
+    httpMethod: 'DELETE',
+    pattern: /^\/session\/([^/]+)\/artifacts\/([^/]+)$/,
+    mapping: {
+      method: '_qwen/session/artifacts/remove',
+      extractParams: (segs) => ({
+        sessionId: segs[0],
+        artifactId: segs[1],
       }),
     },
   },
@@ -204,8 +299,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/session/recap',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -216,8 +311,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/session/btw',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -228,8 +323,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/session/shell',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -240,8 +335,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: 'session/fork',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -252,8 +347,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/session/detach',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         sessionId: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -423,8 +518,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/workspace/agents/delete',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         agentType: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -453,8 +548,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/workspace/mcp/servers/remove',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         name: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -474,8 +569,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/workspace/restart_mcp_server',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         serverName: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },
@@ -516,6 +611,74 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     },
   },
 
+  // GET /workspace/:id/sessions → session/list
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/(.+)\/sessions\/?$/,
+    mapping: {
+      method: 'session/list',
+      extractParams: (segs, _body, _method, query) => {
+        const size = query?.get('size');
+        return {
+          workspaceCwd: segs[0],
+          ...strParam(query, 'cursor'),
+          ...strParam(query, 'archiveState'),
+          ...strParam(query, 'view'),
+          ...strParam(query, 'group'),
+          ...(size == null || size === ''
+            ? {}
+            : { _meta: { size: Number(size) } }),
+        };
+      },
+    },
+  },
+  // GET /workspace/:id/session-groups → _qwen/workspace/session_groups/list
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/(.+)\/session-groups\/?$/,
+    mapping: {
+      method: '_qwen/workspace/session_groups/list',
+      extractParams: (segs) => ({ workspaceCwd: segs[0] }),
+    },
+  },
+  // POST /workspace/:id/session-groups → _qwen/workspace/session_groups/create
+  {
+    httpMethod: 'POST',
+    pattern: /^\/workspace\/(.+)\/session-groups\/?$/,
+    mapping: {
+      method: '_qwen/workspace/session_groups/create',
+      extractParams: (segs, body) => ({
+        ...bodyRecord(body),
+        workspaceCwd: segs[0],
+      }),
+    },
+  },
+  // PATCH /workspace/:id/session-groups/:groupId → _qwen/workspace/session_groups/update
+  {
+    httpMethod: 'PATCH',
+    pattern: /^\/workspace\/(.+)\/session-groups\/([^/]+)\/?$/,
+    mapping: {
+      method: '_qwen/workspace/session_groups/update',
+      extractParams: (segs, body) => ({
+        ...bodyRecord(body),
+        workspaceCwd: segs[0],
+        groupId: segs[1],
+      }),
+    },
+  },
+  // DELETE /workspace/:id/session-groups/:groupId → _qwen/workspace/session_groups/delete
+  {
+    httpMethod: 'DELETE',
+    pattern: /^\/workspace\/(.+)\/session-groups\/([^/]+)\/?$/,
+    mapping: {
+      method: '_qwen/workspace/session_groups/delete',
+      extractParams: (segs) => ({
+        workspaceCwd: segs[0],
+        groupId: segs[1],
+      }),
+    },
+  },
+
   // ---- Workspace catch-all (must be AFTER all specific workspace routes) --
   // Handles any workspace path not matched above (e.g., /workspace/custom/path).
   {
@@ -532,8 +695,8 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     mapping: {
       method: '_hopcode/workspace',
       extractParams: (segs, body) => ({
+        ...bodyRecord(body),
         path: segs[0],
-        ...(isRecord(body) ? body : {}),
       }),
     },
   },

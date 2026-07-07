@@ -6,7 +6,7 @@
 
 export const HOPCODE_SIMPLE_ENV_VAR = 'HOPCODE_SIMPLE';
 
-function isTruthy(value: string | undefined): boolean {
+export function isTruthy(value: string | undefined): boolean {
   if (!value) {
     return false;
   }

@@ -57,7 +57,7 @@ describe('channels/base paths – resolvePath', () => {
   });
 
   it('expands bare tilde (~) to home directory', () => {
-    expect(resolvePath('~')).toBe(os.homedir());
+    expect(resolvePath('~')).toBe(path.normalize(os.homedir()));
   });
 
   it('expands POSIX-style tilde (~/x)', () => {

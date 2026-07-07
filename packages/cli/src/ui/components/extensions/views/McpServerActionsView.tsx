@@ -326,7 +326,7 @@ export const McpServerActionsView = ({
             : SettingScope.User;
         const settings = loadSettings();
         const excluded = settings.forScope(scope).settings.mcp?.excluded || [];
-        if (!excluded.includes(serverName)) {
+        if (!matchesAnyServerPattern(serverName, excluded)) {
           settings.setValue(scope, 'mcp.excluded', [...excluded, serverName]);
         }
         await toolRegistry?.disableMcpServer(serverName);

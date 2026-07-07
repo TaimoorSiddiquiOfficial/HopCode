@@ -106,6 +106,7 @@ interface FakeConfigState {
   gating: { excluded?: string[]; allowed?: string[]; pending?: string[] };
   /** Startup `--allowed-mcp-server-names` upper bound (K); default undefined. */
   bootAllowed?: string[];
+  approvalMode?: ApprovalMode;
 }
 
 function makeFakeConfig(cwd: string, state: FakeConfigState) {
@@ -120,6 +121,7 @@ function makeFakeConfig(cwd: string, state: FakeConfigState) {
     state.gating.pending = v;
   });
   const config = {
+    getApprovalMode: () => state.approvalMode ?? ApprovalMode.DEFAULT,
     getTargetDir: () => cwd,
     getSettingsMcpServers: () => state.settingsMcp,
     // Stand-in for the effective (settings + extensions + runtime) map; the
@@ -457,6 +459,29 @@ describe('registerMcpHotReload', () => {
       await listener([]);
 
       expect(fc.reinitializeMcpServers).toHaveBeenCalledOnce();
+      expect(spy).not.toHaveBeenCalled();
+    } finally {
+      appEvents.off(AppEvent.McpPendingApprovalChanged, spy);
+    }
+  });
+
+  it('YOLO: does not compute pending or emit McpPendingApprovalChanged for gated servers', async () => {
+    const fc = makeFakeConfig(cwd, {
+      settingsMcp: {},
+      gating: {},
+      approvalMode: ApprovalMode.YOLO,
+    });
+    registerMcpHotReload(watcher, settings, fc.config, undefined);
+
+    const spy = vi.fn();
+    appEvents.on(AppEvent.McpPendingApprovalChanged, spy);
+    try {
+      // A workspace-scoped (gated) server with no stored approval would
+      // normally be pending — but YOLO skips gating entirely.
+      merged.mcpServers = { ws: { command: 'ws', scope: 'workspace' } };
+      await listener([]);
+
+      expect(fc.setPendingMcpServers).toHaveBeenCalledWith(undefined);
       expect(spy).not.toHaveBeenCalled();
     } finally {
       appEvents.off(AppEvent.McpPendingApprovalChanged, spy);

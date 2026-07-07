@@ -436,6 +436,10 @@ The effective auth/model/credential values are chosen per field using the follow
 
 \*When present, CLI auth flags override settings. Otherwise, `security.auth.selectedType` or the implicit default determine the auth type. HopCode OAuth and OpenAI are the only auth types surfaced without extra configuration.
 
+> [!note]
+>
+> `--openai-api-key` and `--openai-base-url` are the only credential CLI flags. They apply to the active OpenAI-compatible provider regardless of its name — there are no `--anthropic-*` / `--gemini-*` credential flags. Provider-specific credentials that aren't passed on the CLI are resolved from environment variables (see the row below).
+
 > [!warning]
 >
 > **Deprecation of `security.auth.apiKey` and `security.auth.baseUrl`:** Directly configuring API credentials via `security.auth.apiKey` and `security.auth.baseUrl` in `settings.json` is deprecated. These settings were used in historical versions for credentials entered through the UI, but the credential input flow was removed in version 0.10.1. These fields will be fully removed in a future release. **It is strongly recommended to migrate to `modelProviders`** for all model and credential configurations. Use `envKey` in `modelProviders` to reference environment variables for secure credential management instead of hardcoding credentials in settings files.

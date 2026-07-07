@@ -109,6 +109,8 @@ export interface ToolCallResultParams {
   resultDisplay?: unknown;
   /** Error if tool execution failed */
   error?: Error;
+  /** Structured artifacts produced by the tool result. */
+  artifacts?: ToolArtifact[];
   /** Original args (fallback for TodoWriteTool todos extraction) */
   args?: Record<string, unknown>;
   /** Optional subagent metadata */

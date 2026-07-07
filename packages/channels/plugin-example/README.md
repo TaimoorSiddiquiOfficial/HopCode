@@ -61,6 +61,15 @@ In a separate terminal:
 hopcode channel start my-plugin-test
 ```
 
+Or run the same adapter under the experimental daemon-managed channel worker:
+
+```bash
+cd /path/to/your/project
+qwen serve --channel my-plugin-test
+```
+
+`qwen serve --channel` requires the channel's configured `cwd` to resolve to the daemon workspace.
+
 ### 6. Send a message
 
 ```bash
@@ -100,5 +109,9 @@ See `src/MockPluginChannel.ts` for a working example. The key points:
 - **Attachments** — populate `envelope.attachments` with images/files and `handleInbound()` routes them to the agent (images as vision input, files as paths in the prompt)
 - **Streaming hooks** — override `onResponseChunk()` for progressive display (e.g., editing a message in-place)
 - Access control (allowlist, pairing, open), session routing, slash commands, crash recovery
+
+## Lifecycle status
+
+The mock plugin protocol exposes streamed chunks and final outbound messages only. It does not model typing indicators, reactions, card updates, or any other status surface, so prompt and task lifecycle status are intentionally no-op for this example channel.
 
 Full guide: [Channel Plugin Developer Guide](../../../docs/developers/channel-plugins.md)

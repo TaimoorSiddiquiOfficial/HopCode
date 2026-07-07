@@ -231,7 +231,7 @@ export function CreationSummary({
       <Box flexDirection="column" gap={1}>
         <Box>
           <Text bold color={theme.status.success}>
-            {t('✅ Subagent Created Successfully!')}
+            {t('✓ Subagent Created Successfully!')}
           </Text>
         </Box>
         <Box>
@@ -299,7 +299,7 @@ export function CreationSummary({
       {saveError && (
         <Box flexDirection="column">
           <Text bold color={theme.status.error}>
-            {t('❌ Error saving subagent:')}
+            {t('✗ Error saving subagent:')}
           </Text>
           <Box flexDirection="column" padding={1} paddingBottom={0}>
             <Text color={theme.status.error} wrap="wrap">

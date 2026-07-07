@@ -14,6 +14,18 @@ Learn how to enable and setup OpenTelemetry for HopCode.
   - [Logs and Metrics](#logs-and-metrics)
     - [Logs](#logs)
     - [Metrics](#metrics)
+    - [Daemon Metrics](#daemon-metrics)
+    - [Spans](#spans)
+    - [Resource Metrics](#resource-metrics)
+    - [Performance Monitoring (Reserved)](#performance-monitoring-reserved)
+
+## Migration Notes
+
+- `tool_output_truncated` was renamed to `qwen-code.tool_output_truncated` for namespace consistency — downstream consumers filtering on the old name should update their queries.
+
+- The `tool.call.latency` histogram documentation previously listed a `decision` attribute — this was never set on the histogram (only `function_name` is recorded). The `tool.call.count` counter continues to include `decision`.
+
+- The `qwen-code.file_operation` log event and `file.operation.count` metric documentation previously listed diff-stat attributes (`model_added_lines`, `model_removed_lines`, `user_added_lines`, `user_removed_lines`) — these were never set on either. Diff-stat data is available via the `tool_call` log event's `metadata` attribute.
 
 ## Key Benefits
 
@@ -338,6 +350,10 @@ header is written on every outbound `fetch`:
 ```
 traceparent: 00-<32-hex traceId>-<16-hex parentSpanId>-<01-sampled | 00-not-sampled>
 ```
+
+Additionally, `TRACEPARENT` and `TRACESTATE` environment variables are set in
+shell child processes (Bash tool, hooks, monitor) so that spawned commands can
+participate in the same distributed trace.
 
 Opt in only when the LLM provider also reports into your OTel collector
 for cross-process trace stitching — e.g. ARMS Tracing serving DashScope.

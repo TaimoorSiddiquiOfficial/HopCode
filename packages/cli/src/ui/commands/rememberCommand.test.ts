@@ -44,6 +44,9 @@ describe('rememberCommand', () => {
       content: expect.stringContaining('user prefers dark mode'),
     });
     expect((result as { content: string }).content).toContain('memory system');
+    expect((result as { content: string }).content).not.toContain(
+      '<user-content>',
+    );
   });
 
   it('returns submit_prompt for non-managed memory (HOPCODE.md fallback)', () => {

@@ -194,7 +194,7 @@ describe('Storage – getRuntimeBaseDir / setRuntimeBaseDir', () => {
 
   it('handles bare tilde (~) as home directory', () => {
     Storage.setRuntimeBaseDir('~');
-    expect(Storage.getRuntimeBaseDir()).toBe(os.homedir());
+    expect(Storage.getRuntimeBaseDir()).toBe(path.normalize(os.homedir()));
   });
 });
 

@@ -48,7 +48,7 @@ export interface SettingsMessageSettingsState {
   ) => Promise<DaemonSettingUpdateResult>;
 }
 
-const SUB_DIALOG_KEYS = new Set(['fastModel']);
+const SUB_DIALOG_KEYS = new Set(['fastModel', 'visionModel']);
 const HIDDEN_SETTING_KEYS = new Set([
   'ui.hideTips',
   'ui.enableUserFeedback',

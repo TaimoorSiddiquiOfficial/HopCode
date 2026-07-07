@@ -17,12 +17,23 @@ Subclass `ChannelBase` and implement three methods:
 ```typescript
 import { ChannelBase } from '@hoptrendy/channel-base';
 import type {
+  ChannelAgentBridge,
+  ChannelBaseOptions,
   ChannelConfig,
   Envelope,
   AcpBridge,
 } from '@hoptrendy/channel-base';
 
 class MyChannel extends ChannelBase {
+  constructor(
+    name: string,
+    config: ChannelConfig,
+    bridge: ChannelAgentBridge,
+    options?: ChannelBaseOptions,
+  ) {
+    super(name, config, bridge, options);
+  }
+
   async connect(): Promise<void> {
     // Connect to platform API, register message handlers.
     // When a message arrives, build an Envelope and call:
@@ -55,6 +66,17 @@ export const plugin: ChannelPlugin = {
 
 For a complete working example, see [`@hoptrendy/channel-plugin-example`](../plugin-example/).
 
+Migration note for existing TypeScript plugins: if your adapter constructor or factory explicitly types `bridge` as `AcpBridge`, change that annotation to `ChannelAgentBridge` and keep using only the methods exposed by that contract. JavaScript plugins are unaffected at runtime, and standalone `qwen channel start` still passes the current `AcpBridge` implementation.
+
+## Runtime modes
+
+Channel adapters can run in two host modes:
+
+- `qwen channel start [name]` is the standalone service. It uses `AcpBridge` over a `qwen-code --acp` child process and remains the default channel command.
+- `qwen serve --channel <name>` and `qwen serve --channel all` are experimental daemon-managed modes. `qwen serve` starts one out-of-process channel worker, the worker connects back to the daemon through the SDK, and adapters receive a `DaemonChannelBridge`-backed `ChannelAgentBridge` facade.
+
+In daemon-managed mode, one daemon is bound to one workspace. Every selected channel's `cwd` must resolve to that same workspace. The optional `shellCommand` method is exposed to adapters only when the daemon advertises the `session_shell_command` capability.
+
 ## Architecture
 
 ```
@@ -63,9 +85,9 @@ Inbound:  Platform message
             → GroupGate (group policy + mention gating)
             → SenderGate (allowlist / pairing / open)
             → Slash commands (/clear, /help, /status)
-            → SessionRouter (resolve or create ACP session)
+            → SessionRouter (resolve or create agent session)
             → Resolve attachments (images → bridge, files → prompt text)
-            → AcpBridge.prompt() → agent
+            → ChannelAgentBridge.prompt() → agent
 
 Outbound: Agent response
             → BlockStreamer (if enabled: split into blocks at paragraph boundaries)
@@ -90,24 +112,27 @@ Everything between `handleInbound()` and `sendMessage()` is handled by the base 
 
 ### Types
 
-| Type            | Description                                    |
-| --------------- | ---------------------------------------------- |
-| `Attachment`    | Structured file/image/audio/video attachment   |
-| `ChannelConfig` | Channel configuration from `settings.json`     |
-| `ChannelPlugin` | Plugin factory interface (what you export)     |
-| `Envelope`      | Normalized inbound message format              |
-| `SenderPolicy`  | `'allowlist' \| 'pairing' \| 'open'`           |
-| `GroupPolicy`   | `'disabled' \| 'allowlist' \| 'open'`          |
-| `SessionScope`  | `'user' \| 'thread' \| 'single'`               |
-| `GroupConfig`   | Per-group settings (e.g. `requireMention`)     |
-| `SessionTarget` | Maps a session back to its channel/sender/chat |
+| Type                 | Description                                                              |
+| -------------------- | ------------------------------------------------------------------------ |
+| `Attachment`         | Structured file/image/audio/video attachment                             |
+| `AvailableCommand`   | Agent command advertised through the bridge                              |
+| `ChannelAgentBridge` | Adapter-facing bridge contract used by `ChannelBase` and `SessionRouter` |
+| `ChannelConfig`      | Channel configuration from `settings.json`                               |
+| `ChannelPlugin`      | Plugin factory interface (what you export)                               |
+| `Envelope`           | Normalized inbound message format                                        |
+| `SenderPolicy`       | `'allowlist' \| 'pairing' \| 'open'`                                     |
+| `GroupPolicy`        | `'disabled' \| 'allowlist' \| 'open'`                                    |
+| `SessionScope`       | `'user' \| 'thread' \| 'single'`                                         |
+| `GroupConfig`        | Per-group settings (e.g. `requireMention`)                               |
+| `SessionTarget`      | Maps a session back to its channel/sender/chat                           |
+| `ToolCallEvent`      | Agent tool-call event delivered to adapters                              |
 
 ## API reference
 
 ### ChannelBase
 
 ```typescript
-constructor(name: string, config: ChannelConfig, bridge: AcpBridge, options?: ChannelBaseOptions)
+constructor(name: string, config: ChannelConfig, bridge: ChannelAgentBridge, options?: ChannelBaseOptions)
 ```
 
 **Abstract methods** (you must implement):
@@ -123,7 +148,7 @@ constructor(name: string, config: ChannelConfig, bridge: AcpBridge, options?: Ch
 | Method                                            | Description                                                                                                                       |
 | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `handleInbound(envelope)`                         | Route an inbound message through the full pipeline (gate checks, commands, session, prompt). Call this from your message handler. |
-| `setBridge(bridge)`                               | Replace the ACP bridge after crash recovery                                                                                       |
+| `setBridge(bridge)`                               | Replace the agent bridge after crash recovery                                                                                     |
 | `registerCommand(name, handler)`                  | Register a custom slash command (e.g. `/mycommand`)                                                                               |
 | `onToolCall(chatId, event)`                       | Hook called on agent tool invocations — override to show indicators                                                               |
 | `onResponseChunk(chatId, chunk, sessionId)`       | Hook called per streaming text chunk — override for progressive display (default: no-op)                                          |
@@ -132,6 +157,57 @@ constructor(name: string, config: ChannelConfig, bridge: AcpBridge, options?: Ch
 **Block streaming:** When `blockStreaming: "on"` is set in the channel config, the base class automatically splits the agent's streaming response into multiple messages at paragraph boundaries. See [Block Streaming](#block-streaming) below.
 
 **Built-in slash commands:** `/clear` (`/reset`, `/new`), `/help`, `/status`
+
+**ChannelBaseOptions:**
+
+| Option                 | Description                                                                                                                                                |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `router`               | Optional `SessionRouter`. Omit for the default standalone router.                                                                                          |
+| `proxy`                | Optional proxy URL made available to adapters.                                                                                                             |
+| `registerBridgeEvents` | Set only when the adapter owns a supplied router and `ChannelBase` should consume bridge events directly. Leave unset for routers supplied by the gateway. |
+
+### ChannelAgentBridge
+
+`ChannelAgentBridge` is the adapter-facing contract. Channel adapters, channel plugins, `ChannelBase`, and `SessionRouter` should depend on this type instead of a concrete bridge implementation.
+
+`shellCommand` is optional. Adapters should check for it before enabling `!cmd`-style features because daemon-managed hosts expose it only when the connected daemon supports shell execution.
+
+```typescript
+interface ChannelAgentBridge {
+  readonly availableCommands: AvailableCommand[];
+  on(eventName: 'toolCall', listener: (event: ToolCallEvent) => void): unknown;
+  on(
+    eventName: 'textChunk',
+    listener: (sessionId: string, chunk: string) => void,
+  ): unknown;
+  on(
+    eventName: 'sessionDied',
+    listener: (event: { sessionId: string; reason?: string }) => void,
+  ): unknown;
+  off(eventName: 'toolCall', listener: (event: ToolCallEvent) => void): unknown;
+  off(
+    eventName: 'textChunk',
+    listener: (sessionId: string, chunk: string) => void,
+  ): unknown;
+  off(
+    eventName: 'sessionDied',
+    listener: (event: { sessionId: string; reason?: string }) => void,
+  ): unknown;
+  newSession(cwd: string): Promise<string>;
+  loadSession(sessionId: string, cwd: string): Promise<string>;
+  prompt(
+    sessionId: string,
+    text: string,
+    options?: { imageBase64?: string; imageMimeType?: string },
+  ): Promise<string>;
+  cancelSession(sessionId: string): Promise<void>;
+  shellCommand?(
+    sessionId: string,
+    command: string,
+    signal?: AbortSignal,
+  ): Promise<{ exitCode: number | null; output: string; aborted: boolean }>;
+}
+```
 
 ### AcpBridge
 
@@ -160,10 +236,10 @@ constructor(options: { cliEntryPath: string; cwd: string; model?: string })
 
 ### SessionRouter
 
-Maps senders to ACP sessions based on the configured scope.
+Maps senders to agent sessions based on the configured scope.
 
 ```typescript
-constructor(bridge: AcpBridge, defaultCwd: string, scope?: SessionScope, persistPath?: string)
+constructor(bridge: ChannelAgentBridge, defaultCwd: string, scope?: SessionScope, persistPath?: string)
 ```
 
 **Routing keys by scope:**
@@ -174,12 +250,13 @@ constructor(bridge: AcpBridge, defaultCwd: string, scope?: SessionScope, persist
 | `thread`         | `channel:threadId`        | One session per thread                    |
 | `single`         | `channel:__single__`      | One shared session for the entire channel |
 
-| Method                                                    | Description                                                 |
-| --------------------------------------------------------- | ----------------------------------------------------------- |
-| `resolve(channelName, senderId, chatId, threadId?, cwd?)` | Get or create a session for the given sender                |
-| `removeSession(channelName, senderId, chatId?)`           | Remove session(s) — used by `/clear`                        |
-| `restoreSessions()`                                       | Reload sessions from disk after bridge restart              |
-| `clearAll()`                                              | Clear all sessions and delete persist file (clean shutdown) |
+| Method                                                     | Description                                                 |
+| ---------------------------------------------------------- | ----------------------------------------------------------- |
+| `resolve(channelName, senderId, chatId, threadId?, cwd?)`  | Get or create a session for the given sender                |
+| `removeSession(channelName, senderId, chatId?, threadId?)` | Remove session(s) — used by `/clear`                        |
+| `removeSessionId(sessionId)`                               | Remove all routing state for a bridge session ID            |
+| `restoreSessions()`                                        | Reload sessions from disk after bridge restart              |
+| `clearAll()`                                               | Clear all sessions and delete persist file (clean shutdown) |
 
 ### SenderGate
 

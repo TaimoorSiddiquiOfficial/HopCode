@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as os from 'os';
 import { createDebugLogger } from './debugLogger.js';
 import { isInternalPromptId } from './internalPromptIds.js';
+import { getRateLimitErrorDetails } from './rateLimit.js';
 
 const debugLogger = createDebugLogger('OPENAI_LOGGER');
 const MAIN_SESSION_PROMPT_ID_DELIMITER = '########';
@@ -175,12 +176,7 @@ export class OpenAILogger {
       timestamp: new Date().toISOString(),
       request,
       response: response || null,
-      error: error
-        ? {
-            message: error.message,
-            stack: error.stack,
-          }
-        : null,
+      error: error ? serializeError(error) : null,
       context: contextForPromptId(promptId),
       system: {
         hostname: os.hostname(),

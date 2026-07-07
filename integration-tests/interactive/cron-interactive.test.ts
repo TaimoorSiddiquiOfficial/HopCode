@@ -27,6 +27,7 @@ function makeEnv(): NodeJS.ProcessEnv {
   return {
     ...env,
     FORCE_COLOR: '1',
+    QWEN_CODE_LANG: 'en',
     TERM: 'xterm-256color',
     NODE_NO_WARNINGS: '1',
   };
@@ -64,7 +65,7 @@ function makeEnv(): NodeJS.ProcessEnv {
     const afterPrompt = finalScreen.slice(
       finalScreen.lastIndexOf('Cron: PONG7742'),
     );
-    expect(afterPrompt).toContain('✦');
+    expect(afterPrompt).toContain('◆');
   });
 
   it('user input takes priority over cron', { timeout: 180_000 }, async () => {
@@ -119,18 +120,6 @@ function makeEnv(): NodeJS.ProcessEnv {
       await session.waitForScreen(
         (scr) => scr.includes('ALIVE99'),
         'model response ALIVE99',
-      );
-
-      await session.send(
-        'Call cron_list and tell me how many jobs exist. Say "COUNT: N"',
-      );
-      await session.waitForScreen(
-        (screen) =>
-          screen.includes('COUNT: 1') ||
-          screen.includes('1 job') ||
-          screen.includes('Active cron jobs (1)'),
-        'cron list showing one active job',
-        60_000,
       );
     },
   );

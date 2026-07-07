@@ -178,6 +178,7 @@ export default {
   'toolDisplayName.SaveMemory': '保存记忆',
   'toolDisplayName.Agent': 'Agent',
   'toolDisplayName.Artifact': '制品',
+  'toolDisplayName.RecordArtifact': '记录制品',
   'toolDisplayName.Skill': '技能',
   'toolDisplayName.EnterPlanMode': '进入计划模式',
   'toolDisplayName.ExitPlanMode': '退出计划模式',
@@ -199,6 +200,7 @@ export default {
   'toolDisplayName.TaskStop': '停止任务',
   'toolDisplayName.TeamCreate': '创建团队',
   'toolDisplayName.TeamDelete': '删除团队',
+  'toolDisplayName.TeamPlanApproval': '团队计划审批',
   'toolDisplayName.SendMessage': '发送消息',
   'toolDisplayName.StructuredOutput': '结构化输出',
   'toolDisplayName.Monitor': '监控',
@@ -504,7 +506,7 @@ export default {
   'Open in editor': '在编辑器中打开',
   'Edit tools': '编辑工具',
   'Edit color': '编辑颜色',
-  '❌ Error:': '❌ 错误:',
+  '✗ Error:': '✗ 错误:',
   'Are you sure you want to delete agent "{{name}}"?':
     '您确定要删除智能体 "{{name}}" 吗？',
   // ============================================================================
@@ -517,7 +519,7 @@ export default {
     '子智能体 "{{name}}" 已保存到 {{level}} 级别。',
   'Name: ': '名称: ',
   'Location: ': '位置: ',
-  '❌ Error saving subagent:': '❌ 保存子智能体时出错:',
+  '✗ Error saving subagent:': '✗ 保存子智能体时出错:',
   'Warnings:': '警告:',
   'Name "{{name}}" already exists at {{level}} level - will overwrite existing subagent':
     '名称 "{{name}}" 在 {{level}} 级别已存在 - 将覆盖现有子智能体',
@@ -1306,6 +1308,7 @@ export default {
   'Size:': '大小：',
   '{{count}} bytes': '{{count}} 字节',
   'Reference in chat': '在对话中引用',
+  'MCP server': 'MCP 服务器',
   'MCP resource server': 'MCP 资源服务器',
 
   // Invalid tool related translations
@@ -1350,8 +1353,12 @@ export default {
     '切换此会话的模型（--fast 可设置建议模型）',
   'Switch the model for this session (--fast for suggestion model, --voice for voice transcription model, [model-id] to switch immediately).':
     '切换此会话的模型（--fast 可设置建议模型，--voice 可设置语音转写模型，[model-id] 可立即切换）',
-  'Switch the model for this session (--fast for suggestion model, --voice for voice transcription model, --vision for the vision bridge model, [model-id] to switch immediately).':
-    '切换此会话的模型（--fast 可设置建议模型，--voice 可设置语音转写模型，--vision 可设置视觉桥接模型，[model-id] 可立即切换）',
+  'Switch the model for this session (--fast for suggestion model, --voice for voice transcription model, --vision for the vision bridge model, [model-id] to switch immediately, or [model-id] [prompt] to run a one-off prompt on another model; the inline prompt is sent verbatim without @file expansion).':
+    '切换此会话的模型（--fast 可设置建议模型，--voice 可设置语音转写模型，--vision 可设置视觉桥接模型，[model-id] 可立即切换，或用 [model-id] [prompt] 在另一个模型上运行一次性提示；内联提示按原文发送，不展开 @file）',
+  "Inline one-shot override isn't supported in this mode — run '/model {{model}}' first, then send your prompt.":
+    "此模式不支持内联一次性覆盖——请先运行 '/model {{model}}'，再发送你的提示。",
+  "Inline one-shot override can't switch providers. '{{model}}' belongs to a different provider — run '/model {{model}}' first, then send your prompt.":
+    "内联一次性覆盖无法切换 provider。'{{model}}' 属于另一个 provider——请先运行 '/model {{model}}'，再发送你的提示。",
   "⚠ '{{model}}' is not a known image-capable model; the vision bridge may fail on images.":
     "⚠ '{{model}}' 不是已知的图像能力模型；视觉桥接处理图片时可能会失败。",
   'Set a lighter model for prompt suggestions and speculative execution':
@@ -1506,9 +1513,9 @@ export default {
   'Choose how to proceed with your session:': '选择如何继续您的会话：',
   'Start new chat session': '开始新的聊天会话',
   'Continue previous conversation': '继续之前的对话',
-  '👋 Welcome back! (Last updated: {{timeAgo}})':
-    '👋 欢迎回来！（最后更新：{{timeAgo}}）',
-  '🎯 Overall Goal:': '🎯 总体目标：',
+  'Welcome back! (Last updated: {{timeAgo}})':
+    '欢迎回来！（最后更新：{{timeAgo}}）',
+  'Overall Goal:': '总体目标：',
   'Connect a Provider': '连接服务商',
   'You must connect a provider to proceed. Press Ctrl+C again to exit.':
     '必须连接一个服务商才能继续。再次按 Ctrl+C 退出',
@@ -1691,8 +1698,8 @@ export default {
   // MCP Status
   // ============================================================================
   'No MCP servers configured.': '未配置 MCP servers',
-  '⏳ MCP servers are starting up ({{count}} initializing)...':
-    '⏳ MCP servers 正在启动（{{count}} 个正在初始化）...',
+  '◌ MCP servers are starting up ({{count}} initializing)...':
+    '◌ MCP servers 正在启动（{{count}} 个正在初始化）...',
   'Note: First startup may take longer. Tool availability will update automatically.':
     '注意：首次启动可能需要更长时间。工具可用性将自动更新',
   'Configured MCP servers:': '已配置的 MCP servers：',
@@ -1715,7 +1722,7 @@ export default {
   'Prompts:': '提示：',
   'Resources:': '资源：',
   Blocked: '已阻止',
-  '💡 Tips:': '💡 提示：',
+  '★ Tips:': '★ 提示：',
   Use: '使用',
   'to show server and tool descriptions': '显示服务器和工具描述',
   'to show tool parameter schemas': '显示 tool parameter schemas',
@@ -2055,7 +2062,7 @@ export default {
   'Enter your Coding Plan API key: ': '请输入您的 Coding Plan API Key：',
   'Select authentication method:': '选择认证方式：',
   '\n=== Authentication Status ===\n': '\n=== 认证状态 ===\n',
-  '⚠️  No authentication method configured.\n': '⚠️  未配置认证方式。\n',
+  '⚠  No authentication method configured.\n': '⚠  未配置认证方式。\n',
   'Run one of the following commands to get started:\n':
     '运行以下命令之一开始配置：\n',
   '  qwen auth hopcode-oauth     - Authenticate with HopCode OAuth (discontinued)':
@@ -2076,8 +2083,8 @@ export default {
   '  Current Model: {{model}}': '  当前模型：{{model}}',
   '  Config Version: {{version}}': '  配置版本：{{version}}',
   '  Status: API key configured\n': '  状态：API Key 已配置\n',
-  '⚠️  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)':
-    '⚠️  认证方式：阿里云百炼 Coding Plan（不完整）',
+  '⚠  Authentication Method: Alibaba Cloud Coding Plan (Incomplete)':
+    '⚠  认证方式：阿里云百炼 Coding Plan（不完整）',
   '  Issue: API key not found in environment or settings\n':
     '  问题：在环境变量或设置中未找到 API Key\n',
   '  Run `hopcode auth coding-plan` to re-configure.\n':
@@ -2095,6 +2102,8 @@ export default {
     '紧凑模式下隐藏工具输出和思考过程，界面更简洁（Ctrl+O 切换）。',
   'Press Ctrl+O to show full tool output': '按 Ctrl+O 查看详细工具调用结果',
   'Switch to plan mode or exit plan mode': '切换到计划模式或退出计划模式',
+  'Set how hard reasoning-capable models think ({{tiers}}); mapped and clamped per provider.':
+    '设置具备推理能力的模型思考的强度（{{tiers}}）；按各提供方进行映射与钳制。',
   'Set a goal — keep working until the condition is met':
     '设定目标 — 持续工作直到条件满足',
   'Exited plan mode. Previous approval mode restored.':

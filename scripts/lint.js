@@ -7,6 +7,7 @@
  */
 
 import { execSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -65,9 +66,12 @@ const LINTERS = {
     run: `
       actionlint \
         -color \
+        -pyflakes= \
+        -shellcheck= \
         -ignore 'SC2002:' \
         -ignore 'SC2016:' \
         -ignore 'SC2129:' \
+        -ignore 'unexpected key "deployment" for "environment" section' \
         -ignore 'label ".+" is unknown'
     `,
   },

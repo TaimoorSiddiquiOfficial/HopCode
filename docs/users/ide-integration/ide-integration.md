@@ -119,7 +119,7 @@ If you encounter issues with IDE integration, here are some common error message
     1.  Make sure you have installed the **HopCode Companion** extension in your IDE and that it is enabled.
     2.  Open a new terminal window in your IDE to ensure it picks up the correct environment.
 
-- **Message:** `🔴 Disconnected: IDE connection error. The connection was lost unexpectedly. Please try reconnecting by running /ide enable`
+- **Message:** `● Disconnected: IDE connection error. The connection was lost unexpectedly. Please try reconnecting by running /ide enable`
   - **Cause:** The connection to the IDE companion was lost.
   - **Solution:** Run `/ide enable` to try and reconnect. If the issue continues, open a new terminal window or restart your IDE.
 
@@ -129,7 +129,7 @@ If you encounter issues with IDE integration, here are some common error message
   - **Cause:** The CLI's current working directory is outside the folder or workspace you have open in your IDE.
   - **Solution:** `cd` into the same directory that is open in your IDE and restart the CLI.
 
-- **Message:** `🔴 Disconnected: To use this feature, please open a workspace folder in [IDE Name] and try again.`
+- **Message:** `● Disconnected: To use this feature, please open a workspace folder in [IDE Name] and try again.`
   - **Cause:** You have no workspace open in your IDE.
   - **Solution:** Open a workspace in your IDE and restart the CLI.
 

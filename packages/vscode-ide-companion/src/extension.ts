@@ -371,6 +371,11 @@ export async function activate(context: vscode.ExtensionContext) {
           const terminalOptions: vscode.TerminalOptions = {
             name: `HopCode (${selectedFolder.name})`,
             cwd: selectedFolder.uri.fsPath,
+            env: {
+              [IDE_WORKSPACE_PATH_ENV_VAR]: JSON.stringify(
+                workspaceFolders.map((folder) => folder.uri.fsPath),
+              ),
+            },
             location,
           };
 
