@@ -451,10 +451,10 @@ describe('CLI entry import boundary', () => {
       /from ['"]\.\.\/acp-session-bridge\.js['"]/,
     );
     expect(requestHelpersSource).toContain(
-      "import type { AcpSessionBridge } from '@qwen-code/acp-bridge/bridgeTypes';",
+      "import type { AcpSessionBridge } from '@hoptrendy/acp-bridge/bridgeTypes';",
     );
     expect(requestHelpersSource).toContain(
-      "import { MAX_WORKSPACE_PATH_LENGTH } from '@qwen-code/acp-bridge/workspacePaths';",
+      "import { MAX_WORKSPACE_PATH_LENGTH } from '@hoptrendy/acp-bridge/workspacePaths';",
     );
   });
 
@@ -473,11 +473,11 @@ describe('CLI entry import boundary', () => {
     ).toEqual([]);
 
     const forbiddenExternalImports = [
-      '@qwen-code/acp-bridge',
-      '@qwen-code/acp-bridge/bridge',
-      '@qwen-code/acp-bridge/spawnChannel',
-      '@qwen-code/acp-bridge/bridgeClient',
-      '@qwen-code/acp-bridge/bridgeErrors',
+      '@hoptrendy/acp-bridge',
+      '@hoptrendy/acp-bridge/bridge',
+      '@hoptrendy/acp-bridge/spawnChannel',
+      '@hoptrendy/acp-bridge/bridgeClient',
+      '@hoptrendy/acp-bridge/bridgeErrors',
     ];
     const forbiddenImports = [...graph.externalValueImports].filter(
       (specifier) => forbiddenExternalImports.includes(specifier),

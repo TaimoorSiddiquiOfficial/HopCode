@@ -459,8 +459,8 @@ describe('workspace memory routes', () => {
         .spyOn(Storage, 'getGlobalHopCodeDir')
         .mockImplementation(() => {
           throw new Error('boom');
-        },
-      });
+        });
+      void failGlobal;
       const res = await request(app).get('/workspace/memory');
       expect(res.status).toBe(500);
       expect(res.body.code).toBe('memory_discovery_failed');

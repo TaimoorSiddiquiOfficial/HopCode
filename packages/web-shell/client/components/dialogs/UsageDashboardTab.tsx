@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -9,7 +9,7 @@ import {
   useUsageDashboard,
   type DaemonUsageRange,
   type DaemonUsageModelShare,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../../i18n';
 import { formatMegaTokens } from '../../utils/formatTokenCount';
 import { TokenHeatmap } from './TokenHeatmap';

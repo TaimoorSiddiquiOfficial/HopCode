@@ -1,10 +1,13 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 hopcode Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ApprovalMode } from '@hoptrendy/hopcode-core';
+import type {
+  ApprovalMode,
+  SessionGroupColor,
+} from '@hoptrendy/hopcode-core';
 import type {
   CancelNotification,
   LoadSessionResponse,
@@ -242,7 +245,7 @@ export interface BridgeClientRequestContext {
    *
    * **Security**: this is NOT computed from `X-Forwarded-For` or any
    * other forwardable HTTP header — those are forgeable. Callers that
-   * reverse-proxy `hopcode serve` should not rely on `local-only` (use a
+   * reverse-proxy `qwen serve` should not rely on `local-only` (use a
    * dedicated daemon or `designated` policy instead).
    */
   fromLoopback?: boolean;
@@ -266,7 +269,7 @@ export interface BridgeClientRequestContext {
  * Returned from `recordHeartbeat`. `lastSeenAt` is the server-side
  * `Date.now()` epoch (ms) the bridge stored for this session/client
  * pair. `clientId` is echoed only when the caller provided a trusted
- * one through `X-HopCode-Client-Id`; anonymous heartbeats omit it but
+ * one through `X-Qwen-Client-Id`; anonymous heartbeats omit it but
  * still bump the per-session timestamp.
  */
 export interface BridgeHeartbeatResult {
@@ -288,13 +291,13 @@ export interface BridgeHeartbeatState {
 }
 
 /**
- * ACP ext-method the spawned `hopcode --acp` child calls between tool batches to
+ * ACP ext-method the spawned `qwen --acp` child calls between tool batches to
  * pull user messages the browser queued mid-turn. The child-side caller
  * (`cli/src/acp-integration/session/Session.ts`) and the daemon-side answerer
  * (`bridgeClient.ts`) both import THIS single definition, so a rename can't
  * silently desync them into a runtime `-32601 methodNotFound` (which would
  * latch the drain off for the session). The desktop ACP client answers the same
- * method from its own in-memory queue; in `hopcode serve` the daemon answers it
+ * method from its own in-memory queue; in `qwen serve` the daemon answers it
  * from `SessionEntry.midTurnMessageQueue`.
  */
 export const MID_TURN_QUEUE_DRAIN_METHOD = 'craft/drainMidTurnQueue';
@@ -647,7 +650,7 @@ export interface AcpSessionBridge {
 
   /**
    * Union of every live session's `clientIds`. Used by workspace-level
-   * mutation routes to validate the optional `X-HopCode-Client-Id` header.
+   * mutation routes to validate the optional `X-Qwen-Client-Id` header.
    * Returns a snapshot — callers must not mutate.
    */
   knownClientIds(): ReadonlySet<string>;
@@ -856,7 +859,7 @@ export interface AcpSessionBridge {
 
   /**
    * Generate a one-sentence "where did I leave off" recap of a live
-   * session. Forwards through `hopcode/control/session/recap`, which
+   * session. Forwards through `qwen/control/session/recap`, which
    * invokes `generateSessionRecap` (`core/services/sessionRecap.ts`) in
    * the ACP child against the per-session chat history.
    *
@@ -1095,7 +1098,7 @@ export interface AcpSessionBridge {
 
   /**
    * Active permission mediation policy. Reflects
-   * the value `runHopCodeServe` resolved from
+   * the value `runQwenServe` resolved from
    * `settings.policy.permissionStrategy` (or the
    * `'first-responder'` default). Surfaced through the
    * `/capabilities` envelope's `policy.permission` field so SDK

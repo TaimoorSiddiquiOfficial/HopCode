@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useConnection } from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../../i18n';
 import { useListboxKeyboard } from '../../hooks/useListboxKeyboard';
@@ -228,7 +228,7 @@ export function ModelDialog({
               label={t('model.contextWindow')}
               value={formatContextWindow(selectedModel.contextWindow, t)}
             />
-            {getAuthType(selectedModel) !== 'hopcode-oauth' ? (
+            {getAuthType(selectedModel) !== 'qwen-oauth' ? (
               <>
                 <DetailRow
                   label={t('model.baseUrl')}

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 hopcode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -45,7 +45,7 @@ import {
   ClientMcpRegistrar,
   ToolNames,
   type ClientMcpFrame,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js';
 import { BridgeClient } from './bridgeClient.js';
 import type { BridgeFileSystem } from './bridgeFileSystem.js';

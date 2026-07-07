@@ -8,14 +8,17 @@ import {
   telegramFormat,
   splitHtmlForTelegram,
 } from 'telegram-markdown-formatter';
-import { ChannelBase } from '@hoptrendy/channel-base';
+import {
+  ChannelBase,
+  isTerminalTaskLifecycleType,
+} from '@hoptrendy/channel-base';
 import type {
   ChannelAgentBridge,
   ChannelBaseOptions,
   ChannelConfig,
   ChannelTaskLifecycleEvent,
   Envelope,
-  AcpBridge,
+  SessionTarget,
 } from '@hoptrendy/channel-base';
 
 // ──────────────────────────────────────────────────────────────

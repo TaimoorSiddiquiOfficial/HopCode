@@ -80,6 +80,39 @@ function contextForPromptId(
   };
 }
 
+function getString(value: unknown): string | undefined {
+  return typeof value === 'string' && value ? value : undefined;
+}
+
+function getErrorRequestId(error: Error): string | undefined {
+  const source = error as {
+    requestID?: unknown;
+    request_id?: unknown;
+    requestId?: unknown;
+    response_id?: unknown;
+  };
+  return (
+    getString(source.requestID) ??
+    getString(source.request_id) ??
+    getString(source.requestId) ??
+    getString(source.response_id) ??
+    getRateLimitErrorDetails(error).requestId
+  );
+}
+
+function serializeError(error: Error): {
+  message: string;
+  stack?: string;
+  requestId?: string;
+} {
+  const requestId = getErrorRequestId(error);
+  return {
+    message: error.message,
+    stack: error.stack,
+    ...(requestId ? { requestId } : {}),
+  };
+}
+
 function sanitizeDiagnosticSuffix(
   suffix: string | undefined,
 ): string | undefined {

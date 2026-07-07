@@ -68,7 +68,7 @@ function hashedThreadPath(target: ChannelMemoryTarget): string {
 
 export function getChannelMemoryFilePath(target: ChannelMemoryTarget): string {
   return path.join(
-    Storage.getGlobalQwenDir(),
+    Storage.getGlobalHopCodeDir(),
     'channels',
     'memory',
     safeChannelName(target.channelName),

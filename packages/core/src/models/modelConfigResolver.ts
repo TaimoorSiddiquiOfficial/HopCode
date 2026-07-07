@@ -23,6 +23,7 @@ import type { ContentGeneratorConfig } from '../core/contentGenerator.js';
 import { DEFAULT_HOPCODE_MODEL } from '../config/models.js';
 import { defaultModalities } from '../core/modalityDefaults.js';
 import { knownTokenLimit } from '../core/tokenLimits.js';
+import { parsePositiveIntegerEnv } from '../utils/env.js';
 import {
   resolveField,
   resolveOptionalField,
@@ -121,7 +122,7 @@ function applyTimeoutEnvOverride(
 ): void {
   if (modelProvider?.generationConfig?.timeout !== undefined) return;
 
-  const raw = env['HOPCODE_API_TIMEOUT_MS'] ?? env['HOPCODE_API_TIMEOUT_MS'];
+  const raw = env['HOPCODE_API_TIMEOUT_MS'];
   if (raw === undefined) return;
 
   const parsed = parsePositiveIntegerEnv(raw, 0);

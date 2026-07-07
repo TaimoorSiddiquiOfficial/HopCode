@@ -8,8 +8,8 @@ import type {
   ChannelBaseOptions,
   ChannelPlugin,
   ToolCallEvent,
-} from '@qwen-code/channel-base';
-import { sanitizeLogText } from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
+import { sanitizeLogText } from '@hoptrendy/channel-base';
 import { loadSettings, type LoadedSettings } from '../../config/settings.js';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { getExtensionManager } from '../extensions/utils.js';

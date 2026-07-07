@@ -23,7 +23,7 @@ import type {
   ChannelBaseOptions,
   Envelope,
   Attachment,
-  AcpBridge,
+  ChannelAgentBridge,
 } from '@hoptrendy/channel-base';
 
 const DISCORD_MAX_LENGTH = 2000;
@@ -77,7 +77,7 @@ export class DiscordChannel extends ChannelBase {
   constructor(
     name: string,
     config: ChannelConfig,
-    bridge: AcpBridge,
+    bridge: ChannelAgentBridge,
     options?: ChannelBaseOptions,
   ) {
     super(name, config, bridge, options);

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Config } from '@hoptrendy/hopcode-core';
+import type { Config, ToolArtifact } from '@hoptrendy/hopcode-core';
 import type { Part } from '@google/genai';
 import type {
   SessionUpdate,

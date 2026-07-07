@@ -2119,7 +2119,7 @@ export class GeminiChat {
         const hasUserMaxTokensOverride =
           (cgConfig?.samplingParams?.max_tokens !== undefined &&
             cgConfig?.samplingParams?.max_tokens !== null) ||
-          !!process.env['HOPCODE_MAX_OUTPUT_TOKENS'];
+          parsedEnvMaxTokens !== undefined;
 
         let lastFinishReason: string | undefined;
 
@@ -2985,7 +2985,7 @@ export class GeminiChat {
       extraRetryErrorCodes,
       persistentMode,
       signal: params.config?.abortSignal,
-      heartbeatFn: (info) => {
+      heartbeatFn: (info: HeartbeatInfo) => {
         process.stderr.write(
           `[hopcode] Waiting for API capacity... attempt ${info.attempt}, retry in ${Math.ceil(info.remainingMs / 1000)}s\n`,
         );

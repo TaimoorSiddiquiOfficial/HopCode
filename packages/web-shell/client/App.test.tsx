@@ -115,7 +115,7 @@ const {
   };
 });
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   DAEMON_APPROVAL_MODES: ['default', 'plan', 'auto-edit', 'auto', 'yolo'],
   useActions: () => mockSessionActions,
   useConnection: () => mockConnection,
@@ -139,8 +139,8 @@ vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
   useWorkspaceEventSignals: () => ({ extensionsVersion: 0 }),
 }));
 
-vi.mock('@qwen-code/sdk/daemon', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@qwen-code/sdk/daemon')>()),
+vi.mock('@hoptrendy/sdk/daemon', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@hoptrendy/sdk/daemon')>()),
   isDaemonTurnError: () => false,
 }));
 

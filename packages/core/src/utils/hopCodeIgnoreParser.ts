@@ -172,7 +172,6 @@ export class HopCodeIgnoreParser implements HopCodeIgnoreFilter {
       return null;
     }
 
-    const isDir = filePath.endsWith('/');
     const resolved = path.resolve(this.projectRoot, filePath);
     const relativePath = path.relative(this.projectRoot, resolved);
 

@@ -106,43 +106,36 @@ function truncateStringifiedErrorMessage(message: string): string {
 
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
-    const messages: string[] = [error.message];
-    const seen = new Set<unknown>([error]);
-    let currentCause = error.cause;
-    let depth = 0;
-    const MAX_DEPTH = 10;
-
-    while (currentCause instanceof Error && depth < MAX_DEPTH) {
-      if (seen.has(currentCause)) {
-        break;
-      }
-      seen.add(currentCause);
-
-      if (
-        currentCause.message &&
-        currentCause.message !== messages[messages.length - 1]
-      ) {
-        messages.push(currentCause.message);
-      }
-      currentCause = currentCause.cause;
-      depth++;
-    }
-    if (messages.length > 1) {
-      return `${messages[0]} (cause: ${messages.slice(1).join(' -> ')})`;
-    }
-    const causeDescription = describeErrorCause(error.cause);
-    if (causeDescription) {
-      return `${error.message} (cause: ${causeDescription})`;
+    const detail = describeErrorCause(error.cause);
+    if (detail && detail !== error.message) {
+      return truncateStringifiedErrorMessage(
+        `${error.message} (cause: ${detail})`,
+      );
     }
     return error.message;
   }
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof (error as { message: unknown }).message === 'string'
-  ) {
-    return (error as { message: string }).message;
+  if (error !== null && typeof error === 'object' && !Array.isArray(error)) {
+    const { message, cause } = error as {
+      message?: unknown;
+      cause?: unknown;
+    };
+    if (typeof message === 'string' && message.trim()) {
+      const detail = describeErrorCause(cause);
+      const result =
+        detail && detail !== message
+          ? `${message} (cause: ${detail})`
+          : message;
+      return truncateStringifiedErrorMessage(result);
+    }
+    try {
+      const serialized = JSON.stringify(error);
+      return serialized
+        ? truncateStringifiedErrorMessage(serialized)
+        : String(error);
+    } catch {
+      const detail = describeSingleError(error);
+      return detail ? truncateStringifiedErrorMessage(detail) : String(error);
+    }
   }
   try {
     return String(error);

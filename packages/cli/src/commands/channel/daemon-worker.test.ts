@@ -134,13 +134,13 @@ vi.mock('./runtime.js', () => ({
   sessionsPath: mockSessionsPath,
 }));
 
-vi.mock('@qwen-code/channel-base', () => ({
+vi.mock('@hoptrendy/channel-base', () => ({
   DaemonChannelBridge: mockDaemonChannelBridge,
   sanitizeLogText: mockSanitizeLogText,
   SessionRouter: mockSessionRouter,
 }));
 
-vi.mock('@qwen-code/sdk/daemon', () => ({
+vi.mock('@hoptrendy/sdk/daemon', () => ({
   DaemonClient: mockDefaultDaemonClient,
   DaemonSessionClient: mockDefaultDaemonSessionClient,
 }));

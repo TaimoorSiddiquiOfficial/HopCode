@@ -20,7 +20,7 @@ import type { GroupHistoryEntry } from './group-history-store.js';
 import { SenderGate } from './SenderGate.js';
 import { PairingStore } from './PairingStore.js';
 import { SessionRouter } from './SessionRouter.js';
-import { getGlobalQwenDir } from './paths.js';
+import { getGlobalHopCodeDir } from './paths.js';
 import {
   sanitizeSenderName,
   sanitizeQuotedText,
@@ -256,7 +256,7 @@ export abstract class ChannelBase {
     this.groupHistory = new GroupHistoryStore(
       options?.groupHistoryPath ??
         join(
-          getGlobalQwenDir(),
+          getGlobalHopCodeDir(),
           'channels',
           `${encodeURIComponent(name)}-group-history.jsonl`,
         ),

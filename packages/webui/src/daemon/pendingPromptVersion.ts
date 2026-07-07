@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -8,14 +8,14 @@ import {
   PENDING_PROMPT_ADDED_EVENT,
   PENDING_PROMPT_STARTED_EVENT,
   PENDING_PROMPT_COMPLETED_EVENT,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import type {
   DaemonPendingPromptAddedEvent,
   DaemonPendingPromptStartedEvent,
   DaemonPendingPromptCompletedEvent,
   DaemonTurnCompleteEvent,
   DaemonTurnErrorEvent,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 
 /**
  * Simple version counter for pending-prompt queue changes.

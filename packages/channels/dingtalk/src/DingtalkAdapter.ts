@@ -5,14 +5,21 @@ import { tmpdir } from 'node:os';
 import { Buffer } from 'node:buffer';
 import { DWClient, TOPIC_ROBOT, EventAck } from 'dingtalk-stream-sdk-nodejs';
 import type { DWClientDownStream } from 'dingtalk-stream-sdk-nodejs';
-import { ChannelBase } from '@hoptrendy/channel-base';
+import {
+  ChannelBase,
+  isTerminalTaskLifecycleType,
+  sanitizeLogText,
+  sanitizeSenderName,
+} from '@hoptrendy/channel-base';
 import { normalizeDingTalkMarkdown, extractTitle } from './markdown.js';
 import { downloadMedia } from './media.js';
 import type {
-  ChannelConfig,
+  ChannelAgentBridge,
   ChannelBaseOptions,
+  ChannelConfig,
+  ChannelTaskLifecycleEvent,
   Envelope,
-  AcpBridge,
+  SessionTarget,
 } from '@hoptrendy/channel-base';
 
 /**

@@ -7,12 +7,16 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { basename, join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { ChannelBase } from '@hoptrendy/channel-base';
+import {
+  ChannelBase,
+  isTerminalTaskLifecycleType,
+} from '@hoptrendy/channel-base';
 import type {
-  ChannelConfig,
+  ChannelAgentBridge,
   ChannelBaseOptions,
+  ChannelConfig,
+  ChannelTaskLifecycleEvent,
   Envelope,
-  AcpBridge,
 } from '@hoptrendy/channel-base';
 import { loadAccount, DEFAULT_BASE_URL } from './accounts.js';
 import { startPollLoop, getContextToken } from './monitor.js';

@@ -97,6 +97,10 @@ class CronCreateInvocation extends BaseToolInvocation<
       const where = durable
         ? `Persisted to ${CRON_TASKS_DISPLAY_PATH}`
         : 'Session-only (not written to disk, dies when HopCode exits)';
+      const maxAgeDays = this.config.getCronRecurringMaxAgeDays();
+      const expiry = Number.isFinite(maxAgeDays)
+        ? `Auto-expires after ${formatDays(maxAgeDays)}. Use CronDelete to cancel sooner.`
+        : 'Never auto-expires. Use CronDelete to cancel.';
       const llmContent = recurring
         ? `Scheduled recurring job ${job.id} (${job.cronExpr}). ${where}. ` +
           expiry

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -61,6 +61,12 @@ import {
   unregisterGoalHook,
   ToolNames,
   FORK_SUBAGENT_TYPE,
+  runManagedAutoMemoryDream,
+  runManagedRememberByAgent,
+  matchesAnyServerPattern,
+  IMAGE_CAPABILITY,
+  registerAcpEventLoopLagGauge,
+  startEventLoopLagMonitor,
 } from '@hoptrendy/hopcode-core';
 import { randomUUID } from 'node:crypto';
 import type {
@@ -79,7 +85,10 @@ import type {
   SendSdkMcpMessage,
   DiscoveredMCPResource,
   DiscoveredMCPPrompt,
+  WorkspaceRememberContextMode,
+  ChatRecord,
 } from '@hoptrendy/hopcode-core';
+import type { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js';
 import {
   AgentSideConnection,
   RequestError,
@@ -123,7 +132,7 @@ import {
   pickAuthMethodsForAuthRequired,
 } from './authMethods.js';
 import { AcpFileSystemService } from './service/filesystem.js';
-import { ndJsonStream } from '@qwen-code/acp-bridge/ndJsonStream';
+import { ndJsonStream } from '@agentclientprotocol/sdk';
 import { Readable, Writable } from 'node:stream';
 import { normalizeDisabledToolList } from '../config/normalizeDisabledTools.js';
 import { pipeline } from 'node:stream/promises';
@@ -243,7 +252,7 @@ import {
   LOAD_REPLAY_VERSION,
   type ClientMcpOverWsRuntimeConfig,
   type BridgeLoadReplayEnvelope,
-} from '@qwen-code/acp-bridge/bridgeTypes';
+} from '@hoptrendy/acp-bridge/bridgeTypes';
 import { isValidServerName } from '../serve/validate-server-name.js';
 import { MAX_REMEMBER_CONTENT_BYTES } from '../serve/workspace-memory-remember-constants.js';
 import { computeCpuPercent } from '../serve/daemon-metrics-ring.js';
@@ -422,7 +431,7 @@ function hasFailedDisplayStatus(
  *
  * Drift detection: `AUTH_PREFLIGHT_AUDITED_AUTH_TYPES` below lists every
  * `AuthType` enum value that has been triaged for this map (either keyed
- * here, or explicitly waived for non-env-based auth like hopcode-oauth). The
+ * here, or explicitly waived for non-env-based auth like qwen-oauth). The
  * paired test `AUTH_PREFLIGHT_AUDITED_AUTH_TYPES covers every AuthType`
  * walks the public enum and fails CI when core adds a new auth method
  * without a deliberate decision here.
@@ -486,7 +495,7 @@ type QwenManagedSkillFile = {
   content: string;
 };
 
-const PROJECT_SKILL_DIRS = ['.hopcode', '.agents'] as const;
+const PROJECT_SKILL_DIRS = ['.qwen', '.agents'] as const;
 const SKILLS_DIR = 'skills';
 
 type DownloadedSkillFile = {
@@ -526,7 +535,7 @@ type QwenCoreSettingKey =
   | 'general.gitCoAuthor.pr'
   | 'general.defaultFileEncoding'
   | 'context.fileFiltering.respectGitIgnore'
-  | 'context.fileFiltering.respectHopCodeIgnore'
+  | 'context.fileFiltering.respectQwenIgnore'
   | 'context.fileFiltering.enableFuzzySearch'
   | 'memory.enableManagedAutoMemory'
   | 'memory.enableManagedAutoDream'
@@ -596,7 +605,7 @@ const HOPCODE_CORE_SETTING_DEFINITIONS = {
     values: ['utf-8', 'utf-8-bom'],
   },
   'context.fileFiltering.respectGitIgnore': { type: 'boolean' },
-  'context.fileFiltering.respectHopCodeIgnore': { type: 'boolean' },
+  'context.fileFiltering.respectQwenIgnore': { type: 'boolean' },
   'context.fileFiltering.enableFuzzySearch': { type: 'boolean' },
   'memory.enableManagedAutoMemory': { type: 'boolean' },
   'memory.enableManagedAutoDream': { type: 'boolean' },
@@ -4366,7 +4375,7 @@ class QwenAgent implements Agent {
           status: 'warning',
           errorKind: 'auth_env_error',
           error: 'No auth method configured.',
-          hint: 'Run `hopcode` and complete the auth flow, or set a provider env var.',
+          hint: 'Run `qwen` and complete the auth flow, or set a provider env var.',
           detail: { source: 'none', hasToken: false },
         });
       }
@@ -4374,8 +4383,19 @@ class QwenAgent implements Agent {
       const presentVar = apiKeyVars.find((name: string) =>
         Boolean(process.env[name]),
       );
-      const hasToken = Boolean(presentVar);
-      // No env-var registration → either OAuth-style auth (hopcode-oauth) or
+      let hasToken = Boolean(presentVar);
+      if (
+        !hasToken &&
+        !AUTH_PREFLIGHT_WAIVED_AUTH_TYPES.has(String(authType))
+      ) {
+        const resolvedApiKey = config
+          .getModelsConfig()
+          .getGenerationConfig()?.apiKey;
+        if (resolvedApiKey) {
+          hasToken = true;
+        }
+      }
+      // No env-var registration → either OAuth-style auth (qwen-oauth) or
       // a custom provider whose key is sourced from settings rather than
       // env. If the resolved generation config already contains an apiKey
       // we can report 'ok'; otherwise surface 'unknown' so the SDK
@@ -5270,19 +5290,19 @@ class QwenAgent implements Agent {
     cwd?: string,
   ): Promise<QwenManagedSkillFile> {
     if (scope === 'global') {
-      const qwenSkillDir = resolveManagedSkillDir(
+      const hopcodeSkillDir = resolveManagedSkillDir(
         path.join(Storage.getGlobalHopCodeDir(), 'skills'),
         slug,
       );
-      const qwenSkillFile = path.join(qwenSkillDir, 'SKILL.md');
-      const qwenContent = await fs
-        .readFile(qwenSkillFile, 'utf8')
+      const hopcodeSkillFile = path.join(hopcodeSkillDir, 'SKILL.md');
+      const hopcodeContent = await fs
+        .readFile(hopcodeSkillFile, 'utf8')
         .catch(() => undefined);
-      if (qwenContent !== undefined) {
+      if (hopcodeContent !== undefined) {
         return {
-          skillDir: qwenSkillDir,
-          skillFile: qwenSkillFile,
-          content: qwenContent,
+          skillDir: hopcodeSkillDir,
+          skillFile: hopcodeSkillFile,
+          content: hopcodeContent,
         };
       }
     }
@@ -5407,14 +5427,14 @@ class QwenAgent implements Agent {
     const SESSION_ID_RE = /^[0-9a-fA-F-]{32,36}$/;
 
     switch (method) {
-      case 'qwen/providers/list': {
+      case 'hopcode/providers/list': {
         return {
           providers: ALL_PROVIDERS.map((provider) =>
             serializeProviderConfig(provider, this.settings),
           ),
         };
       }
-      case 'qwen/providers/connect': {
+      case 'hopcode/providers/connect': {
         const providerId = readRequiredString(
           params['providerId'],
           'providerId',
@@ -5469,26 +5489,26 @@ class QwenAgent implements Agent {
           ...(effectiveBaseUrl ? { baseUrl: effectiveBaseUrl } : {}),
         };
       }
-      case 'qwen/skills/install': {
+      case 'hopcode/skills/install': {
         return this.installSkillFromUrl(readSkillInstallRequest(params));
       }
-      case 'qwen/skills/delete': {
+      case 'hopcode/skills/delete': {
         return this.deleteGlobalSkill(readSkillSlugRequest(params));
       }
-      case 'qwen/skills/setEnabled': {
+      case 'hopcode/skills/setEnabled': {
         return this.setGlobalSkillEnabled(
           readSkillSetEnabledRequest(params),
           requestedCwd,
         );
       }
-      case 'qwen/settings/getMemory': {
+      case 'hopcode/settings/getMemory': {
         const settings = loadSettings(cwd);
         this.settings = settings;
         return {
           settings: normalizeQwenMemorySettings(settings.merged.memory),
         };
       }
-      case 'qwen/settings/setMemory': {
+      case 'hopcode/settings/setMemory': {
         const updates = toRecord(params['updates']);
         // Mutate a freshly loaded settings object and adopt it, mirroring the
         // other settings mutation handlers, instead of writing through the
@@ -5509,10 +5529,10 @@ class QwenAgent implements Agent {
           settings: normalizeQwenMemorySettings(settings.merged.memory),
         };
       }
-      case 'qwen/settings/getPath': {
+      case 'hopcode/settings/getPath': {
         return { path: this.settings.user.path };
       }
-      case 'qwen/settings/getMemoryPaths': {
+      case 'hopcode/settings/getMemoryPaths': {
         const projectRoot =
           typeof params['projectRoot'] === 'string'
             ? params['projectRoot']
@@ -7353,7 +7373,7 @@ class QwenAgent implements Agent {
           filesFailed,
         };
       }
-      case 'qwen/session/loadUpdates': {
+      case 'hopcode/session/loadUpdates': {
         const sessionId = params['sessionId'] as string;
         if (!sessionId || !SESSION_ID_RE.test(sessionId)) {
           throw RequestError.invalidParams(
@@ -7504,12 +7524,12 @@ class QwenAgent implements Agent {
           },
         );
       }
-      case 'qwen/settings/getCore': {
+      case 'hopcode/settings/getCore': {
         const settings = loadSettings(cwd);
         this.settings = settings;
         return this.buildCoreSettings(settings, cwd);
       }
-      case 'qwen/settings/setCoreValue': {
+      case 'hopcode/settings/setCoreValue': {
         const key = params['key'];
         if (
           typeof key !== 'string' ||
@@ -7552,7 +7572,7 @@ class QwenAgent implements Agent {
         this.settings = settings;
         return this.buildCoreSettings(settings, cwd);
       }
-      case 'qwen/settings/setMcpServer': {
+      case 'hopcode/settings/setMcpServer': {
         const name = params['name'];
         if (typeof name !== 'string' || !name.trim()) {
           throw RequestError.invalidParams(
@@ -7581,7 +7601,7 @@ class QwenAgent implements Agent {
         this.settings = settings;
         return this.buildCoreSettings(settings, cwd);
       }
-      case 'qwen/settings/removeMcpServer': {
+      case 'hopcode/settings/removeMcpServer': {
         const name = params['name'];
         if (typeof name !== 'string' || !name.trim()) {
           throw RequestError.invalidParams(
@@ -7602,7 +7622,7 @@ class QwenAgent implements Agent {
         this.settings = settings;
         return this.buildCoreSettings(settings, cwd);
       }
-      case 'qwen/settings/setHook': {
+      case 'hopcode/settings/setHook': {
         const event = params['event'];
         if (!isHookEvent(event)) {
           throw RequestError.invalidParams(undefined, 'Invalid hook event');
@@ -7649,7 +7669,7 @@ class QwenAgent implements Agent {
         this.settings = settings;
         return this.buildCoreSettings(settings, cwd);
       }
-      case 'qwen/settings/removeHook': {
+      case 'hopcode/settings/removeHook': {
         const event = params['event'];
         if (!isHookEvent(event)) {
           throw RequestError.invalidParams(undefined, 'Invalid hook event');
@@ -7685,7 +7705,7 @@ class QwenAgent implements Agent {
         this.settings = settings;
         return this.buildCoreSettings(settings, cwd);
       }
-      case 'qwen/settings/setExtensionSetting': {
+      case 'hopcode/settings/setExtensionSetting': {
         const extensionId = params['extensionId'];
         const settingKey = params['settingKey'];
         const value = params['value'];
@@ -7733,14 +7753,14 @@ class QwenAgent implements Agent {
         this.settings = settings;
         return this.buildCoreSettings(settings, cwd);
       }
-      case 'qwen/permissions/getSettings': {
+      case 'hopcode/permissions/getSettings': {
         const settings = this.loadPermissionSettings(cwd);
         return buildPermissionSettings(settings) as unknown as Record<
           string,
           unknown
         >;
       }
-      case 'qwen/permissions/setRules': {
+      case 'hopcode/permissions/setRules': {
         const scope = params['scope'];
         const ruleType = params['ruleType'];
         if (scope !== 'user' && scope !== 'workspace') {

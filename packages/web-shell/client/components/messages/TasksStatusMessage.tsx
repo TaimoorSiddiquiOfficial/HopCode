@@ -3,6 +3,13 @@ import type {
   DaemonSessionTasksStatus,
   DaemonSessionTaskStatus,
 } from '@hoptrendy/sdk/daemon';
+import {
+  computeAgentTreeInfo,
+  computeUserBlockingIds,
+  reorderChildrenUnderParents,
+  TREE_INDENT_MAX_LEVELS,
+  type AgentTreeInfo,
+} from './agentForest';
 import { useActions } from '@hoptrendy/webui/daemon-react-sdk';
 import { useDelayedGlobalKeyDown } from '../../hooks/useDelayedGlobalKeyDown';
 import { useI18n } from '../../i18n';

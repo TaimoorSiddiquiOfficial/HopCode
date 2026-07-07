@@ -43,6 +43,7 @@ export const EVENT_SUBAGENT_EXECUTION = 'hopcode.subagent_execution';
 export const EVENT_SKILL_LAUNCH = 'hopcode.skill_launch';
 export const EVENT_AUTH = 'hopcode.auth';
 export const EVENT_USER_FEEDBACK = 'hopcode.user_feedback';
+export const EVENT_TOOL_OUTPUT_TRUNCATED = 'hopcode.tool_output_truncated';
 
 export const DEFAULT_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH = 1024 * 1024;
 export const SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT = 100 * 1024 * 1024;

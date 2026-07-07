@@ -5,7 +5,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import type {
   DaemonSessionAgentTaskStatus,
   DaemonSessionTasksStatus,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { I18nProvider } from '../../i18n';
 
 // The panel only needs getTasks/cancelTask from the daemon SDK; mock the
@@ -15,7 +15,7 @@ const { getTasksMock, cancelTaskMock } = vi.hoisted(() => ({
   getTasksMock: vi.fn(),
   cancelTaskMock: vi.fn(),
 }));
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useActions: () => ({
     getTasks: getTasksMock,
     cancelTask: cancelTaskMock,

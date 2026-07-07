@@ -45,7 +45,7 @@ import { SERVE_STATUS_EXT_METHODS } from './status.js';
 import type { ChannelFactory } from './channel.js';
 import type { BridgeTelemetry } from './bridgeOptions.js';
 import { createInMemoryChannel } from './inMemoryChannel.js';
-import type { BridgeEvent } from './eventBus.js';
+import { EventBus, type BridgeEvent } from './eventBus.js';
 import { ApprovalMode, ShellExecutionService } from '@hoptrendy/hopcode-core';
 import {
   FakeAgent,

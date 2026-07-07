@@ -1,5 +1,12 @@
-import { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import type { DaemonSettingDescriptor } from '@hoptrendy/webui/daemon-react-sdk';
+import {
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import type {
   ACPToolCall,
   PermissionRequest,

@@ -118,10 +118,6 @@ import {
   type SerializedTasksMessage,
 } from './components/messages/TasksStatusMessage';
 import { isBackgroundSubAgentToolCall } from './adapters/toolClassification';
-import {
-  DAEMON_APPROVAL_MODES,
-  type DaemonApprovalMode,
-} from '@hoptrendy/webui/daemon-react-sdk';
 import { serializeContextUsageMessage } from './components/messages/ContextUsageMessage';
 import {
   serializeStatsMessage,
@@ -235,7 +231,7 @@ const MODES_CYCLE = DAEMON_APPROVAL_MODES;
 const MAX_TOASTS = 4;
 const COMPACT_MODE_SETTING_KEY = 'ui.compactMode';
 const HIDE_TIPS_SETTING_KEY = 'ui.hideTips';
-const HIDDEN_COMPOSER_MODEL_IDS = new Set(['coder-model(hopcode-oauth)']);
+const HIDDEN_COMPOSER_MODEL_IDS = new Set(['coder-model(qwen-oauth)']);
 
 /** Maps each ModelDialogMode to its i18n title key — single source of truth. */
 const MODE_TITLE_KEY: Record<ModelDialogMode, string> = {
@@ -463,9 +459,9 @@ const emptyComposerApi: WebShellComposerApi = {
 const DEFAULT_CHAT_MAX_WIDTH = 1000;
 type ChatWidthMode = `${typeof DEFAULT_CHAT_MAX_WIDTH}` | 'wide';
 
-const CHAT_WIDTH_STORAGE_KEY = 'hopcode-web-shell-chat-width';
+const CHAT_WIDTH_STORAGE_KEY = 'qwen-code-web-shell-chat-width';
 const CHAT_SHELL_HORIZONTAL_PADDING = 40;
-const SIDEBAR_COLLAPSED_STORAGE_KEY = 'hopcode-web-shell-sidebar-collapsed';
+const SIDEBAR_COLLAPSED_STORAGE_KEY = 'qwen-code-web-shell-sidebar-collapsed';
 
 function resolveSidebarOptions(
   sidebar: WebShellProps['sidebar'],
@@ -619,7 +615,7 @@ function getModelSwitchSummary(result: unknown): ModelSwitchSummary | null {
   if (!isRecord(result)) return null;
   const meta = result._meta;
   if (!isRecord(meta)) return null;
-  const summary = meta.hopcodeModelSwitch;
+  const summary = meta.qwenModelSwitch;
   if (!isRecord(summary)) return null;
   const authType = summary.authType;
   const modelId = summary.modelId;
@@ -3385,9 +3381,9 @@ export function App({
               if (authSource) {
                 if (
                   authSource.startsWith('oauth') ||
-                  authSource === 'hopcode-oauth'
+                  authSource === 'qwen-oauth'
                 ) {
-                  formattedAuth = 'HopCode OAuth';
+                  formattedAuth = 'Qwen OAuth';
                 } else {
                   formattedAuth = `API Key - ${authSource}`;
                 }
@@ -3396,9 +3392,9 @@ export function App({
               const platformStr = `${sys.platform} ${sys.arch}`.trim();
               const curModel = currentModelRef.current;
               const conn = connectionRef.current;
-              const HopCodeVersion = conn.capabilities?.HopCodeVersion || '';
+              const hopCodeVersion = conn.capabilities?.HopCodeVersion || '';
               const info: StatusInfo = {
-                cliVersion: HopCodeVersion,
+                cliVersion: hopCodeVersion,
                 runtime: runtimeParts.join(' / '),
                 platform: platformStr,
                 auth: formattedAuth,
@@ -3436,10 +3432,10 @@ export function App({
             ])
               .then(([preflight, env]) => {
                 const sys = collectSystemInfo(preflight, env);
-                const HopCodeVersion =
+                const hopCodeVersion =
                   connectionRef.current.capabilities?.HopCodeVersion || '';
                 const sysInfo: Record<string, string> = {};
-                if (HopCodeVersion) sysInfo.cliVersion = HopCodeVersion;
+                if (hopCodeVersion) sysInfo.cliVersion = hopCodeVersion;
                 if (sys.nodeVersion) sysInfo.nodeVersion = sys.nodeVersion;
                 if (sys.npmVersion) sysInfo.npmVersion = sys.npmVersion;
                 if (sys.platform) sysInfo.platform = sys.platform;
@@ -3460,7 +3456,7 @@ export function App({
                     .map(([k, v]) => `${k}: ${v}`)
                     .join('\n');
                   const url =
-                    `https://github.com/TaimoorSiddiquiOfficial/HopCode/issues/new?template=bug_report.yml` +
+                    `https://github.com/QwenLM/qwen-code/issues/new?template=bug_report.yml` +
                     `&title=${encodeURIComponent(bugTitle)}` +
                     `&info=${encodeURIComponent('\n' + fields + '\n')}`;
                   const win = window.open(url, '_blank');

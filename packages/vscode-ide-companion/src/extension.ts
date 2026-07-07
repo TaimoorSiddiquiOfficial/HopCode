@@ -27,6 +27,7 @@ export { createSdkDaemonSessionFactory as __daemonIdeSessionFactoryForBundle } f
 
 const CLI_IDE_COMPANION_IDENTIFIER = 'hopcode.hopcode-vscode-ide-companion';
 const INFO_MESSAGE_SHOWN_KEY = 'hopcodeInfoMessageShown';
+const IDE_WORKSPACE_PATH_ENV_VAR = 'HOPCODE_IDE_WORKSPACE_PATH';
 export const DIFF_SCHEME = 'hopcode-diff';
 
 /**

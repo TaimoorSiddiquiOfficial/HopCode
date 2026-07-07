@@ -1,4 +1,4 @@
-﻿// @vitest-environment jsdom
+// @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -71,7 +71,7 @@ type MockSession = {
   color?: 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple' | null;
 };
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useConnection: () => mockConnection,
   useActions: () => ({ renameSession: renameSessionSpy }),
   useWorkspaceActions: () => mockWorkspaceActions,

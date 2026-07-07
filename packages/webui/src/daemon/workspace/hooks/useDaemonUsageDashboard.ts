@@ -1,11 +1,11 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { useCallback } from 'react';
-import type { DaemonUsageRange } from '@qwen-code/sdk/daemon';
+import type { DaemonUsageRange } from '@hoptrendy/sdk/daemon';
 import { useDaemonWorkspaceActions } from '../DaemonWorkspaceProvider.js';
 import type { DaemonResourceOptions } from '../types.js';
 import { useDaemonResource } from './useDaemonResource.js';

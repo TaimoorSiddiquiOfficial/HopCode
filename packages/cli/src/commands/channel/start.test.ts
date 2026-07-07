@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import type { ChannelBaseOptions } from '@qwen-code/channel-base';
+import type { ChannelBaseOptions } from '@hoptrendy/channel-base';
 
 const mockLoadSettings = vi.hoisted(() => vi.fn());
 const mockGetExtensionManager = vi.hoisted(() => vi.fn());

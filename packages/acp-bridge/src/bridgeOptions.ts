@@ -367,6 +367,25 @@ export interface BridgeOptions {
    */
   sessionIdleTimeoutMs?: number;
   /**
+   * Reverse tool channel (issue #5626, Phase 2). Looks up the
+   * `sendSdkMcpMessage`-shaped sender for a client-hosted MCP server by its
+   * advertised `server` name, returning `undefined` when no client currently
+   * hosts it.
+   *
+   * The `hopcode --acp` child binds its session `McpClientManager`'s
+   * `sendSdkMcpMessage` to a `hopcode/control/client_mcp/message` ext-method
+   * (child → parent). `BridgeClient.extMethod` answers that method by calling
+   * this lookup to reach the per-WS-connection `ClientMcpRegistrar` that
+   * carries the JSON-RPC frame down the daemon WS to the extension and returns
+   * the correlated response.
+   *
+   * Backed by a process-scoped registry the serve layer populates on
+   * `mcp_register` and clears on `mcp_unregister` / WS close. When omitted
+   * (tests, Mode A consumers, channels / IDE companion), the child never
+   * receives an SDK MCP runtime server, so the method is never called.
+   */
+  clientMcpSender?: ClientMcpMessageSender;
+  /**
    * #4175 Wave 4 PR 17 — optional callback for persisting disabled
    * tools to the workspace settings file. Invoked by
    * `setWorkspaceToolEnabled`. When omitted, calls to

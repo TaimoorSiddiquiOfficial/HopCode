@@ -58,7 +58,7 @@ export class StreamInactivityTimeoutError extends Error {
     super(
       `No stream activity for ${idleMs}ms after ${chunksReceived} chunks ` +
         `(stream lifetime: ${streamLifetimeMs}ms). Set ` +
-        `${QWEN_STREAM_IDLE_TIMEOUT_MS_ENV} to increase this window ` +
+        `${HOPCODE_STREAM_IDLE_TIMEOUT_MS_ENV} to increase this window ` +
         `(or 0 to disable it).`,
     );
     this.name = 'StreamInactivityTimeoutError';
@@ -587,15 +587,24 @@ export class ContentGenerationPipeline {
       // We also keep the legacy `qwen*` guard so raw qwen model names and
       // existing test fixtures continue to emit the disable signal.
       const model = (context.model ?? '').toLowerCase();
-      if (
-        DashScopeOpenAICompatibleProvider.isDashScopeProvider(
-          this.contentGeneratorConfig,
-        ) &&
-        (model.startsWith('hopcode') ||
-          model.startsWith('hopcode') ||
-          model === 'coder-model')
-      ) {
-        typed['enable_thinking'] = false;
+      if (model.startsWith('qwen') || model === 'coder-model') {
+        if (
+          DashScopeOpenAICompatibleProvider.isDashScopeProvider(
+            this.contentGeneratorConfig,
+          )
+        ) {
+          typed['enable_thinking'] = false;
+        } else {
+          delete typed['enable_thinking'];
+          const existing = (typed['chat_template_kwargs'] ?? {}) as Record<
+            string,
+            unknown
+          >;
+          typed['chat_template_kwargs'] = {
+            ...existing,
+            enable_thinking: false,
+          };
+        }
       }
       // Strip reasoning config — extra_body could inject it, overriding
       // buildReasoningConfig's decision to return {} for disabled thinking.

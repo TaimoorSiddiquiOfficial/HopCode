@@ -16,11 +16,15 @@ import {
   ChannelBase,
   SessionRouter,
   getGlobalHopCodeDir,
+  sanitizeSenderName,
+  sanitizePromptText,
+  sanitizeLogText,
 } from '@hoptrendy/channel-base';
 import type {
   ChannelConfig,
   ChannelBaseOptions,
-  AcpBridge,
+  ChannelAgentBridge,
+  ToolCallEvent,
 } from '@hoptrendy/channel-base';
 import WebSocket from 'ws';
 import {

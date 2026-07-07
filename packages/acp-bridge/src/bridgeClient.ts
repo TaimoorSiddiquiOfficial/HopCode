@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @license
- * Copyright 2025 hopcode Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -285,7 +285,7 @@ export const KNOWN_APPROVAL_MODES: ReadonlySet<string> = new Set([
   'default',
   'auto-edit',
   'auto',
-  'izn',
+  'yolo',
 ]);
 
 /**
@@ -398,7 +398,7 @@ interface PreparedSessionUpdateFrames {
  *     subscribers (`GET /session/:id/events`) drain it.
  *   - File reads/writes proxy to local fs (daemon and agent share the host).
  *
- * Stage 1 trust model: the spawned `hopcode --acp` child runs as the same user
+ * Stage 1 trust model: the spawned `qwen --acp` child runs as the same user
  * as the daemon, so the file-proxy methods do NOT enforce a workspace-cwd
  * sandbox. The agent could already read or write the same files via its
  * built-in tools (e.g. shell). Restricting the bridge here would be
@@ -451,7 +451,7 @@ export class BridgeClient implements Client {
      * Optional fs injection seam. When provided, `writeTextFile` /
      * `readTextFile` delegate to this implementation instead of running
      * the inline `fs.realpath` / `fs.writeFile` / `fs.readFile` proxy
-     * below. Production `hopcode serve` wires a serve-side adapter
+     * below. Production `qwen serve` wires a serve-side adapter
      * wrapping `WorkspaceFileSystem` here so writes get the TOCTOU +
      * symlink + trust-gate + audit machinery the inline proxy lacks.
      * Omitted by tests + Mode A in-process consumers + channels / IDE
@@ -893,13 +893,64 @@ export class BridgeClient implements Client {
   }
 
   /**
-   * Handle child->bridge ACP `extNotification` calls. Six methods are
-   * recognized — `hopcode/notify/session/model-update`,
-   * `hopcode/notify/session/mode-update`,
-   * `hopcode/notify/session/title-update` (auto/in-process session titles),
-   * `hopcode/notify/session/prompt-suggestion` (followup assist),
-   * `hopcode/notify/session/terminal-sequence`, and
-   * `hopcode/notify/session/mcp-budget-event` — each translated into a
+   * Reverse tool channel (issue #5626, Phase 2) — answer the child's
+   * `qwen/control/client_mcp/message` ext-method. The child's session
+   * `McpClientManager` calls this when its agent drives a client-hosted
+   * (extension) MCP server: `params` carries the advertised `server` name and
+   * the JSON-RPC `payload` (initialize / tools/list / tools/call / a
+   * notification). We resolve the per-WS-connection sender via the injected
+   * `clientMcpSender` lookup, deliver the payload over the daemon WS, and
+   * return the correlated response as `{ payload }`.
+   *
+   * Rejects with ACP `methodNotFound` when no `clientMcpSender` is wired (Mode
+   * A / tests can't host a client MCP server), and `invalidParams` when the
+   * frame is malformed or the named server is no longer hosted (e.g. the
+   * extension disconnected mid-turn) — the agent's `SdkControlClientTransport`
+   * surfaces that as a transport error rather than hanging.
+   */
+  private async handleClientMcpMessage(
+    params: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
+    if (!this.clientMcpSender) {
+      throw RequestError.methodNotFound(
+        SERVE_CONTROL_EXT_METHODS.clientMcpMessage,
+      );
+    }
+    const server = params['server'];
+    if (typeof server !== 'string' || server.length === 0) {
+      throw RequestError.invalidParams(
+        undefined,
+        '`server` must be a non-empty string',
+      );
+    }
+    const payload = params['payload'];
+    if (payload === null || typeof payload !== 'object') {
+      throw RequestError.invalidParams(
+        undefined,
+        '`payload` must be a JSON-RPC message object',
+      );
+    }
+    const send = this.clientMcpSender(server);
+    if (!send) {
+      // The client that hosted this server is gone (WS closed / unregistered).
+      throw RequestError.invalidParams(
+        undefined,
+        `client-hosted MCP server '${server}' is not currently connected`,
+      );
+    }
+    const response = await send(payload);
+    return { payload: response as Record<string, unknown> };
+  }
+
+  /**
+   * Handle child->bridge ACP `extNotification` calls. Recognized methods are
+   * `qwen/notify/session/model-update`,
+   * `qwen/notify/session/mode-update`,
+   * `qwen/notify/session/title-update` (auto/in-process session titles),
+   * `qwen/notify/session/prompt-suggestion` (followup assist),
+   * `qwen/notify/session/artifact-event` (hook artifacts),
+   * `qwen/notify/session/terminal-sequence`, and
+   * `qwen/notify/session/mcp-budget-event` — each translated into a
    * session-scoped SSE frame. Unknown methods are dropped silently
    * for forward-compat.
    */
@@ -974,6 +1025,10 @@ export class BridgeClient implements Client {
       void _v;
       void _sid;
       this.publishExtNotification(sessionId, 'terminal_sequence', rest);
+      return;
+    }
+    if (method === 'hopcode/notify/session/artifact-event') {
+      await this.handleArtifactEvent(params);
       return;
     }
     if (method !== 'hopcode/notify/session/mcp-budget-event') return;
@@ -1436,7 +1491,7 @@ export class BridgeClient implements Client {
     params: WriteTextFileRequest,
   ): Promise<WriteTextFileResponse> {
     // Delegate to the injected `BridgeFileSystem` when present.
-    // Production `hopcode serve` wires `WorkspaceFileSystem` through a
+    // Production `qwen serve` wires `WorkspaceFileSystem` through a
     // serve-side adapter so writes get the trust-gate + TOCTOU +
     // symlink + `.gitignore` + audit machinery the inline proxy below
     // lacks. Tests, Mode A consumers, channels, and IDE companion
@@ -1592,7 +1647,7 @@ export class BridgeClient implements Client {
     params: ReadTextFileRequest,
   ): Promise<ReadTextFileResponse> {
     // Delegate to the injected `BridgeFileSystem` when present
-    // (parallels the write path above). Production `hopcode serve` wires
+    // (parallels the write path above). Production `qwen serve` wires
     // `WorkspaceFileSystem` adapter; tests + Mode A + channels + IDE
     // companion fall through to the inline proxy below.
     if (this.fileSystem) {

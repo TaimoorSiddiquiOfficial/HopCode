@@ -3,7 +3,7 @@ import type {
   ChannelConfig,
   ChannelBaseOptions,
   Envelope,
-  AcpBridge,
+  ChannelAgentBridge,
 } from '@hoptrendy/channel-base';
 import WebSocket from 'ws';
 import type {

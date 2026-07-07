@@ -106,7 +106,7 @@ class TeamPlanApprovalInvocation extends BaseToolInvocation<
     }
     if (
       !this.config.isTrustedFolder() &&
-      (current === ApprovalMode.AUTO_EDIT || current === ApprovalMode.YOLO)
+      (current === ApprovalMode.AUTO_EDIT || current === ApprovalMode.IZN)
     ) {
       return ApprovalMode.DEFAULT;
     }

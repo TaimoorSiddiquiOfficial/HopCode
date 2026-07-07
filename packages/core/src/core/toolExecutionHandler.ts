@@ -287,7 +287,8 @@ export class ToolExecutionHandler {
           const reminderBlocks: string[] = [];
 
           for (const candidatePath of candidatePaths) {
-            const rulesCtx = rulesRegistry?.matchAndConsume(candidatePath);
+            const rulesCtx =
+              await rulesRegistry?.matchAndConsume(candidatePath);
             if (rulesCtx) reminderBlocks.push(rulesCtx);
           }
 

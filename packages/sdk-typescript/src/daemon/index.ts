@@ -68,7 +68,7 @@ export {
   // Re-export the workspace-scoped budget event helper. Previously
   // the event JSDoc told consumers to use this helper to branch on
   // `scope === 'workspace'`, but the function lived in `events.ts`
-  // and was never added to this barrel — SDK consumers had no public
+  // and was never added to this barrel â€” SDK consumers had no public
   // import path. Now locked down by `daemon-public-surface.test.ts`.
   isWorkspaceScopedBudgetEvent,
   reduceDaemonAuthEvent,
@@ -304,7 +304,7 @@ export type {
   DaemonTurnCompleteEvent,
   DaemonTurnErrorData,
   DaemonTurnErrorEvent,
-  // A5 — side-channel session snapshot
+  // A5 â€” side-channel session snapshot
   DaemonSessionSnapshotData,
   DaemonSessionSnapshotEvent,
   DaemonDeviceFlowReducerState,

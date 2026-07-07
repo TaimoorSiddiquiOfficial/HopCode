@@ -7,7 +7,7 @@
 // ---------------------------------------------------------------------------
 // Shared ACP route table
 // ---------------------------------------------------------------------------
-// Single source of truth for the URL→JSON-RPC mapping used by both
+// Single source of truth for the URLâ†’JSON-RPC mapping used by both
 // `AcpWsTransport` and `AcpHttpTransport`. Keeping a single table
 // prevents route inconsistencies between the two transport variants.
 // ---------------------------------------------------------------------------
@@ -17,12 +17,12 @@ import { isRecord } from './acpTransportUtils.js';
 export interface RouteMapping {
   method: string;
   /**
-   * Extract JSON-RPC params from URL path segments, request body, and — for the
-   * REST-style query-backed helpers (`/file?path=…&maxBytes=…`, `/stat`,
-   * `/list`, `/glob`, `context-usage?detail=…`) — the URL query string. The
+   * Extract JSON-RPC params from URL path segments, request body, and â€” for the
+   * REST-style query-backed helpers (`/file?path=â€¦&maxBytes=â€¦`, `/stat`,
+   * `/list`, `/glob`, `context-usage?detail=â€¦`) â€” the URL query string. The
    * daemon's ACP handlers are strictly typed (e.g. `maxBytes` must be a
-   * `number`, `detail` must be the boolean `true`), so query values — which
-   * arrive as strings — are coerced to the expected type here via
+   * `number`, `detail` must be the boolean `true`), so query values â€” which
+   * arrive as strings â€” are coerced to the expected type here via
    * `strParam`/`numParam`/`boolParam`.
    */
   extractParams: (
@@ -94,9 +94,9 @@ export interface RouteEntry {
  *   - `*`      = rest wildcard
  */
 export const ROUTE_TABLE: readonly RouteEntry[] = [
-  // POST /session → session/new
+  // POST /session â†’ session/new
   // ACP standard: session/new always creates an isolated session.
-  // Strip non-standard params (sessionScope) — the server enforces
+  // Strip non-standard params (sessionScope) â€” the server enforces
   // 'thread' regardless, so passing it is harmless but misleading.
   {
     httpMethod: 'POST',
@@ -110,7 +110,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       },
     },
   },
-  // POST /session/:id/prompt → session/prompt
+  // POST /session/:id/prompt â†’ session/prompt
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/prompt$/,
@@ -122,7 +122,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // POST /session/:id/cancel → session/cancel (notification)
+  // POST /session/:id/cancel â†’ session/cancel (notification)
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/cancel$/,
@@ -132,7 +132,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       notification: true,
     },
   },
-  // DELETE /session/:id → session/close
+  // DELETE /session/:id â†’ session/close
   {
     httpMethod: 'DELETE',
     pattern: /^\/session\/([^/]+)\/?$/,
@@ -141,7 +141,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       extractParams: (segs) => ({ sessionId: segs[0] }),
     },
   },
-  // POST /session/:id/load → session/load
+  // POST /session/:id/load â†’ session/load
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/load$/,
@@ -153,7 +153,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // POST /session/:id/resume → session/resume
+  // POST /session/:id/resume â†’ session/resume
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/resume$/,
@@ -165,7 +165,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // POST /session/:id/permission/:reqId → session/permission
+  // POST /session/:id/permission/:reqId â†’ session/permission
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/permission\/([^/]+)$/,
@@ -190,7 +190,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // POST /session/:id/model → session/set_model
+  // POST /session/:id/model â†’ session/set_model
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/model$/,
@@ -202,7 +202,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // GET /capabilities → use initialize result (handled specially)
+  // GET /capabilities â†’ use initialize result (handled specially)
   {
     httpMethod: 'GET',
     pattern: /^\/capabilities\/?$/,
@@ -216,26 +216,26 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     httpMethod: 'GET',
     pattern: /^\/health\/?$/,
     mapping: {
-      method: '_hopcode/health',
+      method: '_qwen/health',
       extractParams: () => ({}),
     },
   },
 
-  // ---- Vendor session extensions (_hopcode/ prefix) -------------------------
+  // ---- Vendor session extensions (_qwen/ prefix) -------------------------
 
-  // PATCH /session/:id/metadata → _hopcode/session/update_metadata
+  // PATCH /session/:id/metadata â†’ _qwen/session/update_metadata
   {
     httpMethod: 'PATCH',
     pattern: /^\/session\/([^/]+)\/metadata$/,
     mapping: {
-      method: '_hopcode/session/update_metadata',
+      method: '_qwen/session/update_metadata',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         sessionId: segs[0],
       }),
     },
   },
-  // PATCH /session/:id/organization → _qwen/session/update_organization
+  // PATCH /session/:id/organization â†’ _qwen/session/update_organization
   {
     httpMethod: 'PATCH',
     pattern: /^\/session\/([^/]+)\/organization$/,
@@ -247,19 +247,19 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // POST /session/:id/heartbeat → _hopcode/session/heartbeat
+  // POST /session/:id/heartbeat â†’ _qwen/session/heartbeat
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/heartbeat$/,
     mapping: {
-      method: '_hopcode/session/heartbeat',
+      method: '_qwen/session/heartbeat',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         sessionId: segs[0],
       }),
     },
   },
-  // GET /session/:id/artifacts → _qwen/session/artifacts
+  // GET /session/:id/artifacts â†’ _qwen/session/artifacts
   {
     httpMethod: 'GET',
     pattern: /^\/session\/([^/]+)\/artifacts$/,
@@ -268,7 +268,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       extractParams: (segs) => ({ sessionId: segs[0] }),
     },
   },
-  // POST /session/:id/artifacts → _qwen/session/artifacts/add
+  // POST /session/:id/artifacts â†’ _qwen/session/artifacts/add
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/artifacts$/,
@@ -280,7 +280,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // DELETE /session/:id/artifacts/:artifactId → _qwen/session/artifacts/remove
+  // DELETE /session/:id/artifacts/:artifactId â†’ _qwen/session/artifacts/remove
   {
     httpMethod: 'DELETE',
     pattern: /^\/session\/([^/]+)\/artifacts\/([^/]+)$/,
@@ -292,43 +292,43 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // POST /session/:id/recap → _hopcode/session/recap
+  // POST /session/:id/recap â†’ _qwen/session/recap
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/recap$/,
     mapping: {
-      method: '_hopcode/session/recap',
+      method: '_qwen/session/recap',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         sessionId: segs[0],
       }),
     },
   },
-  // POST /session/:id/btw → _hopcode/session/btw
+  // POST /session/:id/btw â†’ _qwen/session/btw
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/btw$/,
     mapping: {
-      method: '_hopcode/session/btw',
+      method: '_qwen/session/btw',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         sessionId: segs[0],
       }),
     },
   },
-  // POST /session/:id/shell → _hopcode/session/shell
+  // POST /session/:id/shell â†’ _qwen/session/shell
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/shell$/,
     mapping: {
-      method: '_hopcode/session/shell',
+      method: '_qwen/session/shell',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         sessionId: segs[0],
       }),
     },
   },
-  // POST /session/:id/branch → session/fork
+  // POST /session/:id/branch â†’ session/fork
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/branch$/,
@@ -340,12 +340,12 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // POST /session/:id/detach → _hopcode/session/detach
+  // POST /session/:id/detach â†’ _qwen/session/detach
   {
     httpMethod: 'POST',
     pattern: /^\/session\/([^/]+)\/detach$/,
     mapping: {
-      method: '_hopcode/session/detach',
+      method: '_qwen/session/detach',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         sessionId: segs[0],
@@ -353,265 +353,394 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     },
   },
 
-  // ---- Session diagnostic routes (_hopcode/ prefix) -------------------------
+  // ---- Session diagnostic routes (_qwen/ prefix) -------------------------
 
-  // GET /session/:id/context → _hopcode/session/context
+  // GET /session/:id/context â†’ _qwen/session/context
   {
     httpMethod: 'GET',
     pattern: /^\/session\/([^/]+)\/context$/,
     mapping: {
-      method: '_hopcode/session/context',
+      method: '_qwen/session/context',
       extractParams: (segs) => ({ sessionId: segs[0] }),
     },
   },
-  // GET /session/:id/context-usage → _hopcode/session/context_usage
+  // GET /session/:id/context-usage?detail=true â†’ _qwen/session/context_usage
   {
     httpMethod: 'GET',
     pattern: /^\/session\/([^/]+)\/context-usage$/,
     mapping: {
-      method: '_hopcode/session/context_usage',
-      extractParams: (segs) => ({ sessionId: segs[0] }),
+      method: '_qwen/session/context_usage',
+      extractParams: (segs, _b, _m, q) => ({
+        sessionId: segs[0],
+        ...boolParam(q, 'detail'),
+      }),
     },
   },
-  // GET /session/:id/supported-commands → _hopcode/session/supported_commands
+  // GET /session/:id/supported-commands â†’ _qwen/session/supported_commands
   {
     httpMethod: 'GET',
     pattern: /^\/session\/([^/]+)\/supported-commands$/,
     mapping: {
-      method: '_hopcode/session/supported_commands',
+      method: '_qwen/session/supported_commands',
       extractParams: (segs) => ({ sessionId: segs[0] }),
     },
   },
-  // GET /session/:id/tasks → _hopcode/session/tasks
+  // GET /session/:id/tasks â†’ _qwen/session/tasks
   {
     httpMethod: 'GET',
     pattern: /^\/session\/([^/]+)\/tasks$/,
     mapping: {
-      method: '_hopcode/session/tasks',
+      method: '_qwen/session/tasks',
       extractParams: (segs) => ({ sessionId: segs[0] }),
     },
   },
-  // GET /session/:id/lsp -> _hopcode/session/lsp
+  // GET /session/:id/lsp -> _qwen/session/lsp
   {
     httpMethod: 'GET',
     pattern: /^\/session\/([^/]+)\/lsp$/,
     mapping: {
-      method: '_hopcode/session/lsp',
+      method: '_qwen/session/lsp',
       extractParams: (segs) => ({ sessionId: segs[0] }),
     },
   },
 
-  // ---- Granular workspace routes (_hopcode/workspace/*) ---------------------
+  // ---- Granular workspace routes (_qwen/workspace/*) ---------------------
 
-  // GET /workspace/mcp → _hopcode/workspace/mcp
+  // GET /workspace/mcp â†’ _qwen/workspace/mcp
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/mcp\/?$/,
     mapping: {
-      method: '_hopcode/workspace/mcp',
+      method: '_qwen/workspace/mcp',
       extractParams: () => ({}),
     },
   },
-  // GET /workspace/skills → _hopcode/workspace/skills
+  // GET /workspace/skills â†’ _qwen/workspace/skills
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/skills\/?$/,
     mapping: {
-      method: '_hopcode/workspace/skills',
+      method: '_qwen/workspace/skills',
       extractParams: () => ({}),
     },
   },
-  // GET /workspace/providers → _hopcode/workspace/providers
+  // GET /workspace/providers â†’ _qwen/workspace/providers
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/providers\/?$/,
     mapping: {
-      method: '_hopcode/workspace/providers',
+      method: '_qwen/workspace/providers',
       extractParams: () => ({}),
     },
   },
-  // GET /workspace/env → _hopcode/workspace/env
+  // GET /workspace/env â†’ _qwen/workspace/env
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/env\/?$/,
     mapping: {
-      method: '_hopcode/workspace/env',
+      method: '_qwen/workspace/env',
       extractParams: () => ({}),
     },
   },
-  // GET /workspace/preflight → _hopcode/workspace/preflight
+  // GET /workspace/preflight â†’ _qwen/workspace/preflight
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/preflight\/?$/,
     mapping: {
-      method: '_hopcode/workspace/preflight',
+      method: '_qwen/workspace/preflight',
       extractParams: () => ({}),
     },
   },
-  // POST /workspace/init → _hopcode/workspace/init
+  // POST /workspace/init â†’ _qwen/workspace/init
   {
     httpMethod: 'POST',
     pattern: /^\/workspace\/init\/?$/,
     mapping: {
-      method: '_hopcode/workspace/init',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/workspace/init',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
-  // GET /workspace/tools → _hopcode/workspace/tools
+  // GET /workspace/trust â†’ _qwen/workspace/trust
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/trust\/?$/,
+    mapping: {
+      method: '_qwen/workspace/trust',
+      extractParams: () => ({}),
+    },
+  },
+  // POST /workspace/trust/request â†’ _qwen/workspace/trust/request
+  {
+    httpMethod: 'POST',
+    pattern: /^\/workspace\/trust\/request\/?$/,
+    mapping: {
+      method: '_qwen/workspace/trust/request',
+      extractParams: (_s, body) => bodyRecord(body),
+    },
+  },
+  // GET /workspace/permissions â†’ _qwen/workspace/permissions
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/permissions\/?$/,
+    mapping: {
+      method: '_qwen/workspace/permissions',
+      extractParams: () => ({}),
+    },
+  },
+  // POST /workspace/permissions â†’ _qwen/workspace/permissions/set
+  {
+    httpMethod: 'POST',
+    pattern: /^\/workspace\/permissions\/?$/,
+    mapping: {
+      method: '_qwen/workspace/permissions/set',
+      extractParams: (_s, body) => bodyRecord(body),
+    },
+  },
+  // GET /workspace/voice â†’ _qwen/workspace/voice
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/voice\/?$/,
+    mapping: {
+      method: '_qwen/workspace/voice',
+      extractParams: () => ({}),
+    },
+  },
+  // POST /workspace/voice â†’ _qwen/workspace/voice/set
+  {
+    httpMethod: 'POST',
+    pattern: /^\/workspace\/voice\/?$/,
+    mapping: {
+      method: '_qwen/workspace/voice/set',
+      extractParams: (_s, body) => bodyRecord(body),
+    },
+  },
+  // POST /workspace/setup-github â†’ _qwen/workspace/setup-github
+  {
+    httpMethod: 'POST',
+    pattern: /^\/workspace\/setup-github\/?$/,
+    mapping: {
+      method: '_qwen/workspace/setup-github',
+      extractParams: (_s, body) => bodyRecord(body),
+    },
+  },
+  // GET /workspace/tools â†’ _qwen/workspace/tools
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/tools\/?$/,
     mapping: {
-      method: '_hopcode/workspace/tools',
+      method: '_qwen/workspace/tools',
       extractParams: () => ({}),
     },
   },
-  // GET /workspace/memory → _hopcode/workspace/memory
+  // GET /workspace/memory â†’ _qwen/workspace/memory
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/memory\/?$/,
     mapping: {
-      method: '_hopcode/workspace/memory',
+      method: '_qwen/workspace/memory',
       extractParams: () => ({}),
     },
   },
-  // POST /workspace/memory → _hopcode/workspace/memory/write
+  // POST /workspace/memory â†’ _qwen/workspace/memory/write
   {
     httpMethod: 'POST',
     pattern: /^\/workspace\/memory\/?$/,
     mapping: {
-      method: '_hopcode/workspace/memory/write',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/workspace/memory/write',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
-  // GET /workspace/agents → _hopcode/workspace/agents/list
+  // POST /workspace/memory/remember â†’ _qwen/workspace/memory/remember
+  {
+    httpMethod: 'POST',
+    pattern: /^\/workspace\/memory\/remember\/?$/,
+    mapping: {
+      method: '_qwen/workspace/memory/remember',
+      extractParams: (_s, body) => bodyRecord(body),
+    },
+  },
+  // GET /workspace/memory/remember/:taskId â†’ _qwen/workspace/memory/remember/get
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/memory\/remember\/([^/]+)$/,
+    mapping: {
+      method: '_qwen/workspace/memory/remember/get',
+      extractParams: (segs) => ({ taskId: segs[0] }),
+    },
+  },
+  // POST /workspace/memory/forget â†’ _qwen/workspace/memory/forget
+  {
+    httpMethod: 'POST',
+    pattern: /^\/workspace\/memory\/forget\/?$/,
+    mapping: {
+      method: '_qwen/workspace/memory/forget',
+      extractParams: (_s, body) => bodyRecord(body),
+    },
+  },
+  // GET /workspace/memory/forget/:taskId â†’ _qwen/workspace/memory/forget/get
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/memory\/forget\/([^/]+)$/,
+    mapping: {
+      method: '_qwen/workspace/memory/forget/get',
+      extractParams: (segs) => ({ taskId: segs[0] }),
+    },
+  },
+  // POST /workspace/memory/dream â†’ _qwen/workspace/memory/dream
+  {
+    httpMethod: 'POST',
+    pattern: /^\/workspace\/memory\/dream\/?$/,
+    mapping: {
+      method: '_qwen/workspace/memory/dream',
+      extractParams: () => ({}),
+    },
+  },
+  // GET /workspace/memory/dream/:taskId â†’ _qwen/workspace/memory/dream/get
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/memory\/dream\/([^/]+)$/,
+    mapping: {
+      method: '_qwen/workspace/memory/dream/get',
+      extractParams: (segs) => ({ taskId: segs[0] }),
+    },
+  },
+  // GET /workspace/agents â†’ _qwen/workspace/agents/list
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/agents\/?$/,
     mapping: {
-      method: '_hopcode/workspace/agents/list',
+      method: '_qwen/workspace/agents/list',
       extractParams: () => ({}),
     },
   },
-  // POST /workspace/agents → _hopcode/workspace/agents/create
+  // POST /workspace/agents â†’ _qwen/workspace/agents/create
   {
     httpMethod: 'POST',
     pattern: /^\/workspace\/agents\/?$/,
     mapping: {
-      method: '_hopcode/workspace/agents/create',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/workspace/agents/create',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
-  // GET /workspace/agents/:agentType → _hopcode/workspace/agents/get
+  // GET /workspace/agents/:agentType â†’ _qwen/workspace/agents/get
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/agents\/([^/]+)\/?$/,
     mapping: {
-      method: '_hopcode/workspace/agents/get',
+      method: '_qwen/workspace/agents/get',
       extractParams: (segs) => ({ agentType: segs[0] }),
     },
   },
-  // DELETE /workspace/agents/:agentType → _hopcode/workspace/agents/delete
+  // DELETE /workspace/agents/:agentType â†’ _qwen/workspace/agents/delete
   {
     httpMethod: 'DELETE',
     pattern: /^\/workspace\/agents\/([^/]+)\/?$/,
     mapping: {
-      method: '_hopcode/workspace/agents/delete',
+      method: '_qwen/workspace/agents/delete',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         agentType: segs[0],
       }),
     },
   },
-  // GET /workspace/mcp/:server/tools → _hopcode/workspace/mcp/tools
+  // GET /workspace/mcp/:server/tools â†’ _qwen/workspace/mcp/tools
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/mcp\/([^/]+)\/tools\/?$/,
     mapping: {
-      method: '_hopcode/workspace/mcp/tools',
+      method: '_qwen/workspace/mcp/tools',
       extractParams: (segs) => ({ serverName: segs[0] }),
     },
   },
-  // POST /workspace/mcp/servers → _hopcode/workspace/mcp/servers/add
+  // GET /workspace/mcp/:server/resources â†’ _qwen/workspace/mcp/resources
+  {
+    httpMethod: 'GET',
+    pattern: /^\/workspace\/mcp\/([^/]+)\/resources\/?$/,
+    mapping: {
+      method: '_qwen/workspace/mcp/resources',
+      extractParams: (segs) => ({ serverName: segs[0] }),
+    },
+  },
+  // POST /workspace/mcp/servers â†’ _qwen/workspace/mcp/servers/add
   {
     httpMethod: 'POST',
     pattern: /^\/workspace\/mcp\/servers\/?$/,
     mapping: {
-      method: '_hopcode/workspace/mcp/servers/add',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/workspace/mcp/servers/add',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
-  // DELETE /workspace/mcp/servers/:name → _hopcode/workspace/mcp/servers/remove
+  // DELETE /workspace/mcp/servers/:name â†’ _qwen/workspace/mcp/servers/remove
   {
     httpMethod: 'DELETE',
     pattern: /^\/workspace\/mcp\/servers\/([^/]+)\/?$/,
     mapping: {
-      method: '_hopcode/workspace/mcp/servers/remove',
+      method: '_qwen/workspace/mcp/servers/remove',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         name: segs[0],
       }),
     },
   },
-  // POST /workspace/set-tool-enabled → _hopcode/workspace/set_tool_enabled
+  // POST /workspace/set-tool-enabled â†’ _qwen/workspace/set_tool_enabled
   {
     httpMethod: 'POST',
     pattern: /^\/workspace\/set-tool-enabled\/?$/,
     mapping: {
-      method: '_hopcode/workspace/set_tool_enabled',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/workspace/set_tool_enabled',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
-  // POST /workspace/mcp/:server/restart → _hopcode/workspace/restart_mcp_server
+  // POST /workspace/mcp/:server/restart â†’ _qwen/workspace/restart_mcp_server
   {
     httpMethod: 'POST',
     pattern: /^\/workspace\/mcp\/([^/]+)\/restart\/?$/,
     mapping: {
-      method: '_hopcode/workspace/restart_mcp_server',
+      method: '_qwen/workspace/restart_mcp_server',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         serverName: segs[0],
       }),
     },
   },
-  // GET /workspace/auth/status → _hopcode/workspace/auth/status
+  // GET /workspace/auth/status â†’ _qwen/workspace/auth/status
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/auth\/status\/?$/,
     mapping: {
-      method: '_hopcode/workspace/auth/status',
+      method: '_qwen/workspace/auth/status',
       extractParams: () => ({}),
     },
   },
-  // POST /workspace/auth/device-flow → _hopcode/workspace/auth/device_flow/start
+  // POST /workspace/auth/device-flow â†’ _qwen/workspace/auth/device_flow/start
   {
     httpMethod: 'POST',
     pattern: /^\/workspace\/auth\/device-flow\/?$/,
     mapping: {
-      method: '_hopcode/workspace/auth/device_flow/start',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/workspace/auth/device_flow/start',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
-  // GET /workspace/auth/device-flow/:id → _hopcode/workspace/auth/device_flow/get
+  // GET /workspace/auth/device-flow/:id â†’ _qwen/workspace/auth/device_flow/get
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/auth\/device-flow\/([^/]+)\/?$/,
     mapping: {
-      method: '_hopcode/workspace/auth/device_flow/get',
+      method: '_qwen/workspace/auth/device_flow/get',
       extractParams: (segs) => ({ id: segs[0] }),
     },
   },
-  // DELETE /workspace/auth/device-flow/:id → _hopcode/workspace/auth/device_flow/cancel
+  // DELETE /workspace/auth/device-flow/:id â†’ _qwen/workspace/auth/device_flow/cancel
   {
     httpMethod: 'DELETE',
     pattern: /^\/workspace\/auth\/device-flow\/([^/]+)\/?$/,
     mapping: {
-      method: '_hopcode/workspace/auth/device_flow/cancel',
+      method: '_qwen/workspace/auth/device_flow/cancel',
       extractParams: (segs) => ({ id: segs[0] }),
     },
   },
 
-  // GET /workspace/:id/sessions → session/list
+  // GET /workspace/:id/sessions â†’ session/list
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/(.+)\/sessions\/?$/,
@@ -632,7 +761,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       },
     },
   },
-  // GET /workspace/:id/session-groups → _qwen/workspace/session_groups/list
+  // GET /workspace/:id/session-groups â†’ _qwen/workspace/session_groups/list
   {
     httpMethod: 'GET',
     pattern: /^\/workspace\/(.+)\/session-groups\/?$/,
@@ -641,7 +770,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       extractParams: (segs) => ({ workspaceCwd: segs[0] }),
     },
   },
-  // POST /workspace/:id/session-groups → _qwen/workspace/session_groups/create
+  // POST /workspace/:id/session-groups â†’ _qwen/workspace/session_groups/create
   {
     httpMethod: 'POST',
     pattern: /^\/workspace\/(.+)\/session-groups\/?$/,
@@ -653,7 +782,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // PATCH /workspace/:id/session-groups/:groupId → _qwen/workspace/session_groups/update
+  // PATCH /workspace/:id/session-groups/:groupId â†’ _qwen/workspace/session_groups/update
   {
     httpMethod: 'PATCH',
     pattern: /^\/workspace\/(.+)\/session-groups\/([^/]+)\/?$/,
@@ -666,7 +795,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
       }),
     },
   },
-  // DELETE /workspace/:id/session-groups/:groupId → _qwen/workspace/session_groups/delete
+  // DELETE /workspace/:id/session-groups/:groupId â†’ _qwen/workspace/session_groups/delete
   {
     httpMethod: 'DELETE',
     pattern: /^\/workspace\/(.+)\/session-groups\/([^/]+)\/?$/,
@@ -685,7 +814,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     httpMethod: 'GET',
     pattern: /^\/workspace\/(.+)$/,
     mapping: {
-      method: '_hopcode/workspace',
+      method: '_qwen/workspace',
       extractParams: (segs) => ({ path: segs[0] }),
     },
   },
@@ -693,7 +822,7 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
     httpMethod: 'POST',
     pattern: /^\/workspace\/(.+)$/,
     mapping: {
-      method: '_hopcode/workspace',
+      method: '_qwen/workspace',
       extractParams: (segs, body) => ({
         ...bodyRecord(body),
         path: segs[0],
@@ -702,82 +831,109 @@ export const ROUTE_TABLE: readonly RouteEntry[] = [
   },
 
   // ---- File system routes -----------------------------------------------
-  // These map the DaemonClient's file-system helpers to _hopcode/file/* RPC
+  // These map the DaemonClient's file-system helpers to _qwen/file/* RPC
   // methods on the ACP daemon.
 
-  // GET /file → _hopcode/file/read (query params forwarded as RPC params)
+  // GET /file?path=â€¦&maxBytes=â€¦&line=â€¦&limit=â€¦ â†’ _qwen/file/read
   {
     httpMethod: 'GET',
     pattern: /^\/file\/?$/,
     mapping: {
-      method: '_hopcode/file/read',
-      extractParams: () => ({}),
+      method: '_qwen/file/read',
+      extractParams: (_s, _b, _m, q) => ({
+        ...strParam(q, 'path'),
+        ...numParam(q, 'maxBytes'),
+        ...numParam(q, 'line'),
+        ...numParam(q, 'limit'),
+      }),
     },
   },
-  // GET /file/bytes → _hopcode/file/read_bytes
+  // GET /file/bytes?path=â€¦&offset=â€¦&maxBytes=â€¦ â†’ _qwen/file/read_bytes
   {
     httpMethod: 'GET',
     pattern: /^\/file\/bytes\/?$/,
     mapping: {
-      method: '_hopcode/file/read_bytes',
-      extractParams: () => ({}),
+      method: '_qwen/file/read_bytes',
+      extractParams: (_s, _b, _m, q) => ({
+        ...strParam(q, 'path'),
+        ...numParam(q, 'offset'),
+        ...numParam(q, 'maxBytes'),
+      }),
     },
   },
-  // GET /stat → _hopcode/file/stat
+  // GET /stat?path=â€¦ â†’ _qwen/file/stat
   {
     httpMethod: 'GET',
     pattern: /^\/stat\/?$/,
     mapping: {
-      method: '_hopcode/file/stat',
-      extractParams: () => ({}),
+      method: '_qwen/file/stat',
+      extractParams: (_s, _b, _m, q) => ({ ...strParam(q, 'path') }),
     },
   },
-  // GET /list → _hopcode/file/list
+  // GET /list?path=â€¦ â†’ _qwen/file/list
   {
     httpMethod: 'GET',
     pattern: /^\/list\/?$/,
     mapping: {
-      method: '_hopcode/file/list',
-      extractParams: () => ({}),
+      method: '_qwen/file/list',
+      extractParams: (_s, _b, _m, q) => ({ ...strParam(q, 'path') }),
     },
   },
-  // GET /glob → _hopcode/file/glob
+  // GET /glob?pattern=â€¦ â†’ _qwen/file/glob
   {
     httpMethod: 'GET',
     pattern: /^\/glob\/?$/,
     mapping: {
-      method: '_hopcode/file/glob',
-      extractParams: () => ({}),
+      method: '_qwen/file/glob',
+      extractParams: (_s, _b, _m, q) => ({ ...strParam(q, 'pattern') }),
     },
   },
-  // POST /file/write → _hopcode/file/write
+  // POST /file/write â†’ _qwen/file/write
   {
     httpMethod: 'POST',
     pattern: /^\/file\/write\/?$/,
     mapping: {
-      method: '_hopcode/file/write',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/file/write',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
-  // POST /file/edit → _hopcode/file/edit
+  // POST /file/edit â†’ _qwen/file/edit
   {
     httpMethod: 'POST',
     pattern: /^\/file\/edit\/?$/,
     mapping: {
-      method: '_hopcode/file/edit',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/file/edit',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
 
   // ---- Bulk session operations -------------------------------------------
 
-  // POST /sessions/delete → _hopcode/sessions/delete
+  // POST /sessions/delete â†’ _qwen/sessions/delete
   {
     httpMethod: 'POST',
     pattern: /^\/sessions\/delete\/?$/,
     mapping: {
-      method: '_hopcode/sessions/delete',
-      extractParams: (_s, body) => (isRecord(body) ? body : {}),
+      method: '_qwen/sessions/delete',
+      extractParams: (_s, body) => bodyRecord(body),
+    },
+  },
+  // POST /sessions/archive â†’ _qwen/sessions/archive
+  {
+    httpMethod: 'POST',
+    pattern: /^\/sessions\/archive\/?$/,
+    mapping: {
+      method: '_qwen/sessions/archive',
+      extractParams: (_s, body) => bodyRecord(body),
+    },
+  },
+  // POST /sessions/unarchive â†’ _qwen/sessions/unarchive
+  {
+    httpMethod: 'POST',
+    pattern: /^\/sessions\/unarchive\/?$/,
+    mapping: {
+      method: '_qwen/sessions/unarchive',
+      extractParams: (_s, body) => bodyRecord(body),
     },
   },
 ];

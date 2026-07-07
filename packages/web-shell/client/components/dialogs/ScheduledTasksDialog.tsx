@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   useWorkspaceActions,
   type DaemonScheduledTask,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../../i18n';
 import { DialogShell } from './DialogShell';
 import {

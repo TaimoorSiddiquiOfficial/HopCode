@@ -6,8 +6,7 @@
 
 import { ToolNames } from '../../tools/tool-names.js';
 import type { ToolResult } from '../../tools/tools.js';
-import { ApprovalMode } from '../../config/approval-mode.js';
-import type { Config } from '../../config/config.js';
+import { ApprovalMode, type Config } from '../../config/config.js';
 import { getTeammateContext, isTeammate } from '../team/identity.js';
 import { getCurrentAgentId } from './agent-context.js';
 

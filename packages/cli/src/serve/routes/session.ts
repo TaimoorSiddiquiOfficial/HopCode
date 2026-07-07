@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -14,7 +14,10 @@ import {
   SessionOrganizationError,
   addDaemonRequestAttribute,
   type ApprovalMode,
+  type SessionGroupColor,
+  type SessionArchiveState,
 } from '@hoptrendy/hopcode-core';
+import type { SessionArtifactInput } from '@hoptrendy/acp-bridge/sessionArtifacts';
 import type { Application, Request, RequestHandler, Response } from 'express';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import {
@@ -772,74 +775,20 @@ export function registerSessionRoutes(
     ),
   );
 
-  app.post('/session/:id/prompt', mutate(), async (req, res) => {
-    const sessionId = req.params['id'];
-    const body = safeBody(req);
-    const prompt = body['prompt'];
-    if (!Array.isArray(prompt) || prompt.length === 0) {
-      res.status(400).json({
-        error:
-          '`prompt` is required and must be a non-empty array of content blocks',
-      });
-      return;
-    }
-    if (
-      !prompt.every(
-        (item: unknown) =>
-          typeof item === 'object' && item !== null && !Array.isArray(item),
-      )
-    ) {
-      res.status(400).json({
-        error: 'each `prompt` element must be an object (content block)',
-      });
-      return;
-    }
-    const rawRequestDeadline = body['deadlineMs'];
-    let requestDeadlineMs: number | undefined;
-    if (rawRequestDeadline !== undefined && rawRequestDeadline !== null) {
-      if (
-        typeof rawRequestDeadline !== 'number' ||
-        !Number.isFinite(rawRequestDeadline) ||
-        !Number.isInteger(rawRequestDeadline) ||
-        rawRequestDeadline <= 0
-      ) {
-        res.status(400).json({
-          error: '`deadlineMs` must be a positive integer (milliseconds)',
-          code: 'invalid_deadline_ms',
-        });
-        return;
-      }
-      requestDeadlineMs = rawRequestDeadline;
-    }
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-
-    const promptId = crypto.randomUUID();
-    const forwardedBody = { ...body };
-    delete forwardedBody['deadlineMs'];
-
-    let lastEventId: number;
-    try {
-      lastEventId = bridge.getSessionLastEventId(sessionId);
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/prompt',
-        sessionId,
-      });
-      return;
-    }
-    addDaemonRequestAttribute('hopcode.prompt_id', promptId);
-
-    const abort = new AbortController();
-    const effectiveDeadlineMs = resolvePromptDeadlineMs(
-      promptDeadlineMs,
-      requestDeadlineMs,
-    );
-    let deadlineTimer: NodeJS.Timeout | undefined;
-    if (effectiveDeadlineMs !== undefined) {
-      deadlineTimer = setTimeout(() => {
-        if (!abort.signal.aborted) {
-          abort.abort(new PromptDeadlineExceededError(effectiveDeadlineMs));
+  app.post(
+    '/session/:id/prompt',
+    mutate(),
+    withMutableSession(
+      'POST /session/:id/prompt',
+      async (req, res, sessionId) => {
+        const body = safeBody(req);
+        const prompt = body['prompt'];
+        if (!Array.isArray(prompt) || prompt.length === 0) {
+          res.status(400).json({
+            error:
+              '`prompt` is required and must be a non-empty array of content blocks',
+          });
+          return;
         }
         if (
           !prompt.every(
@@ -1062,67 +1011,21 @@ export function registerSessionRoutes(
     const uniqueIds = parseSessionIdsBody(req, res);
     if (uniqueIds === undefined) return;
     try {
-      const uniqueIds = [...new Set(sessionIds as string[])];
-      const closeResults = await Promise.allSettled(
-        uniqueIds.map(async (id) => {
-          // Intentional: no clientId — batch delete bypasses per-tab ownership.
-          await bridge.closeSession(id);
-          return id;
-        }),
-      );
-      const closeErrors: Array<{ sessionId: string; error: string }> = [];
-      const closedIds: string[] = [];
-      for (let i = 0; i < closeResults.length; i++) {
-        const r = closeResults[i];
-        const id = uniqueIds[i];
-        if (r.status === 'fulfilled') {
-          closedIds.push(id);
-        } else {
-          const closeErr = r.reason;
-          if (closeErr instanceof SessionNotFoundError) {
-            // Session not active in bridge — still attempt to remove its transcript file
-            closedIds.push(id);
-          } else {
-            const msg =
-              closeErr instanceof Error ? closeErr.message : String(closeErr);
-            writeStderrLine(
-              `hopcode serve: closeSession failed for ${safeLogValue(id)}: ${safeLogValue(msg)}`,
-            );
-            closeErrors.push({ sessionId: id, error: msg });
-          }
-        }
-      }
-      const result = await new SessionService(boundWorkspace).removeSessions(
-        closedIds,
-      );
-      for (const e of result.errors) {
-        const msg =
-          e.error instanceof Error ? e.error.message : String(e.error);
-        writeStderrLine(
-          `hopcode serve: removeSession failed for ${safeLogValue(e.sessionId)}: ${safeLogValue(msg)}`,
-        );
-      }
-      res.status(200).json({
-        removed: result.removed,
-        notFound: result.notFound,
-        errors: [
-          ...closeErrors,
-          ...result.errors.map((e) => ({
-            sessionId: e.sessionId,
-            error: e.error instanceof Error ? e.error.message : String(e.error),
-          })),
-        ],
+      const service = new SessionService(boundWorkspace);
+      const result = await deleteDaemonSessions({
+        sessionIds: uniqueIds,
+        service,
+        bridge,
+        coordinator: archiveCoordinator,
+        onError: ({ phase, sessionId, error }) => {
+          writeStderrLine(
+            `hopcode serve: ${phase}Session failed for ${safeLogValue(sessionId)}: ${safeLogValue(error)}`,
+          );
+        },
       });
       res.status(200).json(result);
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      writeStderrLine(
-        `hopcode serve: failed to batch delete sessions: ${safeLogValue(message)}`,
-      );
-      res.status(500).json({
-        error: 'Failed to delete sessions',
-        code: 'sessions_delete_failed',
-      });
+      sendBridgeError(res, err, { route: 'POST /sessions/delete' });
     }
   });
 

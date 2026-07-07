@@ -5,14 +5,14 @@ import {
   DaemonChannelBridge,
   sanitizeLogText,
   SessionRouter,
-} from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
 import type {
   ChannelAgentBridge,
   ChannelBase,
   DaemonChannelSessionClient,
   DaemonChannelSessionFactory,
   DaemonChannelSessionFactoryRequest,
-} from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
 import type { ServeChannelSelection } from '../../serve/types.js';
 import { normalizeServeChannelSelection } from '../../serve/channel-selection.js';
 import {
@@ -167,7 +167,7 @@ export function createDaemonChannelBridgeFacade(
 }
 
 async function loadDaemonSdk(): Promise<DaemonSdkLike> {
-  return (await import('@qwen-code/sdk/daemon')) as unknown as DaemonSdkLike;
+  return (await import('@hoptrendy/sdk/daemon')) as unknown as DaemonSdkLike;
 }
 
 function selectedChannelNames(

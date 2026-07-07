@@ -11,7 +11,7 @@ import {
   QWEN_DAEMON_WORKSPACE_ENV,
   QWEN_SERVER_TOKEN_ENV,
 } from './channel-worker-env.js';
-import { sanitizeLogText } from '@qwen-code/channel-base';
+import { sanitizeLogText } from '@hoptrendy/channel-base';
 import { redactLogCredentials } from '@hoptrendy/acp-bridge/logRedaction';
 
 const DEFAULT_CHANNEL_WORKER_STARTUP_TIMEOUT_MS = 30_000;

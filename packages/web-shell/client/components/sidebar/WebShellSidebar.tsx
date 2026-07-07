@@ -15,14 +15,19 @@ import {
   useActions,
   useConnection,
   useSessions,
+  useWorkspaceActions,
 } from '@hoptrendy/webui/daemon-react-sdk';
-import type { DaemonSessionSummary } from '@hoptrendy/sdk/daemon';
+import type {
+  DaemonSessionGroup,
+  DaemonSessionGroupColor,
+  DaemonSessionSummary,
+} from '@hoptrendy/sdk/daemon';
 import { useI18n } from '../../i18n';
 import { formatRelativeTime } from '../../utils/formatRelativeTime';
 import { DialogShell } from '../dialogs/DialogShell';
 import styles from './WebShellSidebar.module.css';
 
-const SIDEBAR_WIDTH_STORAGE_KEY = 'hopcode-web-shell-sidebar-width';
+const SIDEBAR_WIDTH_STORAGE_KEY = 'qwen-code-web-shell-sidebar-width';
 const SIDEBAR_DEFAULT_WIDTH = 260;
 const SIDEBAR_MIN_WIDTH = 220;
 const SIDEBAR_MAX_WIDTH = 420;
@@ -532,13 +537,13 @@ export function WebShellSidebar({
     connection.capabilities?.features?.includes('session_export') ?? false;
   const projectName =
     getWorkspaceName(connection.workspaceCwd) || t('sidebar.projectFallback');
-  const qwenCodeVersion = connection.capabilities?.qwenCodeVersion || '';
+  const hopCodeVersion = connection.capabilities?.HopCodeVersion || '';
   // Numeric releases render as "v1.2.3"; a non-semver fallback such as
   // "unknown" is shown as-is so we never produce a bogus "vunknown".
-  const versionLabel = qwenCodeVersion
-    ? /^\d/.test(qwenCodeVersion)
-      ? `v${qwenCodeVersion}`
-      : qwenCodeVersion
+  const versionLabel = hopCodeVersion
+    ? /^\d/.test(hopCodeVersion)
+      ? `v${hopCodeVersion}`
+      : hopCodeVersion
     : '';
   const sidebarStyle = {
     '--web-shell-sidebar-width': `${sidebarWidth}px`,
