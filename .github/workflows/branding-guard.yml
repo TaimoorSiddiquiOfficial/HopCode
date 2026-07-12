@@ -1,0 +1,29 @@
+name: Branding Guard
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  branding:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate HopCode and IZN branding
+        run: python3 .github/scripts/enforce_branding.py --check --report branding-report.md
+
+      - name: Upload branding report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: branding-report
+          path: branding-report.md
+          if-no-files-found: ignore
