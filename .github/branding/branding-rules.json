@@ -33,6 +33,7 @@
     "coverage/**",
     ".cache/**",
     ".github/branding/**",
+    ".github/scripts/enforce_branding.py",
     ".github/workflows/upstream-rebrand-sync.yml",
     ".github/workflows/branding-guard.yml",
     "scripts/branding/**"
