@@ -36,6 +36,7 @@
     ".github/scripts/enforce_branding.py",
     ".github/workflows/upstream-rebrand-sync.yml",
     ".github/workflows/branding-guard.yml",
+    "branding-report.md",
     "scripts/branding/**"
   ],
   "max_file_size_bytes": 5242880
