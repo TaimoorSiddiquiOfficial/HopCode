@@ -1,0 +1,41 @@
+{
+  "upstream": {
+    "repository": "QwenLM/qwen-code",
+    "branch": "main"
+  },
+  "provider_path_globs": [
+    "**/providers/qwen/**",
+    "**/provider/qwen/**",
+    "**/providers/qwen.*",
+    "**/provider/qwen.*",
+    "**/qwen-provider/**",
+    "**/qwen_provider/**",
+    "**/*qwen*provider*"
+  ],
+  "provider_context_regexes": [
+    "(?i)\\b(?:provider|providerId|provider_id|model|modelId|model_id|api|endpoint|baseUrl|base_url|credential|token)\\b.*\\bqwen\\b",
+    "(?i)\\bqwen\\b.*\\b(?:provider|model|api|endpoint|credential|token)\\b"
+  ],
+  "protected_regexes": [
+    "(?i)https?://[^\\s\\\"'<>]*qwen[^\\s\\\"'<>]*",
+    "(?i)\\bQwen/Qwen[A-Za-z0-9._/-]*\\b",
+    "(?i)\\bqwen(?:2(?:\\.5)?|3(?:\\.[0-9]+)?|max|plus|turbo|coder|vl|omni|audio)[A-Za-z0-9._:/-]*\\b",
+    "\\bQWEN_[A-Z0-9_]+\\b",
+    "\\b(?:QwenProvider|qwenProvider|QWEN_PROVIDER)\\b",
+    "(?i)(?:from\\s+|require\\()\\s*[\\\"'][^\\\"']*qwen[^\\\"']*[\\\"']",
+    "(?i)\\b(?:provider|providerId|provider_id)\\s*[:=]\\s*[\\\"']qwen[\\\"']"
+  ],
+  "skip_globs": [
+    ".git/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    ".cache/**",
+    ".github/branding/**",
+    ".github/workflows/upstream-rebrand-sync.yml",
+    ".github/workflows/branding-guard.yml",
+    "scripts/branding/**"
+  ],
+  "max_file_size_bytes": 5242880
+}
