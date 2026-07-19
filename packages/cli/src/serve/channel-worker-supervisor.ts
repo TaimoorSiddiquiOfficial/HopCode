@@ -11,13 +11,13 @@ import {
   QWEN_DAEMON_WORKSPACE_ENV,
   QWEN_SERVER_TOKEN_ENV,
 } from './channel-worker-env.js';
-import { sanitizeLogText } from '@qwen-code/channel-base';
-import type { ChannelWebhookTask } from '@qwen-code/channel-base';
+import { sanitizeLogText } from '@hoptrendy/channel-base';
+import type { ChannelWebhookTask } from '@hoptrendy/channel-base';
 import {
   CHANNEL_WORKER_KILL_GRACE_MS,
   CHANNEL_WORKER_STARTUP_TIMEOUT_MS,
   CHANNEL_WORKER_STOP_GRACE_MS,
-} from '@qwen-code/acp-bridge/channelControlTimeouts';
+} from '@hoptrendy/acp-bridge/channelControlTimeouts';
 import {
   CHANNEL_WEBHOOK_TASK_IPC_TIMEOUT_MS,
   ChannelWebhookEnqueueError,

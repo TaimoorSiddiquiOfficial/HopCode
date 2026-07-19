@@ -144,7 +144,7 @@ vi.mock('@hoptrendy/acp-bridge/workspacePaths', () => ({
   canonicalizeWorkspace: mockCanonicalizeWorkspace,
 }));
 
-vi.mock('@qwen-code/qwen-code-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   addChannelMemoryEntries: mockAddChannelMemoryEntries,
   clearChannelMemory: mockClearChannelMemory,
   getChannelMemoryRevision: mockGetChannelMemoryRevision,
@@ -185,7 +185,7 @@ vi.mock('./observed-contact-store.js', () => ({
   ObservedChannelContactStore: mockObservedContactStore,
 }));
 
-vi.mock('@qwen-code/channel-base', () => ({
+vi.mock('@hoptrendy/channel-base', () => ({
   DaemonChannelBridge: mockDaemonChannelBridge,
   sanitizeLogText: mockSanitizeLogText,
   SessionRouter: mockSessionRouter,

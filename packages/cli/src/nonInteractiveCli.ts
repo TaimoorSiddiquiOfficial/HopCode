@@ -12,7 +12,7 @@ import type {
   CronScheduler,
   ToolCallRequestInfo,
   ToolCallResponseInfo,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { isSlashCommand } from './ui/utils/commandUtils.js';
 import { isInlineModelOverrideAllowed } from './utils/acpModelUtils.js';
 import type { LoadedSettings } from './config/settings.js';
@@ -47,7 +47,7 @@ import {
   canonicalToolName,
   parsePositiveIntegerEnv,
   partitionByConcurrencySafety,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { Content, Part, PartListUnion } from '@google/genai';
 import type { CLIUserMessage, PermissionMode } from './nonInteractive/types.js';
 import type { JsonOutputAdapterInterface } from './nonInteractive/io/BaseJsonOutputAdapter.js';

@@ -8,7 +8,7 @@ import type {
   DaemonSessionSummary,
   DaemonWorkspaceCapability,
   DaemonWorkspaceGitStatus,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import gitStyles from '../ChatEditor.module.css';
 
 const { workspaceGit } = vi.hoisted(() => ({

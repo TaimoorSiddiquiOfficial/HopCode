@@ -10,7 +10,7 @@ import {
   OutputFormat,
   type ChatRecordingFailureEvent,
   type Config,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { JsonOutputAdapterInterface } from '../nonInteractive/io/BaseJsonOutputAdapter.js';
 import type { CLISystemMessage } from '../nonInteractive/types.js';
 import { t } from '../i18n/index.js';

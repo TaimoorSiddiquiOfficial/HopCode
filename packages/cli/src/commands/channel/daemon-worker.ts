@@ -1,5 +1,5 @@
 import type { CommandModule } from 'yargs';
-import { canonicalizeWorkspace } from '@qwen-code/acp-bridge/workspacePaths';
+import { canonicalizeWorkspace } from '@hoptrendy/acp-bridge/workspacePaths';
 import {
   addChannelMemoryEntries,
   clearChannelMemory,
@@ -8,7 +8,7 @@ import {
   readChannelMemory,
   removeChannelMemoryEntries,
   updateChannelMemoryEntry,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../../config/settings.js';
 import {
   DaemonChannelBridge,

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { DaemonSessionGroupPresetColor } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionGroupPresetColor } from '@hoptrendy/sdk/daemon';
 import styles from './ChatEditor.module.css';
 import accentStyles from './WorkspaceAccent.module.css';
 import {

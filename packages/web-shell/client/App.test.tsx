@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, createRef } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import type { DaemonInputAnnotation } from '@qwen-code/sdk/daemon';
+import type { DaemonInputAnnotation } from '@hoptrendy/sdk/daemon';
 import type { WebShellApi } from './App';
 import { loadSplitSessions, saveSplitSessions } from './utils/splitUrl';
 
@@ -225,7 +225,7 @@ vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   }),
 }));
 
-vi.mock('@qwen-code/sdk/daemon', () => ({
+vi.mock('@hoptrendy/sdk/daemon', () => ({
   DAEMON_GOAL_STATUS_SENTINEL_PREFIX: 'qwen-goal-status:',
   isDaemonTurnError: () => false,
 }));

@@ -9,8 +9,8 @@ import {
   AskUserQuestionDialog,
   computeHeaderCap,
 } from './AskUserQuestionDialog.js';
-import type { ToolAskUserQuestionConfirmationDetails } from '@qwen-code/qwen-code-core';
-import { ToolConfirmationOutcome } from '@qwen-code/qwen-code-core';
+import type { ToolAskUserQuestionConfirmationDetails } from '@hoptrendy/hopcode-core';
+import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import stripAnsi from 'strip-ansi';
 

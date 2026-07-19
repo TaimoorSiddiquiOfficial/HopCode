@@ -11,13 +11,13 @@ import {
 } from 'react';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
 import { Tooltip as TooltipPrimitive } from 'radix-ui';
-import { DAEMON_APPROVAL_MODES } from '@qwen-code/webui/daemon-react-sdk';
+import { DAEMON_APPROVAL_MODES } from '@hoptrendy/webui/daemon-react-sdk';
 import type { CommandInfo } from '../adapters/types';
-import type { UseDaemonFollowupSuggestionReturn } from '@qwen-code/webui/daemon-react-sdk';
+import type { UseDaemonFollowupSuggestionReturn } from '@hoptrendy/webui/daemon-react-sdk';
 import type {
   DaemonSessionGroupPresetColor,
   DaemonWorkspaceGitStatus,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import type { CommandDisplayCategoryOrder } from '../utils/commandDisplay';
 import type { SkillInfo } from '../completions/slashCompletion';
 import { useI18n } from '../i18n';

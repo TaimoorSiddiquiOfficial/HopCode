@@ -17,13 +17,13 @@ import {
   useWorkspaceActions,
   type DaemonScheduledTask,
   type DaemonScheduledTaskRun,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import type {
   DaemonExtensionEntry,
   DaemonWorkspaceCapability,
   DaemonWorkspaceMcpServerStatus,
   DaemonWorkspaceSkillStatus,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { useI18n } from '../../i18n';
 import { getComposerTagIconUrl } from '../../utils/composerTag';
 import { cssUrlValue } from '../../utils/cssUrlVar';

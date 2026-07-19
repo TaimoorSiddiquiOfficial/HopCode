@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import type { DaemonSessionGroupColor } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionGroupColor } from '@hoptrendy/sdk/daemon';
 import {
   ChevronDownIcon,
   ChevronRightIcon,

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { DaemonTranscriptBlock } from '@qwen-code/sdk/daemon';
-import { useTranscriptBlocks } from '@qwen-code/webui/daemon-react-sdk';
+import type { DaemonTranscriptBlock } from '@hoptrendy/sdk/daemon';
+import { useTranscriptBlocks } from '@hoptrendy/webui/daemon-react-sdk';
 import { transcriptBlocksToDaemonMessages } from '../adapters/transcriptToMessages';
 import type { Message } from '../adapters/types';
 

@@ -11,11 +11,11 @@ import path from 'node:path';
 export default defineConfig({
   resolve: {
     alias: {
-      '@qwen-code/qwen-code-core/transcriptRecords': path.resolve(
+      '@hoptrendy/hopcode-core/transcriptRecords': path.resolve(
         __dirname,
         '../core/src/utils/transcript-records.ts',
       ),
-      '@qwen-code/qwen-code-core': path.resolve(__dirname, '../core/index.ts'),
+      '@hoptrendy/hopcode-core': path.resolve(__dirname, '../core/index.ts'),
       // cli's daemon-status-provider.test.ts imports `FakeAgent` /
       // `makeChannel` from acp-bridge's package-private
       // `internal/testUtils` module. This alias overrides the runtime
@@ -61,23 +61,23 @@ export default defineConfig({
         __dirname,
         '../acp-bridge/src/bridgeFileSystem.ts',
       ),
-      '@qwen-code/acp-bridge/sessionArtifacts': path.resolve(
+      '@hoptrendy/acp-bridge/sessionArtifacts': path.resolve(
         __dirname,
         '../acp-bridge/src/sessionArtifacts.ts',
       ),
-      '@qwen-code/acp-bridge/eventBus': path.resolve(
+      '@hoptrendy/acp-bridge/eventBus': path.resolve(
         __dirname,
         '../acp-bridge/src/eventBus.ts',
       ),
-      '@qwen-code/acp-bridge/replayWindowLimits': path.resolve(
+      '@hoptrendy/acp-bridge/replayWindowLimits': path.resolve(
         __dirname,
         '../acp-bridge/src/replayWindowLimits.ts',
       ),
-      '@qwen-code/acp-bridge/transcriptReplay': path.resolve(
+      '@hoptrendy/acp-bridge/transcriptReplay': path.resolve(
         __dirname,
         '../acp-bridge/src/transcript-replay.ts',
       ),
-      '@qwen-code/acp-bridge/workspacePaths': path.resolve(
+      '@hoptrendy/acp-bridge/workspacePaths': path.resolve(
         __dirname,
         '../acp-bridge/src/workspacePaths.ts',
       ),
@@ -117,19 +117,19 @@ export default defineConfig({
         __dirname,
         '../quran-guidance/src/index.ts',
       ),
-      '@qwen-code/sdk/daemon/transcript': path.resolve(
+      '@hoptrendy/sdk/daemon/transcript': path.resolve(
         __dirname,
         '../sdk-typescript/src/daemon/transcript.ts',
       ),
-      '@qwen-code/sdk/daemon/ui/transcript': path.resolve(
+      '@hoptrendy/sdk/daemon/ui/transcript': path.resolve(
         __dirname,
         '../sdk-typescript/src/daemon/ui/transcript.ts',
       ),
-      '@qwen-code/sdk/daemon/types': path.resolve(
+      '@hoptrendy/sdk/daemon/types': path.resolve(
         __dirname,
         '../sdk-typescript/src/daemon/types.ts',
       ),
-      '@qwen-code/sdk/daemon': path.resolve(
+      '@hoptrendy/sdk/daemon': path.resolve(
         __dirname,
         '../sdk-typescript/src/daemon/index.ts',
       ),

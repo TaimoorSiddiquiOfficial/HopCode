@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type { DaemonCapabilities } from '@qwen-code/sdk/daemon';
+import type { DaemonCapabilities } from '@hoptrendy/sdk/daemon';
 import { workspaceAccentColor } from './workspaceColor';
 
 function capabilities(cwds: string[]): DaemonCapabilities {

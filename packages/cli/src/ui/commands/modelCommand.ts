@@ -21,7 +21,7 @@ import {
   isImageCapable,
   parseVisionModelSetting,
   resolveModelId,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { SettingScope, type LoadedSettings } from '../../config/settings.js';
 import {
   isInlineModelOverrideAllowed,

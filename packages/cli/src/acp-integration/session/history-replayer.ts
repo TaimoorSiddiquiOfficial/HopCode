@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ChatRecord, HistoryGap } from '@qwen-code/qwen-code-core';
+import type { ChatRecord, HistoryGap } from '@hoptrendy/hopcode-core';
 import {
   createTranscriptReplayMachine,
   MISSING_TRANSCRIPT_TOOL_RESULT_MESSAGE,
@@ -12,7 +12,7 @@ import {
   type TranscriptReplayMachine,
   type TranscriptReplayPresentationAdapter,
   type TranscriptReplayStateV1,
-} from '@qwen-code/acp-bridge/transcriptReplay';
+} from '@hoptrendy/acp-bridge/transcriptReplay';
 import type { SessionEmitterContext } from './types.js';
 import { hasFullSessionContext } from './types.js';
 import { MessageEmitter } from './emitters/MessageEmitter.js';

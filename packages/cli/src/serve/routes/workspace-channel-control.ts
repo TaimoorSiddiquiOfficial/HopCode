@@ -5,9 +5,9 @@
  */
 
 import type { Application, Request, RequestHandler, Response } from 'express';
-import { redactLogCredentials } from '@qwen-code/acp-bridge/logRedaction';
-import { MAX_WORKSPACE_PATH_LENGTH } from '@qwen-code/acp-bridge/workspacePaths';
-import { sanitizeLogText } from '@qwen-code/channel-base';
+import { redactLogCredentials } from '@hoptrendy/acp-bridge/logRedaction';
+import { MAX_WORKSPACE_PATH_LENGTH } from '@hoptrendy/acp-bridge/workspacePaths';
+import { sanitizeLogText } from '@hoptrendy/channel-base';
 import { normalizeServeChannelSelection } from '../channel-selection.js';
 import {
   MAX_CHANNEL_STARTUP_FAILURES,

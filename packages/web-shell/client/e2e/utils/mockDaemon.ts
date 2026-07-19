@@ -23,7 +23,7 @@ import {
   type ExtensionUpdateCheckResponse,
   type PermissionResponse,
   type PromptRequest,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { installSseTransport, type SseTransport } from './sseTransport';
 
 export interface DaemonRequestRecord {

@@ -23,9 +23,9 @@ import { isWithinRoot } from '../config/path-comparison.js';
 import {
   DEFAULT_COMPACTED_REPLAY_MAX_BYTES,
   normalizeCompactedReplayMaxBytes,
-} from '@qwen-code/acp-bridge/replayWindowLimits';
-import type { BridgeEvent } from '@qwen-code/acp-bridge/eventBus';
-import type { NdJsonMessageObservation } from '@qwen-code/acp-bridge/ndJsonStream';
+} from '@hoptrendy/acp-bridge/replayWindowLimits';
+import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
+import type { NdJsonMessageObservation } from '@hoptrendy/acp-bridge/ndJsonStream';
 import { getDeviceFlowRegistry } from './auth/device-flow.js';
 import {
   loadServeFastPathSettings,
@@ -36,8 +36,8 @@ import {
   MAX_REGISTERED_WORKSPACES,
   resolveWorkspaceInputs,
 } from './workspace-inputs.js';
-import type { AcpSessionBridge } from '@qwen-code/acp-bridge/bridgeTypes';
-import { canonicalizeWorkspace } from '@qwen-code/acp-bridge/workspacePaths';
+import type { AcpSessionBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
+import { canonicalizeWorkspace } from '@hoptrendy/acp-bridge/workspacePaths';
 import type {
   AuthType,
   ProviderSetupInputs,
@@ -93,7 +93,7 @@ import {
   workspaceRegistrationId,
   type WorkspaceRegistrationStore,
 } from './workspace-registration-store.js';
-import type { PermissionPolicy } from '@qwen-code/acp-bridge';
+import type { PermissionPolicy } from '@hoptrendy/acp-bridge';
 import { getCliVersion } from '../utils/version.js';
 import { getRateLimiter } from './rate-limit.js';
 import type { AcpHttpHandle } from './acp-http/index.js';
@@ -138,7 +138,7 @@ import type {
   ServiceInfo,
   ServiceInfoWorker,
 } from '../commands/channel/pidfile.js';
-import { sanitizeLogText } from '@qwen-code/channel-base';
+import { sanitizeLogText } from '@hoptrendy/channel-base';
 import { isBrowserAutomationMcpAvailable } from './cdp-mcp-command.js';
 import { WorkspaceVoiceCoordinator } from './voice/workspace-voice-coordinator.js';
 import {

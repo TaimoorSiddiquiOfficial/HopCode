@@ -20,7 +20,7 @@ const { mockConnection } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useConnection: () => mockConnection,
 }));
 

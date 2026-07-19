@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/channel-plugin-example",
+  "name": "@hoptrendy/channel-plugin-example",
   "version": "0.19.12",
   "private": true,
   "type": "module",

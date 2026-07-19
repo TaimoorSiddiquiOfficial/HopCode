@@ -8,7 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   useWorkspaceActions,
   type DaemonGoal,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../../i18n';
 import { DialogShell } from './DialogShell';
 import { formatRuntime } from '../../utils/formatRuntime';

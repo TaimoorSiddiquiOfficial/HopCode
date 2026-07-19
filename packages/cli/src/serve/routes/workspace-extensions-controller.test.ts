@@ -5,7 +5,7 @@
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ExtensionManager } from '@qwen-code/qwen-code-core';
+import { ExtensionManager } from '@hoptrendy/hopcode-core';
 import type { Response } from 'express';
 import type { AcpSessionBridge } from '../acp-session-bridge.js';
 import type { DaemonWorkspaceService } from '../workspace-service/types.js';

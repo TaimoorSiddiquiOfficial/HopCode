@@ -66,7 +66,7 @@ import {
   ShellExecutionService,
   stableSessionArtifactId,
   ToolNames,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   FakeAgent,
   type ChannelHandle,

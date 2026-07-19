@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/channel-telegram",
+  "name": "@hoptrendy/channel-telegram",
   "version": "0.19.12",
   "description": "Telegram channel adapter for Qwen Code",
   "type": "module",

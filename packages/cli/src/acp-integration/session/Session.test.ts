@@ -27,7 +27,7 @@ import type {
   Config,
   Extension,
   GeminiChat,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   ApprovalMode,
   AuthType,

@@ -2738,7 +2738,7 @@ describe('DaemonSessionProvider', () => {
     // receives. Batched dispatch must hand the whole burst to a single reducer
     // pass; a regression to per-event dispatch would surface as many
     // single-event dispatches and fail the batch-size assertion below.
-    const sdk = await import('@qwen-code/sdk/daemon');
+    const sdk = await import('@hoptrendy/sdk/daemon');
     const realCreateStore = sdk.createDaemonTranscriptStore;
     const dispatchBatchSizes: number[] = [];
     const createStoreSpy = vi

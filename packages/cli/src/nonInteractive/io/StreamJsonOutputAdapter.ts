@@ -11,8 +11,8 @@ import type {
   ToolCallRequestInfo,
   McpToolProgressData,
   ShellProgressData,
-} from '@qwen-code/qwen-code-core';
-import { GeminiEventType } from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
+import { GeminiEventType } from '@hoptrendy/hopcode-core';
 import type {
   CLIAssistantMessage,
   CLIMessage,

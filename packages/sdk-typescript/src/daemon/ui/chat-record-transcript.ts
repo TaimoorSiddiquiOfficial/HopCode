@@ -7,8 +7,8 @@
 import {
   prepareTranscriptRecords,
   TranscriptRecordPreparationError,
-} from '@qwen-code/qwen-code-core/transcriptRecords';
-import { createTranscriptReplayMachine } from '@qwen-code/acp-bridge/transcriptReplay';
+} from '@hoptrendy/hopcode-core/transcriptRecords';
+import { createTranscriptReplayMachine } from '@hoptrendy/acp-bridge/transcriptReplay';
 import type { DaemonEvent } from '../types.js';
 import { normalizeDaemonEvent } from './normalizer.js';
 import {

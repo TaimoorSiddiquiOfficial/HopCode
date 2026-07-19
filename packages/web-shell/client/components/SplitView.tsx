@@ -9,8 +9,8 @@ import {
   DaemonSessionProvider,
   useConnection,
   type DaemonWorkspaceActions,
-} from '@qwen-code/webui/daemon-react-sdk';
-import type { DaemonSessionArtifact } from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/webui/daemon-react-sdk';
+import type { DaemonSessionArtifact } from '@hoptrendy/sdk/daemon';
 import { useI18n } from '../i18n';
 import { ChatPane } from './ChatPane';
 import { ErrorBoundary } from './ErrorBoundary';

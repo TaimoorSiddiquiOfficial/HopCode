@@ -14,7 +14,7 @@ import {
   type GoalTerminalEvent,
   type GoalTerminalKind,
   type SlashCommandRecordPayload,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   isGoalStatusKind,
   isTerminalGoalStatusKind,

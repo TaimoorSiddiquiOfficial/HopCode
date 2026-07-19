@@ -28,7 +28,7 @@ const { actions } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useWorkspaceActions: () => actions,
 }));
 

@@ -30,7 +30,7 @@ import type { Application } from 'express';
 import type {
   BridgeSessionGoal,
   BridgeSessionSummary,
-} from '@qwen-code/acp-bridge';
+} from '@hoptrendy/acp-bridge';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 
 /**

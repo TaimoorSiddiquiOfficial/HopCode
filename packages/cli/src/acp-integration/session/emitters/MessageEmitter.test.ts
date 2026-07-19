@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MessageEmitter } from './MessageEmitter.js';
 import type { SessionContext } from '../types.js';
-import { apiActivityTracker, type Config } from '@qwen-code/qwen-code-core';
+import { apiActivityTracker, type Config } from '@hoptrendy/hopcode-core';
 
 describe('MessageEmitter', () => {
   let mockContext: SessionContext;

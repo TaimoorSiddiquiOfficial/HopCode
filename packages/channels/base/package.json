@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/channel-base",
+  "name": "@hoptrendy/channel-base",
   "version": "0.19.12",
   "description": "Base channel infrastructure for Qwen Code",
   "type": "module",

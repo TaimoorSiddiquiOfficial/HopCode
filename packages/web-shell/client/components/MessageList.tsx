@@ -17,7 +17,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import type { DaemonSessionArtifact } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionArtifact } from '@hoptrendy/sdk/daemon';
 import type { Message, ACPToolCall, TurnCollapseHead } from '../adapters/types';
 import type { PermissionRequest } from '../adapters/types';
 import {

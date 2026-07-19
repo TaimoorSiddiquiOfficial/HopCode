@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/channel-wecom",
+  "name": "@hoptrendy/channel-wecom",
   "version": "0.19.12",
   "description": "WeCom channel adapter for Qwen Code",
   "type": "module",
@@ -20,7 +20,7 @@
     "test:ci": "vitest run"
   },
   "dependencies": {
-    "@qwen-code/channel-base": "file:../base",
+    "@hoptrendy/channel-base": "file:../base",
     "@wecom/aibot-node-sdk": "^1.0.7"
   },
   "devDependencies": {

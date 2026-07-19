@@ -12,7 +12,7 @@ import type {
 import {
   createDebugLogger,
   isVisionBridgeNoticeDisplay,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   ToolCallStatus,
   type HistoryItemToolGroup,

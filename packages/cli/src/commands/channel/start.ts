@@ -9,7 +9,7 @@ import {
   readChannelMemory,
   removeChannelMemoryEntries,
   updateChannelMemoryEntry,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../../config/settings.js';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { AcpBridge, SessionRouter } from '@hoptrendy/channel-base';

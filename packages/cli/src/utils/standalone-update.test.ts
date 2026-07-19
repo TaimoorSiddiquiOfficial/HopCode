@@ -356,7 +356,7 @@ describe('standalone-update', () => {
       fs.writeFileSync(
         path.join(standaloneDir, 'manifest.json'),
         JSON.stringify({
-          name: '@qwen-code/qwen-code',
+          name: '@hoptrendy/hopcode',
           target: 'win-x64',
         }),
       );

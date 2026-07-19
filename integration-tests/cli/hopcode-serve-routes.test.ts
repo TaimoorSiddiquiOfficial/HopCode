@@ -36,12 +36,12 @@ import {
   DaemonClient,
   DaemonHttpError,
   type DaemonSessionSummary,
-} from '@qwen-code/sdk';
+} from '@hoptrendy/sdk';
 import {
   SESSION_TRANSCRIPT_MAX_INDEX_BYTES,
   Storage,
   type ChatRecord,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Match the rest of the integration suite: prefer the bundled CLI

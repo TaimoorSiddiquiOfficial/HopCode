@@ -29,19 +29,19 @@ import {
   UnsupportedDeviceFlowProviderError,
   UpstreamDeviceFlowError,
 } from '../auth/device-flow.js';
-import type { HttpAcpBridge } from '@qwen-code/acp-bridge/bridgeTypes';
-import { parseSessionSource } from '@qwen-code/acp-bridge';
-import type { BridgeEvent } from '@qwen-code/acp-bridge/eventBus';
+import type { HttpAcpBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
+import { parseSessionSource } from '@hoptrendy/acp-bridge';
+import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
 import {
   SessionShellClientRequiredError,
   SessionShellDisabledError,
   WorkspaceMismatchError,
-} from '@qwen-code/acp-bridge/bridgeErrors';
+} from '@hoptrendy/acp-bridge/bridgeErrors';
 import {
   SessionArtifactAuthorizationError,
   SessionArtifactValidationError,
-} from '@qwen-code/acp-bridge/sessionArtifacts';
-import { canonicalizeWorkspace } from '@qwen-code/acp-bridge/workspacePaths';
+} from '@hoptrendy/acp-bridge/sessionArtifacts';
+import { canonicalizeWorkspace } from '@hoptrendy/acp-bridge/workspacePaths';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import { MAX_WORKSPACE_PATH_LENGTH } from '../fs/paths.js';
 import {

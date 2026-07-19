@@ -27,8 +27,8 @@ import {
 import { isBrowserAutomationMcpAvailable } from './cdp-mcp-command.js';
 import { RUNTIME_STARTUP_CANCELLED_MESSAGE } from './runtime-startup-errors.js';
 import { isLoopbackBind } from './loopback-binds.js';
-import * as acpBridge from '@qwen-code/acp-bridge/bridge';
-import { canonicalizeWorkspace } from '@qwen-code/acp-bridge/workspacePaths';
+import * as acpBridge from '@hoptrendy/acp-bridge/bridge';
+import { canonicalizeWorkspace } from '@hoptrendy/acp-bridge/workspacePaths';
 import type {
   BridgeDaemonStatusSnapshot,
   HttpAcpBridge,

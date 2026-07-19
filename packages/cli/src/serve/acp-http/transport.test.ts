@@ -12,15 +12,15 @@ import WebSocket from 'ws';
 import type {
   BridgeSessionSummary,
   HttpAcpBridge,
-} from '@qwen-code/acp-bridge/bridgeTypes';
+} from '@hoptrendy/acp-bridge/bridgeTypes';
 import type {
   BridgeEvent,
   SessionReplaySnapshot,
-} from '@qwen-code/acp-bridge/eventBus';
+} from '@hoptrendy/acp-bridge/eventBus';
 import {
   SessionArtifactAuthorizationError,
   SessionArtifactValidationError,
-} from '@qwen-code/acp-bridge/sessionArtifacts';
+} from '@hoptrendy/acp-bridge/sessionArtifacts';
 import {
   CancelSentinelCollisionError,
   InvalidClientIdError,
@@ -32,8 +32,8 @@ import {
   SessionShellClientRequiredError,
   SessionShellDisabledError,
   TotalSessionLimitExceededError,
-} from '@qwen-code/acp-bridge/bridgeErrors';
-import { SessionService, Storage } from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/acp-bridge/bridgeErrors';
+import { SessionService, Storage } from '@hoptrendy/hopcode-core';
 import {
   resetHomeEnvBootstrapForTesting,
   SettingScope,

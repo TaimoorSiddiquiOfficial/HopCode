@@ -1,6 +1,6 @@
 ﻿import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { hashDaemonWorkspace, Storage } from '@qwen-code/qwen-code-core';
+import { hashDaemonWorkspace, Storage } from '@hoptrendy/hopcode-core';
 import type {
   SessionRouter,
   ChannelAgentBridge,

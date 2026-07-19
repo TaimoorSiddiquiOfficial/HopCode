@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { redactLogCredentials } from '@qwen-code/acp-bridge/logRedaction';
-import { sanitizeLogText } from '@qwen-code/channel-base';
+import { redactLogCredentials } from '@hoptrendy/acp-bridge/logRedaction';
+import { sanitizeLogText } from '@hoptrendy/channel-base';
 import { normalizeWorkerDiagnostic } from '../../serve/channel-worker-diagnostics.js';
 import {
   MAX_CHANNEL_STARTUP_FAILURES,

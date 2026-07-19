@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { useCallback, useEffect, useState } from 'react';
-import { DaemonWorkspaceProvider } from '@qwen-code/webui/daemon-react-sdk';
+import { DaemonWorkspaceProvider } from '@hoptrendy/webui/daemon-react-sdk';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { RootErrorFallback } from './components/RootErrorFallback';
 import { WorkspaceSessionProvider } from './components/WorkspaceSessionProvider';

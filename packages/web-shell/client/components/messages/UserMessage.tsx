@@ -15,7 +15,7 @@ import {
   isBuiltinComposerTagIconUrl,
   splitComposerTagContentByAnnotations,
 } from '../../utils/composerTag';
-import type { DaemonInputAnnotation } from '@qwen-code/sdk/daemon';
+import type { DaemonInputAnnotation } from '@hoptrendy/sdk/daemon';
 import { isSafeImageSrc } from './Markdown';
 import { useWebShellCustomization } from '../../customization';
 import type {

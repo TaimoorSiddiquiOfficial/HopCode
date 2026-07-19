@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { DaemonInputAnnotation } from '@qwen-code/sdk/daemon';
+import type { DaemonInputAnnotation } from '@hoptrendy/sdk/daemon';
 
 export type DaemonMessageToolCallStatus =
   | 'pending'

@@ -6,7 +6,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as path from 'node:path';
-import type { Config, ExtensionMutationEvent } from '@qwen-code/qwen-code-core';
+import type { Config, ExtensionMutationEvent } from '@hoptrendy/hopcode-core';
 import { ExtensionFileWatcher } from './extension-file-watcher.js';
 import { ExtensionRefreshState } from './extension-refresh-state.js';
 

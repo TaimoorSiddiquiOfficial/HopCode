@@ -14,7 +14,7 @@ import type {
   TranscriptProjectionDiagnostic,
   TranscriptRecordInput,
   TranscriptReplayGapInput,
-} from '@qwen-code/qwen-code-core/transcriptRecords';
+} from '@hoptrendy/hopcode-core/transcriptRecords';
 
 export const MISSING_TRANSCRIPT_TOOL_RESULT_MESSAGE =
   'Tool result missing from saved history; the previous run likely ended ' +

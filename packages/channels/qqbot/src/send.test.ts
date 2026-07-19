@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type {
   ChannelAgentBridge,
   ChannelTaskLifecycleEvent,
-} from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
 import { isValidChatId, DeliveryError } from './QQChannel.js';
 
 const {

@@ -71,7 +71,7 @@ import {
   getComposerTagSerialized,
   isBuiltinComposerTagIconUrl,
 } from '../utils/composerTag';
-import type { DaemonInputAnnotation } from '@qwen-code/sdk/daemon';
+import type { DaemonInputAnnotation } from '@hoptrendy/sdk/daemon';
 import { isSafeImageSrc } from '../components/messages/Markdown';
 import type {
   ComposerTagClickHandler,

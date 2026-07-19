@@ -4,7 +4,7 @@ import type {
   SubagentConfig,
   McpToolProgressData,
   ShellProgressData,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 
 /**
  * Annotation for attaching metadata to content blocks

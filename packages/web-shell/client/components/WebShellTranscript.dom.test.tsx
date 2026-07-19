@@ -2,7 +2,7 @@
 import { act, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { DaemonTranscriptBlock } from '@qwen-code/sdk/daemon';
+import type { DaemonTranscriptBlock } from '@hoptrendy/sdk/daemon';
 import { WebShellTranscript } from './WebShellTranscript';
 
 const mounted: Array<{ root: Root; container: HTMLElement }> = [];

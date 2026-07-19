@@ -8,7 +8,7 @@ import type {
   ChatRecord,
   SessionTranscriptCursorState,
   SessionTranscriptRecordPage,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { HistoryReplayer } from './history-replayer.js';
 import {

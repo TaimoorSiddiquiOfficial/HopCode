@@ -9,7 +9,7 @@ import {
   resolveBranchName,
   watchRepoBranch,
   type GitOperation,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { AcpSessionBridge } from './acp-session-bridge.js';
 
 export interface WorkspaceGitStatus {

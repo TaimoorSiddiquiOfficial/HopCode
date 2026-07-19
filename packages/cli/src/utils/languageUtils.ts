@@ -12,7 +12,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { Storage } from '@qwen-code/qwen-code-core';
+import { Storage } from '@hoptrendy/hopcode-core';
 import { getLanguageNameFromLocale } from '../i18n/index.js';
 import { SUPPORTED_LANGUAGES } from '../i18n/languages.js';
 

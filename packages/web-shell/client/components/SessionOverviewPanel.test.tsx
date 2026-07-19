@@ -11,7 +11,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import type {
   DaemonSessionSummary,
   DaemonStatusReportSession,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { I18nProvider } from '../i18n';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -39,7 +39,7 @@ let workspaceClient: { listWorkspaceSessions: ReturnType<typeof vi.fn> };
 const sessionsReload = vi.fn(async () => sessionsState.sessions);
 const statusReload = vi.fn(async () => statusState.report);
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useConnection: () => connectionState,
   useSessions: () => ({ ...sessionsState, reload: sessionsReload }),
   useStatusReport: () => ({ ...statusState, reload: statusReload }),

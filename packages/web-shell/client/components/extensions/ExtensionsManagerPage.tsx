@@ -27,12 +27,12 @@ import {
   type DaemonExtensionUpdateState,
   type ExtensionInteractionResponse,
   type ExtensionPendingInteraction,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import {
   useConnection,
   useWorkspaceActions,
   useWorkspaceEventSignals,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../../i18n';
 import { trimDialogLabel } from '../../utils/dialogLabels';
 import styles from './ExtensionsManagerPage.module.css';

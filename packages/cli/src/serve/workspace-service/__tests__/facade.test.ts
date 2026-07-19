@@ -91,8 +91,8 @@ vi.mock('../../../utils/stdioHelpers.js', () => ({
 }));
 
 const { createDaemonWorkspaceService } = await import('../index.js');
-import { SessionNotFoundError } from '@qwen-code/acp-bridge/bridgeErrors';
-import { BridgeChannelClosedError } from '@qwen-code/acp-bridge/status';
+import { SessionNotFoundError } from '@hoptrendy/acp-bridge/bridgeErrors';
+import { BridgeChannelClosedError } from '@hoptrendy/acp-bridge/status';
 import {
   resetHomeEnvBootstrapForTesting,
   SettingScope,

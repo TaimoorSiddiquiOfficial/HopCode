@@ -181,7 +181,7 @@ await esbuild.build({
   treeShaking: true,
 });
 
-// Opt-in transports subpath (`@qwen-code/sdk/daemon/transports`): the concrete
+// Opt-in transports subpath (`@hoptrendy/sdk/daemon/transports`): the concrete
 // ACP transports + negotiateTransport. Kept out of the default daemon barrel
 // (and its byte budget) so REST-only consumers stay tree-shaken; consumers who
 // want resumable ACP-over-HTTP import this entry explicitly. Built as its own
@@ -318,8 +318,8 @@ function assertTranscriptBundle(filePath) {
 function assertTranscriptDeclaration(filePath) {
   const contents = readFileSync(filePath, 'utf8');
   const forbiddenReferences = [
-    '@qwen-code/qwen-code-core',
-    '@qwen-code/acp-bridge',
+    '@hoptrendy/hopcode-core',
+    '@hoptrendy/acp-bridge',
     'reference types="node"',
   ];
   const found = forbiddenReferences.find((token) => contents.includes(token));

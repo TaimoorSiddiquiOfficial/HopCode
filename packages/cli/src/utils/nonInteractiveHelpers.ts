@@ -23,7 +23,7 @@ import {
   getMCPServerStatus,
   getPlanModeSystemReminder,
   isShellProgressData,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { Part, PartListUnion } from '@google/genai';
 import type {
   CLIUserMessage,

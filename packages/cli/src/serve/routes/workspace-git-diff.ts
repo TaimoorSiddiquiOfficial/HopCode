@@ -10,7 +10,7 @@ import {
   fetchGitDiffHunksForFile,
   type GitDiffFileHunks,
   type GitDiffResult,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { SendBridgeError } from '../server/error-response.js';
 import type {
   WorkspaceRegistry,

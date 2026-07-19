@@ -8,7 +8,7 @@ import { describe, it, expect, vi } from 'vitest';
 import type { InsightData } from '../types/StaticInsightTypes.js';
 
 // Stub the web-templates bundle so the renderer can be imported in isolation.
-vi.mock('@qwen-code/web-templates', () => ({
+vi.mock('@hoptrendy/web-templates', () => ({
   INSIGHT_JS: '',
   INSIGHT_CSS: '',
 }));

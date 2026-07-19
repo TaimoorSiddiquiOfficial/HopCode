@@ -9,7 +9,7 @@ import {
   SESSION_TRANSCRIPT_MAX_INDEX_BYTES,
   SessionService,
   type ResumedSessionData,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   collectSessionData,
   generateExportFilename,

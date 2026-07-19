@@ -15,7 +15,7 @@ import {
 } from '../../customization';
 import { useI18n } from '../../i18n';
 import { formatTimestamp } from '../MessageTimestamp';
-import type { DaemonSessionGenerationEvent } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionGenerationEvent } from '@hoptrendy/sdk/daemon';
 import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import flashStyles from '../MessageLocateFlash.module.css';

@@ -1,4 +1,4 @@
-import type { DaemonSessionArtifact } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionArtifact } from '@hoptrendy/sdk/daemon';
 
 export function artifactKindLabel(kind: string): string {
   switch (kind) {

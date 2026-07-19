@@ -16,7 +16,7 @@ import type { ApprovalMode } from '@hoptrendy/hopcode-core';
 import {
   APPROVAL_MODES,
   ApprovalMode as ApprovalModeEnum,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { formatApprovalModeName } from '../utils/approvalModeDisplay.js';
 
 /**

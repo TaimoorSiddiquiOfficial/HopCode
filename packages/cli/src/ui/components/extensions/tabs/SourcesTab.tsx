@@ -21,7 +21,7 @@ import {
   redactUrlCredentials,
   createDebugLogger,
   isExtensionCommittedWithWarningsError,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { getErrorMessage } from '../../../../utils/errors.js';
 import { stripUnsafeCharacters } from '../../../utils/textUtils.js';
 import type { StatusMessage } from '../ExtensionsManagerDialog.js';

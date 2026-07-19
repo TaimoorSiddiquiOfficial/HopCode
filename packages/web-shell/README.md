@@ -143,8 +143,8 @@ export function App() {
 投影：
 
 ```tsx
-import { projectChatRecordsToDaemonTranscript } from '@qwen-code/sdk/daemon/transcript';
-import { WebShellTranscript } from '@qwen-code/web-shell';
+import { projectChatRecordsToDaemonTranscript } from '@hoptrendy/sdk/daemon/transcript';
+import { WebShellTranscript } from '@hoptrendy/web-shell';
 
 const records = jsonl
   .split(/\r?\n/)
@@ -217,7 +217,7 @@ fenced code block 的渲染。图表类场景可以注册内置的
 `echarts-fulldata` renderer：
 
 ```tsx
-import { createEchartsFullDataRenderer } from '@qwen-code/web-shell';
+import { createEchartsFullDataRenderer } from '@hoptrendy/web-shell';
 
 <WebShellWithProviders
   markdown={{
@@ -237,7 +237,7 @@ renderer 不会自己读取 URL 或本地路径。
 
 如果需要让模型主动输出 `echarts-fulldata` block，宿主应在自己的 skills 来源中
 提供对应 skill，并且只在确认当前 Web Shell 宿主已经注册 renderer 时启用。
-`@qwen-code/web-shell` 不内置或自动加载这个 skill；可从
+`@hoptrendy/web-shell` 不内置或自动加载这个 skill；可从
 `packages/web-shell/docs/examples/qwencode-viz/SKILL.md` 复制模板到宿主的
 `.qwen/skills/qwencode-viz/SKILL.md`，或通过宿主自己的 skill 注入机制提供等价
 说明。

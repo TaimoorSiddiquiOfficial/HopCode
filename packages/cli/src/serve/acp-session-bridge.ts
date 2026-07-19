@@ -135,9 +135,9 @@ export {
 export {
   MAX_WORKSPACE_PATH_LENGTH,
   canonicalizeWorkspace,
-} from '@qwen-code/acp-bridge/workspacePaths';
+} from '@hoptrendy/acp-bridge/workspacePaths';
 
 export {
   SessionArtifactAuthorizationError,
   SessionArtifactValidationError,
-} from '@qwen-code/acp-bridge/sessionArtifacts';
+} from '@hoptrendy/acp-bridge/sessionArtifacts';

@@ -8,12 +8,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   useConnection,
   useStatusReport,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import type {
   DaemonSessionGroupPresetColor,
   DaemonSessionSummary,
   DaemonStatusReportSession,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { useI18n } from '../i18n';
 import { formatRelativeTime } from '../utils/formatRelativeTime';
 import { buildSplitUrl, MAX_SPLIT_PANES } from '../utils/splitUrl';

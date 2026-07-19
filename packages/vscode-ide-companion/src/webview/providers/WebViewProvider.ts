@@ -40,7 +40,7 @@ import {
 import {
   buildInstallPlan,
   parseInsightMessage,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { isLogLevel, logger } from '../../utils/logger.js';
 
 /** Threshold (ms) before a completed task triggers a notification. */

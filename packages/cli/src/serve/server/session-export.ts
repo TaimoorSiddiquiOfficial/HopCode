@@ -8,7 +8,7 @@ import {
   SESSION_TRANSCRIPT_MAX_INDEX_BYTES,
   SessionService,
   type SessionArchiveState,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { SessionNotFoundError } from '../acp-session-bridge.js';
 import {
   collectSessionData,

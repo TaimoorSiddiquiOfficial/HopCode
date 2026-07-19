@@ -7,24 +7,24 @@
     "lib": ["DOM", "DOM.Iterable", "ES2023"],
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@qwen-code/qwen-code-core": ["../core/src/index.ts"],
-      "@qwen-code/qwen-code-core/transcriptRecords": [
+      "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
+      "@hoptrendy/hopcode-core/transcriptRecords": [
         "../core/src/utils/transcript-records.ts"
       ],
-      "@qwen-code/qwen-code-core/*": ["../core/src/*"],
-      "@qwen-code/acp-bridge": ["../acp-bridge/src/index.ts"],
-      "@qwen-code/acp-bridge/transcriptReplay": [
+      "@hoptrendy/hopcode-core/*": ["../core/src/*"],
+      "@hoptrendy/acp-bridge": ["../acp-bridge/src/index.ts"],
+      "@hoptrendy/acp-bridge/transcriptReplay": [
         "../acp-bridge/src/transcript-replay.ts"
       ],
-      "@qwen-code/acp-bridge/*": ["../acp-bridge/src/*"],
-      "@qwen-code/audio-capture": ["../audio-capture/src/index.ts"],
-      "@qwen-code/audio-capture/*": ["../audio-capture/src/*"],
-      "@qwen-code/sdk": ["../sdk-typescript/src/index.ts"],
-      "@qwen-code/sdk/daemon/ui/transcript": [
+      "@hoptrendy/acp-bridge/*": ["../acp-bridge/src/*"],
+      "@hoptrendy/audio-capture": ["../audio-capture/src/index.ts"],
+      "@hoptrendy/audio-capture/*": ["../audio-capture/src/*"],
+      "@hoptrendy/sdk": ["../sdk-typescript/src/index.ts"],
+      "@hoptrendy/sdk/daemon/ui/transcript": [
         "../sdk-typescript/src/daemon/ui/transcript.ts"
       ],
-      "@qwen-code/sdk/daemon/types": ["../sdk-typescript/src/daemon/types.ts"],
-      "@qwen-code/sdk/*": ["../sdk-typescript/src/*"]
+      "@hoptrendy/sdk/daemon/types": ["../sdk-typescript/src/daemon/types.ts"],
+      "@hoptrendy/sdk/*": ["../sdk-typescript/src/*"]
     }
   },
   "include": [

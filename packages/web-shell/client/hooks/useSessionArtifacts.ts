@@ -4,8 +4,8 @@ import {
   useConnection,
   usePromptStatus,
   useWorkspaceEventSignals,
-} from '@qwen-code/webui/daemon-react-sdk';
-import type { DaemonSessionArtifact } from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/webui/daemon-react-sdk';
+import type { DaemonSessionArtifact } from '@hoptrendy/sdk/daemon';
 
 const SESSION_ARTIFACTS_FEATURE = 'session_artifacts';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/web-shell",
+  "name": "@hoptrendy/web-shell",
   "version": "0.19.12",
   "type": "module",
   "main": "./dist/index.js",
@@ -63,8 +63,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
-    "@qwen-code/sdk": "file:../sdk-typescript",
-    "@qwen-code/webui": "file:../webui",
+    "@hoptrendy/sdk": "file:../sdk-typescript",
+    "@hoptrendy/webui": "file:../webui",
     "@tailwindcss/vite": "^4.3.2",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.0",

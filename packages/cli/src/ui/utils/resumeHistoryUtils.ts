@@ -15,8 +15,8 @@ import type {
   SlashCommandRecordPayload,
   AtCommandRecordPayload,
   HistoryGap,
-} from '@qwen-code/qwen-code-core';
-import { getToolResponseDisplayText } from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
+import { getToolResponseDisplayText } from '@hoptrendy/hopcode-core';
 import type {
   HistoryItem,
   HistoryItemInfo,

@@ -674,17 +674,17 @@ describe('getInstallationInfo', () => {
 describe('resolveUpdateCommand', () => {
   it('replaces @latest with the pinned stable version', () => {
     expect(
-      resolveUpdateCommand('npm i -g @qwen-code/qwen-code@latest', '1.2.3'),
-    ).toBe('npm i -g @qwen-code/qwen-code@1.2.3');
+      resolveUpdateCommand('npm i -g @hoptrendy/hopcode@latest', '1.2.3'),
+    ).toBe('npm i -g @hoptrendy/hopcode@1.2.3');
   });
 
   it('replaces @latest with @nightly for nightly versions', () => {
     expect(
       resolveUpdateCommand(
-        'npm i -g @qwen-code/qwen-code@latest',
+        'npm i -g @hoptrendy/hopcode@latest',
         '1.2.3-nightly.20250101',
       ),
-    ).toBe('npm i -g @qwen-code/qwen-code@nightly');
+    ).toBe('npm i -g @hoptrendy/hopcode@nightly');
   });
 });
 
@@ -695,13 +695,13 @@ describe('formatUpdateInstructions', () => {
         {
           packageManager: PackageManager.NPM,
           isGlobal: true,
-          updateCommand: 'npm i -g @qwen-code/qwen-code@latest',
+          updateCommand: 'npm i -g @hoptrendy/hopcode@latest',
         },
         '1.2.3',
       ),
     ).toEqual([
       'Run the following to update:',
-      '  npm i -g @qwen-code/qwen-code@1.2.3',
+      '  npm i -g @hoptrendy/hopcode@1.2.3',
     ]);
   });
 
@@ -712,13 +712,13 @@ describe('formatUpdateInstructions', () => {
           packageManager: PackageManager.NPM,
           isGlobal: true,
           updateMessage:
-            'Update requires sudo. Please run: sudo npm i -g @qwen-code/qwen-code@latest',
+            'Update requires sudo. Please run: sudo npm i -g @hoptrendy/hopcode@latest',
         },
         '1.2.3-nightly.20250101',
       ),
     ).toEqual([
       'Update requires sudo. Please run:',
-      '  sudo npm i -g @qwen-code/qwen-code@nightly',
+      '  sudo npm i -g @hoptrendy/hopcode@nightly',
     ]);
   });
 

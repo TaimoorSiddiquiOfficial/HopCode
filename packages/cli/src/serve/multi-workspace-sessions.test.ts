@@ -16,7 +16,7 @@ import {
   createDebugLogger,
   resetDebugLoggingState,
   setDebugLogSession,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   InvalidRewindTargetError,
   SessionBusyError,

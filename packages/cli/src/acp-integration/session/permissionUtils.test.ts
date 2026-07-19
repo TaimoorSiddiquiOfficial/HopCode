@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { ToolConfirmationOutcome } from '@qwen-code/qwen-code-core';
+import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
 import {
   interactionMetaFields,
   toPermissionOptions,

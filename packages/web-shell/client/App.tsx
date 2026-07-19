@@ -37,7 +37,7 @@ import type {
   DaemonSessionArtifact,
   DaemonWorkspaceCapability,
   DaemonWorkspaceGitStatus,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { extractPendingPermission } from './adapters/transcriptAdapter';
 import { MessageList, type MessageListHandle } from './components/MessageList';
 import { extractVoiceModels, type VoiceModelOption } from './voice/voiceModels';

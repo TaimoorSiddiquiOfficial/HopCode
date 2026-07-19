@@ -519,9 +519,9 @@ import { describe, it, expect, vi } from 'vitest';
 import type { UsageSummaryRecord } from '@hoptrendy/hopcode-core';
 
 // Mock loadUsageHistory to return controlled data
-vi.mock('@qwen-code/qwen-code-core', async (importOriginal) => {
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
   const orig =
-    await importOriginal<typeof import('@qwen-code/qwen-code-core')>();
+    await importOriginal<typeof import('@hoptrendy/hopcode-core')>();
   return {
     ...orig,
     loadUsageHistory: vi.fn(),

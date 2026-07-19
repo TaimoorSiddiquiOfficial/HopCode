@@ -8,15 +8,15 @@ import type { SessionUpdate } from '@agentclientprotocol/sdk';
 import {
   prepareTranscriptRecords,
   type ChatRecord,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   createDaemonTranscriptState,
   normalizeDaemonEvent,
   reduceDaemonTranscriptEvents,
-} from '@qwen-code/sdk/daemon';
-import { projectChatRecordsToDaemonTranscript } from '@qwen-code/sdk/daemon/transcript';
-import { finalizeOfflineDaemonTranscriptState } from '@qwen-code/sdk/daemon/ui/transcript';
-import type { DaemonEvent } from '@qwen-code/sdk/daemon/types';
+} from '@hoptrendy/sdk/daemon';
+import { projectChatRecordsToDaemonTranscript } from '@hoptrendy/sdk/daemon/transcript';
+import { finalizeOfflineDaemonTranscriptState } from '@hoptrendy/sdk/daemon/ui/transcript';
+import type { DaemonEvent } from '@hoptrendy/sdk/daemon/types';
 import { describe, expect, it } from 'vitest';
 import { HistoryReplayer } from './history-replayer.js';
 import type { SessionEmitterContext } from './types.js';

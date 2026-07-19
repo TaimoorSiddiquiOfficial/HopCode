@@ -4,8 +4,8 @@ import {
   DaemonSessionProvider,
   useWorkspace,
   useWorkspaceActions,
-} from '@qwen-code/webui/daemon-react-sdk';
-import type { DaemonWorkspaceCapability } from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/webui/daemon-react-sdk';
+import type { DaemonWorkspaceCapability } from '@hoptrendy/sdk/daemon';
 import { App, type WebShellProps } from '../App';
 import {
   WEB_SHELL_HISTORY_PAGE_SIZE,

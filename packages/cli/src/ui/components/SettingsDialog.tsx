@@ -36,7 +36,7 @@ import {
   useVimModeState,
   useVimModeActions,
 } from '../contexts/VimModeContext.js';
-import { createDebugLogger, type Config } from '@qwen-code/qwen-code-core';
+import { createDebugLogger, type Config } from '@hoptrendy/hopcode-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import {
   isDeletionKey,

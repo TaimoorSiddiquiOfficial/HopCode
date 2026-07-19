@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import type { DaemonSessionSummary } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionSummary } from '@hoptrendy/sdk/daemon';
 
 const { connection, workspace, workspaceActions, active, pinned, archived } =
   vi.hoisted(() => {
@@ -78,7 +78,7 @@ const { connection, workspace, workspaceActions, active, pinned, archived } =
     };
   });
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useConnection: () => connection,
   useActions: () => ({ renameSession: vi.fn() }),
   useWorkspace: () => workspace,

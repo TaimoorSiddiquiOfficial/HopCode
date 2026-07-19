@@ -4,7 +4,7 @@ import { Storage } from '@hoptrendy/hopcode-core';
 import type { CommandModule } from 'yargs';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { readServiceInfo } from './pidfile.js';
-import type { SessionTarget } from '@qwen-code/channel-base';
+import type { SessionTarget } from '@hoptrendy/channel-base';
 import {
   QWEN_DAEMON_TOKEN_ENV,
   QWEN_SERVER_TOKEN_ENV,
@@ -60,7 +60,7 @@ export const statusCommand: CommandModule<unknown, StatusArgs> = {
         process.env[QWEN_SERVER_TOKEN_ENV] ??
         process.env[QWEN_DAEMON_TOKEN_ENV];
       try {
-        const sdk = (await import('@qwen-code/sdk/daemon')) as unknown as {
+        const sdk = (await import('@hoptrendy/sdk/daemon')) as unknown as {
           DaemonClient: new (opts: { baseUrl: string; token?: string }) => {
             getChannelWorkerControl(opts?: { timeoutMs?: number }): Promise<{
               enabled: boolean;

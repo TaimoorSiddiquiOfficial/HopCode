@@ -18,7 +18,7 @@ import {
   createWorkspaceFileSystemFactory,
 } from '../fs/index.js';
 import type { Request } from 'express';
-import type { BridgeEvent } from '@qwen-code/acp-bridge/eventBus';
+import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
 import type { ServeOptions } from '../types.js';
 
 const baseOpts: ServeOptions = {

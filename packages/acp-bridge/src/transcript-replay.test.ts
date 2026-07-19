@@ -10,7 +10,7 @@ import {
   MISSING_TRANSCRIPT_TOOL_RESULT_MESSAGE,
   type TranscriptReplayStateV1,
 } from './transcript-replay.js';
-import type { TranscriptRecordInput } from '@qwen-code/qwen-code-core/transcriptRecords';
+import type { TranscriptRecordInput } from '@hoptrendy/hopcode-core/transcriptRecords';
 
 function record(
   uuid: string,

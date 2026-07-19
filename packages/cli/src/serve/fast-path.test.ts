@@ -404,7 +404,7 @@ describe('CLI entry import boundary', () => {
     );
 
     expect(helperSource).not.toMatch(
-      /import\s+(?!type\b)[^;]*from ['"]@qwen-code\/qwen-code-core['"]/,
+      /import\s+(?!type\b)[^;]*from ['"]@hoptrendy\/hopcode-core['"]/,
     );
   });
 

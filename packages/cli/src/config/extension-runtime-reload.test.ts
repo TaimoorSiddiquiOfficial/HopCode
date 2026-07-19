@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
-import type { Config } from '@qwen-code/qwen-code-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   refreshExtensionContentRuntime,
   reloadPluginsRuntime,

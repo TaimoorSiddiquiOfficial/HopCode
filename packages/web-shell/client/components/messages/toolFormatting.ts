@@ -4,7 +4,7 @@ import type { ACPToolCall } from '../../adapters/types';
  * Internal-tool-name → display-name lookup. This is a standalone copy of
  * core's `ToolDisplayNames` (mapped to wire names, as the CLI's shared
  * `tool-display-map.ts` does): the web-shell is a browser bundle and
- * intentionally does not depend on `@qwen-code/qwen-code-core`, so the map
+ * intentionally does not depend on `@hoptrendy/hopcode-core`, so the map
  * can't be imported. Keep the canonical tool entries in sync with core's
  * `ToolDisplayNames`; the extra lowercase ACP aliases below (bash, read,
  * write, …) are web-shell-only conveniences with no core equivalent.

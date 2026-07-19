@@ -32,7 +32,7 @@ import {
   type ServeWorkspacePreflightStatus,
   type ServeWorkspaceSkillsRefreshResult,
   type ServeWorkspaceSkillsStatus,
-} from '@qwen-code/acp-bridge/status';
+} from '@hoptrendy/acp-bridge/status';
 
 import {
   WorkspaceInitPathEscapeError,
@@ -44,7 +44,7 @@ import {
   SessionNotFoundError,
 } from '@hoptrendy/acp-bridge/bridgeErrors';
 
-import { MCP_RESTART_SERVER_DEADLINE_MS } from '@qwen-code/acp-bridge/mcpTimeouts';
+import { MCP_RESTART_SERVER_DEADLINE_MS } from '@hoptrendy/acp-bridge/mcpTimeouts';
 
 import { loadSettings } from '../../config/settings.js';
 import { getWorkspaceTrustStatus } from '../../config/trustedFolders.js';

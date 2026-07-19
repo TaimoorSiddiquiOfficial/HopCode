@@ -84,7 +84,7 @@ describe('updateCommand', () => {
     });
     getInstallationInfo.mockReturnValue({
       isStandalone: false,
-      updateCommand: 'npm install -g @qwen-code/qwen-code@latest',
+      updateCommand: 'npm install -g @hoptrendy/hopcode@latest',
     });
   });
 
@@ -108,7 +108,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nRun the following to update:\n  npm install -g @qwen-code/qwen-code@1.2.3',
+        'Update available: 1.2.3\nRun the following to update:\n  npm install -g @hoptrendy/hopcode@1.2.3',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
   });
@@ -122,7 +122,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nRun the following to update:\n  npm install -g @qwen-code/qwen-code@1.2.3',
+        'Update available: 1.2.3\nRun the following to update:\n  npm install -g @hoptrendy/hopcode@1.2.3',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
     expect(
@@ -201,7 +201,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nRun the following to update:\n  npm install -g @qwen-code/qwen-code@1.2.3',
+        'Update available: 1.2.3\nRun the following to update:\n  npm install -g @hoptrendy/hopcode@1.2.3',
     });
   });
 

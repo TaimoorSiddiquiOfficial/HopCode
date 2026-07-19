@@ -7,7 +7,7 @@
 import type {
   DaemonCapabilities,
   DaemonSessionSummary,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 
 /**
  * Last path segment of an absolute workspace cwd, for a compact per-workspace

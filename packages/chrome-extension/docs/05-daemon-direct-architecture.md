@@ -5,7 +5,7 @@ Messaging. This doc is the concrete implementation spec for the two phases.
 
 ```
 ┌─ Chrome extension (pure web client) ──────────────┐
-│  Side panel (React, @qwen-code/webui)             │
+│  Side panel (React, @hoptrendy/webui)             │
 │    DaemonSessionProvider ── chat over HTTP+SSE ───┼──┐
 │  Service worker                                   │  │
 │    browser-tools MCP server (over WS) ────────────┼─┐│
@@ -17,7 +17,7 @@ Messaging. This doc is the concrete implementation spec for the two phases.
 
 ## Phase 1 — chat (no daemon changes)
 
-The side panel is a daemon client. `@qwen-code/webui`'s `DaemonSessionProvider`
+The side panel is a daemon client. `@hoptrendy/webui`'s `DaemonSessionProvider`
 ({ baseUrl, token? }) handles connect / session-create / SSE / reconnect /
 heartbeat. Loopback ⇒ `token` omitted, `workspaceCwd` omitted (daemon uses its
 bound workspace).

@@ -1,9 +1,9 @@
-import type { DaemonSessionArtifact } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionArtifact } from '@hoptrendy/sdk/daemon';
 import {
   useWorkspaceActions,
   type DaemonWorkspaceActions,
   type DaemonScheduledTask,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { EditorState } from '@codemirror/state';
 import { basicSetup, EditorView } from 'codemirror';
 import {

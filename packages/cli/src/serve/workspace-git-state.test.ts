@@ -9,11 +9,11 @@ import {
   getGitWorkingTreeStatus,
   resolveBranchName,
   watchRepoBranch,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { AcpSessionBridge } from './acp-session-bridge.js';
 import { WorkspaceGitState } from './workspace-git-state.js';
 
-vi.mock('@qwen-code/qwen-code-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   getGitWorkingTreeStatus: vi.fn(),
   resolveBranchName: vi.fn(),
   watchRepoBranch: vi.fn(),

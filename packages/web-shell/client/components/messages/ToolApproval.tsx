@@ -7,7 +7,7 @@ import {
   useId,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
-import { isAgentTool } from '@qwen-code/webui/daemon-react-sdk';
+import { isAgentTool } from '@hoptrendy/webui/daemon-react-sdk';
 import type { PermissionRequest } from '../../adapters/types';
 import { useI18n } from '../../i18n';
 import { localizeToolDisplayName } from './toolFormatting';

@@ -9,7 +9,7 @@ import {
   AuthType,
   type AvailableModel,
   type Config,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { z } from 'zod';
 
 export const ACP_ROUTE_ID_PREFIX = 'qwen-route:v1:';

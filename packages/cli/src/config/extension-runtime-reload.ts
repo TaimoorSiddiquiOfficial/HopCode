@@ -8,7 +8,7 @@ import {
   createDebugLogger,
   type Config,
   type Extension,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 
 const debugLogger = createDebugLogger('EXTENSION_RUNTIME_RELOAD');
 

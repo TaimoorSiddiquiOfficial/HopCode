@@ -7,8 +7,8 @@ import type {
   ObservedChannelIdentity,
   ObservedChannelRelatedContact,
   ObservedChannelTopic,
-} from '@qwen-code/channel-base';
-import { atomicWriteFileSync } from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/channel-base';
+import { atomicWriteFileSync } from '@hoptrendy/hopcode-core';
 
 const REGISTRY_VERSION = 1;
 const MAX_OBSERVATIONS = 500;

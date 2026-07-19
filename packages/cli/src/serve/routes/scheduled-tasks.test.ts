@@ -15,7 +15,7 @@ import {
   SessionService,
   Storage,
   getCronFilePath,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   registerScheduledTasksRoutes,
   registerWorkspaceQualifiedScheduledTasksRoutes,

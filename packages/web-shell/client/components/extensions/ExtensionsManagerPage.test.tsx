@@ -6,7 +6,7 @@ import {
   DaemonHttpError,
   type DaemonExtensionEntry,
   type ExtensionOperationStatus,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { I18nProvider } from '../../i18n';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -29,7 +29,7 @@ const { actions, connection, signals } = vi.hoisted(() => ({
   signals: { extensionsVersion: 0 },
 }));
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useConnection: () => connection,
   useWorkspaceActions: () => actions,
   useWorkspaceEventSignals: () => signals,

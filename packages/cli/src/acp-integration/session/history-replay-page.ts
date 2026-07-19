@@ -10,9 +10,9 @@ import type {
   HistoryGap,
   SessionTranscriptCursorState,
   SessionTranscriptRecordPage,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { SessionUpdate } from '@agentclientprotocol/sdk';
-import type { TranscriptReplayStateV1 } from '@qwen-code/acp-bridge/transcriptReplay';
+import type { TranscriptReplayStateV1 } from '@hoptrendy/acp-bridge/transcriptReplay';
 import { HistoryReplayer } from './history-replayer.js';
 import type { PendingReplayToolCall } from './history-replayer.js';
 import type { CumulativeUsage, SessionEmitterContext } from './types.js';

@@ -1,4 +1,4 @@
-# @qwen-code/mobile-mcp
+# @hoptrendy/mobile-mcp
 
 Fork of [mobile-next/mobile-mcp](https://github.com/mobile-next/mobile-mcp) for [qwen-code](https://github.com/QwenLM/qwen-code), with opt-in relative coordinate support and additional Android tooling.
 
@@ -104,7 +104,7 @@ Upstream PostHog telemetry is off by default in this fork. Set `MOBILEMCP_ENABLE
   "mcpServers": {
     "mobile-mcp": {
       "command": "npx",
-      "args": ["@qwen-code/mobile-mcp"]
+      "args": ["@hoptrendy/mobile-mcp"]
     }
   }
 }
@@ -117,7 +117,7 @@ With relative coordinates enabled:
   "mcpServers": {
     "mobile-mcp": {
       "command": "npx",
-      "args": ["@qwen-code/mobile-mcp"],
+      "args": ["@hoptrendy/mobile-mcp"],
       "env": {
         "MOBILE_MCP_COORDINATE_SPACE": "1"
       }

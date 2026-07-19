@@ -181,7 +181,7 @@ read files, parse JSONL text, start a daemon, or access network or browser
 storage.
 
 ```typescript
-import { projectChatRecordsToDaemonTranscript } from '@qwen-code/sdk/daemon/transcript';
+import { projectChatRecordsToDaemonTranscript } from '@hoptrendy/sdk/daemon/transcript';
 
 const projection = projectChatRecordsToDaemonTranscript(records);
 if (!projection.complete) {
@@ -347,7 +347,7 @@ object keyed by the question's index (as a string), where each value is the
 label of the chosen option (or free-form text when the user picks "Other").
 
 ```typescript
-import { query, type CanUseTool } from '@qwen-code/sdk';
+import { query, type CanUseTool } from '@hoptrendy/sdk';
 
 const canUseTool: CanUseTool = async (toolName, input, { signal }) => {
   if (toolName === 'ask_user_question') {

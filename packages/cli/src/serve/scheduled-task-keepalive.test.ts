@@ -14,7 +14,7 @@ import {
   SessionService,
   updateCronTasks,
   type DurableCronTask,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   startScheduledTaskKeepalive,
   rehydrateScheduledTaskSessions,

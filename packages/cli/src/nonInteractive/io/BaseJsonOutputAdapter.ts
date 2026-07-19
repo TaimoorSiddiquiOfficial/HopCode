@@ -14,7 +14,7 @@ import type {
   AgentResultDisplay,
   McpToolProgressData,
   ShellProgressData,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   formatVisionBridgeNoticeDisplay,
   GeminiEventType,

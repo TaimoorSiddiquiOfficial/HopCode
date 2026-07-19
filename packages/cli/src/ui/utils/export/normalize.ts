@@ -9,8 +9,8 @@ import {
   formatVisionBridgeNoticeDisplay,
   isVisionBridgeNoticeDisplay,
   ToolNames,
-} from '@qwen-code/qwen-code-core';
-import type { ChatRecord, Kind } from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
+import type { ChatRecord, Kind } from '@hoptrendy/hopcode-core';
 import { buildTruncatedDiffPreviewText } from '../../../utils/truncatedDiffPreview.js';
 import { getToolResultCallId } from '../../../utils/chat-record-tool-call-id.js';
 import { sanitizeTerminalText } from '../textUtils.js';

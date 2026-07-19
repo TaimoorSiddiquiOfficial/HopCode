@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ChannelWebhookTask } from '@qwen-code/channel-base';
+import type { ChannelWebhookTask } from '@hoptrendy/channel-base';
 import { ChannelWebhookEnqueueError } from './channel-webhook-ipc.js';
 import type {
   ChannelWorkerGroup,

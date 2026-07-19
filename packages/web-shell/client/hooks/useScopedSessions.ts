@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSessions, useWorkspace } from '@qwen-code/webui/daemon-react-sdk';
+import { useSessions, useWorkspace } from '@hoptrendy/webui/daemon-react-sdk';
 import type {
   DaemonSessionArchiveState,
   DaemonSessionSummary,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { WEB_SHELL_SESSION_SOURCE_TYPE } from '../constants/sessions';
 
 interface ScopedSessionsOptions {

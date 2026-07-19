@@ -15,7 +15,7 @@ vi.mock('../../utils/stdioHelpers.js', () => ({
 import type {
   BridgeSessionGoal,
   BridgeSessionSummary,
-} from '@qwen-code/acp-bridge';
+} from '@hoptrendy/acp-bridge';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import { registerGoalsRoutes, type GoalsSessionBridge } from './goals.js';
 

@@ -1,5 +1,5 @@
-import type { DaemonSessionArtifact } from '@qwen-code/sdk/daemon';
-import type { DaemonWorkspaceActions } from '@qwen-code/webui/daemon-react-sdk';
+import type { DaemonSessionArtifact } from '@hoptrendy/sdk/daemon';
+import type { DaemonWorkspaceActions } from '@hoptrendy/webui/daemon-react-sdk';
 import { memo, useState } from 'react';
 import { useI18n } from '../../i18n';
 import { describeCron } from '../dialogs/scheduledTasksSchedule';

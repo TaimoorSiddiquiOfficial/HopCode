@@ -54,7 +54,7 @@ export default defineConfig(({ command }) => ({
           }
         : {}),
     },
-    dedupe: ['react', 'react-dom', '@qwen-code/webui', '@qwen-code/sdk'],
+    dedupe: ['react', 'react-dom', '@hoptrendy/webui', '@hoptrendy/sdk'],
   },
   build: {
     outDir: '../dist',

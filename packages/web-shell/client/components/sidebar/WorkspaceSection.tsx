@@ -6,13 +6,13 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { DaemonClient } from '@qwen-code/sdk/daemon';
+import type { DaemonClient } from '@hoptrendy/sdk/daemon';
 import type {
   DaemonSessionGroup,
   DaemonSessionSummary,
   DaemonWorkspaceCapability,
   DaemonWorkspaceGitStatus,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { FolderClosedIcon, FolderOpenIcon } from 'lucide-react';
 import { GitBranchIndicator } from '../GitBranchIndicator';
 import { SESSION_LIST_PAGE_SIZE } from '../../constants/sessions';

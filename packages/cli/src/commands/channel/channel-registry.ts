@@ -7,12 +7,12 @@ function ensureBuiltins(): Promise<void> {
   if (!builtinsPromise) {
     builtinsPromise = (async () => {
       const labelled = [
-        { name: 'telegram', promise: import('@qwen-code/channel-telegram') },
-        { name: 'weixin', promise: import('@qwen-code/channel-weixin') },
-        { name: 'dingtalk', promise: import('@qwen-code/channel-dingtalk') },
-        { name: 'wecom', promise: import('@qwen-code/channel-wecom') },
-        { name: 'feishu', promise: import('@qwen-code/channel-feishu') },
-        { name: 'qqbot', promise: import('@qwen-code/channel-qqbot') },
+        { name: 'telegram', promise: import('@hoptrendy/channel-telegram') },
+        { name: 'weixin', promise: import('@hoptrendy/channel-weixin') },
+        { name: 'dingtalk', promise: import('@hoptrendy/channel-dingtalk') },
+        { name: 'wecom', promise: import('@hoptrendy/channel-wecom') },
+        { name: 'feishu', promise: import('@hoptrendy/channel-feishu') },
+        { name: 'qqbot', promise: import('@hoptrendy/channel-qqbot') },
       ];
 
       const results = await Promise.allSettled(labelled.map((l) => l.promise));

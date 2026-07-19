@@ -29,7 +29,7 @@ import {
   isAnyAutoMemPath,
   isShellProgressData,
   ToolErrorType,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import * as path from 'node:path';
 import { useCallback, useState, useMemo } from 'react';
 import type {

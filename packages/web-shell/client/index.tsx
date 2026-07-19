@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { DaemonWorkspaceProvider } from '@qwen-code/webui/daemon-react-sdk';
+import { DaemonWorkspaceProvider } from '@hoptrendy/webui/daemon-react-sdk';
 import { App, type WebShellProps } from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { RootErrorFallback } from './components/RootErrorFallback';

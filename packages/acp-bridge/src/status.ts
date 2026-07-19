@@ -792,7 +792,7 @@ export interface ServeWorkspaceMemoryStatus {
  * the daemon-scoped `SubagentManager` runs against a stub `Config`
  * whose `getActiveExtensions()` returns `[]`, and session-level
  * subagents live in a runtime-only cache no CRUD route reads.
- * Mirrors `DaemonAgentLevel` in `@qwen-code/sdk` so route + SDK
+ * Mirrors `DaemonAgentLevel` in `@hoptrendy/sdk` so route + SDK
  * consumers see the same forward-compat union.
  */
 export type ServeAgentLevel =

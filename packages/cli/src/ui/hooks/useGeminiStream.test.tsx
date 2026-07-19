@@ -24,7 +24,7 @@ import type {
   GeminiClient,
   AnyToolInvocation,
   SteerInput,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   ApprovalMode,
   AUTONOMOUS_SENTINEL_DYNAMIC,

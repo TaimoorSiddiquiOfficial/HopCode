@@ -53,7 +53,7 @@ const clearQueuedPrompts = vi.fn(() => false);
 let queuedPromptsMock: any[] = [];
 let queuedTextsMock: string[] = [];
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   DAEMON_APPROVAL_MODES: ['default', 'plan', 'auto-edit', 'auto', 'yolo'],
   useActions: () => daemonActions,
   useConnection: () => connectionState,

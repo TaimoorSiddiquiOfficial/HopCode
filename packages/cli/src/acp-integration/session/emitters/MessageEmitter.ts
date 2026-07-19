@@ -9,12 +9,12 @@ import type { SubagentMeta } from '../types.js';
 import {
   createTranscriptMessageUpdate,
   createTranscriptUsageUpdate,
-} from '@qwen-code/acp-bridge/transcriptReplay';
+} from '@hoptrendy/acp-bridge/transcriptReplay';
 import {
   apiActivityTracker,
   getActiveGoal,
   type GoalTerminalEvent,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { BaseEmitter } from './base-emitter.js';
 import type { HistoryItemGoalStatus } from '../../../ui/types.js';
 

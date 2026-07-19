@@ -162,7 +162,7 @@ vi.mock('node:stream', async (importOriginal) => {
 });
 
 // Mock core dependencies
-vi.mock('@qwen-code/qwen-code-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   SESSION_ARTIFACT_PERSISTENCE_VERSION: 2,
   normalizeEventPayload: vi.fn((payload: unknown) =>
     typeof payload === 'object' &&
@@ -779,7 +779,7 @@ import {
   SESSION_ARTIFACT_PERSISTENCE_VERSION,
   mcpServerRequiresOAuth,
   APPROVAL_MODES,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type { McpServer } from '@agentclientprotocol/sdk';
 import { AgentSideConnection } from '@agentclientprotocol/sdk';
 import { loadSettings, SettingScope } from '../config/settings.js';
@@ -794,8 +794,8 @@ import { Session, buildAvailableCommandsSnapshot } from './session/Session.js';
 import {
   SERVE_STATUS_EXT_METHODS,
   SERVE_CONTROL_EXT_METHODS,
-} from '@qwen-code/acp-bridge/status';
-import type { ServeWorkspaceSkillsStatus } from '@qwen-code/acp-bridge/status';
+} from '@hoptrendy/acp-bridge/status';
+import type { ServeWorkspaceSkillsStatus } from '@hoptrendy/acp-bridge/status';
 import {
   resolveOutputLanguageOrPreserveAuto,
   updateOutputLanguageFile,
@@ -806,7 +806,7 @@ import {
   CHANNEL_STARTUP_PROFILE_META_KEY,
   CHANNEL_STARTUP_PROFILE_VERSION,
   TODO_STOP_GUARD_QUEUE_RELEASE_METHOD,
-} from '@qwen-code/acp-bridge/bridgeTypes';
+} from '@hoptrendy/acp-bridge/bridgeTypes';
 import {
   initializeAcpStartupProfiler,
   resetAcpStartupProfilerForTesting,

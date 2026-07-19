@@ -23,7 +23,7 @@ import {
   type ServeContextFileScope,
   type ServeWorkspaceMemoryFile,
   type ServeWorkspaceMemoryStatus,
-} from '@qwen-code/acp-bridge/status';
+} from '@hoptrendy/acp-bridge/status';
 import {
   requireTrustedWorkspaceRuntime,
   resolveWorkspaceRuntimeFromParam,

@@ -13,7 +13,7 @@ import {
   Storage,
   readCronTasks,
   updateCronTasks,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   SessionArchivedError,
   SessionArchivingError,

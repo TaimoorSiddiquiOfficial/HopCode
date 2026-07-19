@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { buildLearnSkillPrompt } from '@qwen-code/qwen-code-core';
+import { buildLearnSkillPrompt } from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import type {
   CommandContext,

@@ -5,7 +5,7 @@ import {
   getScheduledTasksByTurn,
 } from './turnOutputSelectors';
 import type { ACPToolCall, Message } from '../../adapters/types';
-import type { DaemonSessionArtifact } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionArtifact } from '@hoptrendy/sdk/daemon';
 
 type ToolGroupMessage = Extract<Message, { role: 'tool_group' }>;
 

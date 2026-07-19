@@ -13,7 +13,7 @@ import type {
 } from './types.js';
 // Single source of truth: the daemon publisher owns the wire literal in
 // acp-bridge's dependency-free `daemonEventTypes` module. We re-export it so the
-// validator/reducer below, and the browser consumer via `@qwen-code/sdk/daemon`,
+// validator/reducer below, and the browser consumer via `@hoptrendy/sdk/daemon`,
 // share the exact same value â€” a rename can't silently break browser-side dedup.
 // The build-time devDep on acp-bridge inlines the value into the published bundle
 // (same lightweight mechanism as `@hoptrendy/acp-bridge/mcpTimeouts`). A `const`

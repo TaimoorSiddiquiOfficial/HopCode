@@ -24,9 +24,9 @@ import {
   type SessionGroupColor,
   type SessionGroupPresetColor,
   type SessionArchiveState,
-} from '@qwen-code/qwen-code-core';
-import type { SessionArtifactInput } from '@qwen-code/acp-bridge/sessionArtifacts';
-import { parseSessionSource } from '@qwen-code/acp-bridge';
+} from '@hoptrendy/hopcode-core';
+import type { SessionArtifactInput } from '@hoptrendy/acp-bridge/sessionArtifacts';
+import { parseSessionSource } from '@hoptrendy/acp-bridge';
 import type { Application, Request, RequestHandler, Response } from 'express';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import {

@@ -178,4 +178,4 @@ export type {
   DaemonWorkspaceProviderCurrent,
   DaemonModelDeleteRequest,
   DaemonModelDeleteResult,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';

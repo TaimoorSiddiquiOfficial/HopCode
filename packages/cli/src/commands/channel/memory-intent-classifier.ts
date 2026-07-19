@@ -2,8 +2,8 @@ import type {
   ChannelAgentBridge,
   ChannelMemoryIntentClassifier,
   ChannelMemoryIntentClassifierResult,
-} from '@qwen-code/channel-base';
-import { sanitizeLogText, sanitizePromptText } from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
+import { sanitizeLogText, sanitizePromptText } from '@hoptrendy/channel-base';
 
 type ChannelMemoryEntries = NonNullable<
   Parameters<ChannelMemoryIntentClassifier['classifyChannelMemoryIntent']>[1]

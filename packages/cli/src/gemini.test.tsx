@@ -246,7 +246,7 @@ describe('gemini.tsx main function', () => {
     lspConfigWatcherMock.instances.length = 0;
     mockUpdateBeforeRelaunch.mockResolvedValue(true);
     mockGetInstallationInfo.mockReturnValue({
-      updateCommand: 'npm install -g @qwen-code/qwen-code@latest',
+      updateCommand: 'npm install -g @hoptrendy/hopcode@latest',
     });
     // Store and clear sandbox-related env variables to ensure a consistent test environment
     originalEnvGeminiSandbox = process.env['HOPCODE_SANDBOX'];

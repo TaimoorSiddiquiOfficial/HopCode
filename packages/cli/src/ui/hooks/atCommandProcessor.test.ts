@@ -10,7 +10,7 @@ import {
   extractAtPathCommands,
   handleAtCommand,
 } from './atCommandProcessor.js';
-import type { Config } from '@qwen-code/qwen-code-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import {
   FileDiscoveryService,
   StandardFileSystemService,

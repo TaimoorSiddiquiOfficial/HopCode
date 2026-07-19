@@ -3,7 +3,7 @@ import { AlertCircleIcon, UploadIcon } from 'lucide-react';
 import type {
   DaemonSkillInstallRequest,
   DaemonSkillScope,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { useI18n } from '../../i18n';
 import { extractErrorDetail } from '../../utils/errorDetail';
 import { Alert, AlertDescription } from '../ui/alert';

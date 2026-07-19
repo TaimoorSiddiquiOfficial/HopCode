@@ -23,7 +23,7 @@ let workspaceCapabilities: {
 };
 const addWorkspace = vi.fn();
 const refreshCapabilities = vi.fn();
-vi.mock('@qwen-code/webui/daemon-react-sdk', async () => {
+vi.mock('@hoptrendy/webui/daemon-react-sdk', async () => {
   const React = await import('react');
   return {
     DaemonWorkspaceProvider: ({ children }: { children: React.ReactNode }) => {

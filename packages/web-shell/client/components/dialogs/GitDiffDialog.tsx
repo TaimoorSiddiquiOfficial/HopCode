@@ -5,12 +5,12 @@
  */
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { useWorkspace } from '@qwen-code/webui/daemon-react-sdk';
+import { useWorkspace } from '@hoptrendy/webui/daemon-react-sdk';
 import type {
   DaemonDiffHunk,
   DaemonWorkspaceGitDiff,
   DaemonWorkspaceGitDiffFile,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import type { BundledLanguage, ThemedToken } from 'shiki';
 import { useI18n } from '../../i18n';
 import { useTheme, WebShellThemeId } from '../../themeContext';

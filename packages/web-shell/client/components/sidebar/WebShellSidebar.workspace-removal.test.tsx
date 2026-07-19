@@ -7,7 +7,7 @@ import {
   DaemonHttpError,
   type DaemonSessionSummary,
   type DaemonWorkspaceCapability,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 
 const {
   connection,
@@ -97,7 +97,7 @@ const {
   };
 });
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useConnection: () => connection,
   useActions: () => ({ renameSession: vi.fn() }),
   useWorkspace: () => workspace,

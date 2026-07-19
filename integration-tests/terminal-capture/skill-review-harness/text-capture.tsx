@@ -5,7 +5,7 @@
  * literal rendered frames — the actual TUI output the component produces.
  *
  * Runs from SOURCE — no build needed. CLI source imports
- * `@qwen-code/qwen-code-core`, which normally resolves through the package's
+ * `@hoptrendy/hopcode-core`, which normally resolves through the package's
  * built `dist` (absent on a fresh clone, and stale whenever core src moves
  * ahead of the last build). To avoid both, this registers an ESM loader hook
  * (same idea as scripts/dev.js) that redirects that specifier to
@@ -23,7 +23,7 @@ import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { Config } from '@qwen-code/qwen-code-core';
+import type { Config } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings } from '../../../packages/cli/src/config/settings.js';
 import type { PendingSkillView } from '../../../packages/cli/src/ui/contexts/UIStateContext.js';
 
@@ -220,7 +220,7 @@ async function main() {
   const mode = process.argv[2] ?? 'all';
   const shouldPrint = (name: string) => mode === 'all' || mode === name;
 
-  // Redirect @qwen-code/qwen-code-core to its TypeScript source so the harness
+  // Redirect @hoptrendy/hopcode-core to its TypeScript source so the harness
   // runs without a build and can never pick up a stale dist. Registered before
   // the dynamic imports below, which is what routes them through the hook.
   const repoRoot = path.resolve(
@@ -232,7 +232,7 @@ async function main() {
   ).href;
   const loader = `
     export function resolve(specifier, context, nextResolve) {
-      if (specifier === '@qwen-code/qwen-code-core') {
+      if (specifier === '@hoptrendy/hopcode-core') {
         return { shortCircuit: true, url: '${coreSrcUrl}', format: 'module' };
       }
       return nextResolve(specifier, context);
@@ -312,7 +312,7 @@ async function main() {
         const reason = err instanceof Error ? err.message : String(err);
         banner('BEFORE — unavailable: could not render the global qwen dialog');
         console.log(
-          `${reason}\nInstall it first: npm install -g @qwen-code/qwen-code`,
+          `${reason}\nInstall it first: npm install -g @hoptrendy/hopcode`,
         );
         if (mode === 'before') throw err;
       }

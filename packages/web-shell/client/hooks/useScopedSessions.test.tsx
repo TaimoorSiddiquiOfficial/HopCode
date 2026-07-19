@@ -2,7 +2,7 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { DaemonSessionSummary } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionSummary } from '@hoptrendy/sdk/daemon';
 
 const primarySessions = [
   { sessionId: 'primary', workspaceCwd: '/primary' },
@@ -19,7 +19,7 @@ const workspaceByCwd = vi.fn(() => ({
 }));
 const workspaceClient = { workspaceByCwd };
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useSessions: () => ({
     sessions: primarySessions,
     loading: false,

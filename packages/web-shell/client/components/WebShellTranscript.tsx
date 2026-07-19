@@ -6,7 +6,7 @@ import {
   type CSSProperties,
   type ReactElement,
 } from 'react';
-import type { DaemonTranscriptBlock } from '@qwen-code/sdk/daemon';
+import type { DaemonTranscriptBlock } from '@hoptrendy/sdk/daemon';
 import {
   CompactModeContext,
   TodoDetailContext,

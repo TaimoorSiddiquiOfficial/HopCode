@@ -24,13 +24,13 @@ import type {
   Config,
   McpToolProgressData,
   FileDiff,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   formatVisionBridgeNoticeDisplay,
   isVisionBridgeNoticeDisplay,
   ToolNames,
   ToolNamesMigration,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { ToolConfirmationMessage } from './ToolConfirmationMessage.js';
 import { PlanSummaryDisplay } from '../PlanSummaryDisplay.js';
 import { ShellInputPrompt } from '../ShellInputPrompt.js';

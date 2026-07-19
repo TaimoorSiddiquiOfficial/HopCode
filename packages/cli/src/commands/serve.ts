@@ -13,8 +13,8 @@ import { normalizeServeChannelSelection } from '../serve/channel-selection.js';
 // with ~50ms of cold ESM resolution. The runtime import is deferred to the
 // handler below so it only loads when the user actually runs `hopcode serve`.
 import { writeStderrLine } from '../utils/stdioHelpers.js';
-import { DEFAULT_RING_SIZE } from '@qwen-code/acp-bridge/eventBus';
-import { DEFAULT_COMPACTED_REPLAY_MAX_BYTES } from '@qwen-code/acp-bridge/replayWindowLimits';
+import { DEFAULT_RING_SIZE } from '@hoptrendy/acp-bridge/eventBus';
+import { DEFAULT_COMPACTED_REPLAY_MAX_BYTES } from '@hoptrendy/acp-bridge/replayWindowLimits';
 import {
   ApprovalMode,
   MCP_BUDGET_WARN_FRACTION,

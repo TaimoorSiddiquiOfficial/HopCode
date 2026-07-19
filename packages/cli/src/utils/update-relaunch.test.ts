@@ -38,7 +38,7 @@ describe('updateBeforeRelaunch', () => {
       },
     });
     getInstallationInfo.mockReturnValue({
-      updateCommand: 'npm install -g @qwen-code/qwen-code@latest',
+      updateCommand: 'npm install -g @hoptrendy/hopcode@latest',
     });
   });
 

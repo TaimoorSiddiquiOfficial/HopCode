@@ -21,12 +21,12 @@ import type {
   ApprovalMode,
   TeammateApprovalRequestEvent,
   ToolConfirmationPayload,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   InputFormat,
   ToolConfirmationOutcome,
   ToolNames,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import type {
   CLIControlPermissionRequest,
   CLIControlSetPermissionModeRequest,

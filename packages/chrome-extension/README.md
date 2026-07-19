@@ -1,4 +1,4 @@
-﻿# @qwen-code/chrome-bridge
+﻿# @hoptrendy/chrome-bridge
 
 A Chrome extension that brings HopCode into the browser as a thin client of a
 local [`qwen serve`](../../docs/users/qwen-serve.md) daemon — no Native
@@ -51,7 +51,7 @@ QWEN_CDP_MCP_COMMAND=/path/to/cdp-mcp-adapter \
 qwen serve --allow-origin chrome-extension://<this-extension-id>
 ```
 
-No browser automation adapter is bundled with the main `@qwen-code/qwen-code`
+No browser automation adapter is bundled with the main `@hoptrendy/hopcode`
 package. When `QWEN_CDP_MCP_COMMAND` is unset, the extension can still open the
 Web Shell, but the daemon will not register browser automation MCP tools.
 Clients can distinguish the states through `/capabilities`:

@@ -11,7 +11,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import type {
   DaemonSessionSummary,
   DaemonWorkspaceCapability,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { SESSION_LIST_PAGE_SIZE } from '../constants/sessions';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -24,7 +24,7 @@ let listWorkspaceSessions: ReturnType<typeof vi.fn>;
 // mock would re-fire the load effect on every render (infinite loop).
 let client: { listWorkspaceSessions: ReturnType<typeof vi.fn> };
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useWorkspace: () => ({ client, capabilities }),
 }));
 

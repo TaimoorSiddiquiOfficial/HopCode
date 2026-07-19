@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { DaemonWorkspaceGitStatus } from '@qwen-code/sdk/daemon';
+import type { DaemonWorkspaceGitStatus } from '@hoptrendy/sdk/daemon';
 import { CircleDotIcon, LayersIcon, TriangleAlertIcon } from 'lucide-react';
 import { useI18n } from '../i18n';
 import styles from './ChatEditor.module.css';

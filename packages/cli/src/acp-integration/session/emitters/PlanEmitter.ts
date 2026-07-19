@@ -9,7 +9,7 @@ import type { TodoItem } from '../types.js';
 import {
   createTranscriptPlanUpdate,
   extractTranscriptTodos,
-} from '@qwen-code/acp-bridge/transcriptReplay';
+} from '@hoptrendy/acp-bridge/transcriptReplay';
 
 /**
  * Handles emission of plan/todo updates.

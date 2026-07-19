@@ -104,7 +104,7 @@ vi.mock('undici', () => ({
   setGlobalDispatcher: mockSetGlobalDispatcher,
 }));
 
-vi.mock('@qwen-code/qwen-code-core', () => ({
+vi.mock('@hoptrendy/hopcode-core', () => ({
   addChannelMemoryEntries: mockAddChannelMemoryEntries,
   clearChannelMemory: mockClearChannelMemory,
   getChannelMemoryRevision: mockGetChannelMemoryRevision,

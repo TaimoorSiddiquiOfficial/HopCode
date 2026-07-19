@@ -24,11 +24,11 @@ import {
   isVisionBridgeNoticeDisplay,
   ToolNames,
   Kind,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   createTranscriptToolCallResultUpdate,
   createTranscriptToolCallStartUpdate,
-} from '@qwen-code/acp-bridge/transcriptReplay';
+} from '@hoptrendy/acp-bridge/transcriptReplay';
 import { sanitizeTerminalText } from '../../../ui/utils/textUtils.js';
 
 const KIND_MAP: Record<Kind, ToolKind> = {

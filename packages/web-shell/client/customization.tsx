@@ -5,8 +5,8 @@ import {
   type ReactNode,
 } from 'react';
 import type { Components, Options } from 'react-markdown';
-import type { DaemonInputAnnotation } from '@qwen-code/sdk/daemon';
-import type { DaemonStreamingState } from '@qwen-code/webui/daemon-react-sdk';
+import type { DaemonInputAnnotation } from '@hoptrendy/sdk/daemon';
+import type { DaemonStreamingState } from '@hoptrendy/webui/daemon-react-sdk';
 import type { ACPToolCall } from './adapters/types';
 import type { WelcomeHeaderProps } from './components/WelcomeHeader';
 import type { WebShellTheme } from './themeContext';

@@ -25,7 +25,7 @@ import type {
   ChannelAgentBridge,
   ChannelConfig,
   Envelope,
-} from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
 
 const mocks = vi.hoisted(() => {
   type MockHttpResponse = {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type {
   DaemonStatusTranscriptBlock,
   DaemonTranscriptBlock,
-} from '@qwen-code/sdk/daemon';
+} from '@hoptrendy/sdk/daemon';
 import { transcriptBlocksToLocalizedMessages } from './useMessages';
 
 function baseBlock(

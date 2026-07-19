@@ -464,7 +464,7 @@ jobs:
             qwen --version
             exit 0
           fi
-          npm install -g --registry=https://registry.npmjs.org '@qwen-code/qwen-code@latest'
+          npm install -g --registry=https://registry.npmjs.org '@hoptrendy/hopcode@latest'
           qwen --version
 
       - name: 'Run review'

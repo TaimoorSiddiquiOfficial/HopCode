@@ -104,7 +104,7 @@ import {
   type SessionArtifactSnapshotRecordPayload,
   type WorkspaceRememberContextMode,
   type ChatRecord,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import type { JSONRPCMessage } from '@modelcontextprotocol/sdk/types.js';
@@ -279,8 +279,8 @@ import {
   type ServeExtensionCapabilities,
   type ServeWorkspaceExtensionsStatus,
   IDLE_HOOK_EVENTS,
-} from '@qwen-code/acp-bridge/status';
-import { parseSessionSource } from '@qwen-code/acp-bridge';
+} from '@hoptrendy/acp-bridge/status';
+import { parseSessionSource } from '@hoptrendy/acp-bridge';
 import {
   CHANNEL_STARTUP_PROFILE_META_KEY,
   CHANNEL_STARTUP_PROFILE_VERSION,
@@ -293,7 +293,7 @@ import {
   TODO_STOP_GUARD_QUEUE_RELEASE_METHOD,
   type ClientMcpOverWsRuntimeConfig,
   type BridgeLoadReplayEnvelope,
-} from '@qwen-code/acp-bridge/bridgeTypes';
+} from '@hoptrendy/acp-bridge/bridgeTypes';
 import {
   beginAcpBootstrapConfigProfiling,
   buildAndFreezeAcpStartupProfile,

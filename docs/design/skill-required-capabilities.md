@@ -265,7 +265,7 @@ import * as echarts from 'echarts';
 import {
   WebShellWithProviders,
   createEchartsFullDataRenderer,
-} from '@qwen-code/web-shell';
+} from '@hoptrendy/web-shell';
 
 <WebShellWithProviders
   baseUrl="http://127.0.0.1:4170"

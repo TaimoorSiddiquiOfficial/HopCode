@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/mobile-mcp",
+  "name": "@hoptrendy/mobile-mcp",
   "version": "0.19.12",
   "description": "Mobile MCP with opt-in relative coordinate support",
   "repository": {

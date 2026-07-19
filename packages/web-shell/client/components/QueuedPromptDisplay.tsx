@@ -5,7 +5,7 @@
  */
 
 import type { PromptImage } from '../adapters/promptTypes';
-import type { DaemonInputAnnotation } from '@qwen-code/sdk/daemon';
+import type { DaemonInputAnnotation } from '@hoptrendy/sdk/daemon';
 import deleteIconUrl from '../assets/icons/delete.svg';
 import editIconUrl from '../assets/icons/edit.svg';
 import insertIconUrl from '../assets/icons/insert.svg';

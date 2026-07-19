@@ -20,7 +20,7 @@ import type {
 import type {
   ApprovalMode,
   RebuiltSessionArtifactSnapshot,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   DAEMON_TRACEPARENT_META_KEY,
   DAEMON_TRACESTATE_META_KEY,

@@ -7,7 +7,7 @@ import type {
   DaemonSettingUpdateResult,
   DaemonWorkspaceSettingsStatus,
   DaemonWorkspaceProviderStatus,
-} from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
 import { I18nProvider } from '../../i18n';
 import {
   SettingsMessage,

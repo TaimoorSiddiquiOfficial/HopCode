@@ -9,7 +9,7 @@ import * as React from 'react';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { DaemonSessionArtifact } from '@qwen-code/sdk/daemon';
+import type { DaemonSessionArtifact } from '@hoptrendy/sdk/daemon';
 import {
   useSessionArtifacts,
   type SessionArtifactsState,
@@ -35,7 +35,7 @@ const sdkMock = vi.hoisted(() => ({
   artifactsVersion: 0,
 }));
 
-vi.mock('@qwen-code/webui/daemon-react-sdk', () => ({
+vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
   useActions: () => sdkMock.actions,
   useConnection: () => sdkMock.connection,
   usePromptStatus: () => sdkMock.promptStatus,

@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/qwen-code",
+  "name": "@hoptrendy/hopcode",
   "version": "0.19.12",
   "engines": {
     "node": ">=22.0.0"

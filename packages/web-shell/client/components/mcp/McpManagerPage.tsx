@@ -19,8 +19,8 @@ import type {
   DaemonWorkspaceMcpServerStatus,
   DaemonWorkspaceMcpToolStatus,
   DaemonWorkspaceMcpToolsStatus,
-} from '@qwen-code/webui/daemon-react-sdk';
-import { useMcp, useSettings } from '@qwen-code/webui/daemon-react-sdk';
+} from '@hoptrendy/webui/daemon-react-sdk';
+import { useMcp, useSettings } from '@hoptrendy/webui/daemon-react-sdk';
 import { useI18n } from '../../i18n';
 import { extractErrorDetail } from '../../utils/errorDetail';
 import styles from './McpManagerPage.module.css';

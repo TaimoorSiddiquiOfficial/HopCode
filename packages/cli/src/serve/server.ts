@@ -7,8 +7,8 @@
 import path from 'node:path';
 import express from 'express';
 import type { Application } from 'express';
-import type { DaemonStatusProvider } from '@qwen-code/acp-bridge';
-import { hashDaemonWorkspace } from '@qwen-code/qwen-code-core';
+import type { DaemonStatusProvider } from '@hoptrendy/acp-bridge';
+import { hashDaemonWorkspace } from '@hoptrendy/hopcode-core';
 import type { DaemonLogger } from './daemon-logger.js';
 import type {
   DaemonMetricsBucket,

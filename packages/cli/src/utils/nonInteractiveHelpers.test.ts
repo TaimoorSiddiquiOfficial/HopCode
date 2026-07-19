@@ -9,7 +9,7 @@ import type {
   Config,
   SessionMetrics,
   AgentResultDisplay,
-} from '@qwen-code/qwen-code-core';
+} from '@hoptrendy/hopcode-core';
 import {
   ToolErrorType,
   MCPServerStatus,

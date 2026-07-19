@@ -746,7 +746,7 @@ Expected: all adapter tests pass.
 
 - [ ] **Step 1: Write failing CLI tests**
 
-Update the mocked `@qwen-code/channel-base` module to include `ChannelLoopStore` and `ChannelLoopScheduler`, then assert:
+Update the mocked `@hoptrendy/channel-base` module to include `ChannelLoopStore` and `ChannelLoopScheduler`, then assert:
 
 - `startSingle` creates one store and scheduler.
 - `createChannel` receives `{ loopController }`.
@@ -774,7 +774,7 @@ import {
   ChannelLoopScheduler,
   ChannelLoopStore,
   SessionRouter,
-} from '@qwen-code/channel-base';
+} from '@hoptrendy/channel-base';
 import { nextFireTime, parseCron } from '@hoptrendy/hopcode-core';
 ```
 
