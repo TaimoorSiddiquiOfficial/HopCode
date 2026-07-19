@@ -31,7 +31,8 @@ export const TOP_LEVEL_COMMANDS = [
     'serve',
     'Run HopCode as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
   ],
-  ['sessions <command>', 'Manage HopCode sessions'],
+  ['sessions <command>', 'Manage Qwen Code sessions'],
+  ['update', 'Check for Qwen Code updates and install if available'],
 ] as const;
 
 export const MCP_COMMANDS = [
@@ -359,7 +360,15 @@ export async function runCliEntry(
     return;
   }
 
+  const acpStartupProfiler = rawArgv.some(
+    (arg) => arg === '--acp' || arg === '--experimental-acp',
+  )
+    ? await import('./utils/acp-startup-profiler.js')
+    : undefined;
+  acpStartupProfiler?.initializeAcpStartupProfiler();
+  acpStartupProfiler?.markAcpStartup('geminiImportStart');
   const { main } = await import('./gemini.js');
+  acpStartupProfiler?.markAcpStartup('geminiImportEnd');
   await main();
 }
 

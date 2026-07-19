@@ -42,19 +42,42 @@ describe('generateValidName', () => {
   });
 
   it('should replace invalid characters with underscores', () => {
-    expect(generateValidName('invalid-name with spaces')).toBe(
-      'invalid-name_with_spaces',
+    const normalized = generateValidName('invalid-name with spaces');
+    expect(normalized).toMatch(/^[A-Za-z][A-Za-z0-9_-]*$/);
+    expect(normalized).not.toBe('invalid-name with spaces');
+  });
+
+  it('should normalize dotted MCP names for strict providers', () => {
+    const normalized = generateValidName(
+      'mcp__zybio__literature.search_pubmed',
+    );
+
+    expect(normalized).toMatch(/^[A-Za-z][A-Za-z0-9_-]*$/);
+    expect(normalized).not.toContain('.');
+    expect(normalized).toBe(
+      generateValidName('mcp__zybio__literature.search_pubmed'),
+    );
+    expect(generateValidName(normalized)).toBe(normalized);
+  });
+
+  it('should not collide after replacing unsupported characters', () => {
+    expect(generateValidName('mcp__zybio__literature.search_pubmed')).not.toBe(
+      generateValidName('mcp__zybio__literature_search_pubmed'),
     );
   });
 
   it('should truncate long names', () => {
-    expect(generateValidName('x'.repeat(80))).toBe(
-      'xxxxxxxxxxxxxxxxxxxxxxxxxxxx___xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-    );
+    const name = 'x'.repeat(80);
+    const normalized = generateValidName(name);
+
+    expect(normalized).toHaveLength(63);
+    expect(normalized).toMatch(/^[A-Za-z][A-Za-z0-9_-]*$/);
+    expect(normalized).toBe(generateValidName(name));
+    expect(normalized).not.toBe(generateValidName(`${name}y`));
   });
 
   it('should handle names with only invalid characters', () => {
-    expect(generateValidName('!@#$%^&*()')).toBe('__________');
+    expect(generateValidName('!@#$%^&*()')).toMatch(/^[A-Za-z][A-Za-z0-9_-]*$/);
   });
 
   it('should handle names that are exactly 63 characters long', () => {
@@ -807,11 +830,79 @@ describe('DiscoveredMCPTool', () => {
         ]);
       }
     });
+
+    it('should use the registered provider-safe name in permission rules', async () => {
+      const dottedTool = new DiscoveredMCPTool(
+        mockCallableToolInstance,
+        serverName,
+        'literature.search_pubmed',
+        baseDescription,
+        inputSchema,
+      );
+      const confirmation = await dottedTool
+        .build({ param: 'mock' })
+        .getConfirmationDetails(new AbortController().signal);
+
+      expect(dottedTool.name).not.toContain('.');
+      expect(dottedTool.schema.name).toBe(dottedTool.name);
+      expect(confirmation.type).toBe('mcp');
+      if (confirmation.type === 'mcp') {
+        expect(confirmation.permissionRules).toEqual([dottedTool.name]);
+      }
+    });
   });
 
   describe('getDefaultPermission with folder trust', () => {
     const mockConfig = (isTrusted: boolean | undefined) => ({
       isTrustedFolder: () => isTrusted,
+    });
+
+    it.each([
+      {
+        name: 'an untrusted server with readOnlyHint',
+        trust: undefined,
+        isTrustedFolder: true,
+        readOnlyHint: true,
+        expected: 'ask',
+      },
+      {
+        name: 'a trusted server with readOnlyHint in an untrusted folder',
+        trust: true,
+        isTrustedFolder: false,
+        readOnlyHint: true,
+        expected: 'ask',
+      },
+      {
+        name: 'a trusted server with readOnlyHint in a trusted folder',
+        trust: true,
+        isTrustedFolder: true,
+        readOnlyHint: true,
+        expected: 'allow',
+      },
+      {
+        name: 'an untrusted server with readOnlyHint disabled',
+        trust: undefined,
+        isTrustedFolder: true,
+        readOnlyHint: false,
+        expected: 'ask',
+      },
+    ])('should return $expected for $name', async (testCase) => {
+      const annotatedTool = new DiscoveredMCPTool(
+        mockCallableToolInstance,
+        serverName,
+        serverToolName,
+        baseDescription,
+        inputSchema,
+        testCase.trust,
+        undefined,
+        mockConfig(testCase.isTrustedFolder) as any,
+        undefined,
+        undefined,
+        undefined,
+        { readOnlyHint: testCase.readOnlyHint },
+      );
+      const invocation = annotatedTool.build({ param: 'mock' });
+      expect(await invocation.getDefaultPermission()).toBe(testCase.expected);
     });
 
     it('should return allow when trust is true and folder is trusted', async () => {
@@ -1242,6 +1333,7 @@ describe('DiscoveredMCPTool', () => {
   describe('auto-reconnect on connection error', () => {
     it('should attempt reconnect and retry on connection error', async () => {
       const params = { param: 'test' };
+      const reconnectServerToolName = 'literature.search_pubmed';
       const mockMcpClient: McpDirectClient = {
         callTool: vi.fn(),
       };
@@ -1257,7 +1349,7 @@ describe('DiscoveredMCPTool', () => {
       const newTool = new DiscoveredMCPTool(
         mockCallableToolInstance,
         serverName,
-        serverToolName,
+        reconnectServerToolName,
         baseDescription,
         inputSchema,
         undefined,
@@ -1286,7 +1378,7 @@ describe('DiscoveredMCPTool', () => {
       const reconnectTool = new DiscoveredMCPTool(
         mockCallableToolInstance,
         serverName,
-        serverToolName,
+        reconnectServerToolName,
         baseDescription,
         inputSchema,
         undefined,
@@ -1301,6 +1393,7 @@ describe('DiscoveredMCPTool', () => {
       expect(mockMcpClient.callTool).toHaveBeenCalledTimes(1);
       expect(newMockMcpClient.callTool).toHaveBeenCalledTimes(1);
       expect(discoverToolsForServer).toHaveBeenCalledWith(serverName);
+      expect(ensureTool).toHaveBeenCalledWith(reconnectTool.name);
       expect(result.llmContent).toEqual([{ text: 'Success after reconnect' }]);
     });
 

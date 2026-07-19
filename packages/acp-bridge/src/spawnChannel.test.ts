@@ -70,16 +70,17 @@ describe('createSpawnChannelFactory env policy', () => {
   let originalSimple: string | undefined;
   let originalServerToken: string | undefined;
   let originalCliEntry: string | undefined;
+  let originalRuntimeOnlyForTest: string | undefined;
 
   beforeEach(() => {
     mockSpawn.mockReset();
-    originalSimple = process.env['HOPCODE_SIMPLE'];
-    originalServerToken = process.env['HOPCODE_SERVER_TOKEN'];
-    originalCliEntry = process.env['HOPCODE_CLI_ENTRY'];
-    process.argv[1] = '/tmp/hopcode.js';
-    delete process.env['HOPCODE_CLI_ENTRY'];
-    process.env['HOPCODE_SIMPLE'] = '1';
-    process.env['HOPCODE_SERVER_TOKEN'] = 'secret';
+    originalSimple = process.env['QWEN_CODE_SIMPLE'];
+    originalServerToken = process.env['QWEN_SERVER_TOKEN'];
+    originalCliEntry = process.env['QWEN_CLI_ENTRY'];
+    originalRuntimeOnlyForTest = process.env['RUNTIME_ONLY_FOR_TEST'];
+    process.argv[1] = '/tmp/qwen.js';
+    process.env['QWEN_CODE_SIMPLE'] = '1';
+    process.env['QWEN_SERVER_TOKEN'] = 'secret';
   });
 
   afterEach(() => {
@@ -98,6 +99,16 @@ describe('createSpawnChannelFactory env policy', () => {
       delete process.env['HOPCODE_CLI_ENTRY'];
     } else {
       process.env['HOPCODE_CLI_ENTRY'] = originalCliEntry;
+    }
+    if (originalCliEntry === undefined) {
+      delete process.env['QWEN_CLI_ENTRY'];
+    } else {
+      process.env['QWEN_CLI_ENTRY'] = originalCliEntry;
+    }
+    if (originalRuntimeOnlyForTest === undefined) {
+      delete process.env['RUNTIME_ONLY_FOR_TEST'];
+    } else {
+      process.env['RUNTIME_ONLY_FOR_TEST'] = originalRuntimeOnlyForTest;
     }
   });
 
@@ -138,6 +149,30 @@ describe('createSpawnChannelFactory env policy', () => {
 
     const args = mockSpawn.mock.calls[0]?.[1] as string[] | undefined;
     expect(args?.slice(-2)).toEqual(['--acp', '--experimental-lsp']);
+  });
+
+  it('builds child env and cli entry from sourceEnv when provided', async () => {
+    mockSpawn.mockReturnValue(createFakeChildProcess());
+    process.env['QWEN_CLI_ENTRY'] = '/process/qwen.js';
+    process.env['RUNTIME_ONLY_FOR_TEST'] = 'from-process';
+
+    const factory = createSpawnChannelFactory({
+      sourceEnv: {
+        QWEN_CLI_ENTRY: '/runtime/qwen.js',
+        RUNTIME_ONLY_FOR_TEST: 'from-runtime',
+        QWEN_SERVER_TOKEN: 'runtime-secret',
+      },
+    });
+    await factory('/tmp/project');
+
+    const args = mockSpawn.mock.calls[0]?.[1] as string[] | undefined;
+    const spawnOptions = mockSpawn.mock.calls[0]?.[2] as
+      | { env?: NodeJS.ProcessEnv }
+      | undefined;
+    expect(args).toContain('/runtime/qwen.js');
+    expect(args).not.toContain('/process/qwen.js');
+    expect(spawnOptions?.env?.['RUNTIME_ONLY_FOR_TEST']).toBe('from-runtime');
+    expect(spawnOptions?.env).not.toHaveProperty('QWEN_SERVER_TOKEN');
   });
 
   it('threads NDJSON pipe hooks through daemon-side spawned channels', async () => {

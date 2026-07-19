@@ -14,6 +14,7 @@ import {
   SessionService,
   SessionOrganizationError,
   type SessionGroupColor,
+  type SessionGroupPresetColor,
   BuiltinAgentRegistry,
   SubagentError,
   WorkspaceMemoryFileTooLargeError,
@@ -28,12 +29,19 @@ import {
   UnsupportedDeviceFlowProviderError,
   UpstreamDeviceFlowError,
 } from '../auth/device-flow.js';
-import type { HttpAcpBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
-import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
+import type { HttpAcpBridge } from '@qwen-code/acp-bridge/bridgeTypes';
+import { parseSessionSource } from '@qwen-code/acp-bridge';
+import type { BridgeEvent } from '@qwen-code/acp-bridge/eventBus';
 import {
   SessionShellClientRequiredError,
   SessionShellDisabledError,
-} from '@hoptrendy/acp-bridge/bridgeErrors';
+  WorkspaceMismatchError,
+} from '@qwen-code/acp-bridge/bridgeErrors';
+import {
+  SessionArtifactAuthorizationError,
+  SessionArtifactValidationError,
+} from '@qwen-code/acp-bridge/sessionArtifacts';
+import { canonicalizeWorkspace } from '@qwen-code/acp-bridge/workspacePaths';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import { MAX_WORKSPACE_PATH_LENGTH } from '../fs/paths.js';
 import {
@@ -329,6 +337,8 @@ function pickSessionArtifactInput(
     mimeType,
     sizeBytes,
     metadata,
+    retention,
+    clientRetained,
   } = params;
 
   return {
@@ -342,6 +352,8 @@ function pickSessionArtifactInput(
     mimeType,
     sizeBytes,
     metadata,
+    retention,
+    clientRetained,
   } as AddSessionArtifactInput;
 }
 
@@ -451,6 +463,17 @@ function toRpcError(err: unknown): {
       data: { errorKind: 'client_id_required' },
     };
   }
+  if (err instanceof SessionArtifactAuthorizationError) {
+    return {
+      code: RPC.INVALID_REQUEST,
+      message: err.message,
+      data: {
+        errorKind: 'artifact_forbidden',
+        sessionId: err.sessionId,
+        artifactId: err.artifactId,
+      },
+    };
+  }
   if (err instanceof SessionArtifactValidationError) {
     return {
       code: RPC.INVALID_PARAMS,
@@ -496,7 +519,27 @@ function toRpcError(err: unknown): {
     case 'InvalidClientIdError':
       return { code: RPC.INVALID_PARAMS, message: errMsg(err) };
     case 'SessionLimitExceededError':
-      return { code: RPC.INTERNAL_ERROR, message: errMsg(err) };
+      return {
+        code: RPC.INTERNAL_ERROR,
+        message: errMsg(err),
+        data: {
+          errorKind: 'session_limit_exceeded',
+          limit: (err as { limit?: unknown }).limit,
+          scope: 'workspace',
+          retryable: true,
+        },
+      };
+    case 'TotalSessionLimitExceededError':
+      return {
+        code: RPC.INTERNAL_ERROR,
+        message: errMsg(err),
+        data: {
+          errorKind: 'session_limit_exceeded',
+          limit: (err as { limit?: unknown }).limit,
+          scope: (err as { scope?: unknown }).scope,
+          retryable: true,
+        },
+      };
     case 'PromptQueueFullError': {
       const promptErr = err as {
         sessionId?: unknown;
@@ -545,6 +588,7 @@ export class AcpDispatcher {
   constructor(
     private readonly bridge: HttpAcpBridge,
     private readonly boundWorkspace: string,
+    private readonly env: Readonly<NodeJS.ProcessEnv>,
     private readonly workspace: DaemonWorkspaceService,
     private readonly workspaceRememberLane: WorkspaceRememberTaskLane,
     private readonly fsFactory?: WorkspaceFileSystemFactory,
@@ -556,9 +600,19 @@ export class AcpDispatcher {
     this.agentManager = createDaemonSubagentManager(boundWorkspace);
   }
 
-  private killOrphanSession(sessionId: string): void {
+  private killOrphanSession(
+    sessionId: string,
+    removePersistedSession = false,
+  ): void {
     void this.bridge
       .killSession(sessionId, { requireZeroAttaches: true })
+      .then(async (killed) => {
+        if (killed && removePersistedSession) {
+          await new SessionService(this.boundWorkspace).removeSession(
+            sessionId,
+          );
+        }
+      })
       .catch((err) =>
         writeStderrLine(
           `hopcode serve: /acp orphan killSession(${logSafe(sessionId)}) failed: ${logSafe(errMsg(err))}`,
@@ -955,6 +1009,16 @@ export class AcpDispatcher {
 
         case 'session/new': {
           const cwd = parseOptionalWorkspaceCwd(params, this.boundWorkspace);
+          const source = parseSessionSource(
+            params['sourceType'],
+            params['sourceId'],
+          );
+          if ('error' in source) {
+            if (id !== undefined) {
+              conn.sendConn(error(id, RPC.INVALID_PARAMS, source.error));
+            }
+            return;
+          }
           // ACP standard: session/new MUST create a new isolated session.
           // Always use sessionScope 'thread' regardless of client params.
           // The REST surface (POST /session) supports 'single' for
@@ -963,12 +1027,13 @@ export class AcpDispatcher {
             workspaceCwd: cwd,
             clientId: conn.clientId,
             sessionScope: 'thread',
+            ...source,
           });
           // Teardown raced the spawn: the connection was destroyed while the
           // bridge call was in flight, so nothing will tear this session down.
           // Kill the orphan (no other client could have attached yet).
           if (conn.destroyed) {
-            this.killOrphanSession(session.sessionId);
+            this.killOrphanSession(session.sessionId, true);
             return;
           }
           conn.getOrCreateSession(session.sessionId).clientId =
@@ -976,7 +1041,7 @@ export class AcpDispatcher {
           conn.ownSession(session.sessionId);
           const configOptions = await this.configOptionsFor(session.sessionId);
           if (conn.destroyed) {
-            this.killOrphanSession(session.sessionId);
+            this.killOrphanSession(session.sessionId, true);
             return;
           }
           // Build ACP-standard models/modes from configOptions.
@@ -986,6 +1051,13 @@ export class AcpDispatcher {
           const modes = this.extractModeState(configOptions);
           this.replyConn(conn, id, {
             sessionId: session.sessionId,
+            ...(session.sourceType ? { sourceType: session.sourceType } : {}),
+            ...(session.sourceId !== undefined
+              ? { sourceId: session.sourceId }
+              : {}),
+            ...(session.sourcePersisted !== undefined
+              ? { sourcePersisted: session.sourcePersisted }
+              : {}),
             ...(configOptions ? { configOptions } : {}),
             ...(models ? { models } : {}),
             ...(modes ? { modes } : {}),
@@ -1028,17 +1100,25 @@ export class AcpDispatcher {
             [sessionId],
             async () => {
               await assertSessionLoadable(cwd, sessionId);
+              // Re-seed the persisted parent lineage so a restored sub-session
+              // still reports its parent over the ACP transport (parity with the
+              // REST restore handler); the bridge creates the entry without it.
+              const metadata = await new SessionService(
+                cwd,
+              ).readCreationMetadata(sessionId);
               return method === 'session/load'
                 ? await this.bridge.loadSession({
                     sessionId,
                     workspaceCwd: cwd,
                     clientId: conn.clientId,
                     historyReplay: 'response',
+                    ...metadata,
                   })
                 : await this.bridge.resumeSession({
                     sessionId,
                     workspaceCwd: cwd,
                     clientId: conn.clientId,
+                    ...metadata,
                   });
             },
           );
@@ -1166,10 +1246,41 @@ export class AcpDispatcher {
             }
             archiveState = rawArchiveState;
           }
+          const parentSessionId =
+            typeof params['parentSessionId'] === 'string'
+              ? params['parentSessionId']
+              : undefined;
+          if (parentSessionId !== undefined) {
+            if (parentSessionId.length === 0) {
+              throw new AcpParamError(
+                '`parentSessionId` must be a non-empty string',
+              );
+            }
+            if (view === 'organized') {
+              throw new AcpParamError(
+                '`parentSessionId` is not supported with `view` "organized"',
+              );
+            }
+          }
+          const parsedSource = parseSessionSource(
+            params['sourceType'],
+            params['sourceId'],
+          );
+          if ('error' in parsedSource) {
+            throw new AcpParamError(parsedSource.error);
+          }
           const result = await listWorkspaceSessionsForResponse(
             this.bridge,
             workspaceCwd,
-            { cursor, size: metaSize, archiveState, view, group },
+            {
+              cursor,
+              size: metaSize,
+              archiveState,
+              view,
+              group,
+              parentSessionId,
+              ...parsedSource,
+            },
           );
           this.replyConn(conn, id, {
             sessions: result.sessions.map((s) => ({
@@ -1180,6 +1291,13 @@ export class AcpDispatcher {
               updatedAt: s.updatedAt,
               displayName: s.displayName,
               title: s.displayName,
+              ...(s.parentSessionId !== undefined
+                ? { parentSessionId: s.parentSessionId }
+                : {}),
+              ...(s.sourceType !== undefined
+                ? { sourceType: s.sourceType }
+                : {}),
+              ...(s.sourceId !== undefined ? { sourceId: s.sourceId } : {}),
               clientCount: s.clientCount,
               hasActivePrompt: s.hasActivePrompt,
               isArchived: s.isArchived === true,
@@ -1858,7 +1976,7 @@ export class AcpDispatcher {
             params['color'] !== null &&
             (typeof params['color'] !== 'string' ||
               !GROUP_COLOR_OPTIONS.includes(
-                params['color'] as SessionGroupColor,
+                params['color'] as SessionGroupPresetColor,
               ))
           ) {
             throw new AcpParamError(
@@ -1890,7 +2008,7 @@ export class AcpDispatcher {
                 ? { groupId: params['groupId'] as string | null }
                 : {}),
               ...('color' in params
-                ? { color: params['color'] as SessionGroupColor | null }
+                ? { color: params['color'] as SessionGroupPresetColor | null }
                 : {}),
             });
             this.replyConn(conn, id, { sessionId, ...organization });
@@ -2020,7 +2138,245 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${HOPCODE_METHOD_NS}workspace/set_tool_enabled`: {
+        case `${QWEN_METHOD_NS}workspace/trust`: {
+          const result = await this.workspace.getWorkspaceTrustStatus(
+            this.wsCtx(conn, method),
+          );
+          this.replyConn(conn, id, result as unknown);
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}workspace/trust/request`: {
+          const desiredState = params['desiredState'];
+          if (desiredState !== 'trusted' && desiredState !== 'untrusted') {
+            if (id !== undefined) {
+              conn.sendConn(
+                error(
+                  id,
+                  RPC.INVALID_PARAMS,
+                  '`desiredState` must be "trusted" or "untrusted"',
+                ),
+              );
+            }
+            return;
+          }
+          const reason = params['reason'];
+          if (
+            reason !== undefined &&
+            (typeof reason !== 'string' ||
+              reason.length > MAX_TRUST_REASON_LENGTH)
+          ) {
+            if (id !== undefined) {
+              conn.sendConn(
+                error(
+                  id,
+                  RPC.INVALID_PARAMS,
+                  `\`reason\` must be a string up to ${MAX_TRUST_REASON_LENGTH} chars`,
+                ),
+              );
+            }
+            return;
+          }
+          const ctx = this.wsCtx(conn, method);
+          const status = await this.workspace.getWorkspaceTrustStatus(ctx);
+          if (!status.folderTrustEnabled) {
+            if (id !== undefined) {
+              conn.sendConn(
+                error(
+                  id,
+                  RPC.INVALID_REQUEST,
+                  'Folder trust is disabled for this workspace',
+                ),
+              );
+            }
+            return;
+          }
+          const result = await this.workspace.requestWorkspaceTrustChange(ctx, {
+            desiredState,
+            ...(reason !== undefined ? { reason } : {}),
+          });
+          this.replyConn(conn, id, result as unknown);
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}workspace/permissions`: {
+          const result = await this.workspace.getWorkspacePermissionsStatus(
+            this.wsCtx(conn, method),
+          );
+          this.replyConn(conn, id, result as unknown);
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}workspace/permissions/set`: {
+          const scope = params['scope'];
+          if (scope !== 'user' && scope !== 'workspace') {
+            if (id !== undefined) {
+              conn.sendConn(
+                error(
+                  id,
+                  RPC.INVALID_PARAMS,
+                  '`scope` must be "user" or "workspace"',
+                ),
+              );
+            }
+            return;
+          }
+
+          const ruleType = params['ruleType'];
+          if (!isPermissionRuleType(ruleType)) {
+            if (id !== undefined) {
+              conn.sendConn(
+                error(
+                  id,
+                  RPC.INVALID_PARAMS,
+                  '`ruleType` must be "allow", "ask", or "deny"',
+                ),
+              );
+            }
+            return;
+          }
+
+          let rules: string[];
+          try {
+            const settings = loadSettings(this.boundWorkspace);
+            const scopeSettings =
+              scope === 'workspace'
+                ? settings.workspace.settings
+                : settings.user.settings;
+            const existingRules =
+              readPermissionRuleSet(scopeSettings)[ruleType];
+            rules = normalizePermissionRules(params['rules'], {
+              existingRules,
+            });
+          } catch (err) {
+            if (err instanceof PermissionRulesValidationError) {
+              if (id !== undefined) {
+                conn.sendConn(error(id, RPC.INVALID_PARAMS, err.message));
+              }
+              return;
+            }
+            throw err;
+          }
+
+          let result: unknown;
+          try {
+            result = await this.workspace.setWorkspacePermissionRules(
+              this.wsCtx(conn, method),
+              { scope, ruleType, rules },
+            );
+          } catch (err) {
+            if (
+              err instanceof WorkspacePermissionRulesSessionRequiredError &&
+              id !== undefined
+            ) {
+              conn.sendConn(
+                error(id, RPC.INVALID_PARAMS, err.message, {
+                  errorKind: 'permission_session_required',
+                }),
+              );
+              return;
+            }
+            throw err;
+          }
+          this.replyConn(conn, id, result as unknown);
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}workspace/voice`: {
+          const result = await this.workspace.getWorkspaceVoiceStatus(
+            this.wsCtx(conn, method),
+          );
+          this.replyConn(conn, id, result as unknown);
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}workspace/voice/set`: {
+          const update = parseWorkspaceVoiceUpdateParams(params);
+          if ('error' in update) {
+            if (id !== undefined) {
+              conn.sendConn(error(id, RPC.INVALID_PARAMS, update.error));
+            }
+            return;
+          }
+
+          const result = await this.workspace.setWorkspaceVoiceSettings(
+            this.wsCtx(conn, method),
+            update,
+          );
+          this.replyConn(conn, id, result as unknown);
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}workspace/setup-github`: {
+          if (params['consent'] !== true) {
+            if (id !== undefined) {
+              conn.sendConn(
+                error(id, RPC.INVALID_PARAMS, '`consent` must be true', {
+                  errorKind: 'github_setup_consent_required',
+                }),
+              );
+            }
+            return;
+          }
+          if (!this.fsFactory) {
+            if (id !== undefined) {
+              conn.sendConn(
+                error(id, RPC.INTERNAL_ERROR, 'File system not configured', {
+                  errorKind: 'internal_error',
+                }),
+              );
+            }
+            return;
+          }
+          try {
+            const result = await setupGithub({
+              cwd: this.boundWorkspace,
+              workspaceRoot: this.boundWorkspace,
+              proxy: resolveSetupGithubProxy(this.boundWorkspace, this.env),
+              abortSignal: conn.abortSignal,
+              fileOps: createSetupGithubFileOps(
+                this.fsFactory,
+                `ACP ${method}`,
+                conn.clientId,
+              ),
+            });
+            this.bridge.publishWorkspaceEvent({
+              type: 'github_setup_completed',
+              data: setupGithubEventData(result),
+              ...(conn.clientId ? { originatorClientId: conn.clientId } : {}),
+            } as BridgeEvent);
+            this.replyConn(conn, id, result as unknown);
+          } catch (err) {
+            if (err instanceof SetupGithubError && id !== undefined) {
+              conn.sendConn(
+                error(
+                  id,
+                  err.status >= 500 ? RPC.INTERNAL_ERROR : RPC.INVALID_PARAMS,
+                  sanitizeSetupGithubMessage(err.message, this.boundWorkspace),
+                  {
+                    errorKind: err.code,
+                    ...(err.partial
+                      ? {
+                          partial: true,
+                          result: err.partialResult
+                            ? sanitizeSetupGithubResult(
+                                err.partialResult,
+                                this.boundWorkspace,
+                              )
+                            : null,
+                        }
+                      : {}),
+                  },
+                ),
+              );
+              return;
+            }
+            throw err;
+          }
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}workspace/set_tool_enabled`: {
           const toolName = String(params['toolName'] ?? '');
           if (!toolName || toolName.length > MAX_NAME_LENGTH) {
             if (id !== undefined) {
@@ -2206,7 +2562,61 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${HOPCODE_METHOD_NS}workspace/memory`: {
+        case `${QWEN_METHOD_NS}session/lsp`: {
+          const sessionId = String(params['sessionId'] ?? '');
+          if (!this.requireOwned(conn, sessionId, id)) return;
+          const result = await this.bridge.getSessionLspStatus(sessionId);
+          this.replyConn(conn, id, result as unknown);
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}session/artifacts`: {
+          const sessionId = String(params['sessionId'] ?? '');
+          if (!this.requireOwned(conn, sessionId, id)) return;
+          const result = await this.bridge.getSessionArtifacts(
+            sessionId,
+            this.sessionCtx(conn, sessionId, loopback),
+          );
+          this.replyConn(conn, id, result as unknown);
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}session/artifacts/add`: {
+          const sessionId = String(params['sessionId'] ?? '');
+          await this.withMutableOwned(conn, sessionId, id, async () => {
+            const result = await this.bridge.addSessionArtifact(
+              sessionId,
+              pickSessionArtifactInput(params),
+              this.sessionCtx(conn, sessionId, loopback),
+            );
+            this.replyConn(conn, id, result as unknown);
+          });
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}session/artifacts/remove`: {
+          const sessionId = String(params['sessionId'] ?? '');
+          await this.withMutableOwned(conn, sessionId, id, async () => {
+            const artifactId = String(params['artifactId'] ?? '');
+            if (!artifactId) {
+              if (id !== undefined) {
+                conn.sendConn(
+                  error(id, RPC.INVALID_PARAMS, '`artifactId` is required'),
+                );
+              }
+              return;
+            }
+            const result = await this.bridge.removeSessionArtifact(
+              sessionId,
+              artifactId,
+              this.sessionCtx(conn, sessionId, loopback),
+            );
+            this.replyConn(conn, id, result as unknown);
+          });
+          return;
+        }
+
+        case `${QWEN_METHOD_NS}workspace/memory`: {
           const result = await collectWorkspaceMemoryStatus(
             this.boundWorkspace,
           );

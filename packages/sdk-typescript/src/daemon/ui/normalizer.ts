@@ -9,6 +9,7 @@ import type {
   DaemonAuthProviderId,
   DaemonErrorKind,
   DaemonEvent,
+  DaemonSessionArtifactChange,
 } from '../types.js';
 import { DAEMON_ERROR_KINDS } from '../types.js';
 import type {
@@ -38,7 +39,11 @@ import {
  */
 type NormalizedEventBase = Pick<
   DaemonUiEvent,
-  'eventId' | 'serverTimestamp' | 'originatorClientId' | 'rawEvent'
+  | 'eventId'
+  | 'serverTimestamp'
+  | 'sourceRecordIds'
+  | 'originatorClientId'
+  | 'rawEvent'
 >;
 
 const DAEMON_ERROR_KIND_SET = new Set<string>(DAEMON_ERROR_KINDS);
@@ -47,10 +52,13 @@ const MCP_RESTART_REFUSED_REASONS = new Set<string>([
   'in_flight',
   'disabled',
   'budget_would_exceed',
+  'authentication_required',
 ]);
 
 const MALFORMED_MEMORY_CHANGED = 'malformed memory_changed payload';
 const MAX_DETAILS_LENGTH = 4096;
+const SESSION_RECORDING_DEGRADED_MESSAGE =
+  'Session recording stopped after a write failure. New messages for the affected session will not be saved. Check disk space and permissions, then start a new session to resume recording.';
 
 export function normalizeDaemonEvent(
   event: DaemonEvent,
@@ -124,6 +132,45 @@ export function normalizeDaemonEvent(
           text: `Session closed: ${getString(event.data, 'reason') ?? 'closed'}`,
         },
       ];
+    case 'session_recording_degraded': {
+      const sessionId = getString(event.data, 'sessionId');
+      if (!sessionId || getString(event.data, 'reason') !== 'write_failed') {
+        return fallbackDebug(event, base, 'malformed recording state');
+      }
+      return [
+        {
+          ...base,
+          type: 'error',
+          recoverable: true,
+          code: 'session_recording_degraded',
+          text: SESSION_RECORDING_DEGRADED_MESSAGE,
+        },
+      ];
+    }
+    case 'session_snapshot': {
+      if (!isRecord(event.data) || !getString(event.data, 'sessionId')) {
+        return fallbackDebug(event, base, 'malformed recording snapshot');
+      }
+      const recordingDegraded = event.data['recordingDegraded'];
+      if (
+        recordingDegraded !== undefined &&
+        typeof recordingDegraded !== 'boolean'
+      ) {
+        return fallbackDebug(event, base, 'malformed recording snapshot');
+      }
+      if (recordingDegraded === true) {
+        return [
+          {
+            ...base,
+            type: 'error',
+            recoverable: true,
+            code: 'session_recording_degraded',
+            text: SESSION_RECORDING_DEGRADED_MESSAGE,
+          },
+        ];
+      }
+      return [];
+    }
     case 'client_evicted':
       return [
         {
@@ -159,6 +206,7 @@ export function normalizeDaemonEvent(
     }
     case 'turn_error': {
       const code = getString(event.data, 'code');
+      const errorKind = asDaemonErrorKind(getString(event.data, 'errorKind'));
       const promptId = getString(event.data, 'promptId');
       return [
         {
@@ -167,6 +215,7 @@ export function normalizeDaemonEvent(
           source: 'turn_error',
           recoverable: true,
           ...(code ? { code } : {}),
+          ...(errorKind ? { errorKind } : {}),
           ...(promptId ? { promptId } : {}),
           text:
             getString(event.data, 'message') ??
@@ -176,6 +225,9 @@ export function normalizeDaemonEvent(
     }
     case 'state_resync_required':
       return normalizeStateResyncRequired(event, base);
+
+    case 'history_truncated':
+      return normalizeHistoryTruncated(event, base);
 
     case 'session_rewound':
       return normalizeSessionRewound(event, base);
@@ -255,6 +307,9 @@ export function normalizeDaemonEvent(
       return normalizeApprovalModeChanged(event, base);
 
     // ── Workspace events ──────────────────────────────────────
+    case 'git_branch_changed':
+      return [];
+
     case 'memory_changed':
       return normalizeMemoryChanged(event, base);
 
@@ -291,8 +346,20 @@ export function normalizeDaemonEvent(
     case 'mcp_server_restart_refused':
       return normalizeMcpServerRestartRefused(event, base);
 
+    case 'mcp_server_added':
+      return normalizeMcpServerChanged(event, base, 'added');
+
+    case 'mcp_server_removed':
+      return normalizeMcpServerChanged(event, base, 'removed');
+
+    case 'mcp_server_changed':
+      return normalizeMcpServerChanged(event, base);
+
     case 'extensions_changed':
       return normalizeExtensionsChanged(event, base);
+
+    case 'artifact_changed':
+      return normalizeArtifactChanged(event, base);
 
     // ── Auth device-flow events (RFC 8628) ─────────────────
     case 'auth_device_flow_started':
@@ -319,14 +386,21 @@ export function normalizeDaemonEvent(
       // status block was redundant. Adapters that want a user-visible
       // banner can pattern-match on `event.type === 'debug'` and the
       // text prefix.
-      return [
-        {
-          ...base,
-          type: 'debug',
-          text: `${event.type} (unrecognized daemon event): ${stringifyRedactedJson(event.data)}`,
-        },
-      ];
+      return normalizeUnrecognizedEvent(event, base);
   }
+}
+
+function normalizeUnrecognizedEvent(
+  event: DaemonEvent,
+  base: NormalizedEventBase,
+): DaemonUiEvent[] {
+  return [
+    {
+      ...base,
+      type: 'debug',
+      text: `${event.type} (unrecognized daemon event): ${stringifyRedactedJson(event.data)}`,
+    },
+  ];
 }
 
 function normalizeStateResyncRequired(
@@ -354,6 +428,34 @@ function normalizeStateResyncRequired(
       reason,
       lastDeliveredId,
       earliestAvailableId,
+    },
+  ];
+}
+
+function normalizeHistoryTruncated(
+  event: DaemonEvent,
+  base: NormalizedEventBase,
+): DaemonUiEvent[] {
+  const reason = getString(event.data, 'reason');
+  const truncatedEvents = numberField(event.data, 'truncatedEvents');
+  const retainedEvents = numberField(event.data, 'retainedEvents');
+  const maxBytes = numberField(event.data, 'maxBytes');
+  if (
+    reason !== 'replay_window_exceeded' ||
+    truncatedEvents === undefined ||
+    retainedEvents === undefined ||
+    maxBytes === undefined ||
+    !isRecord(event.data) ||
+    typeof event.data['fullTranscriptAvailable'] !== 'boolean'
+  ) {
+    return fallbackDebug(event, base, 'malformed history_truncated payload');
+  }
+  return [
+    {
+      ...base,
+      type: 'status',
+      text: `History truncated: retained ${retainedEvents}, dropped ${truncatedEvents} (window ${maxBytes} bytes).`,
+      source: 'history_truncated',
     },
   ];
 }
@@ -453,9 +555,11 @@ function createBase(
   opts: NormalizeDaemonEventOptions,
 ): NormalizedEventBase {
   const serverTimestamp = extractServerTimestamp(event);
+  const sourceRecordIds = extractSourceRecordIds(event);
   return {
     ...(event.id !== undefined ? { eventId: event.id } : {}),
     ...(serverTimestamp !== undefined ? { serverTimestamp } : {}),
+    ...(sourceRecordIds ? { sourceRecordIds } : {}),
     ...(event.originatorClientId
       ? { originatorClientId: event.originatorClientId }
       : {}),
@@ -534,6 +638,7 @@ function normalizeSessionUpdate(
       ) {
         return [];
       }
+      const meta = extractUpdateMeta(update);
       const content = update['content'];
       const part = extractContentPart(content);
       if (part) {
@@ -558,13 +663,29 @@ function normalizeSessionUpdate(
         }
         if (part.kind === 'text') {
           return part.text
-            ? [{ ...base, type: 'user.text.delta', text: part.text }]
+            ? [
+                {
+                  ...base,
+                  type: 'user.text.delta',
+                  text: part.text,
+                  ...(meta ? { meta } : {}),
+                },
+              ]
             : [];
         }
         return [];
       }
       const text = getTextContent(content);
-      return text ? [{ ...base, type: 'user.text.delta', text }] : [];
+      return text
+        ? [
+            {
+              ...base,
+              type: 'user.text.delta',
+              text,
+              ...(meta ? { meta } : {}),
+            },
+          ]
+        : [];
     }
     case 'agent_message_chunk': {
       const text = getTextContent(update['content']);
@@ -608,8 +729,21 @@ function normalizeSessionUpdate(
       ];
     }
     case 'tool_call':
-    case 'tool_call_update':
+    case 'tool_call_update': {
+      // Silent-shell liveness heartbeat: a meta-only in_progress frame with
+      // no kind/title/content. Normalizing it would overwrite the tool
+      // block's human-readable title with the bare tool name from _meta;
+      // the web UI has its own activity indicator, so drop the frame.
+      const meta = isRecord(update['_meta']) ? update['_meta'] : undefined;
+      if (
+        getString(update, 'status') === 'in_progress' &&
+        getString(update, 'kind') === undefined &&
+        meta?.['shellProgress'] !== undefined
+      ) {
+        return [];
+      }
       return [normalizeToolUpdate(update, base)];
+    }
     case 'shell_output':
     case 'tool_output': {
       const text = getOutputText(update);
@@ -669,7 +803,30 @@ function extractUpdateMeta(
   update: Record<string, unknown>,
 ): Record<string, unknown> | undefined {
   const meta = isRecord(update['_meta']) ? update['_meta'] : undefined;
-  return meta ? { ...meta } : undefined;
+  if (!meta) return undefined;
+  const { qwenTranscript: _qwenTranscript, ...displayMeta } = meta;
+  return Object.keys(displayMeta).length > 0 ? displayMeta : undefined;
+}
+
+function extractSourceRecordIds(
+  event: DaemonEvent,
+): readonly string[] | undefined {
+  if (!isRecord(event.data)) return undefined;
+  const update = getSessionUpdatePayload(event.data);
+  const meta =
+    update && isRecord(update['_meta']) ? update['_meta'] : undefined;
+  const transcript =
+    meta && isRecord(meta['qwenTranscript'])
+      ? meta['qwenTranscript']
+      : undefined;
+  const values = transcript?.['sourceRecordIds'];
+  if (!Array.isArray(values)) return undefined;
+  const ids = [
+    ...new Set(
+      values.filter((value): value is string => typeof value === 'string'),
+    ),
+  ];
+  return ids.length > 0 ? ids : undefined;
 }
 
 /**
@@ -794,14 +951,19 @@ function normalizePlanUpdate(
 ): DaemonUiEvent {
   const entries = Array.isArray(update['entries']) ? update['entries'] : [];
   const contentText = capDetails(formatPlanEntries(entries));
+  const meta = isRecord(update['_meta']) ? update['_meta'] : undefined;
+  const transcript =
+    meta && isRecord(meta['qwenTranscript'])
+      ? meta['qwenTranscript']
+      : undefined;
   const planCallId =
-    base.eventId !== undefined
+    getString(transcript, 'planToolCallId') ??
+    (base.eventId !== undefined
       ? `${DAEMON_PLAN_TOOL_CALL_ID}-${base.eventId}`
-      : DAEMON_PLAN_TOOL_CALL_ID;
+      : DAEMON_PLAN_TOOL_CALL_ID);
   // Carry the cumulative-usage snapshot the agent stamps on each plan update
   // (PlanEmitter) through to rawOutput, so the web-shell can diff consecutive
   // todo snapshots into per-task token/time detail.
-  const meta = isRecord(update['_meta']) ? update['_meta'] : undefined;
   const stats = meta && isRecord(meta['stats']) ? meta['stats'] : undefined;
   return {
     ...base,
@@ -1072,6 +1234,30 @@ function normalizeSessionMetadataUpdated(
       type: 'session.metadata.changed',
       sessionId,
       ...(displayName !== undefined ? { displayName } : {}),
+    },
+  ];
+}
+
+function normalizeArtifactChanged(
+  event: DaemonEvent,
+  base: NormalizedEventBase,
+): DaemonUiEvent[] {
+  const sessionId = getString(event.data, 'sessionId');
+  const change = isRecord(event.data) ? event.data['change'] : undefined;
+  if (!sessionId || !isRecord(change)) {
+    return fallbackDebug(event, base, 'malformed artifact_changed payload');
+  }
+  const action = getString(change, 'action');
+  const artifactId = getString(change, 'artifactId');
+  if (!action || !artifactId) {
+    return fallbackDebug(event, base, 'missing action or artifactId');
+  }
+  return [
+    {
+      ...base,
+      type: 'session.artifact.changed',
+      sessionId,
+      change: change as unknown as DaemonSessionArtifactChange,
     },
   ];
 }
@@ -1452,7 +1638,50 @@ function normalizeMcpServerRestartRefused(
       ...base,
       type: 'workspace.mcp.server_restart_refused',
       serverName,
-      reason: reason as 'in_flight' | 'disabled' | 'budget_would_exceed',
+      reason: reason as
+        | 'in_flight'
+        | 'disabled'
+        | 'budget_would_exceed'
+        | 'authentication_required',
+    },
+  ];
+}
+
+function normalizeMcpServerChanged(
+  event: DaemonEvent,
+  base: NormalizedEventBase,
+  fixedAction?: 'added' | 'removed',
+): DaemonUiEvent[] {
+  const serverName = getString(event.data, fixedAction ? 'name' : 'serverName');
+  const action = fixedAction ?? getString(event.data, 'action');
+  if (
+    !serverName ||
+    !action ||
+    ![
+      'added',
+      'removed',
+      'approve',
+      'enable',
+      'disable',
+      'authenticate',
+      'clear-auth',
+    ].includes(action)
+  ) {
+    return fallbackDebug(event, base, `malformed ${event.type} payload`);
+  }
+  return [
+    {
+      ...base,
+      type: 'workspace.mcp.server_changed',
+      serverName,
+      action: action as
+        | 'added'
+        | 'removed'
+        | 'approve'
+        | 'enable'
+        | 'disable'
+        | 'authenticate'
+        | 'clear-auth',
     },
   ];
 }

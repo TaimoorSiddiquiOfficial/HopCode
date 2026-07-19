@@ -27,6 +27,7 @@ export interface SessionReplaySnapshot {
 
 export interface CompactionEngine {
   ingest(event: BridgeEvent): void;
+  seedReplayEvents(events: BridgeEvent[]): void;
   snapshot(): SessionReplaySnapshot;
   close(): void;
 }
@@ -49,6 +50,11 @@ export interface BridgeEvent {
   type: string;
   /** Frame payload — opaque JSON. */
   data: unknown;
+  /**
+   * Identifier of the admitted prompt that produced this event, when the
+   * event belongs to a specific turn.
+   */
+  promptId?: string;
   /**
    * Envelope metadata shared by SSE and load/replay responses.
    */
@@ -132,7 +138,7 @@ function normalizeMaxQueuedBytes(value: number | undefined): number {
   return value;
 }
 
-function serializedByteLength(event: BridgeEvent): number {
+export function serializedBridgeEventByteLength(event: BridgeEvent): number {
   try {
     const serialized = JSON.stringify(event);
     if (serialized === undefined) return 0;
@@ -291,12 +297,12 @@ export class EventBus {
         },
       };
       events.push(event);
-      try {
-        this.compactionEngine?.ingest(event);
-      } catch {
-        // CompactionEngine is best-effort; mirror publish()'s never-throws
-        // contract for bulk replay seeding.
-      }
+    }
+    try {
+      this.compactionEngine?.seedReplayEvents(events);
+    } catch {
+      // CompactionEngine is best-effort; mirror publish()'s never-throws
+      // contract for bulk replay seeding.
     }
 
     // Seeded replay frames intentionally do not enter the reconnect ring. A
@@ -361,7 +367,7 @@ export class EventBus {
     if (this.ring.length > this.ringSize) this.ring.shift();
     let eventBytes: number | undefined;
     const getEventBytes = () => {
-      eventBytes ??= serializedByteLength(event);
+      eventBytes ??= serializedBridgeEventByteLength(event);
       return eventBytes;
     };
     // Snapshot the subscribers so an in-loop `this.subs.delete(sub)`

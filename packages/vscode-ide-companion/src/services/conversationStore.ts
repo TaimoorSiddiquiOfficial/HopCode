@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { logger } from '../utils/logger.js';
 import type * as vscode from 'vscode';
 import type { ChatMessage } from './hopcodeAgentManager.js';
 import { randomUUID } from 'node:crypto';
@@ -72,7 +73,7 @@ export class ConversationStore {
     const conversation = conversations.find((c) => c.id === conversationId);
 
     if (!conversation) {
-      console.warn(
+      logger.warn(
         '[ConversationStore] replaceMessages: conversation not found:',
         conversationId,
       );
@@ -99,7 +100,7 @@ export class ConversationStore {
     );
 
     if (sourceIndex < 0) {
-      console.warn(
+      logger.warn(
         '[ConversationStore] renameConversationId: source conversation not found:',
         fromConversationId,
       );
@@ -107,7 +108,7 @@ export class ConversationStore {
     }
 
     if (conversations.some((c) => c.id === toConversationId)) {
-      console.warn(
+      logger.warn(
         '[ConversationStore] renameConversationId: target conversation already exists:',
         toConversationId,
       );
@@ -162,7 +163,7 @@ export class ConversationStore {
     const conversation = conversations.find((c) => c.id === conversationId);
 
     if (!conversation) {
-      console.warn(
+      logger.warn(
         '[ConversationStore] truncateFromUserTurn: conversation not found:',
         conversationId,
       );
@@ -184,7 +185,7 @@ export class ConversationStore {
     }
 
     if (truncateAt < 0) {
-      console.warn(
+      logger.warn(
         '[ConversationStore] truncateFromUserTurn: target turn not found:',
         targetTurnIndex,
       );

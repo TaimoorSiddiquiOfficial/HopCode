@@ -64,6 +64,137 @@ describe('daemon UI normalizer and transcript reducer', () => {
     ]);
   });
 
+  it('drops silent-shell heartbeat tool updates instead of rewriting the tool block', () => {
+    const events = normalizeDaemonEvent({
+      id: 1,
+      v: 1,
+      type: 'session_update',
+      data: {
+        update: {
+          sessionUpdate: 'tool_call_update',
+          toolCallId: 'call-1',
+          status: 'in_progress',
+          _meta: {
+            toolName: 'run_shell_command',
+            shellProgress: { type: 'shell_progress', elapsedMs: 10_000 },
+          },
+        },
+      },
+    });
+
+    expect(events).toEqual([]);
+
+    // A real terminal update for the same call still normalizes.
+    const completed = normalizeDaemonEvent({
+      id: 2,
+      v: 1,
+      type: 'session_update',
+      data: {
+        update: {
+          sessionUpdate: 'tool_call_update',
+          toolCallId: 'call-1',
+          status: 'completed',
+          _meta: { toolName: 'run_shell_command' },
+        },
+      },
+    });
+    expect(completed).toMatchObject([
+      { type: 'tool.update', toolCallId: 'call-1', status: 'completed' },
+    ]);
+  });
+
+  it('normalizes an in_progress frame that carries a kind (the drop is scoped to kind-less heartbeats)', () => {
+    // The `kind === undefined` condition is load-bearing: an in_progress
+    // frame WITH a kind is not a bare heartbeat and must pass through to a
+    // tool.update, even if it also carries shellProgress.
+    const events = normalizeDaemonEvent({
+      id: 1,
+      v: 1,
+      type: 'session_update',
+      data: {
+        update: {
+          sessionUpdate: 'tool_call_update',
+          toolCallId: 'call-1',
+          status: 'in_progress',
+          kind: 'execute',
+          _meta: {
+            toolName: 'run_shell_command',
+            shellProgress: { type: 'shell_progress', elapsedMs: 10_000 },
+          },
+        },
+      },
+    });
+    expect(events).toMatchObject([
+      { type: 'tool.update', toolCallId: 'call-1', status: 'in_progress' },
+    ]);
+  });
+
+  it('stores input annotations on locally appended user messages', () => {
+    const store = createDaemonTranscriptStore();
+    const inputAnnotations = [
+      {
+        type: 'reference' as const,
+        start: 6,
+        end: 13,
+        text: '@file/a',
+        reference: {
+          id: 'file:@file/a',
+          kind: 'file',
+          value: 'file/a',
+          serialized: '@file/a',
+        },
+      },
+    ];
+
+    store.appendLocalUserMessage('hello @file/a', undefined, {
+      inputAnnotations,
+    });
+
+    expect(store.getSnapshot().blocks[0]).toMatchObject({
+      kind: 'user',
+      meta: { inputAnnotations },
+    });
+  });
+
+  it('stores input annotations from replayed user message chunks', () => {
+    const inputAnnotations = [
+      {
+        type: 'reference' as const,
+        start: 0,
+        end: 7,
+        text: '@file/a',
+        reference: {
+          id: 'file:@file/a',
+          kind: 'file',
+          value: 'file/a',
+          serialized: '@file/a',
+        },
+      },
+    ];
+    const state = reduceDaemonTranscriptEvents(
+      createDaemonTranscriptState({ now: 1 }),
+      normalizeDaemonEvent({
+        id: 1,
+        v: 1,
+        type: 'session_update',
+        data: {
+          sessionId: 's1',
+          update: {
+            sessionUpdate: 'user_message_chunk',
+            content: { type: 'text', text: '@file/a' },
+            _meta: { inputAnnotations },
+          },
+        },
+      }),
+      { now: 2 },
+    );
+
+    expect(state.blocks[0]).toMatchObject({
+      kind: 'user',
+      meta: { inputAnnotations },
+    });
+  });
+
   it('preserves assistant message metadata on transcript blocks', () => {
     const events = normalizeDaemonEvent({
       id: 10,
@@ -520,6 +651,39 @@ describe('daemon UI normalizer and transcript reducer', () => {
         suppressOwnUserEcho: false,
       }),
     ).toMatchObject([{ type: 'user.text.delta', text: 'hello' }]);
+  });
+
+  it('preserves user message metadata on transcript blocks', () => {
+    const events = normalizeDaemonEvent({
+      id: 23,
+      v: 1,
+      type: 'session_update',
+      data: {
+        update: {
+          sessionUpdate: 'user_message_chunk',
+          content: { type: 'text', text: 'scheduled prompt' },
+          _meta: { source: 'cron' },
+        },
+      },
+    } as const);
+
+    expect(events).toMatchObject([
+      {
+        type: 'user.text.delta',
+        text: 'scheduled prompt',
+        meta: { source: 'cron' },
+      },
+    ]);
+
+    const state = reduceDaemonTranscriptEvents(
+      createDaemonTranscriptState({ now: 1 }),
+      events,
+    );
+    expect(state.blocks[0]).toMatchObject({
+      kind: 'user',
+      text: 'scheduled prompt',
+      meta: { source: 'cron' },
+    });
   });
 
   it('carries user shell command metadata into user shell transcript blocks', () => {
@@ -1161,6 +1325,103 @@ describe('daemon UI normalizer and transcript reducer', () => {
     expect(event && 'text' in event ? event.text : '').not.toContain(
       'secret-token',
     );
+  });
+
+  it('preserves structured model stream interruption turn errors', () => {
+    expect(
+      normalizeDaemonEvent({
+        id: 44,
+        v: 1,
+        type: 'turn_error',
+        data: {
+          sessionId: 'session-1',
+          message: 'terminated',
+          code: '-32603',
+          errorKind: 'model_stream_interrupted',
+          promptId: 'prompt-1',
+        },
+      }),
+    ).toMatchObject([
+      {
+        type: 'error',
+        source: 'turn_error',
+        recoverable: true,
+        code: '-32603',
+        errorKind: 'model_stream_interrupted',
+        promptId: 'prompt-1',
+        text: 'terminated',
+      },
+    ]);
+  });
+
+  it('keeps structured model stream interruption on transcript blocks', () => {
+    const state = reduceDaemonTranscriptEvents(
+      createDaemonTranscriptState({ now: 100 }),
+      normalizeDaemonEvent({
+        id: 46,
+        v: 1,
+        type: 'turn_error',
+        data: {
+          sessionId: 'session-1',
+          message: 'terminated',
+          code: '-32603',
+          errorKind: 'model_stream_interrupted',
+          promptId: 'prompt-1',
+        },
+      }),
+      { now: 101 },
+    );
+
+    expect(state.blocks).toMatchObject([
+      {
+        kind: 'error',
+        source: 'turn_error',
+        text: 'terminated',
+        code: '-32603',
+        errorKind: 'model_stream_interrupted',
+        promptId: 'prompt-1',
+      },
+    ]);
+  });
+
+  it('keeps older daemon terminated turn error text unchanged', () => {
+    expect(
+      normalizeDaemonEvent({
+        id: 45,
+        v: 1,
+        type: 'turn_error',
+        data: {
+          sessionId: 'session-1',
+          message: 'terminated',
+        },
+      }),
+    ).toMatchObject([
+      {
+        type: 'error',
+        source: 'turn_error',
+        text: 'terminated',
+      },
+    ]);
+  });
+
+  it('drops unrecognized errorKind from turn error events', () => {
+    const [event] = normalizeDaemonEvent({
+      id: 47,
+      v: 1,
+      type: 'turn_error',
+      data: {
+        sessionId: 'session-1',
+        message: 'some error',
+        errorKind: 'some_future_kind',
+      },
+    });
+
+    expect(event).toMatchObject({
+      type: 'error',
+      source: 'turn_error',
+      text: 'some error',
+    });
+    expect(event).not.toHaveProperty('errorKind');
   });
 
   it('normalizes daemon lifecycle and control events', () => {
@@ -3133,6 +3394,68 @@ describe('daemon UI reducer state machine (PR-E)', () => {
       },
     ]);
     expect(JSON.stringify(state.blocks)).not.toContain('stale delta');
+  });
+
+  it('projects history truncation as status without entering resync', () => {
+    const events = normalizeDaemonEvent({
+      v: 1,
+      type: 'history_truncated',
+      data: {
+        reason: 'replay_window_exceeded',
+        truncatedEvents: 4,
+        retainedEvents: 2,
+        maxBytes: 512,
+        truncatedTurns: 2,
+        fullTranscriptAvailable: true,
+      },
+    } as never);
+
+    expect(events).toEqual([
+      expect.objectContaining({
+        type: 'status',
+        source: 'history_truncated',
+        text: expect.stringContaining('History truncated') as string,
+      }),
+    ]);
+
+    const state = reduceDaemonTranscriptEvents(
+      createDaemonTranscriptState({ now: 1 }),
+      events,
+      { now: 2 },
+    );
+
+    expect(state.awaitingResync).toBe(false);
+    expect(state.resyncRequiredCount).toBe(0);
+    expect(state.blocks).toMatchObject([
+      {
+        kind: 'status',
+        text: expect.stringContaining('History truncated') as string,
+      },
+    ]);
+    expect(daemonUiEventToTerminalText(events[0])).toContain(
+      'History truncated',
+    );
+  });
+
+  it('routes malformed history truncation payloads to debug', () => {
+    const events = normalizeDaemonEvent({
+      v: 1,
+      type: 'history_truncated',
+      data: {
+        reason: 'replay_window_exceeded',
+        truncatedEvents: '4',
+        retainedEvents: 2,
+        maxBytes: 512,
+        fullTranscriptAvailable: true,
+      },
+    } as never);
+
+    expect(events).toEqual([
+      expect.objectContaining({
+        type: 'debug',
+        text: 'history_truncated: malformed history_truncated payload',
+      }),
+    ]);
   });
 
   it('mirrors approval mode from session.approval_mode.changed event', async () => {
@@ -6459,6 +6782,71 @@ describe('parallel subAgent text interleaving — normalizer', () => {
   });
 });
 
+describe('daemon UI normalizer — artifact events', () => {
+  it('normalizes artifact_changed as a structured session event', () => {
+    const events = normalizeDaemonEvent({
+      type: 'artifact_changed',
+      data: {
+        sessionId: 'session-1',
+        change: {
+          action: 'updated',
+          artifactId: 'artifact-1',
+          artifact: {
+            id: 'artifact-1',
+            title: 'Report',
+            kind: 'html',
+            storage: 'workspace',
+            source: 'tool',
+            status: 'available',
+          },
+        },
+      },
+    } as never);
+
+    expect(events).toEqual([
+      expect.objectContaining({
+        type: 'session.artifact.changed',
+        sessionId: 'session-1',
+        change: expect.objectContaining({
+          action: 'updated',
+          artifactId: 'artifact-1',
+        }),
+      }),
+    ]);
+  });
+
+  it('falls back to debug for malformed artifact_changed payloads', () => {
+    const events = normalizeDaemonEvent({
+      type: 'artifact_changed',
+      data: { sessionId: 'session-1' },
+    } as never);
+
+    expect(events).toEqual([
+      expect.objectContaining({
+        type: 'debug',
+        text: 'artifact_changed: malformed artifact_changed payload',
+      }),
+    ]);
+  });
+
+  it('falls back to debug when artifact_changed change misses required fields', () => {
+    const events = normalizeDaemonEvent({
+      type: 'artifact_changed',
+      data: {
+        sessionId: 'session-1',
+        change: {},
+      },
+    } as never);
+
+    expect(events).toEqual([
+      expect.objectContaining({
+        type: 'debug',
+        text: 'artifact_changed: missing action or artifactId',
+      }),
+    ]);
+  });
+});
+
 describe('parallel subAgent text interleaving fix', () => {
   it('T1: separates text chunks by parentToolCallId into independent blocks', () => {
     let state = createDaemonTranscriptState({ now: 1 });
@@ -7173,5 +7561,67 @@ describe('parallel subAgent text interleaving fix', () => {
     expect(allAssistant[1]!.streaming).toBe(false);
     expect(state.activeAssistantBlockId).toBeUndefined();
     expect(state.activeAssistantBlockByParent).toEqual({});
+  });
+
+  it('normalizes live and snapshot recording degradation as recoverable errors', () => {
+    const live = normalizeDaemonEvent({
+      id: 80,
+      v: 1,
+      type: 'session_recording_degraded',
+      data: { sessionId: 's-1', reason: 'write_failed' },
+    });
+    const snapshot = normalizeDaemonEvent({
+      id: 81,
+      v: 1,
+      type: 'session_snapshot',
+      data: { sessionId: 's-1', recordingDegraded: true },
+    });
+
+    expect(live).toMatchObject([
+      {
+        type: 'error',
+        code: 'session_recording_degraded',
+        recoverable: true,
+      },
+    ]);
+    expect(snapshot).toMatchObject([
+      {
+        type: 'error',
+        code: 'session_recording_degraded',
+        recoverable: true,
+      },
+    ]);
+  });
+
+  it('does not turn a healthy recording snapshot into a warning', () => {
+    const events = normalizeDaemonEvent({
+      id: 82,
+      v: 1,
+      type: 'session_snapshot',
+      data: { sessionId: 's-1', recordingDegraded: false },
+    });
+
+    expect(events).toEqual([]);
+  });
+
+  it('normalizes malformed recording snapshots as debug events', () => {
+    for (const data of [
+      { recordingDegraded: false },
+      { sessionId: 's-1', recordingDegraded: 'yes' },
+    ]) {
+      expect(
+        normalizeDaemonEvent({
+          id: 83,
+          v: 1,
+          type: 'session_snapshot',
+          data,
+        }),
+      ).toMatchObject([
+        {
+          type: 'debug',
+          text: expect.stringContaining('malformed recording snapshot'),
+        },
+      ]);
+    }
   });
 });

@@ -232,7 +232,7 @@ jobs:
           echo "stale agent state cleaned"
 
       - name: 'Checkout repo'
-        uses: 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd' # v6.0.2
+        uses: 'actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10'  # v6.0.3
         with:
           token: '${{ secrets.GITHUB_TOKEN }}'
 
@@ -247,8 +247,9 @@ jobs:
             echo "number=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: 'Run HopCode Triage'
-        uses: 'TaimoorSiddiquiOfficial/HopCode-action@5fd6818d04d64e87d255ee4d5f77995e32fbf4c2'
+      - name: 'Run Qwen Triage'
+        id: 'triage'
+        uses: 'QwenLM/qwen-code-action@6d08e91aa807257b9c8af60edb5bb6bb2d7d951f'
         env:
           GITHUB_TOKEN: '${{ secrets.HOPCODE_CODE_BOT_TOKEN || secrets.CI_BOT_PAT }}'
           GH_TOKEN: '${{ secrets.HOPCODE_CODE_BOT_TOKEN || secrets.CI_BOT_PAT }}'
@@ -276,6 +277,65 @@ jobs:
               "sandbox": false
             }
           prompt: '/triage ${{ steps.resolve.outputs.number }} --repo ${{ github.repository }}'
+
+      - name: 'Check triage response'
+        if: 'success() || failure()'
+        shell: 'bash'
+        env:
+          RESPONSE: '${{ steps.triage.outputs.summary }}'
+        run: |-
+          set -uo pipefail
+          if [[ -z "${RESPONSE}" || "${RESPONSE}" == "null" ]]; then
+            echo "::error title=Triage silent failure::Qwen Code exited without a response. Check the 'Run Qwen Triage' step stderr above for diagnostics."
+            exit 1
+          fi
+          echo "Triage response received (${#RESPONSE} chars)."
+
+      - name: 'Notify silent triage re-run'
+        if: >-
+          success() &&
+          github.event_name == 'issue_comment' &&
+          github.event.issue.pull_request &&
+          startsWith(github.event.comment.body, '@qwen-code /triage')
+        shell: 'bash'
+        env:
+          GH_TOKEN: '${{ secrets.QWEN_CODE_BOT_TOKEN || secrets.CI_BOT_PAT }}'
+          NUMBER: '${{ steps.resolve.outputs.number }}'
+          TRIGGERED_AT: '${{ github.event.comment.created_at }}'
+          RUN_URL: '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        run: |-
+          set -euo pipefail
+          HAS_REVIEW=false
+          if BOT_LOGIN="$(gh api user --jq '.login')" &&
+             REVIEWS="$(
+               gh api "repos/$GITHUB_REPOSITORY/pulls/$NUMBER/reviews" \
+                 --method GET \
+                 --paginate \
+                 -F per_page=100
+             )"; then
+            if ! HAS_REVIEW="$(
+              printf '%s' "$REVIEWS" |
+                jq -s \
+                  --arg bot "$BOT_LOGIN" \
+                  --arg since "$TRIGGERED_AT" \
+                  'any(.[][]; .user.login == $bot and .submitted_at != null and .submitted_at >= $since)'
+            )"; then
+              echo "::warning::Failed to inspect triage reviews; posting a summary comment."
+              HAS_REVIEW=false
+            fi
+          else
+            echo "::warning::Failed to fetch triage reviews; posting a summary comment."
+          fi
+          if [ "$HAS_REVIEW" = true ]; then
+            echo "Triage re-run posted a review; no summary comment needed."
+            exit 0
+          fi
+          printf -v BODY '%s\n\n%s\n\n%s' \
+            '<!-- qwen-triage stage=rerun-summary -->' \
+            'Triage re-run completed without a new review.' \
+            "The stage comments above were updated with the latest result. [View workflow run]($RUN_URL)."
+          gh api "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments" \
+            -f body="$BODY" >/dev/null
 
   # On-demand real-user testing: a write-permission user comments
   # `@hopcode /tmux` on a PR to launch the changed app in a tmux TUI and
@@ -428,7 +488,7 @@ jobs:
 
       - name: 'Checkout PR merge ref'
         if: "steps.pr.outputs.decision == 'run'"
-        uses: 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd' # v6.0.2
+        uses: 'actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10'  # v6.0.3
         with:
           # Untrusted PR code — keep the token out of .git/config.
           persist-credentials: false

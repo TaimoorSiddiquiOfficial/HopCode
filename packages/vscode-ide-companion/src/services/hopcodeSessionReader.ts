@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { logger } from '../utils/logger.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
@@ -71,10 +72,7 @@ export class HopCodeSessionReader {
         // All projects
         const tmpDir = path.join(this.runtimeDir, 'tmp');
         if (!fs.existsSync(tmpDir)) {
-          console.log(
-            '[HopCodeSessionReader] Tmp directory not found:',
-            tmpDir,
-          );
+          logger.log('[QwenSessionReader] Tmp directory not found:', tmpDir);
           return [];
         }
 
@@ -94,7 +92,7 @@ export class HopCodeSessionReader {
 
       return sessions;
     } catch (error) {
-      console.error('[HopCodeSessionReader] Failed to get sessions:', error);
+      logger.error('[QwenSessionReader] Failed to get sessions:', error);
       return [];
     }
   }
@@ -129,8 +127,8 @@ export class HopCodeSessionReader {
         session.filePath = filePath;
         sessions.push(session);
       } catch (error) {
-        console.error(
-          '[HopCodeSessionReader] Failed to read session file:',
+        logger.error(
+          '[QwenSessionReader] Failed to read session file:',
           filePath,
           error,
         );
@@ -146,8 +144,8 @@ export class HopCodeSessionReader {
           sessions.push(session);
         }
       } catch (error) {
-        console.error(
-          '[HopCodeSessionReader] Failed to read JSONL session file:',
+        logger.error(
+          '[QwenSessionReader] Failed to read JSONL session file:',
           filePath,
           error,
         );
@@ -318,10 +316,7 @@ export class HopCodeSessionReader {
         cwd,
       };
     } catch (error) {
-      console.error(
-        '[HopCodeSessionReader] Failed to parse JSONL session:',
-        error,
-      );
+      logger.error('[QwenSessionReader] Failed to parse JSONL session:', error);
       return null;
     }
   }
@@ -410,7 +405,7 @@ export class HopCodeSessionReader {
       fs.unlinkSync(session.filePath);
       return true;
     } catch (error) {
-      console.error('[HopCodeSessionReader] Failed to delete session:', error);
+      logger.error('[QwenSessionReader] Failed to delete session:', error);
       return false;
     }
   }
@@ -455,7 +450,7 @@ export class HopCodeSessionReader {
       fs.appendFileSync(session.filePath, record + '\n');
       return true;
     } catch (error) {
-      console.error('[HopCodeSessionReader] Failed to rename session:', error);
+      logger.error('[QwenSessionReader] Failed to rename session:', error);
       return false;
     }
   }

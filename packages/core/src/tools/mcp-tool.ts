@@ -24,6 +24,10 @@ import { truncateToolOutput } from '../utils/truncation.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { getErrorMessage, isAbortError } from '../utils/errors.js';
 import { getMCPServerStatus, MCPServerStatus } from './mcp-status.js';
+import {
+  generateLegacyMcpToolName,
+  normalizeToolNameForProvider,
+} from '../utils/tool-name-utils.js';
 
 const debugLogger = createDebugLogger('MCP_TOOL');
 
@@ -131,6 +135,8 @@ class DiscoveredMCPToolInvocation extends BaseToolInvocation<
     readonly serverName: string,
     readonly serverToolName: string,
     readonly displayName: string,
+    readonly registeredToolName: string,
+    readonly permissionAliases: readonly string[],
     readonly trust?: boolean,
     params: ToolParams = {},
     private readonly cliConfig?: Config,
@@ -144,19 +150,14 @@ class DiscoveredMCPToolInvocation extends BaseToolInvocation<
   }
 
   /**
-   * MCP tool default permission based on trust and annotations:
+   * MCP tool default permission based on trust:
    * - trust: true in a trusted folder → 'allow' (server explicitly trusted by user config)
-   * - readOnlyHint → 'allow'
    * - All other MCP tools → 'ask'
    */
   override async getDefaultPermission(): Promise<PermissionDecision> {
     // MCP servers explicitly marked as trusted bypass confirmation,
     // but only when the workspace folder is also trusted (security gate).
     if (this.trust === true && this.cliConfig?.isTrustedFolder()) {
-      return 'allow';
-    }
-    // MCP tools annotated with readOnlyHint: true are safe
-    if (this.annotations?.readOnlyHint === true) {
       return 'allow';
     }
     return 'ask';
@@ -168,7 +169,7 @@ class DiscoveredMCPToolInvocation extends BaseToolInvocation<
   override async getConfirmationDetails(
     _abortSignal: AbortSignal,
   ): Promise<ToolCallConfirmationDetails> {
-    const permissionRule = `mcp__${this.serverName}__${this.serverToolName}`;
+    const permissionRule = this.registeredToolName;
 
     const confirmationDetails: ToolMcpConfirmationDetails = {
       type: 'mcp',
@@ -220,9 +221,7 @@ class DiscoveredMCPToolInvocation extends BaseToolInvocation<
       const toolRegistry = this.cliConfig.getToolRegistry();
       await toolRegistry.discoverToolsForServer(this.serverName);
 
-      const newTool = await toolRegistry.ensureTool(
-        `mcp__${this.serverName}__${this.serverToolName}`,
-      );
+      const newTool = await toolRegistry.ensureTool(this.registeredToolName);
       if (newTool instanceof DiscoveredMCPTool) {
         debugLogger.info(
           `Successfully reconnected to MCP server '${this.serverName}'`,
@@ -260,6 +259,8 @@ class DiscoveredMCPToolInvocation extends BaseToolInvocation<
           this.serverName,
           this.serverToolName,
           this.displayName,
+          newTool.name,
+          newTool.permissionAliases,
           this.trust,
           this.params,
           this.cliConfig,
@@ -506,7 +507,7 @@ class DiscoveredMCPToolInvocation extends BaseToolInvocation<
       if (part.text && !part.inlineData) {
         const truncated = await truncateToolOutput(
           this.cliConfig,
-          `mcp__${this.serverName}__${this.serverToolName}`,
+          this.registeredToolName,
           part.text,
           // Per-tool char budget; mirrors DiscoveredMCPTool.maxOutputChars
           // (10x the global default, since MCP servers return large structured
@@ -538,6 +539,14 @@ export class DiscoveredMCPTool extends BaseDeclarativeTool<
   // scheduler offloads. truncateTextParts uses the same ceiling per text part.
   override get maxOutputChars(): number {
     return 500_000;
+  }
+
+  /** Keeps pre-normalization permission and disabled-tool entries effective. */
+  get permissionAliases(): readonly string[] {
+    const legacyName = generateLegacyMcpToolName(
+      `mcp__${this.serverName}__${this.serverToolName}`,
+    );
+    return legacyName === this.name ? [] : [legacyName];
   }
 
   constructor(
@@ -636,6 +645,8 @@ export class DiscoveredMCPTool extends BaseDeclarativeTool<
       this.serverName,
       this.serverToolName,
       this.displayName,
+      this.name,
+      this.permissionAliases,
       this.trust,
       params,
       this.cliConfig,
@@ -785,14 +796,5 @@ function getDisplayFromParts(parts: Part[]): string {
 
 /** Visible for testing */
 export function generateValidName(name: string) {
-  // Replace invalid characters (based on 400 error message from Gemini API) with underscores
-  let validToolname = name.replace(/[^a-zA-Z0-9_.-]/g, '_');
-
-  // If longer than 63 characters, replace middle with '___'
-  // (Gemini API says max length 64, but actual limit seems to be 63)
-  if (validToolname.length > 63) {
-    validToolname =
-      validToolname.slice(0, 28) + '___' + validToolname.slice(-32);
-  }
-  return validToolname;
+  return normalizeToolNameForProvider(name);
 }

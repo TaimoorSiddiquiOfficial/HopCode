@@ -22,6 +22,7 @@ import type {
   DaemonRewindResult,
   DaemonRewindSnapshotInfo,
   DaemonSessionBtwResult,
+  DaemonSessionGenerationEvent,
   DaemonMidTurnMessageResult,
   DaemonPendingPromptsResult,
   DaemonRemovePendingPromptResult,
@@ -29,6 +30,7 @@ import type {
   DaemonSessionContextUsageStatus,
   DaemonSessionLspStatus,
   DaemonSessionRecapResult,
+  DaemonSessionSummary,
   DaemonShellCommandResult,
   DaemonSessionArtifactInput,
   DaemonSessionArtifactMutationResult,
@@ -68,6 +70,8 @@ export interface DaemonSessionClientOptions {
   lastEventId?: number;
   /** Compacted replay snapshot from daemon load response. */
   replaySnapshot?: DaemonReplaySnapshot;
+  /** True when older persisted records precede the replay snapshot. */
+  historyHasMore?: boolean;
   /**
    * Local per-session prompt cap. The counter is shared with the parent
    * `DaemonClient`; other session clients using the same parent instance
@@ -103,6 +107,7 @@ export class DaemonSessionClient {
   readonly state: DaemonSessionState;
   readonly replaySnapshot: DaemonReplaySnapshot;
   readonly hasActivePrompt: boolean;
+  readonly historyHasMore: boolean;
   private lastSeenEventId: number | undefined;
   private subscriptionActive = false;
   /** In-flight `reattach()` so concurrent prompts re-register only once. */
@@ -121,6 +126,7 @@ export class DaemonSessionClient {
     this.session = { ...opts.session };
     this.state = { ...(opts.state ?? {}) };
     this.hasActivePrompt = opts.hasActivePrompt ?? false;
+    this.historyHasMore = opts.historyHasMore ?? false;
     this.replaySnapshot = opts.replaySnapshot ?? {
       compactedReplay: [],
       liveJournal: [],
@@ -157,18 +163,21 @@ export class DaemonSessionClient {
     //   guardrail events advertised via `mcp_guardrail_events` are
     //   useless without this seed because they predate any live
     //   subscription.
-    // - **Carve-out**: `modelServiceId` switch failures are
-    //   reported on SSE, not the create/attach HTTP response. The
-    //   original carve-out covered just this case; the unified rule
-    //   below subsumes it (newly-created sessions always seed) while
-    //   preserving the semantics for re-attached sessions where the
-    //   caller may have an existing event cursor it doesn't want to
-    //   reset.
+    // - **Carve-out**: attach-time `modelServiceId` and
+    //   `approvalMode` changes are reported on SSE, not only the
+    //   create/attach HTTP response. The original carve-out covered
+    //   just model changes; approval-mode changes have the same
+    //   pre-subscription event window. The unified rule below subsumes
+    //   newly-created sessions while preserving re-attach semantics for
+    //   callers without attach-time state changes.
     //
     // The daemon treats Last-Event-ID: 0 as "replay from the beginning
     // of the bounded ring"; if older events have already been evicted,
     // clients receive the retained suffix and continue live from there.
-    const lastEventId = !session.attached || req.modelServiceId ? 0 : undefined;
+    const lastEventId =
+      !session.attached || req.modelServiceId || req.approvalMode
+        ? 0
+        : undefined;
     return new DaemonSessionClient({
       client,
       session,
@@ -193,6 +202,7 @@ export class DaemonSessionClient {
       hasActivePrompt,
       compactedReplay,
       liveJournal,
+      historyHasMore,
       lastEventId: serverLastEventId,
       ...session
     } = await client.loadSession(sessionId, req, clientId);
@@ -206,6 +216,7 @@ export class DaemonSessionClient {
         compactedReplay: compactedReplay ?? [],
         liveJournal: liveJournal ?? [],
       },
+      historyHasMore,
     });
   }
 
@@ -488,6 +499,16 @@ export class DaemonSessionClient {
     });
   }
 
+  generateContent(
+    prompt: string,
+    opts?: { signal?: AbortSignal },
+  ): AsyncGenerator<DaemonSessionGenerationEvent> {
+    return this.client.generateSessionContent(this.sessionId, prompt, {
+      ...(opts?.signal ? { signal: opts.signal } : {}),
+      ...(this.clientId ? { clientId: this.clientId } : {}),
+    });
+  }
+
   async btw(
     question: string,
     opts?: { signal?: AbortSignal },
@@ -546,6 +567,10 @@ export class DaemonSessionClient {
 
   async context(): Promise<DaemonSessionContextStatus> {
     return await this.client.sessionContext(this.sessionId, this.clientId);
+  }
+
+  async status(): Promise<DaemonSessionSummary> {
+    return await this.client.sessionStatus(this.sessionId, this.clientId);
   }
 
   async contextUsage(

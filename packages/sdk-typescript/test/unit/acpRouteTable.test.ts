@@ -248,7 +248,65 @@ describe('acpRouteTable – matchRoute', () => {
     expect(result!.mapping.method).toBe('_hopcode/session/heartbeat');
   });
 
-  it('POST /session/:id/recap maps to _hopcode/session/recap', () => {
+  it('GET /session/:id/artifacts maps to _qwen/session/artifacts', () => {
+    const result = matchRoute('/session/s8/artifacts', 'GET');
+    expect(result).not.toBeNull();
+    expect(result!.mapping.method).toBe('_qwen/session/artifacts');
+    expect(
+      result!.mapping.extractParams(result!.segments, undefined, 'GET'),
+    ).toEqual({ sessionId: 's8' });
+  });
+
+  it('POST /session/:id/artifacts maps to _qwen/session/artifacts/add', () => {
+    const result = matchRoute('/session/s8/artifacts', 'POST');
+    expect(result).not.toBeNull();
+    expect(result!.mapping.method).toBe('_qwen/session/artifacts/add');
+    expect(
+      result!.mapping.extractParams(
+        result!.segments,
+        {
+          sessionId: 'body-session',
+          title: 'Lineage',
+          url: 'https://example.com/lineage',
+        },
+        'POST',
+      ),
+    ).toEqual({
+      sessionId: 's8',
+      title: 'Lineage',
+      url: 'https://example.com/lineage',
+    });
+  });
+
+  it('DELETE /session/:id/artifacts/:artifactId maps to _qwen/session/artifacts/remove', () => {
+    const result = matchRoute('/session/s8/artifacts/art%201', 'DELETE');
+    expect(result).not.toBeNull();
+    expect(result!.mapping.method).toBe('_qwen/session/artifacts/remove');
+    expect(
+      result!.mapping.extractParams(result!.segments, undefined, 'DELETE'),
+    ).toEqual({
+      sessionId: 's8',
+      artifactId: 'art 1',
+    });
+    expect(
+      result!.mapping.extractParams(
+        result!.segments,
+        {
+          clientId: 'client-a',
+          sessionId: 'body-session',
+          artifactId: 'body-artifact',
+          deleteContent: true,
+        },
+        'DELETE',
+      ),
+    ).toEqual({
+      sessionId: 's8',
+      artifactId: 'art 1',
+      clientId: 'client-a',
+    });
+  });
+
+  it('POST /session/:id/recap maps to _qwen/session/recap', () => {
     const result = matchRoute('/session/s9/recap', 'POST');
     expect(result).not.toBeNull();
     expect(result!.mapping.method).toBe('_hopcode/session/recap');
@@ -330,7 +388,13 @@ describe('acpRouteTable – matchRoute', () => {
     expect(result!.mapping.method).toBe('_hopcode/workspace/mcp');
   });
 
-  it('GET /workspace/skills maps to _hopcode/workspace/skills', () => {
+  it('POST /workspace/mcp/reload maps to _qwen/workspace/mcp/reload', () => {
+    const result = matchRoute('/workspace/mcp/reload', 'POST');
+    expect(result).not.toBeNull();
+    expect(result!.mapping.method).toBe('_qwen/workspace/mcp/reload');
+  });
+
+  it('GET /workspace/skills maps to _qwen/workspace/skills', () => {
     const result = matchRoute('/workspace/skills', 'GET');
     expect(result).not.toBeNull();
     expect(result!.mapping.method).toBe('_hopcode/workspace/skills');
@@ -615,6 +679,11 @@ describe('acpRouteTable – matchRoute', () => {
 
   it('returns null for removed route /session/:id/approval-mode', () => {
     expect(matchRoute('/session/s12/approval-mode', 'POST')).toBeNull();
+  });
+
+  it('keeps rewind routes off ACP so strict REST auth cannot be bypassed', () => {
+    expect(matchRoute('/session/s12/rewind/snapshots', 'GET')).toBeNull();
+    expect(matchRoute('/session/s12/rewind', 'POST')).toBeNull();
   });
 
   // ---- Unknown/unmatched routes ---------------------------------------

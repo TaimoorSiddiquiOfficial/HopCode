@@ -21,11 +21,11 @@ import { useUIState } from '../contexts/UIStateContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { useVimModeState } from '../contexts/VimModeContext.js';
-import { ApprovalMode } from '@hoptrendy/hopcode-core';
 import { GeminiSpinner } from './GeminiRespondingSpinner.js';
 import { GoalPill, useFooterGoalState } from './GoalPill.js';
 import { CronPill, useFooterCronTaskCount } from './CronPill.js';
 import { t } from '../../i18n/index.js';
+import { StreamingState } from '../types.js';
 
 export const Footer: React.FC = () => {
   const uiState = useUIState();
@@ -97,8 +97,21 @@ export const Footer: React.FC = () => {
     <Text color={theme.text.secondary}>
       <GeminiSpinner /> {configInitMessage}
     </Text>
-  ) : showAutoAcceptIndicator !== undefined &&
-    showAutoAcceptIndicator !== ApprovalMode.DEFAULT ? (
+  ) : uiState.startupIdeConnectionStatus.state === 'connecting' ? (
+    <Text color={theme.text.secondary}>
+      <GeminiSpinner /> {t('IDE connecting... context may be unavailable')}
+    </Text>
+  ) : uiState.startupIdeConnectionStatus.state === 'failed' ? (
+    <Text color={theme.status.warning}>
+      {t('IDE connection unavailable: {{message}}', {
+        message: uiState.startupIdeConnectionStatus.message,
+      })}
+    </Text>
+  ) : uiState.streamingState === StreamingState.Responding ? (
+    <Text color={theme.text.secondary}>
+      {t('Enter to steer · Ctrl+Q to queue')}
+    </Text>
+  ) : showAutoAcceptIndicator !== undefined ? (
     <AutoAcceptIndicator approvalMode={showAutoAcceptIndicator} />
   ) : suppressHint ? null : (
     <Text color={theme.text.secondary}>{t('? for shortcuts')}</Text>

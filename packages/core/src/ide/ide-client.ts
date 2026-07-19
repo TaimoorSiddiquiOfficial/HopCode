@@ -973,7 +973,7 @@ export class IdeClient {
       },
     );
 
-    // For backwards compatability. Newer extension versions will only send
+    // For backwards compatibility. Newer extension versions will only send
     // IdeDiffRejectedNotificationSchema.
     this.client.setNotificationHandler(
       IdeDiffClosedNotificationSchema,

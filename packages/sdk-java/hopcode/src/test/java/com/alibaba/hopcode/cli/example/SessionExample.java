@@ -162,8 +162,8 @@ public class SessionExample {
 
     public static void runPromptUseLowLevelEventExample(Session session) {
         try {
-            session.setPermissionMode(PermissionMode.IZN);
-            session.sendPrompt("devlop Fibonacci function by python", new SessionEventSimpleConsumers() {
+            session.setPermissionMode(PermissionMode.YOLO);
+            session.sendPrompt("develop Fibonacci function by python", new SessionEventSimpleConsumers() {
                 @Override
                 public void onAssistantMessage(Session session, SDKAssistantMessage assistantMessage) {
                     logger.info("Received assistantMessage {}", JSON.toJSONString(assistantMessage));
@@ -212,7 +212,7 @@ public class SessionExample {
 
     public static void runPromptUseHighLevelEventExample(Session session) {
         try {
-            session.sendPrompt("devlop Fibonacci function by python", new SessionEventSimpleConsumers().setAssistantContentConsumer(new AssistantContentSimpleConsumers(){
+            session.sendPrompt("develop Fibonacci function by python", new SessionEventSimpleConsumers().setAssistantContentConsumer(new AssistantContentSimpleConsumers(){
                 @Override
                 public void onText(Session session, TextAssistantContent textAssistantContent) {
                     logger.info("Received textAssistantContent {}", textAssistantContent.getText());

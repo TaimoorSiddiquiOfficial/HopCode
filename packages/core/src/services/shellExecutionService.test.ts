@@ -133,12 +133,33 @@ const shellExecutionConfig = {
   disableDynamicLineTrimming: true,
 } satisfies ShellExecutionConfig;
 
+const shellExecutionConfigWithoutPager = {
+  terminalWidth: 80,
+  terminalHeight: 24,
+  showColor: false,
+  disableDynamicLineTrimming: true,
+} satisfies ShellExecutionConfig;
+
 const WINDOWS_SYSTEM_PATH = 'C:\\Windows\\System32;C:\\Shared\\Tools';
 const WINDOWS_USER_PATH = 'C:\\Users\\tester\\bin;C:\\Shared\\Tools';
 const EXPECTED_MERGED_WINDOWS_PATH =
   'C:\\Windows\\System32;C:\\Shared\\Tools;C:\\Users\\tester\\bin';
 
 let originalProcessEnv: NodeJS.ProcessEnv;
+
+async function withoutGitPagerEnv(run: () => Promise<unknown>): Promise<void> {
+  const originalGitPager = process.env['GIT_PAGER'];
+  delete process.env['GIT_PAGER'];
+  try {
+    await run();
+  } finally {
+    if (originalGitPager === undefined) {
+      delete process.env['GIT_PAGER'];
+    } else {
+      process.env['GIT_PAGER'] = originalGitPager;
+    }
+  }
+}
 
 const createExpectedAnsiOutput = (text: string | string[]): AnsiOutput => {
   const lines = Array.isArray(text) ? text : text.split('\n');
@@ -1896,6 +1917,52 @@ describe('ShellExecutionService', () => {
       });
     });
 
+    it('does not inject Unix pager defaults into Windows pty env when unset', async () => {
+      mockPlatform.mockReturnValue('win32');
+      mockGetShellConfiguration.mockReturnValue({
+        executable: 'cmd.exe',
+        argsPrefix: ['/d', '/s', '/c'],
+        shell: 'cmd',
+      });
+
+      await simulateExecution(
+        'echo hello',
+        (pty) => pty.onExit.mock.calls[0][0]({ exitCode: 0, signal: null }),
+        shellExecutionConfigWithoutPager,
+      );
+
+      const spawnOptions = mockPtySpawn.mock.calls[0][2];
+      expect(spawnOptions.env['PAGER']).toBe('');
+      expect(spawnOptions.env['GIT_PAGER']).toBe('');
+      mockGetShellConfiguration.mockReturnValue({
+        executable: 'bash',
+        argsPrefix: ['-c'],
+        shell: 'bash',
+      });
+    });
+
+    it('preserves explicit pager configuration in Windows pty env', async () => {
+      mockPlatform.mockReturnValue('win32');
+      mockGetShellConfiguration.mockReturnValue({
+        executable: 'cmd.exe',
+        argsPrefix: ['/d', '/s', '/c'],
+        shell: 'cmd',
+      });
+
+      await simulateExecution('echo hello', (pty) =>
+        pty.onExit.mock.calls[0][0]({ exitCode: 0, signal: null }),
+      );
+
+      const spawnOptions = mockPtySpawn.mock.calls[0][2];
+      expect(spawnOptions.env['PAGER']).toBe('cat');
+      expect(spawnOptions.env['GIT_PAGER']).toBe('cat');
+      mockGetShellConfiguration.mockReturnValue({
+        executable: 'bash',
+        argsPrefix: ['-c'],
+        shell: 'bash',
+      });
+    });
+
     it('should use bash on Linux', async () => {
       mockPlatform.mockReturnValue('linux');
       await simulateExecution('ls "foo bar"', (pty) =>
@@ -3163,6 +3230,54 @@ describe('ShellExecutionService child_process fallback', () => {
       expectNormalizedWindowsPathEnv(spawnOptions.env);
     });
 
+    it('does not inject Unix pager defaults into Windows child_process env when unset', async () => {
+      mockPlatform.mockReturnValue('win32');
+      mockGetShellConfiguration.mockReturnValue({
+        executable: 'cmd.exe',
+        argsPrefix: ['/d', '/s', '/c'],
+        shell: 'cmd',
+      });
+
+      await withoutGitPagerEnv(() =>
+        simulateExecutionWithConfig(
+          'echo hello',
+          (cp) => cp.emit('exit', 0, null),
+          shellExecutionConfigWithoutPager,
+        ),
+      );
+
+      const spawnOptions = mockCpSpawn.mock.calls[0][2];
+      expect(spawnOptions.env['PAGER']).toBe('');
+      expect(spawnOptions.env['GIT_PAGER']).toBeUndefined();
+      mockGetShellConfiguration.mockReturnValue({
+        executable: 'bash',
+        argsPrefix: ['-c'],
+        shell: 'bash',
+      });
+    });
+
+    it('preserves explicit pager configuration in Windows child_process env', async () => {
+      mockPlatform.mockReturnValue('win32');
+      mockGetShellConfiguration.mockReturnValue({
+        executable: 'cmd.exe',
+        argsPrefix: ['/d', '/s', '/c'],
+        shell: 'cmd',
+      });
+
+      await withoutGitPagerEnv(() =>
+        simulateExecution('echo hello', (cp) => cp.emit('exit', 0, null)),
+      );
+
+      const spawnOptions = mockCpSpawn.mock.calls[0][2];
+      expect(spawnOptions.env['PAGER']).toBe('cat');
+      expect(spawnOptions.env['GIT_PAGER']).toBeUndefined();
+      mockGetShellConfiguration.mockReturnValue({
+        executable: 'bash',
+        argsPrefix: ['-c'],
+        shell: 'bash',
+      });
+    });
+
     it('should use bash and detached process group on Linux', async () => {
       mockPlatform.mockReturnValue('linux');
       await simulateExecution('ls "foo bar"', (cp) => cp.emit('exit', 0, null));
@@ -3247,6 +3362,86 @@ describe('ShellExecutionService execution method selection', () => {
     });
     mockCpSpawn.mockReturnValue(mockChildProcess);
   });
+
+  it.each([
+    { shouldUseNodePty: true, label: 'PTY' },
+    { shouldUseNodePty: false, label: 'child_process' },
+  ])(
+    'does not spawn through $label when the signal is already aborted',
+    async ({ shouldUseNodePty }) => {
+      const abortController = new AbortController();
+      abortController.abort();
+
+      const handle = await ShellExecutionService.execute(
+        'test command',
+        '/test/dir',
+        onOutputEventMock,
+        abortController.signal,
+        shouldUseNodePty,
+        shellExecutionConfig,
+      );
+      const result = await handle.result;
+
+      expect(handle.pid).toBeUndefined();
+      expect(result).toMatchObject({
+        aborted: true,
+        pid: undefined,
+        executionMethod: 'none',
+        output: '',
+      });
+      expect(mockGetPty).not.toHaveBeenCalled();
+      expect(mockPtySpawn).not.toHaveBeenCalled();
+      expect(mockCpSpawn).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(['resolve', 'reject'] as const)(
+    'returns on abort while getPty is pending and ignores its late %s',
+    async (settlement) => {
+      let resolvePty: ((value: null) => void) | undefined;
+      let rejectPty: ((reason: Error) => void) | undefined;
+      mockGetPty.mockReturnValue(
+        new Promise((resolve, reject) => {
+          resolvePty = resolve;
+          rejectPty = reject;
+        }),
+      );
+      const abortController = new AbortController();
+      const removeAbortListener = vi.spyOn(
+        abortController.signal,
+        'removeEventListener',
+      );
+      const handlePromise = ShellExecutionService.execute(
+        'test command',
+        '/test/dir',
+        onOutputEventMock,
+        abortController.signal,
+        true,
+        shellExecutionConfig,
+      );
+
+      abortController.abort();
+      const handle = await handlePromise;
+      expect((await handle.result).executionMethod).toBe('none');
+      expect(removeAbortListener).toHaveBeenCalledWith(
+        'abort',
+        expect.any(Function),
+      );
+      expect(mockPtySpawn).not.toHaveBeenCalled();
+      expect(mockCpSpawn).not.toHaveBeenCalled();
+
+      if (settlement === 'resolve') {
+        resolvePty?.(null);
+      } else {
+        rejectPty?.(new Error('late PTY failure'));
+      }
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(mockPtySpawn).not.toHaveBeenCalled();
+      expect(mockCpSpawn).not.toHaveBeenCalled();
+    },
+  );
 
   it('should use node-pty when shouldUseNodePty is true and pty is available', async () => {
     const abortController = new AbortController();

@@ -25,6 +25,7 @@ import { safeJsonStringify } from '../utils/safeJsonStringify.js';
 import type { EventEmitter } from 'node:events';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import type { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
+import { normalizeMcpToolName } from '../utils/tool-name-utils.js';
 
 type ToolParams = Record<string, unknown>;
 
@@ -244,8 +245,24 @@ export class ToolRegistry {
    * built-ins and MCP-discovered tools flow through `registerTool`, so
    * gating here covers every registration path.
    */
-  private isToolDisabled(name: string): boolean {
-    return this.config.getDisabledTools().has(name);
+  private isToolDisabled(
+    name: string,
+    aliases: readonly string[] = [],
+  ): boolean {
+    const disabledTools = this.config.getDisabledTools();
+    const hasExactMatch =
+      disabledTools.has(name) ||
+      aliases.some((alias) => disabledTools.has(alias));
+    if (hasExactMatch || !name.startsWith('mcp__')) {
+      return hasExactMatch;
+    }
+
+    for (const disabledName of disabledTools) {
+      if (normalizeMcpToolName(disabledName) === name) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -253,7 +270,12 @@ export class ToolRegistry {
    * @param tool - The tool object containing schema and execution logic.
    */
   registerTool(tool: AnyDeclarativeTool): void {
-    if (this.isToolDisabled(tool.name)) {
+    if (
+      this.isToolDisabled(
+        tool.name,
+        tool instanceof DiscoveredMCPTool ? tool.permissionAliases : [],
+      )
+    ) {
       debugLogger.info(
         `Tool "${tool.name}" skipped: present in disabledTools set.`,
       );
@@ -290,7 +312,12 @@ export class ToolRegistry {
     // `isToolDisabled(tool.name)` gate above when the operator
     // disabled the renamed-and-exposed name. Re-evaluating after the
     // rename closes that hole.
-    if (this.isToolDisabled(tool.name)) {
+    if (
+      this.isToolDisabled(
+        tool.name,
+        tool instanceof DiscoveredMCPTool ? tool.permissionAliases : [],
+      )
+    ) {
       debugLogger.info(
         `Tool "${tool.name}" skipped (post-rename): present in disabledTools set.`,
       );
@@ -721,7 +748,7 @@ export class ToolRegistry {
           includeDeferred ||
           !tool.shouldDefer ||
           tool.alwaysLoad ||
-          this.revealedDeferred.has(tool.name),
+          !this.isDeferredAndHidden(tool.name),
       )
       .sort(ToolRegistry.compareToolsByDeclarationName)
       .map((tool) => tool.schema);
@@ -755,6 +782,25 @@ export class ToolRegistry {
   }
 
   /**
+   * Whether a deferred tool is currently hidden from the model's
+   * function-declaration list. Returns `true` when the tool:
+   * - is deferred (`shouldDefer=true`),
+   * - is not always-loaded,
+   * - has not been revealed this session, AND
+   * - is not in the visibleTools config list.
+   */
+  isDeferredAndHidden(name: string): boolean {
+    const tool = this.tools.get(name);
+    if (!tool) return false;
+    return (
+      tool.shouldDefer &&
+      !tool.alwaysLoad &&
+      !this.revealedDeferred.has(name) &&
+      !this.config.getVisibleTools().has(name)
+    );
+  }
+
+  /**
    * Clears the set of revealed deferred tools. Called by {@link GeminiClient}
    * when a chat session is reset (e.g. `/clear`) so the new session starts
    * with no revealed tools — the same state as any fresh session.
@@ -767,12 +813,17 @@ export class ToolRegistry {
    * Returns a lightweight summary of tools that are
    * deferred from the initial function-declaration list. Used to describe the
    * set of on-demand tools in the startup reminder so the model knows what is
-   * reachable via ToolSearch. `alwaysLoad` tools are excluded.
+   * reachable via ToolSearch. `alwaysLoad` tools and tools listed in
+   * {@link Config.getVisibleTools} are excluded.
    */
   getDeferredToolSummary(): DeferredToolSummary[] {
     const summary: DeferredToolSummary[] = [];
     this.tools.forEach((tool) => {
-      if (tool.shouldDefer && !tool.alwaysLoad) {
+      if (
+        tool.shouldDefer &&
+        !tool.alwaysLoad &&
+        !this.config.getVisibleTools().has(tool.name)
+      ) {
         summary.push({
           name: tool.name,
           description: tool.description,

@@ -21,6 +21,11 @@ import { writeStderrLine } from './stdioHelpers.js';
 import { parseSandboxImageName } from './sandboxImageName.js';
 import { isContainerPathWithinWorkdir } from './sandbox-path.js';
 import { parseSandboxMountSpec } from './sandboxMounts.js';
+import {
+  CUSTOM_SANDBOX_IMAGE_ENV_VAR,
+  HOST_UPDATE_RELAUNCH_ENV_VAR,
+  SKIP_UPDATE_CHECK_ENV_VAR,
+} from './processUtils.js';
 
 const execAsync = promisify(exec);
 
@@ -55,6 +60,20 @@ const BUILTIN_SEATBELT_PROFILES = [
   'restrictive-closed',
   'restrictive-proxied',
 ];
+
+export function getSandboxPassthroughEnvArgs(
+  env: NodeJS.ProcessEnv = process.env,
+): string[] {
+  return [
+    'QWEN_DEBUG_LOG_FILE',
+    'QWEN_CODE_LEGACY_MCP_BLOCKING',
+    SKIP_UPDATE_CHECK_ENV_VAR,
+    CUSTOM_SANDBOX_IMAGE_ENV_VAR,
+    HOST_UPDATE_RELAUNCH_ENV_VAR,
+  ].flatMap((envVar) =>
+    env[envVar] === undefined ? [] : ['--env', `${envVar}=${env[envVar]}`],
+  );
+}
 
 export function resolveSeatbeltProfileFile(
   profile: string,
@@ -273,6 +292,9 @@ export async function start_sandbox(
       'sh',
       '-c',
       [
+        ...(process.env['QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE'] === '1'
+          ? ['ELECTRON_RUN_AS_NODE=1']
+          : []),
         `SANDBOX=sandbox-exec`,
         `NODE_OPTIONS="${nodeOptions}"`,
         ...finalArgv.map((arg) => quote([arg])),
@@ -619,15 +641,8 @@ export async function start_sandbox(
   if (process.env['HOPCODE_TEST_VAR']) {
     args.push('--env', `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`);
   }
-  for (const envVar of [
-    'HOPCODE_DEBUG_LOG_FILE',
-    'HOPCODE_CODE_LEGACY_MCP_BLOCKING',
-  ] as const) {
-    if (process.env[envVar]) {
-      args.push('--env', `${envVar}=${process.env[envVar]}`);
-    }
-  }
-  if (process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']) {
+  args.push(...getSandboxPassthroughEnvArgs());
+  if (process.env['QWEN_CODE_MCP_APPROVALS_PATH']) {
     args.push(
       '--env',
       `HOPCODE_CODE_MCP_APPROVALS_PATH=${getContainerPath(

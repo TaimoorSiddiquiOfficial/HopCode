@@ -429,6 +429,35 @@ export const MCPManagementDialog: React.FC<MCPManagementDialogProps> = ({
     }
   }, [config, selectedServer, reloadServers]);
 
+  const handleApprove = useCallback(async () => {
+    if (!config || !selectedServer) return;
+
+    try {
+      setIsLoading(true);
+      const approvals = loadMcpApprovals();
+      const root = config.getWorkingDir();
+      await approvals.setState(
+        root,
+        selectedServer.name,
+        selectedServer.config,
+        'approved',
+      );
+      config.approveMcpServerForSession(selectedServer.name);
+      const toolRegistry = config.getToolRegistry();
+      if (toolRegistry) {
+        await toolRegistry.discoverToolsForServer(selectedServer.name);
+      }
+      await reloadServers();
+    } catch (error) {
+      debugLogger.error(
+        `Error approving server '${selectedServer.name}':`,
+        error,
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [config, selectedServer, reloadServers]);
+
   // Enable server
   const handleEnableServer = useCallback(async () => {
     if (!config || !selectedServer) return;
@@ -753,6 +782,7 @@ export const MCPManagementDialog: React.FC<MCPManagementDialogProps> = ({
             server={selectedServer}
             onViewTools={handleViewTools}
             onViewResources={handleViewResources}
+            onApprove={handleApprove}
             onReconnect={handleReconnect}
             onDisable={handleDisable}
             onAuthenticate={handleAuthenticate}
@@ -833,6 +863,7 @@ export const MCPManagementDialog: React.FC<MCPManagementDialogProps> = ({
     handleViewResources,
     handleReconnect,
     handleDisable,
+    handleApprove,
     handleAuthenticate,
     handleClearAuth,
     handleNavigateBack,

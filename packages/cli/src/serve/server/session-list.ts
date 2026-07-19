@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { SessionService } from '@hoptrendy/hopcode-core';
+import {
+  SessionService,
+  SessionOrganizationError,
+  type SessionArchiveState,
+  type SessionGroupPresetColor,
+} from '@qwen-code/qwen-code-core';
 import type {
   AcpSessionBridge,
   BridgeSessionSummary,
@@ -22,6 +27,19 @@ export interface ListWorkspaceSessionsOptions {
   archiveState?: SessionArchiveState;
   view?: 'organized';
   group?: string;
+  /**
+   * Restrict the result to sessions spawned by this parent (via
+   * `create_sub_session`), matched exactly against each session's
+   * `parentSessionId`. When set on the default (non-organized) path the whole
+   * workspace is gathered and filtered before pagination, so a page is never
+   * silently short of matches; the returned cursor is opaque and activity-based
+   * (not the numeric storage cursor). Absent = no parent filter.
+   */
+  parentSessionId?: string;
+  /** Restrict results to sessions created by this source type. */
+  sourceType?: string;
+  /** Further restrict `sourceType` matches to this source identifier. */
+  sourceId?: string;
 }
 
 export interface ListWorkspaceSessionsResult {
@@ -31,8 +49,36 @@ export interface ListWorkspaceSessionsResult {
   truncated?: boolean;
 }
 
+/**
+ * Aggregate session counts for `GET .../session-info`.
+ *
+ * `expensive` is always true: the persisted totals require a disk scan of
+ * local JSONL files and must not be polled in a tight loop.
+ */
+export interface WorkspaceSessionInfoResult {
+  active: number;
+  archived: number;
+  total: number;
+  live?: number;
+  expensive: true;
+  /**
+   * Stable machine-readable hint that this response came from a full disk
+   * scan. Clients should refresh infrequently / on demand only.
+   */
+  cost: 'disk_scan';
+  truncated?: boolean;
+}
+
+export interface ListWorkspaceSessionsReadOptions {
+  /** Merge live bridge state into persisted summaries. */
+  mergeLive?: boolean;
+}
+
 export class InvalidCursorError extends Error {
-  constructor(cursor: string, kind: 'numeric' | 'organized' = 'numeric') {
+  constructor(
+    cursor: string,
+    kind: 'numeric' | 'organized' | 'live' | 'parent' | 'metadata' = 'numeric',
+  ) {
     super(`Invalid cursor: "${cursor}" is not a valid ${kind} cursor`);
     this.name = 'InvalidCursorError';
   }
@@ -56,6 +102,8 @@ function parseSessionCursor(cursor: string): number | undefined {
 interface OrganizedCursor {
   group: string;
   archiveState: SessionArchiveState;
+  sourceType?: string;
+  sourceId?: string;
   last: OrganizedCursorKey;
 }
 
@@ -65,9 +113,19 @@ interface OrganizedCursorKey {
   sessionId: string;
 }
 
+interface LiveSessionCursorKey {
+  activityTime: number;
+  sessionId: string;
+}
+
 function parseOrganizedCursor(
   cursor: string,
-  expected: { group: string; archiveState: SessionArchiveState },
+  expected: {
+    group: string;
+    archiveState: SessionArchiveState;
+    sourceType?: string;
+    sourceId?: string;
+  },
 ): OrganizedCursorKey | undefined {
   if (cursor === '') return undefined;
   try {
@@ -87,7 +145,9 @@ function parseOrganizedCursor(
       typeof last.sessionId !== 'string' ||
       last.sessionId.length === 0 ||
       (parsed as OrganizedCursor).group !== expected.group ||
-      (parsed as OrganizedCursor).archiveState !== expected.archiveState
+      (parsed as OrganizedCursor).archiveState !== expected.archiveState ||
+      (parsed as OrganizedCursor).sourceType !== expected.sourceType ||
+      (parsed as OrganizedCursor).sourceId !== expected.sourceId
     ) {
       throw new Error('invalid organized cursor');
     }
@@ -101,9 +161,113 @@ function encodeOrganizedCursor(
   last: OrganizedCursorKey,
   group: string,
   archiveState: SessionArchiveState,
+  sourceType?: string,
+  sourceId?: string,
 ): string {
   return Buffer.from(
-    JSON.stringify({ group, archiveState, last }),
+    JSON.stringify({ group, archiveState, sourceType, sourceId, last }),
+    'utf8',
+  ).toString('base64url');
+}
+
+function parseLiveSessionCursor(
+  cursor: string,
+): LiveSessionCursorKey | undefined {
+  if (cursor === '') return undefined;
+  try {
+    const parsed = JSON.parse(
+      Buffer.from(cursor, 'base64url').toString('utf8'),
+    ) as unknown;
+    if (
+      typeof parsed !== 'object' ||
+      parsed === null ||
+      Array.isArray(parsed) ||
+      typeof (parsed as LiveSessionCursorKey).activityTime !== 'number' ||
+      !Number.isFinite((parsed as LiveSessionCursorKey).activityTime) ||
+      typeof (parsed as LiveSessionCursorKey).sessionId !== 'string' ||
+      (parsed as LiveSessionCursorKey).sessionId.length === 0
+    ) {
+      throw new Error('invalid live cursor');
+    }
+    return parsed as LiveSessionCursorKey;
+  } catch {
+    throw new InvalidCursorError(cursor, 'live');
+  }
+}
+
+function encodeLiveSessionCursor(last: LiveSessionCursorKey): string {
+  return Buffer.from(JSON.stringify(last), 'utf8').toString('base64url');
+}
+
+/** Binds an opaque cursor to the metadata filter that produced it. */
+interface SessionMetadataFilter {
+  parentSessionId?: string;
+  sourceType?: string;
+  sourceId?: string;
+}
+
+function matchesSessionMetadataSource(
+  session: BridgeSessionSummary,
+  filter: Pick<SessionMetadataFilter, 'sourceType' | 'sourceId'>,
+): boolean {
+  const sourceTypeMatches =
+    filter.sourceType === undefined ||
+    session.sourceType === filter.sourceType ||
+    // Legacy sessions without source metadata belong to the default catalog.
+    (filter.sourceType === 'default' && session.sourceType === undefined);
+  return (
+    sourceTypeMatches &&
+    // sourceId remains exact; only the default source type has legacy fallback.
+    (filter.sourceId === undefined || session.sourceId === filter.sourceId)
+  );
+}
+
+function parseMetadataSessionCursor(
+  cursor: string,
+  expected: SessionMetadataFilter & { archiveState: SessionArchiveState },
+): LiveSessionCursorKey | undefined {
+  if (cursor === '') return undefined;
+  try {
+    const parsed = JSON.parse(
+      Buffer.from(cursor, 'base64url').toString('utf8'),
+    ) as unknown;
+    const last = (parsed as { last?: LiveSessionCursorKey }).last;
+    if (
+      typeof parsed !== 'object' ||
+      parsed === null ||
+      Array.isArray(parsed) ||
+      typeof last !== 'object' ||
+      last === null ||
+      Array.isArray(last) ||
+      typeof last.activityTime !== 'number' ||
+      !Number.isFinite(last.activityTime) ||
+      typeof last.sessionId !== 'string' ||
+      last.sessionId.length === 0 ||
+      (parsed as { parentSessionId?: unknown }).parentSessionId !==
+        expected.parentSessionId ||
+      (parsed as { sourceType?: unknown }).sourceType !== expected.sourceType ||
+      (parsed as { sourceId?: unknown }).sourceId !== expected.sourceId ||
+      (parsed as { archiveState?: unknown }).archiveState !==
+        expected.archiveState
+    ) {
+      throw new Error('invalid metadata cursor');
+    }
+    return { activityTime: last.activityTime, sessionId: last.sessionId };
+  } catch {
+    throw new InvalidCursorError(
+      cursor,
+      expected.sourceType === undefined ? 'parent' : 'metadata',
+    );
+  }
+}
+
+function encodeMetadataSessionCursor(
+  last: LiveSessionCursorKey,
+  filter: SessionMetadataFilter,
+  archiveState: SessionArchiveState,
+): string {
+  return Buffer.from(
+    JSON.stringify({ ...filter, archiveState, last }),
     'utf8',
   ).toString('base64url');
 }
@@ -115,6 +279,9 @@ function toSummary(item: {
   mtime: number;
   prompt: string;
   customTitle?: string;
+  parentSessionId?: string;
+  sourceType?: string;
+  sourceId?: string;
   isArchived?: boolean;
 }): BridgeSessionSummary {
   return {
@@ -123,9 +290,42 @@ function toSummary(item: {
     createdAt: item.startTime,
     updatedAt: new Date(item.mtime).toISOString(),
     displayName: item.customTitle || item.prompt,
+    ...(item.parentSessionId ? { parentSessionId: item.parentSessionId } : {}),
+    ...(item.sourceType ? { sourceType: item.sourceType } : {}),
+    ...(item.sourceId !== undefined ? { sourceId: item.sourceId } : {}),
     clientCount: 0,
     hasActivePrompt: false,
     isArchived: item.isArchived === true,
+  };
+}
+
+/**
+ * Merges a live session's summary onto its persisted counterpart for a session
+ * that exists in both. The persisted record owns identity/immutable facts
+ * (`createdAt`, `parentSessionId` lineage) while the live entry owns volatile
+ * state (`clientCount`, `hasActivePrompt`, a fresher `displayName`/`updatedAt`).
+ * Shared by all three list paths (default, organized, metadata-filtered) so the merge
+ * rule lives in one place.
+ */
+function mergeLiveSessionSummary(
+  existing: BridgeSessionSummary,
+  live: BridgeSessionSummary,
+): BridgeSessionSummary {
+  return {
+    ...existing,
+    ...live,
+    createdAt: existing.createdAt,
+    displayName: live.displayName ?? existing.displayName,
+    // Immutable lineage; the persisted transcript is authoritative, and a live
+    // entry only carries it when spawned this run.
+    parentSessionId: existing.parentSessionId ?? live.parentSessionId,
+    sourceType: existing.sourceType ?? live.sourceType,
+    sourceId:
+      existing.sourceType !== undefined ? existing.sourceId : live.sourceId,
+    updatedAt: live.updatedAt ?? existing.updatedAt,
+    clientCount: live.clientCount,
+    hasActivePrompt: live.hasActivePrompt,
+    isArchived: false,
   };
 }
 
@@ -169,6 +369,24 @@ function getSummaryActivityTime(session: BridgeSessionSummary): number {
   return Number.isFinite(time) ? time : 0;
 }
 
+function getLiveSessionCursorKey(
+  session: BridgeSessionSummary,
+): LiveSessionCursorKey {
+  return {
+    activityTime: getSummaryActivityTime(session),
+    sessionId: session.sessionId,
+  };
+}
+
+function compareLiveSessionCursorKeys(
+  a: LiveSessionCursorKey,
+  b: LiveSessionCursorKey,
+): number {
+  const byTime = b.activityTime - a.activityTime;
+  if (byTime !== 0) return byTime;
+  return a.sessionId.localeCompare(b.sessionId);
+}
+
 function compareOrganizedSessions(
   activityTimeById: ReadonlyMap<string, number>,
   a: BridgeSessionSummary,
@@ -207,7 +425,7 @@ function applyOrganization(
   organization:
     | {
         groupId: string | null;
-        color?: SessionGroupColor | null;
+        color?: SessionGroupPresetColor | null;
         isPinned: boolean;
         pinnedAt?: string;
       }
@@ -229,6 +447,7 @@ async function listOrganizedWorkspaceSessionsForResponse(
   workspaceCwd: string,
   options: ListWorkspaceSessionsOptions,
   pageSize: number,
+  readOptions: ListWorkspaceSessionsReadOptions,
 ): Promise<ListWorkspaceSessionsResult> {
   const archiveState = options.archiveState ?? 'active';
   const sessionService = new SessionService(workspaceCwd);
@@ -250,7 +469,12 @@ async function listOrganizedWorkspaceSessionsForResponse(
   }
   const cursorKey =
     options.cursor !== undefined
-      ? parseOrganizedCursor(options.cursor, { group, archiveState })
+      ? parseOrganizedCursor(options.cursor, {
+          group,
+          archiveState,
+          sourceType: options.sourceType,
+          sourceId: options.sourceId,
+        })
       : undefined;
   const isFirstPage = cursorKey === undefined;
   let liveMergeFailed = false;
@@ -267,7 +491,11 @@ async function listOrganizedWorkspaceSessionsForResponse(
     );
   }
 
-  if (archiveState !== 'archived' && isFirstPage) {
+  if (
+    readOptions.mergeLive !== false &&
+    archiveState !== 'archived' &&
+    isFirstPage
+  ) {
     try {
       const liveSessions = bridge.listWorkspaceSessions(workspaceCwd);
       for (const live of liveSessions) {
@@ -277,16 +505,7 @@ async function listOrganizedWorkspaceSessionsForResponse(
           bySessionId.set(
             live.sessionId,
             applyOrganization(
-              {
-                ...existing,
-                ...live,
-                createdAt: existing.createdAt,
-                displayName: live.displayName ?? existing.displayName,
-                updatedAt: live.updatedAt ?? existing.updatedAt,
-                clientCount: live.clientCount,
-                hasActivePrompt: live.hasActivePrompt,
-                isArchived: false,
-              },
+              mergeLiveSessionSummary(existing, live),
               organization,
             ),
           );
@@ -317,6 +536,7 @@ async function listOrganizedWorkspaceSessionsForResponse(
   }
 
   const filtered = [...bySessionId.values()].filter((session) => {
+    if (!matchesSessionMetadataSource(session, options)) return false;
     if (group === 'all') return true;
     if (group === 'pinned') return session.isPinned === true;
     if (group === 'ungrouped')
@@ -351,6 +571,108 @@ async function listOrganizedWorkspaceSessionsForResponse(
           getOrganizedCursorKey(activityTimeById, page[page.length - 1]!),
           group,
           archiveState,
+          options.sourceType,
+          options.sourceId,
+        )
+      : undefined;
+  return {
+    sessions: page,
+    ...(nextCursor !== undefined ? { nextCursor } : {}),
+    ...(liveMergeFailed ? { liveMergeFailed: true } : {}),
+    ...(persisted.truncated ? { truncated: true } : {}),
+  };
+}
+
+/**
+ * Applies persisted metadata filters before pagination so pages are not
+ * silently short of matches.
+ */
+async function listWorkspaceSessionsByMetadataForResponse(
+  bridge: AcpSessionBridge,
+  workspaceCwd: string,
+  options: ListWorkspaceSessionsOptions,
+  pageSize: number,
+  filter: SessionMetadataFilter,
+  readOptions: ListWorkspaceSessionsReadOptions,
+): Promise<ListWorkspaceSessionsResult> {
+  const archiveState = options.archiveState ?? 'active';
+  const sessionService = new SessionService(workspaceCwd);
+  const bySessionId = new Map<string, BridgeSessionSummary>();
+  const persisted = await listAllPersistedSummaries(
+    sessionService,
+    archiveState,
+  );
+  for (const session of persisted.sessions) {
+    bySessionId.set(session.sessionId, session);
+  }
+
+  let liveMergeFailed = false;
+  if (readOptions.mergeLive !== false && archiveState !== 'archived') {
+    try {
+      for (const live of bridge.listWorkspaceSessions(workspaceCwd)) {
+        const existing = bySessionId.get(live.sessionId);
+        if (existing) {
+          bySessionId.set(
+            live.sessionId,
+            mergeLiveSessionSummary(existing, live),
+          );
+        } else if (!(await sessionService.sessionExists(live.sessionId))) {
+          bySessionId.set(live.sessionId, {
+            ...live,
+            createdAt: live.createdAt,
+            clientCount: live.clientCount,
+            hasActivePrompt: live.hasActivePrompt,
+            isArchived: false,
+          });
+        }
+      }
+    } catch (error) {
+      liveMergeFailed = true;
+      writeStderrLine(
+        `qwen serve: session metadata filter live merge failed; using persisted sessions only: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+  }
+
+  const matches = [...bySessionId.values()]
+    .filter(
+      (session) =>
+        (filter.parentSessionId === undefined ||
+          session.parentSessionId === filter.parentSessionId) &&
+        matchesSessionMetadataSource(session, filter),
+    )
+    .sort((a, b) =>
+      compareLiveSessionCursorKeys(
+        getLiveSessionCursorKey(a),
+        getLiveSessionCursorKey(b),
+      ),
+    );
+  const cursorKey =
+    options.cursor !== undefined && options.cursor !== ''
+      ? parseMetadataSessionCursor(options.cursor, {
+          ...filter,
+          archiveState,
+        })
+      : undefined;
+  const afterCursor =
+    cursorKey === undefined
+      ? matches
+      : matches.filter(
+          (session) =>
+            compareLiveSessionCursorKeys(
+              cursorKey,
+              getLiveSessionCursorKey(session),
+            ) < 0,
+        );
+  const page = afterCursor.slice(0, pageSize);
+  const nextCursor =
+    page.length < afterCursor.length
+      ? encodeMetadataSessionCursor(
+          getLiveSessionCursorKey(page[page.length - 1]!),
+          filter,
+          archiveState,
         )
       : undefined;
   return {
@@ -365,6 +687,7 @@ export async function listWorkspaceSessionsForResponse(
   bridge: AcpSessionBridge,
   workspaceCwd: string,
   options?: ListWorkspaceSessionsOptions,
+  readOptions: ListWorkspaceSessionsReadOptions = {},
 ): Promise<ListWorkspaceSessionsResult> {
   const rawSize = options?.size;
   const requestedSize =
@@ -379,6 +702,31 @@ export async function listWorkspaceSessionsForResponse(
       workspaceCwd,
       options,
       pageSize,
+      readOptions,
+    );
+  }
+
+  if (
+    options?.parentSessionId !== undefined ||
+    options?.sourceType !== undefined
+  ) {
+    return listWorkspaceSessionsByMetadataForResponse(
+      bridge,
+      workspaceCwd,
+      options,
+      pageSize,
+      {
+        ...(options.parentSessionId !== undefined
+          ? { parentSessionId: options.parentSessionId }
+          : {}),
+        ...(options.sourceType !== undefined
+          ? { sourceType: options.sourceType }
+          : {}),
+        ...(options.sourceId !== undefined
+          ? { sourceId: options.sourceId }
+          : {}),
+      },
+      readOptions,
     );
   }
 
@@ -401,7 +749,7 @@ export async function listWorkspaceSessionsForResponse(
     bySessionId.set(item.sessionId, toSummary(item));
   }
 
-  if (archiveState === 'archived') {
+  if (archiveState === 'archived' || readOptions.mergeLive === false) {
     const sessions = [...bySessionId.values()];
     const nextCursor =
       persisted.nextCursor != null ? String(persisted.nextCursor) : undefined;
@@ -412,16 +760,7 @@ export async function listWorkspaceSessionsForResponse(
   for (const live of liveSessions) {
     const existing = bySessionId.get(live.sessionId);
     if (existing) {
-      bySessionId.set(live.sessionId, {
-        ...existing,
-        ...live,
-        createdAt: existing.createdAt,
-        displayName: live.displayName ?? existing.displayName,
-        updatedAt: live.updatedAt ?? existing.updatedAt,
-        clientCount: live.clientCount,
-        hasActivePrompt: live.hasActivePrompt,
-        isArchived: false,
-      });
+      bySessionId.set(live.sessionId, mergeLiveSessionSummary(existing, live));
     } else if (
       isFirstPage &&
       !(await sessionService.sessionExists(live.sessionId))
@@ -446,6 +785,76 @@ export async function listWorkspaceSessionsForResponse(
     persisted.nextCursor != null ? String(persisted.nextCursor) : undefined;
 
   return { sessions, nextCursor };
+}
+
+export function listLiveWorkspaceSessionsForResponse(
+  bridge: AcpSessionBridge,
+  workspaceCwd: string,
+  options?: Pick<ListWorkspaceSessionsOptions, 'cursor' | 'size'>,
+): ListWorkspaceSessionsResult {
+  const rawSize = options?.size;
+  const requestedSize =
+    typeof rawSize === 'number' && Number.isSafeInteger(rawSize)
+      ? rawSize
+      : DEFAULT_SESSION_PAGE_SIZE;
+  const pageSize = Math.min(Math.max(requestedSize, 1), MAX_SESSION_PAGE_SIZE);
+  const cursorKey =
+    options?.cursor !== undefined
+      ? parseLiveSessionCursor(options.cursor)
+      : undefined;
+  const sessions = bridge
+    .listWorkspaceSessions(workspaceCwd)
+    .sort((a, b) =>
+      compareLiveSessionCursorKeys(
+        getLiveSessionCursorKey(a),
+        getLiveSessionCursorKey(b),
+      ),
+    );
+  const afterCursor =
+    cursorKey === undefined
+      ? sessions
+      : sessions.filter(
+          (session) =>
+            compareLiveSessionCursorKeys(
+              cursorKey,
+              getLiveSessionCursorKey(session),
+            ) < 0,
+        );
+  const page = afterCursor.slice(0, pageSize);
+  const nextCursor =
+    page.length < afterCursor.length
+      ? encodeLiveSessionCursor(getLiveSessionCursorKey(page[page.length - 1]!))
+      : undefined;
+  return {
+    sessions: page,
+    ...(nextCursor !== undefined ? { nextCursor } : {}),
+  };
+}
+
+/**
+ * Scans local persisted session JSONL files for aggregate counts and merges
+ * the current in-memory live count from the bridge.
+ *
+ * This is an O(n) disk walk. Callers (and HTTP clients) must treat it as an
+ * infrequent / on-demand operator endpoint, not a polling source.
+ */
+export async function getWorkspaceSessionInfoForResponse(
+  bridge: AcpSessionBridge,
+  workspaceCwd: string,
+  options: { includeLive?: boolean } = {},
+): Promise<WorkspaceSessionInfoResult> {
+  const counts = await new SessionService(workspaceCwd).getSessionInfoCounts();
+  return {
+    active: counts.active,
+    archived: counts.archived,
+    total: counts.total,
+    ...(options.includeLive === false
+      ? {}
+      : { live: bridge.listWorkspaceSessions(workspaceCwd).length }),
+    expensive: true,
+    cost: 'disk_scan',
+    ...(counts.truncated ? { truncated: true } : {}),
+  };
 }
 
 export function parseSessionPageSizeQuery(raw: unknown): number | undefined {

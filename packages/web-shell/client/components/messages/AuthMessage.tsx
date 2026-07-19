@@ -33,23 +33,27 @@ interface Option<T extends string> {
   description?: string;
 }
 
-const PROTOCOL_OPTIONS: Array<Option<string>> = [
-  {
-    value: 'openai',
-    label: 'OpenAI-compatible',
-    description: 'Standard OpenAI API format (most common)',
-  },
-  {
-    value: 'anthropic',
-    label: 'Anthropic-compatible',
-    description: 'Anthropic Messages API format',
-  },
-  {
-    value: 'gemini',
-    label: 'Gemini-compatible',
-    description: 'Google Gemini API format',
-  },
-];
+function getProtocolOptions(
+  t: (key: string, vars?: Record<string, string | number>) => string,
+): Array<Option<string>> {
+  return [
+    {
+      value: 'openai',
+      label: t('auth.protocol.openai'),
+      description: t('auth.protocol.openaiDesc'),
+    },
+    {
+      value: 'anthropic',
+      label: t('auth.protocol.anthropic'),
+      description: t('auth.protocol.anthropicDesc'),
+    },
+    {
+      value: 'gemini',
+      label: t('auth.protocol.gemini'),
+      description: t('auth.protocol.geminiDesc'),
+    },
+  ];
+}
 
 function defaultBaseUrl(protocol: string): string {
   if (protocol === 'anthropic') return 'https://api.anthropic.com/v1';
@@ -82,9 +86,12 @@ function titleForStep(
   return t('auth.step.advanced');
 }
 
-function maskApiKey(value: string): string {
+function maskApiKey(
+  value: string,
+  t?: (key: string, vars?: Record<string, string | number>) => string,
+): string {
   const trimmed = value.trim();
-  if (!trimmed) return '(not set)';
+  if (!trimmed) return t ? t('auth.notSet') : '(not set)';
   if (trimmed.length <= 6) return '***';
   return `${trimmed.slice(0, 3)}...${trimmed.slice(-4)}`;
 }
@@ -550,7 +557,9 @@ export function AuthMessage({ onMessage, onClose }: AuthMessageProps) {
     if (currentStep === 'protocol') {
       const allowed = provider.protocolOptions ?? [provider.protocol];
       return renderOptions(
-        PROTOCOL_OPTIONS.filter((option) => allowed.includes(option.value)),
+        getProtocolOptions(t).filter((option) =>
+          allowed.includes(option.value),
+        ),
         optionIndex,
         setOptionIndex,
       );
@@ -617,7 +626,9 @@ export function AuthMessage({ onMessage, onClose }: AuthMessageProps) {
             className={styles.input}
             type="password"
             value={apiKey}
-            placeholder={provider.apiKeyPlaceholder ?? 'sk-...'}
+            placeholder={
+              provider.apiKeyPlaceholder ?? t('auth.apiKeyPlaceholder')
+            }
             onChange={(event) => {
               setApiKey(event.target.value);
               setError(null);
@@ -646,7 +657,7 @@ export function AuthMessage({ onMessage, onClose }: AuthMessageProps) {
           <input
             className={styles.input}
             value={models}
-            placeholder={defaultIds || 'model-id-1, model-id-2'}
+            placeholder={defaultIds || t('auth.modelsPlaceholder')}
             onChange={(event) => {
               setModels(event.target.value);
               setError(null);
@@ -708,7 +719,7 @@ export function AuthMessage({ onMessage, onClose }: AuthMessageProps) {
         <input
           className={styles.input}
           value={contextWindow}
-          placeholder="auto"
+          placeholder={t('common.auto')}
           onChange={(event) =>
             setContextWindow(event.target.value.replace(/[^0-9]/g, ''))
           }
@@ -748,7 +759,7 @@ export function AuthMessage({ onMessage, onClose }: AuthMessageProps) {
     const hasGenerationConfig = Object.keys(generationConfig).length > 0;
     return JSON.stringify(
       {
-        env: { [envKey]: maskApiKey(apiKey) },
+        env: { [envKey]: maskApiKey(apiKey, t) },
         modelProviders: {
           [protocol]: normalizedIds.map((id) => ({
             id,
@@ -776,6 +787,7 @@ export function AuthMessage({ onMessage, onClose }: AuthMessageProps) {
     models,
     protocol,
     provider,
+    t,
     thinking,
   ]);
 

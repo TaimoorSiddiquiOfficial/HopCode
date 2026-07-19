@@ -8,8 +8,11 @@
     "composite": true,
     "types": ["node", "vitest/globals"],
     "paths": {
-      "@hoptrendy/hopcode-core": ["../core/src/index.ts"],
-      "@hoptrendy/hopcode-core/*": ["../core/src/*"]
+      "@qwen-code/qwen-code-core": ["../core/src/index.ts"],
+      "@qwen-code/qwen-code-core/transcriptRecords": [
+        "../core/src/utils/transcript-records.ts"
+      ],
+      "@qwen-code/qwen-code-core/*": ["../core/src/*"]
     }
   },
   "include": ["src/**/*.ts"],

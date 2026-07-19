@@ -28,7 +28,9 @@ export const EVENT_CHAT_COMPRESSION = 'hopcode.chat_compression';
 export const EVENT_INVALID_CHUNK = 'hopcode.chat.invalid_chunk';
 export const EVENT_CONTENT_RETRY = 'hopcode.chat.content_retry';
 export const EVENT_CONTENT_RETRY_FAILURE =
-  'hopcode.chat.content_retry_failure';
+  'qwen-code.chat.content_retry_failure';
+export const EVENT_PROTOCOL_TAG_SANITIZED =
+  'qwen-code.chat.protocol_tag_sanitized';
 // Phase 4b — HTTP-status retry telemetry emitted by `retryWithBackoff` for
 // 429 / 5xx errors at LLM call sites. Distinct from EVENT_CONTENT_RETRY,
 // which is fired by geminiChat for InvalidStreamError retries on a separate

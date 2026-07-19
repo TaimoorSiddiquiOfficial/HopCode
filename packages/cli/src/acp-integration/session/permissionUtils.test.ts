@@ -5,8 +5,11 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { ToolConfirmationOutcome } from '@hoptrendy/hopcode-core';
-import { toPermissionOptions } from './permissionUtils.js';
+import { ToolConfirmationOutcome } from '@qwen-code/qwen-code-core';
+import {
+  interactionMetaFields,
+  toPermissionOptions,
+} from './permissionUtils.js';
 
 describe('permissionUtils', () => {
   describe('toPermissionOptions', () => {
@@ -92,6 +95,41 @@ describe('permissionUtils', () => {
           name: 'Always Allow in project: git',
         }),
       );
+    });
+  });
+
+  describe('interactionMetaFields', () => {
+    it('identifies ask_user_question requests and preserves their questions', () => {
+      const questions = [
+        {
+          header: 'Continue?',
+          question: 'Continue?',
+          options: [{ label: 'Continue', description: 'Proceed.' }],
+        },
+      ];
+
+      expect(
+        interactionMetaFields({
+          type: 'ask_user_question',
+          title: 'Question',
+          questions,
+          onConfirm: async () => undefined,
+        }),
+      ).toEqual({
+        qwenInteractionKind: 'user_question',
+        qwenQuestions: questions,
+      });
+    });
+
+    it('does not add interaction metadata for permission requests', () => {
+      expect(
+        interactionMetaFields({
+          type: 'info',
+          title: 'Need permission',
+          prompt: 'Allow?',
+          onConfirm: async () => undefined,
+        }),
+      ).toEqual({});
     });
   });
 });

@@ -20,7 +20,8 @@ import {
   redactUrlCredentials,
   getExtensionDisplayName,
   getExtensionDescription,
-} from '@hoptrendy/hopcode-core';
+  isExtensionCommittedWithWarningsError,
+} from '@qwen-code/qwen-code-core';
 
 const debugLogger = createDebugLogger('EXTENSIONS_COMMAND');
 const EXTENSION_EXPLORE_URL = {
@@ -244,6 +245,20 @@ async function installAction(context: CommandContext, args: string) {
     // FIXME: refresh command controlled by ui for now, cannot be auto refreshed by extensionManager
     context.ui.reloadCommands();
   } catch (error) {
+    if (isExtensionCommittedWithWarningsError(error)) {
+      context.ui.addItem(
+        {
+          type: MessageType.WARNING,
+          text: t(
+            'Extension was installed but could not be reloaded: {{error}}',
+            { error: redactUrlCredentials(getErrorMessage(error)) },
+          ),
+        },
+        Date.now(),
+      );
+      context.ui.reloadCommands();
+      return;
+    }
     context.ui.addItem(
       {
         type: MessageType.ERROR,

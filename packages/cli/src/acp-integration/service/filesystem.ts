@@ -13,6 +13,7 @@ import type {
 } from '@agentclientprotocol/sdk';
 import { RequestError } from '@agentclientprotocol/sdk';
 import type {
+  CoreReadTextFileRequest,
   FileSystemService,
   ReadTextFileResponse,
 } from '@hoptrendy/hopcode-core';
@@ -98,6 +99,29 @@ async function resolveRealPath(value: string): Promise<string | undefined> {
   }
 }
 
+function toAcpReadTextFileRequest(
+  params: CoreReadTextFileRequest,
+  sessionId: string,
+): ReadTextFileRequest {
+  // `maxOutputBytes`, `signal`, and `stats` are core-local concerns that the
+  // current ACP schema cannot represent. Keep this boundary explicit if the
+  // schema grows.
+  const request: ReadTextFileRequest = {
+    path: params.path,
+    sessionId,
+  };
+  if (params._meta !== undefined) {
+    request._meta = params._meta;
+  }
+  if (params.limit !== undefined) {
+    request.limit = params.limit;
+  }
+  if (params.line != null) {
+    request.line = params.line + 1;
+  }
+  return request;
+}
+
 export class AcpFileSystemService implements FileSystemService {
   constructor(
     private readonly connection: AgentSideConnection,
@@ -108,7 +132,7 @@ export class AcpFileSystemService implements FileSystemService {
   ) {}
 
   async readTextFile(
-    params: Omit<ReadTextFileRequest, 'sessionId'>,
+    params: CoreReadTextFileRequest,
   ): Promise<ReadTextFileResponse> {
     if (!this.capabilities.readTextFile) {
       return this.fallback.readTextFile(params);
@@ -116,10 +140,9 @@ export class AcpFileSystemService implements FileSystemService {
 
     let response: ReadTextFileResponse;
     try {
-      response = await this.connection.readTextFile({
-        ...params,
-        sessionId: this.sessionId,
-      });
+      response = await this.connection.readTextFile(
+        toAcpReadTextFileRequest(params, this.sessionId),
+      );
     } catch (error) {
       const errorCode = getErrorCode(error);
 

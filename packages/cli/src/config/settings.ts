@@ -433,7 +433,7 @@ export class LoadedSettings {
     user: SettingsFile,
     workspace: SettingsFile,
     isTrusted: boolean,
-    migratedInMemorScopes: Set<SettingScope>,
+    migratedInMemoryScopes: Set<SettingScope>,
     migrationWarnings: string[] = [],
     corruptedPath: string | undefined = undefined,
     wasRecovered: boolean = false,
@@ -444,7 +444,7 @@ export class LoadedSettings {
     this.user = user;
     this.workspace = workspace;
     this.isTrusted = isTrusted;
-    this.migratedInMemorScopes = migratedInMemorScopes;
+    this.migratedInMemoryScopes = migratedInMemoryScopes;
     this.migrationWarnings = migrationWarnings;
     this.corruptedPath = corruptedPath;
     this.wasRecovered = wasRecovered;
@@ -457,7 +457,7 @@ export class LoadedSettings {
   readonly user: SettingsFile;
   readonly workspace: SettingsFile;
   readonly isTrusted: boolean;
-  readonly migratedInMemorScopes: Set<SettingScope>;
+  readonly migratedInMemoryScopes: Set<SettingScope>;
   readonly migrationWarnings: string[];
   readonly corruptedPath: string | undefined;
   readonly wasRecovered: boolean;
@@ -701,7 +701,7 @@ export function loadSettings(
   const settingsErrors: SettingsError[] = [];
   const systemSettingsPath = getSystemSettingsPath();
   const systemDefaultsPath = getSystemDefaultsPath();
-  const migratedInMemorScopes = new Set<SettingScope>();
+  const migratedInMemoryScopes = new Set<SettingScope>();
 
   // Resolve paths to their canonical representation to handle symlinks
   const resolvedWorkspaceDir = path.resolve(workspaceDir);
@@ -1002,7 +1002,7 @@ export function loadSettings(
     isTrusted,
   );
 
-  // loadEnviroment depends on settings so we have to create a temp version of
+  // loadEnvironment depends on settings so we have to create a temp version of
   // the settings to avoid a cycle
   if (!opts.skipLoadEnvironment) {
     loadEnvironment(tempMergedSettings, workspaceDir);
@@ -1054,7 +1054,7 @@ export function loadSettings(
       rawJson: workspaceResult.rawJson,
     },
     isTrusted,
-    migratedInMemorScopes,
+    migratedInMemoryScopes,
     allMigrationWarnings,
     userResult.corruptedPath,
     userResult.wasRecovered ?? false,

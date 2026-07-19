@@ -219,6 +219,7 @@ class CLIControlInitializeRequest(TypedDict):
     subtype: Literal["initialize"]
     hooks: NotRequired[Any]
     mcpServers: NotRequired[dict[str, dict[str, Any]]]
+    effort: NotRequired[str]
 
 
 class CLIControlSetPermissionModeRequest(TypedDict):
@@ -239,6 +240,25 @@ class CLIControlSupportedCommandsRequest(TypedDict):
     subtype: Literal["supported_commands"]
 
 
+class CLIControlGetContextUsageRequest(TypedDict):
+    subtype: Literal["get_context_usage"]
+    show_details: NotRequired[bool]
+
+
+class CLIControlSetEffortRequest(TypedDict):
+    subtype: Literal["set_effort"]
+    effort: str
+
+
+class CLIControlGetAvailableModelsRequest(TypedDict):
+    subtype: Literal["get_available_models"]
+
+
+class CLIControlGetUsageInfoRequest(TypedDict):
+    subtype: Literal["get_usage_info"]
+    range: NotRequired[Literal["today", "week", "month", "all"]]
+
+
 ControlRequestPayload: TypeAlias = (
     CLIControlInterruptRequest
     | CLIControlPermissionRequest
@@ -247,6 +267,10 @@ ControlRequestPayload: TypeAlias = (
     | CLIControlSetModelRequest
     | CLIControlMcpStatusRequest
     | CLIControlSupportedCommandsRequest
+    | CLIControlGetContextUsageRequest
+    | CLIControlSetEffortRequest
+    | CLIControlGetAvailableModelsRequest
+    | CLIControlGetUsageInfoRequest
     | dict[str, Any]
 )
 

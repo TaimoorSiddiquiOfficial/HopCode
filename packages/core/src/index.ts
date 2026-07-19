@@ -58,6 +58,11 @@ export * from './output/types.js';
 
 export * from './core/client.js';
 export * from './core/contentGenerator.js';
+export {
+  getRuntimeContentGenerator,
+  runWithRuntimeContentGenerator,
+  type RuntimeContentGeneratorView,
+} from './agents/runtime/agent-context.js';
 export * from './core/reasoning-effort.js';
 export * from './core/coreToolScheduler.js';
 export * from './core/permissionFlow.js';
@@ -67,9 +72,12 @@ export * from './core/geminiRequest.js';
 export * from './core/inlineMediaLimit.js';
 export * from './core/insightProtocol.js';
 export * from './core/logger.js';
+export * from './core/message-display-dispatcher.js';
 export * from './core/nonInteractiveToolExecutor.js';
 export * from './core/prompts.js';
+export * from './core/session-recovery.js';
 export * from './core/tokenLimits.js';
+export * from './core/tool-call-preparation.js';
 export * from './core/toolCallIdUtils.js';
 export * from './core/turn.js';
 export * from './core/turn-interruption.js';
@@ -204,13 +212,16 @@ export {
 } from './services/chatCompressionService.js';
 export * from './services/chatRecordingService.js';
 export * from './services/cronScheduler.js';
-export type { DurableCronTask } from './services/cronTasksFile.js';
+export type { DurableCronTask, CronTaskRun } from './services/cronTasksFile.js';
 export {
   readCronTasks,
   updateCronTasks,
   removeCronTasks,
   getCronFilePath,
   generateCronTaskId,
+  appendCronRun,
+  taskHasLegacyCondition,
+  MAX_TASK_RUNS,
 } from './services/cronTasksFile.js';
 export * from './services/fileDiscoveryService.js';
 export * from './services/fileHistoryService.js';
@@ -223,7 +234,30 @@ export * from './services/visionBridge/vision-bridge-service.js';
 export * from './services/visionBridge/image-part-utils.js';
 export * from './services/visionBridge/image-capability.js';
 export * from './services/sessionRecap.js';
+export * from './services/session-artifact-persistence.js';
 export * from './services/sessionService.js';
+export {
+  decodeSessionTranscriptCursor,
+  encodeSessionTranscriptCursor,
+  InvalidSessionTranscriptCursorError,
+  SESSION_TRANSCRIPT_CURSOR_VERSION,
+  SESSION_TRANSCRIPT_DEFAULT_LIMIT,
+  SESSION_TRANSCRIPT_MAX_INDEX_BYTES,
+  SESSION_TRANSCRIPT_MAX_LIMIT,
+  SESSION_TRANSCRIPT_MAX_PAGE_BYTES,
+  SessionTranscriptCursorCodec,
+  SessionTranscriptReader,
+  SessionTranscriptPageTooLargeError,
+  SessionTranscriptSnapshotUnavailableError,
+  SessionTranscriptTooLargeError,
+} from './services/session-transcript-reader.js';
+export type {
+  SessionTranscriptCursorState,
+  SessionTranscriptReadPageOptions,
+  SessionTranscriptRecordPage,
+} from './services/session-transcript-reader.js';
+export * from './utils/conversation-chain.js';
+export * from './utils/transcript-records.js';
 export * from './services/sessionTitle.js';
 export * from './services/sleepInhibitor.js';
 // Named exports keep @internal test helpers out of the barrel.
@@ -293,9 +327,12 @@ export * from './memory/types.js';
 export * from './memory/paths.js';
 export * from './memory/store.js';
 export * from './memory/const.js';
+export * from './memory/channel-memory-document.js';
 export * from './memory/channel-memory.js';
 export * from './memory/remember.js';
+export * from './memory/refresh.js';
 export * from './memory/dream.js';
+export * from './memory/learn-skill-agent.js';
 // Issue : write helper for hierarchical context files,
 // re-exported so the `hopcode serve` daemon can mutate workspace memory
 // via `POST /workspace/memory` without depending on internal paths.

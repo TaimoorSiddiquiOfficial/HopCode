@@ -21,6 +21,8 @@ export default {
 
   'User level': '使用者層級',
   'Project level': '專案層級',
+  'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall Qwen Code or use the npm installation method.':
+    '剪貼簿圖片貼上功能無法使用，因為原生剪貼簿模組載入失敗。請重新安裝 Qwen Code，或改用 npm 安裝方式。',
 
   // ==========================================================================
   // Extensions manager dialog (Installed / Discover / Sources tabs)
@@ -190,6 +192,7 @@ export default {
   'toolDisplayName.CronList': '定時任務清單',
   'toolDisplayName.CronDelete': '刪除定時任務',
   'toolDisplayName.LoopWakeup': '循環喚醒',
+  'toolDisplayName.CreateSubSession': '建立子會話',
   'toolDisplayName.TaskCreate': '建立任務',
   'toolDisplayName.TaskGet': '取得任務',
   'toolDisplayName.TaskUpdate': '更新任務',
@@ -223,8 +226,10 @@ export default {
   '@': '@',
   '@src/myFile.ts': '@src/myFile.ts',
   'Shell mode': 'Shell 模式',
-  'IZN mode': 'IZN 模式',
-  'Auto mode': 'Auto 模式',
+  'YOLO mode': 'YOLO 模式',
+  'Auto mode': '自動模式',
+  'auto_mode.entry_notice':
+    '已啟用自動模式。\n   LLM 分類器會評估每次工具呼叫 — 安全操作將自動批准，\n   有風險的操作將被阻止。退出：Shift+Tab 或 /approval-mode default。',
   'plan mode': '規劃模式',
   'auto-accept edits': '自動接受編輯',
   'Accepting edits': '接受編輯',
@@ -257,7 +262,7 @@ export default {
   'to search history': '搜索歷史',
   'to paste images': '粘貼圖片',
   'for external editor': '外部編輯器',
-  'to toggle compact mode': '切換緊湊模式',
+  'to view transcript': '檢視完整記錄',
   'Jump through words in the input': '在輸入中按單詞跳轉',
   'Close dialogs, cancel requests, or quit application':
     '關閉對話框、取消請求或退出應用程序',
@@ -442,6 +447,8 @@ export default {
   'Manage existing subagents (view, edit, delete).':
     '管理現有子智能體（查看、編輯、刪除）',
   'Create a new subagent with guided setup.': '通過引導式設置創建新的子智能體',
+  'Create a reusable skill from a knowledge source (file, URL, conversation, or text).':
+    '從知識源（檔案、URL、對話或文字）建立可重複使用的技能。',
   Agents: '智能體',
   'Choose Action': '選擇操作',
   'Edit {{name}}': '編輯 {{name}}',
@@ -450,6 +457,42 @@ export default {
   'Delete {{name}}': '刪除 {{name}}',
   'Unknown Step': '未知步驟',
   'Esc to close': '按 Esc 關閉',
+  Transcript: '完整記錄',
+  'to close': '關閉',
+  'to scroll': '捲動',
+  'Failed to render transcript.': '無法呈現完整記錄。',
+  'Read {{count}} file': '讀取了 {{count}} 個檔案',
+  'Read {{count}} files': '讀取了 {{count}} 個檔案',
+  'Reading {{count}} file': '正在讀取 {{count}} 個檔案',
+  'Reading {{count}} files': '正在讀取 {{count}} 個檔案',
+  'Edited {{count}} file': '編輯了 {{count}} 個檔案',
+  'Edited {{count}} files': '編輯了 {{count}} 個檔案',
+  'Editing {{count}} file': '正在編輯 {{count}} 個檔案',
+  'Editing {{count}} files': '正在編輯 {{count}} 個檔案',
+  'Wrote {{count}} file': '寫入了 {{count}} 個檔案',
+  'Wrote {{count}} files': '寫入了 {{count}} 個檔案',
+  'Writing {{count}} file': '正在寫入 {{count}} 個檔案',
+  'Writing {{count}} files': '正在寫入 {{count}} 個檔案',
+  'Searched {{count}} pattern': '搜尋了 {{count}} 個模式',
+  'Searched {{count}} patterns': '搜尋了 {{count}} 個模式',
+  'Searching {{count}} pattern': '正在搜尋 {{count}} 個模式',
+  'Searching {{count}} patterns': '正在搜尋 {{count}} 個模式',
+  'Listed {{count}} directory': '列出了 {{count}} 個目錄',
+  'Listed {{count}} directories': '列出了 {{count}} 個目錄',
+  'Listing {{count}} directory': '正在列出 {{count}} 個目錄',
+  'Listing {{count}} directories': '正在列出 {{count}} 個目錄',
+  'Ran {{count}} command': '執行了 {{count}} 個命令',
+  'Ran {{count}} commands': '執行了 {{count}} 個命令',
+  'Running {{count}} command': '正在執行 {{count}} 個命令',
+  'Running {{count}} commands': '正在執行 {{count}} 個命令',
+  'Ran {{count}} agent': '執行了 {{count}} 個代理',
+  'Ran {{count}} agents': '執行了 {{count}} 個代理',
+  'Running {{count}} agent': '正在執行 {{count}} 個代理',
+  'Running {{count}} agents': '正在執行 {{count}} 個代理',
+  'Used {{count}} tool': '使用了 {{count}} 個工具',
+  'Used {{count}} tools': '使用了 {{count}} 個工具',
+  'Using {{count}} tool': '正在使用 {{count}} 個工具',
+  'Using {{count}} tools': '正在使用 {{count}} 個工具',
   'Enter to select, ↑↓ to navigate, Esc to close':
     'Enter 選擇，↑↓ 導航，Esc 關閉',
   'Esc to go back': '按 Esc 返回',
@@ -649,6 +692,7 @@ export default {
   'Folder Trust': '檔案夾信任',
   'Tool Schema Compliance': 'Tool Schema 兼容性',
   'Auto (detect from system)': '自動（從系統檢測）',
+  'Auto (follow user input)': '自動（跟隨使用者輸入）',
   'Auto (detect terminal theme)': '自動（檢測終端主題）',
   Auto: '自動',
   Text: '文本',
@@ -801,7 +845,7 @@ export default {
     '請將要卸載的擴展名稱作為位置參數。',
   'Enables an extension.': '啟用擴展。',
   'The name of the extension to enable.': '要啟用的擴展名稱。',
-  'The scope to enable the extenison in. If not set, will be enabled in all scopes.':
+  'The scope to enable the extension in. If not set, will be enabled in all scopes.':
     '啟用擴展的作用域。如果未設置，將在所有作用域中啟用。',
   'Extension "{{name}}" successfully enabled for scope "{{scope}}".':
     '擴展 "{{name}}" 已在作用域 "{{scope}}" 中啟用。',
@@ -811,7 +855,7 @@ export default {
     '無效的作用域：{{scope}}。請使用 {{scopes}} 之一。',
   'Disables an extension.': '禁用擴展。',
   'The name of the extension to disable.': '要禁用的擴展名稱。',
-  'The scope to disable the extenison in.': '禁用擴展的作用域。',
+  'The scope to disable the extension in.': '禁用擴展的作用域。',
   'Extension "{{name}}" successfully disabled for scope "{{scope}}".':
     '擴展 "{{name}}" 已在作用域 "{{scope}}" 中禁用。',
   'Extension "{{name}}" successfully updated: {{oldVersion}} → {{newVersion}}.':
@@ -1239,8 +1283,8 @@ export default {
     '切換此會話的模型（--fast 可設置建議模型）',
   'Switch the model for this session (--fast for suggestion model, --voice for voice transcription model, [model-id] to switch immediately).':
     '切換此會話的模型（--fast 可設置建議模型，--voice 可設置語音轉寫模型，[model-id] 可立即切換）',
-  'Switch the model for this session (--fast for suggestion model, --voice for voice transcription model, --vision for the vision bridge model, [model-id] to switch immediately, or [model-id] [prompt] to run a one-off prompt on another model; the inline prompt is sent verbatim without @file expansion).':
-    '切換此會話的模型（--fast 可設置建議模型，--voice 可設置語音轉寫模型，--vision 可設置視覺橋接模型，[model-id] 可立即切換，或用 [model-id] [prompt] 在另一個模型上執行一次性提示；內聯提示按原文發送，不展開 @file）',
+  'Switch the model for this session (--fast for suggestion model, --voice for voice transcription model, --vision for the vision bridge model, --project to persist to project settings, --global to persist to user settings, [model-id] to switch immediately, or [model-id] [prompt] to run a one-off prompt on another model; the inline prompt is sent verbatim without @file expansion).':
+    '切換此會話的模型（--fast 建議模型，--voice 語音轉寫模型，--vision 視覺橋接模型，--project 持久化到專案設定，--global 持久化到使用者設定，[model-id] 立即切換，或用 [model-id] [prompt] 在另一個模型上執行一次性提示；內聯提示按原文發送，不展開 @file）',
   "Inline one-shot override isn't supported in this mode — run '/model {{model}}' first, then send your prompt.":
     "此模式不支援內聯一次性覆寫——請先執行 '/model {{model}}'，再發送你的提示。",
   "Inline one-shot override can't switch providers. '{{model}}' belongs to a different provider — run '/model {{model}}' first, then send your prompt.":
@@ -1253,6 +1297,10 @@ export default {
   'Set the model for voice transcription': '設定語音轉寫模型',
   'Set the image-capable model used to transcribe images for a text-only main model':
     '設定用於為純文字主模型轉寫圖像的圖像能力模型',
+  'Persist the model selection to the project settings (workspace scope)':
+    '將模型選擇持久化到專案設定（工作區）',
+  'Persist the model selection to the user settings (global scope)':
+    '將模型選擇持久化到使用者設定（全域）',
   'Select Fast Model': '選擇快速模型',
   'Select Vision Model': '選擇視覺模型',
   'Select Voice Model': '選擇語音模型',
@@ -1447,6 +1495,8 @@ export default {
   'Invalid HOPCODE_DEFAULT_AUTH_TYPE value: "{{value}}". Valid values are: {{validValues}}':
     '無效的 HOPCODE_DEFAULT_AUTH_TYPE 值："{{value}}"。有效值為：{{validValues}}',
   'Select Model': '選擇模型',
+  ' (this project)': '（當前專案）',
+  ' (global)': '（全域）',
   'API Key': 'API Key',
   '(default)': '(默認)',
   '(not set)': '(未設置)',
@@ -1542,7 +1592,11 @@ export default {
   'Press Ctrl+C again to exit.': '再次按 Ctrl+C 退出',
   'Press Ctrl+D again to exit.': '再次按 Ctrl+D 退出',
   'Press Esc again to clear.': '再次按 Esc 清除',
-  'Press ↑ to edit queued messages': '按 ↑ 編輯排隊消息',
+  'Ctrl+Q to queue · ↑ to edit queued messages':
+    'Ctrl+Q 排到下一輪 · ↑ 編輯排隊消息',
+  'Enter to steer · Ctrl+Q to queue':
+    'Enter 追加到目前任務 · Ctrl+Q 排到下一輪',
+  'Queue message for the next turn': '將消息排到下一輪',
   'No MCP servers configured.': '未配置 MCP servers',
   '◌ MCP servers are starting up ({{count}} initializing)...':
     '◌ MCP servers 正在啟動（{{count}} 個正在初始化）...',
@@ -1599,10 +1653,8 @@ export default {
     '按 Tab 或輸入 /approval-mode 可快速切換權限模式。',
   'Try /insight to generate personalized insights from your chat history.':
     '試試 /insight，從聊天記錄中生成個性化洞察。',
-  'Press Ctrl+O to toggle compact mode — hide tool output and thinking for a cleaner view.':
-    '按 Ctrl+O 切換緊湊模式 ── 隱藏工具輸出和思考過程，界面更簡潔。',
-  'Add a HOPCODE.md file to give HopCode persistent project context.':
-    '添加 HOPCODE.md 檔案，為 HopCode 提供持久的項目上下文。',
+  'Add a QWEN.md file to give Qwen Code persistent project context.':
+    '添加 QWEN.md 檔案，為 Qwen Code 提供持久的項目上下文。',
   'Use /btw to ask a quick side question without disrupting the conversation.':
     '用 /btw 快速問一個小問題，不會打斷當前對話。',
   'Context is almost full! Run /compress now or start /new to continue.':
@@ -1756,6 +1808,7 @@ export default {
   'Press Ctrl+Y to retry': '按 Ctrl+Y 重試。',
   'No failed request to retry.': '沒有可重試的失敗請求。',
   'to retry last request': '重試上一次請求',
+  'to queue for the next turn': '排到下一輪',
   'API key cannot be empty.': 'API Key 不能為空。',
   'Invalid API key. Coding Plan API keys start with "sk-sp-". Please check.':
     '無效的 API Key，Coding Plan API Key 均以 "sk-sp-" 開頭，請檢查',
@@ -1892,9 +1945,6 @@ export default {
     '原始模式不可用。請在交互式終端中運行。',
   '(Use ↑ ↓ arrows to navigate, Enter to select, Ctrl+C to exit)\n':
     '(使用 ↑ ↓ 箭頭導航，Enter 選擇，Ctrl+C 退出)\n',
-  'Hide tool output and thinking for a cleaner view (toggle with Ctrl+O).':
-    '緊湊模式下隱藏工具輸出和思考過程，界面更簡潔（Ctrl+O 切換）。',
-  'Press Ctrl+O to show full tool output': '按 Ctrl+O 查看詳細工具調用結果',
   'Switch to plan mode or exit plan mode': '切換到計劃模式或退出計劃模式',
   'Set how hard reasoning-capable models think ({{tiers}}); mapped and clamped per provider.':
     '設定具備推理能力的模型思考的強度（{{tiers}}）；依各供應商進行映射與鉗制。',
@@ -2118,4 +2168,106 @@ export default {
   ' (not in model registry)': '（不在模型註冊表中）',
   'start server': '啟動伺服器',
   'No compression needed.': '無需壓縮。',
+  // Update command
+  'Check for Qwen Code updates and install if available':
+    '檢查 Qwen Code 更新並安裝（如果可用）',
+  'Qwen Code update available! {{current}} → {{latest}}':
+    'Qwen Code 有可用更新！{{current}} → {{latest}}',
+  'A new version of Qwen Code is available! {{current}} → {{latest}}':
+    'Qwen Code 有新版本可用！{{current}} → {{latest}}',
+  'Qwen Code {{version}} is up to date!': 'Qwen Code {{version}} 已是最新！',
+  'Failed to check for updates. Please check your network or registry configuration.':
+    '檢查更新失敗。請檢查網路或 registry 設定。',
+  'Unable to check for updates: {{reason}}': '無法檢查更新：{{reason}}',
+  'Update successful! The new version will be used on your next run.':
+    '更新成功！新版本將在下次執行時生效。',
+  'Update downloaded. It will be applied after you exit this session.':
+    '更新已下載。將在結束目前工作階段後套用。',
+  'Update failed: {{error}}': '更新失敗：{{error}}',
+  'Downloading update...': '正在下載更新...',
+  'Update successful! Please restart Qwen Code to use the new version. Switching model providers before restarting may not work correctly.':
+    '更新成功！請重新啟動 Qwen Code 以使用新版本。重新啟動前切換模型提供商可能無法正常運作。',
+  'Automatic update failed. Please try updating manually.':
+    '自動更新失敗。請嘗試手動更新。',
+  'Automatic update failed: {{error}}. Re-run the installer to update manually.':
+    '自動更新失敗：{{error}}。請重新執行安裝程式以手動更新。',
+  'Running from a local git clone. Please update with "git pull".':
+    '正在從本機 Git 複製執行。請使用 "git pull" 更新。',
+  'Running via npx, update not applicable.': '正在透過 npx 執行，更新不適用。',
+  'Running via pnpx, update not applicable.':
+    '正在透過 pnpx 執行，更新不適用。',
+  'Running via bunx, update not applicable.':
+    '正在透過 bunx 執行，更新不適用。',
+  'Installed via Homebrew. Please update with "brew upgrade".':
+    '透過 Homebrew 安裝。請使用 "brew upgrade" 更新。',
+  "Locally installed. Please update via your project's package.json.":
+    '本機安裝。請透過專案的 package.json 更新。',
+  'Update requires sudo. Please run:': '更新需要 sudo。請執行：',
+  'Standalone install detected. Attempting to automatically update now...':
+    '偵測到獨立安裝。正在嘗試自動更新...',
+  'Standalone install detected. Please rerun the standalone installer to update:':
+    '偵測到獨立安裝。請重新執行獨立安裝程式以更新：',
+  'Run the following to update:': '執行以下命令進行更新：',
+  'Unable to auto-update this standalone installation. Please reinstall from:':
+    '無法自動更新此獨立安裝。請從以下位址重新安裝：',
+  'Manual update required. Please reinstall Qwen Code.':
+    '需要手動更新。請重新安裝 Qwen Code。',
+  'This session uses the custom sandbox image {{image}}. Update that image and restart Qwen Code.':
+    '此工作階段使用自訂沙箱映像 {{image}}。請更新該映像並重新啟動 Qwen Code。',
+  'Update Qwen Code on the host, then restart the sandbox.':
+    '請在主機上更新 Qwen Code，然後重新啟動沙箱。',
+  'The update will be installed after you exit this session.':
+    '結束目前工作階段後將自動安裝更新。',
+  'Run /update to install the update on the host.':
+    '執行 /update 在主機上安裝更新。',
+  'Run /update to install the update.': '執行 /update 安裝更新。',
+  '⚠️ History gap: earlier conversation was lost before this point (storage interruption) and could not be recovered.':
+    '⚠️ 歷史記錄缺口：此處之前的會話記錄已遺失（儲存中斷），且無法找回。',
+
+  // ============================================================================
+  // reload-plugins 命令
+  // ============================================================================
+  '{{count}} extension': '{{count}} 個擴充',
+  '{{count}} extensions': '{{count}} 個擴充',
+  '{{count}} command': '{{count}} 個指令',
+  '{{count}} commands': '{{count}} 個指令',
+  '{{count}} skill': '{{count}} 個技能',
+  '{{count}} skills': '{{count}} 個技能',
+  '{{count}} agent': '{{count}} 個代理',
+  '{{count}} agents': '{{count}} 個代理',
+  '{{count}} hook': '{{count}} 個鉤子',
+  '{{count}} hooks': '{{count}} 個鉤子',
+  '{{count}} extension MCP server': '{{count}} 個擴充 MCP 伺服器',
+  '{{count}} extension MCP servers': '{{count}} 個擴充 MCP 伺服器',
+  '{{count}} extension LSP server': '{{count}} 個擴充 LSP 伺服器',
+  '{{count}} extension LSP servers': '{{count}} 個擴充 LSP 伺服器',
+  'Reload extension changes from disk': '從磁碟重新載入擴充變更',
+  'Reloaded extensions: {{summary}}': '已重新載入擴充：{{summary}}',
+  'Reload failed: {{message}}': '重新載入失敗：{{message}}',
+  'Reload failed.': '重新載入失敗。',
+  'Extensions changed on disk. Run /reload-plugins to apply updates.':
+    '磁碟上的擴充已變更。執行 /reload-plugins 來套用更新。',
+  'Failed to refresh extension content: {{message}}. Run /reload-plugins to apply updates.':
+    '擴充內容重新整理失敗：{{message}}。執行 /reload-plugins 來套用更新。',
+  'Failed to refresh extension content. Run /reload-plugins to apply updates.':
+    '擴充內容重新整理失敗。執行 /reload-plugins 來套用更新。',
+  'Extension reload did not complete. Run /reload-plugins to try again.':
+    '擴充重新載入未完成。執行 /reload-plugins 重試。',
+  'Precondition check': '前置條件檢查',
+  'Precondition not met — this scheduled run was skipped.':
+    '前置條件不滿足 —— 已略過本次定時執行。',
+  'The precondition check was cancelled — this scheduled run was skipped.':
+    '前置條件檢查已取消 —— 已略過本次定時執行。',
+  'The precondition check was interrupted — this scheduled run was skipped.':
+    '前置條件檢查被中斷 —— 已略過本次定時執行。',
+  'The precondition check failed — this scheduled run was skipped.':
+    '前置條件檢查失敗 —— 已略過本次定時執行。',
+  'Running this scheduled task in a new session: {{link}}':
+    '正在新會話中執行該定時任務：{{link}}',
+  'This scheduled run could not be started: {{error}}':
+    '本次定時執行無法啟動：{{error}}',
+  'Session recording stopped after a write failure. New messages for the affected session will not be saved. Check disk space and permissions, then start a new session to resume recording. See the debug log for details.':
+    '工作階段錄製因寫入失敗而停止。受影響工作階段中的新訊息將不會被儲存。請檢查磁碟空間和權限，然後建立新的工作階段以恢復錄製。詳細資訊請查看偵錯日誌。',
+  'Session recording stopped after a write failure. New messages for the affected session will not be saved. Check disk space and permissions, then run `/clear` to start a new recorded session. See the debug log for details.':
+    '工作階段錄製因寫入失敗而停止。受影響工作階段中的新訊息將不會被儲存。請檢查磁碟空間和權限，然後執行 `/clear` 建立新的可錄製工作階段。詳細資訊請查看偵錯日誌。',
 };

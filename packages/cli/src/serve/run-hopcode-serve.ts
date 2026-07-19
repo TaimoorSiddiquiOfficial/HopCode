@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { X509Certificate } from 'node:crypto';
+import { X509Certificate, createHash, timingSafeEqual } from 'node:crypto';
 import * as fs from 'node:fs';
 import type { Server } from 'node:http';
 import * as https from 'node:https';
@@ -19,15 +19,25 @@ import express, {
   type Response,
 } from 'express';
 import { writeStderrLine, writeStdoutLine } from '../utils/stdioHelpers.js';
-import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
+import { isWithinRoot } from '../config/path-comparison.js';
+import {
+  DEFAULT_COMPACTED_REPLAY_MAX_BYTES,
+  normalizeCompactedReplayMaxBytes,
+} from '@qwen-code/acp-bridge/replayWindowLimits';
+import type { BridgeEvent } from '@qwen-code/acp-bridge/eventBus';
+import type { NdJsonMessageObservation } from '@qwen-code/acp-bridge/ndJsonStream';
 import { getDeviceFlowRegistry } from './auth/device-flow.js';
 import {
   loadServeFastPathSettings,
   preResolveServeFastPathHomeEnvOverrides,
   type ServeFastPathSettings,
 } from './fast-path-settings.js';
-import type { AcpSessionBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
-import { canonicalizeWorkspace } from '@hoptrendy/acp-bridge/workspacePaths';
+import {
+  MAX_REGISTERED_WORKSPACES,
+  resolveWorkspaceInputs,
+} from './workspace-inputs.js';
+import type { AcpSessionBridge } from '@qwen-code/acp-bridge/bridgeTypes';
+import { canonicalizeWorkspace } from '@qwen-code/acp-bridge/workspacePaths';
 import type {
   AuthType,
   ProviderSetupInputs,
@@ -35,7 +45,11 @@ import type {
   TelemetrySettings,
 } from '@hoptrendy/hopcode-core';
 import { createBridgeFileSystemAdapter } from './bridge-file-system-adapter.js';
+// Dynamic-imported below (not at module scope) so the serve fast-path bundle
+// closure check doesn't trace create-sub-session's transitive deps through
+// the run-qwen-serve chunk. The launcher is only needed after listen().
 import { PathMutexRegistry } from './fs/path-mutex-registry.js';
+import { isDeepHealthQuery } from './health-query.js';
 import { isLoopbackBind } from './loopback-binds.js';
 import { RUNTIME_STARTUP_CANCELLED_MESSAGE } from './runtime-startup-errors.js';
 import { resolveWebShellDir } from './web-shell-resolver.js';
@@ -67,12 +81,23 @@ import {
   type ServeAuthProviderInstallRequest,
   type ServeAuthProviderInstallResult,
   type ServeOptions,
+  type ServeChannelSelection,
+  type ChannelWebhookConfigSource,
 } from './types.js';
 import type { WorkspaceFileSystemFactory } from './fs/index.js';
-import type { PermissionPolicy } from '@hoptrendy/acp-bridge';
+import type {
+  WorkspaceRegistry,
+  WorkspaceRuntime,
+} from './workspace-registry.js';
+import {
+  workspaceRegistrationId,
+  type WorkspaceRegistrationStore,
+} from './workspace-registration-store.js';
+import type { PermissionPolicy } from '@qwen-code/acp-bridge';
 import { getCliVersion } from '../utils/version.js';
 import { getRateLimiter } from './rate-limit.js';
 import type { AcpHttpHandle } from './acp-http/index.js';
+import type { WorkspaceRuntimeRemovalController } from './routes/workspace-management.js';
 import {
   allowOriginMode,
   listenerMaxConnections,
@@ -87,22 +112,76 @@ import { DaemonMetricsRing, computeCpuPercent } from './daemon-metrics-ring.js';
 import { createLargePipeFrameObserver } from './large-pipe-frame-observer.js';
 import type {
   ChannelWorkerSupervisor,
+  ChannelWorkerSnapshot,
   CreateChannelWorkerSupervisorOptions,
 } from './channel-worker-supervisor.js';
 import { QWEN_SERVER_TOKEN_ENV } from './channel-worker-env.js';
+import { ChannelWebhookEnqueueError } from './channel-webhook-ipc.js';
 import { channelSelectionNames } from './channel-selection.js';
+import {
+  resolveChannelWorkspaceGroups,
+  type ChannelWorkspaceGroup,
+} from './channel-workspace-grouping.js';
+import { type ChannelWorkerGroupSnapshot } from './channel-worker-group.js';
+import type {
+  ChannelWorkerControlState,
+  ChannelWorkerManager,
+  ChannelWorkerSetResult,
+  ChannelWorkerStopResult,
+  CreateChannelWorkerManagerOptions,
+} from './channel-worker-manager.js';
 import {
   finalizeStartupProfile,
   profileCheckpoint,
 } from '../utils/startupProfiler.js';
-import type { ServiceInfo } from '../commands/channel/pidfile.js';
-import { findCliEntryPath } from '../commands/channel/cli-entry-path.js';
+import type {
+  ServiceInfo,
+  ServiceInfoWorker,
+} from '../commands/channel/pidfile.js';
+import { sanitizeLogText } from '@qwen-code/channel-base';
+import { isBrowserAutomationMcpAvailable } from './cdp-mcp-command.js';
+import { WorkspaceVoiceCoordinator } from './voice/workspace-voice-coordinator.js';
+import {
+  ACCESS_LOG_CONTROLLER_LOCAL,
+  type AccessLogAppLocals,
+} from './server/access-log.js';
+import {
+  setDeferredRuntimeRequestTiming,
+  type DeferredRuntimeRequestTiming,
+} from './server/request-helpers.js';
 
 const HOPCODE_SERVER_TOKEN_ENV = 'HOPCODE_SERVER_TOKEN';
 const HOPCODE_SERVE_PROMPT_DEADLINE_MS_ENV = 'HOPCODE_SERVE_PROMPT_DEADLINE_MS';
 const HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV =
   'HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS';
 const SHUTDOWN_FORCE_CLOSE_MS = 5_000;
+const DAEMON_LOG_FORCED_FLUSH_BUDGET_MS = 250;
+
+async function flushDaemonLogBounded(
+  daemonLog: DaemonLogger,
+  budgetMs: number,
+): Promise<void> {
+  let timer: NodeJS.Timeout | undefined;
+  try {
+    await Promise.race([
+      daemonLog.flush().catch(() => {}),
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, budgetMs);
+        timer.unref();
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+function writeDaemonLifecycleBestEffort(write: () => void): void {
+  try {
+    write();
+  } catch {
+    // Best-effort lifecycle diagnostics must not make shutdown throw.
+  }
+}
 
 function daemonPipeDirection(
   direction: NdJsonMessageObservation['direction'],
@@ -152,6 +231,10 @@ type RunQwenServeOptions = Omit<ServeOptions, 'token' | 'workspace'> & {
 };
 type WorkspaceSettingsWrite =
   import('./workspace-service/types.js').WorkspaceSettingsWrite;
+type ChannelWebhookConfigRuntime = {
+  loadChannelsConfig: typeof import('../commands/channel/runtime.js').loadChannelsConfig;
+  parseChannelWebhookConfig: typeof import('../commands/channel/config-utils.js').parseChannelWebhookConfig;
+};
 
 function isPositiveIntegerMs(value: number): boolean {
   return Number.isFinite(value) && Number.isInteger(value) && value > 0;
@@ -164,11 +247,25 @@ function isNonNegativeIntegerOrInfinity(value: number): boolean {
   );
 }
 
+function deriveDefaultMaxTotalSessions(
+  maxSessionsPerWorkspace: number | undefined,
+  workspaceCount: number,
+): number | undefined {
+  if (workspaceCount <= 1) return undefined;
+  const perWorkspace = maxSessionsPerWorkspace ?? DEFAULT_MAX_SESSIONS;
+  if (perWorkspace === 0 || perWorkspace === Number.POSITIVE_INFINITY) {
+    return undefined;
+  }
+  return perWorkspace * workspaceCount;
+}
+
 function isNonNegativeIntegerMs(value: number): boolean {
   return Number.isFinite(value) && Number.isInteger(value) && value >= 0;
 }
 
 const MAX_TIMEOUT_MS = 2_147_483_647;
+
+const MAX_PORT_ATTEMPTS = 10;
 
 function assertTimerDelayInRange(name: string, value: number): void {
   if (value > MAX_TIMEOUT_MS) {
@@ -211,21 +308,6 @@ function envFlagDisabled(raw: string | undefined): boolean {
   if (raw === undefined) return false;
   const normalized = raw.trim().toLowerCase();
   return normalized === '0' || normalized === 'false';
-}
-
-function resolveSingleWorkspaceInput(workspace: unknown): string {
-  if (Array.isArray(workspace)) {
-    if (workspace.length === 0) return process.cwd();
-    if (workspace.length > 1) {
-      throw new Error(
-        'Multiple --workspace values are not supported yet. ' +
-          'Multi-workspace serve is not enabled; pass one --workspace.',
-      );
-    }
-    return String(workspace[0]);
-  }
-  if (workspace === undefined) return process.cwd();
-  return String(workspace);
 }
 
 function hasChromeExtensionOrigin(origins: readonly string[] | undefined) {
@@ -441,6 +523,12 @@ export function extractContextFilename(value: unknown): string | undefined {
   return undefined;
 }
 
+function sessionArtifactsPersistenceAvailableFromSettings(
+  settings: { general?: { chatRecording?: unknown } } | undefined,
+): boolean {
+  return settings?.general?.chatRecording !== false;
+}
+
 /**
  * Per-workspace promise chain that serializes settings read-modify-write
  * cycles inside this process.
@@ -493,6 +581,7 @@ export interface RunHandle {
 type CoreRuntime = typeof import('@hoptrendy/hopcode-core');
 type ProviderConfig = NonNullable<ReturnType<CoreRuntime['findProviderById']>>;
 type SettingsRuntime = typeof import('../config/settings.js');
+type EnvironmentRuntime = typeof import('../config/environment.js');
 type LoadedSettingsAdapterRuntime =
   typeof import('../config/loadedSettingsAdapter.js');
 type TrustedFoldersRuntime = typeof import('../config/trustedFolders.js');
@@ -502,6 +591,7 @@ type ChannelServicePidfile = {
     channels: string[];
     servePid?: number;
     workerPid?: number;
+    workers?: ServiceInfoWorker[];
   }): void;
   reserveServeServiceInfo(opts: {
     channels: string[];
@@ -515,6 +605,12 @@ type ChannelWorkerRuntime = {
     opts: CreateChannelWorkerSupervisorOptions,
   ): ChannelWorkerSupervisor;
   channelServicePidfile: ChannelServicePidfile;
+  loadChannelsConfig: (typeof import('../commands/channel/runtime.js'))['loadChannelsConfig'];
+  createChannelWorkerGroup: (typeof import('./channel-worker-group.js'))['createChannelWorkerGroup'];
+  createChannelWorkerManager: (
+    opts: CreateChannelWorkerManagerOptions,
+  ) => ChannelWorkerManager;
+  findCliEntryPath(): string;
 };
 
 let channelWorkerRuntimePromise: Promise<ChannelWorkerRuntime> | undefined;
@@ -522,11 +618,28 @@ async function loadChannelWorkerRuntime(): Promise<ChannelWorkerRuntime> {
   channelWorkerRuntimePromise ??= Promise.all([
     import('./channel-worker-supervisor.js'),
     import('../commands/channel/pidfile.js'),
+    import('../commands/channel/runtime.js'),
+    import('../commands/channel/cli-entry-path.js'),
+    import('./channel-worker-group.js'),
+    import('./channel-worker-manager.js'),
   ])
-    .then(([supervisor, pidfile]) => ({
-      createChannelWorkerSupervisor: supervisor.createChannelWorkerSupervisor,
-      channelServicePidfile: pidfile,
-    }))
+    .then(
+      ([
+        supervisor,
+        pidfile,
+        channelRuntime,
+        cliEntryPath,
+        workerGroup,
+        workerManager,
+      ]) => ({
+        createChannelWorkerSupervisor: supervisor.createChannelWorkerSupervisor,
+        channelServicePidfile: pidfile,
+        loadChannelsConfig: channelRuntime.loadChannelsConfig,
+        createChannelWorkerGroup: workerGroup.createChannelWorkerGroup,
+        createChannelWorkerManager: workerManager.createChannelWorkerManager,
+        findCliEntryPath: cliEntryPath.findCliEntryPath,
+      }),
+    )
     .catch((err: unknown) => {
       channelWorkerRuntimePromise = undefined;
       throw err;
@@ -534,7 +647,7 @@ async function loadChannelWorkerRuntime(): Promise<ChannelWorkerRuntime> {
   return channelWorkerRuntimePromise;
 }
 
-function createDisabledChannelWorkerSupervisor(): ChannelWorkerSupervisor {
+export function createDisabledChannelWorkerSupervisor(): ChannelWorkerSupervisor {
   const snapshot = {
     enabled: false,
     state: 'disabled' as const,
@@ -543,8 +656,17 @@ function createDisabledChannelWorkerSupervisor(): ChannelWorkerSupervisor {
   return {
     async start() {},
     async stop() {},
+    async restart() {
+      return { ...snapshot, channels: [] };
+    },
     killAllSync() {},
     snapshot: () => ({ ...snapshot, channels: [] }),
+    async enqueueWebhookTask() {
+      throw new ChannelWebhookEnqueueError(
+        'channel_worker_unavailable',
+        'Channel worker is not running.',
+      );
+    },
   };
 }
 
@@ -560,8 +682,20 @@ function writeServeChannelReservation(
 
 function channelServicePidfileConflictError(info: ServiceInfo): Error {
   const owner = info.owner === 'serve' ? 'qwen serve' : 'qwen channel start';
-  return new Error(
-    `Channel service is already running under ${owner} (PID ${info.pid}). Stop it before starting qwen serve --channel.`,
+  return Object.assign(
+    new Error(
+      `Channel service is already running under ${owner} (PID ${info.pid}). Stop it before enabling daemon-managed channels.`,
+    ),
+    { code: 'channel_service_conflict', owner: info.owner, pid: info.pid },
+  );
+}
+
+function channelServiceStartingConflictError(): Error {
+  return Object.assign(
+    new Error(
+      'Channel service is already starting. Retry after the current startup finishes.',
+    ),
+    { code: 'channel_service_conflict' },
   );
 }
 
@@ -670,6 +804,7 @@ export interface runHopCodeServeDeps {
     opts: CreateChannelWorkerSupervisorOptions,
   ) => ChannelWorkerSupervisor;
   channelServicePidfile?: ChannelServicePidfile;
+  workspaceRegistrationStore?: WorkspaceRegistrationStore;
 }
 
 function shouldPreheatBridge(deps: runHopCodeServeDeps): boolean {
@@ -713,25 +848,48 @@ async function resolveDaemonLogBaseDirForRun(input: {
 let settingsRuntimePromise:
   | Promise<{
       settings: SettingsRuntime;
+      environment: EnvironmentRuntime;
       loadedSettingsAdapter: LoadedSettingsAdapterRuntime;
       trustedFolders: TrustedFoldersRuntime;
     }>
   | undefined;
 function loadSettingsRuntimeModules(): Promise<{
   settings: SettingsRuntime;
+  environment: EnvironmentRuntime;
   loadedSettingsAdapter: LoadedSettingsAdapterRuntime;
   trustedFolders: TrustedFoldersRuntime;
 }> {
   settingsRuntimePromise ??= Promise.all([
     import('../config/settings.js'),
+    import('../config/environment.js'),
     import('../config/loadedSettingsAdapter.js'),
     import('../config/trustedFolders.js'),
-  ]).then(([settings, loadedSettingsAdapter, trustedFolders]) => ({
+  ]).then(([settings, environment, loadedSettingsAdapter, trustedFolders]) => ({
     settings,
+    environment,
     loadedSettingsAdapter,
     trustedFolders,
   }));
   return settingsRuntimePromise;
+}
+
+let channelWebhookConfigRuntimePromise:
+  | Promise<ChannelWebhookConfigRuntime>
+  | undefined;
+function loadChannelWebhookConfigRuntime(): Promise<ChannelWebhookConfigRuntime> {
+  channelWebhookConfigRuntimePromise ??= Promise.all([
+    import('../commands/channel/runtime.js'),
+    import('../commands/channel/config-utils.js'),
+  ])
+    .then(([channelRuntime, configUtils]) => ({
+      loadChannelsConfig: channelRuntime.loadChannelsConfig,
+      parseChannelWebhookConfig: configUtils.parseChannelWebhookConfig,
+    }))
+    .catch((err: unknown) => {
+      channelWebhookConfigRuntimePromise = undefined;
+      throw err;
+    });
+  return channelWebhookConfigRuntimePromise;
 }
 
 async function loadServeRuntimeModules() {
@@ -744,6 +902,8 @@ async function loadServeRuntimeModules() {
     daemonStatusProviderModule,
     workspaceProvidersStatusModule,
     workspaceSkillsStatusModule,
+    totalSessionAdmissionModule,
+    workspaceRegistryModule,
   ] = await Promise.all([
     import('./server.js'),
     import('@hoptrendy/acp-bridge/bridge'),
@@ -753,6 +913,8 @@ async function loadServeRuntimeModules() {
     import('./daemon-status-provider.js'),
     import('./workspace-providers-status.js'),
     import('./workspace-skills-status.js'),
+    import('./total-session-admission.js'),
+    import('./workspace-registry.js'),
   ]);
   return {
     createServeApp: serverModule.createServeApp,
@@ -765,12 +927,19 @@ async function loadServeRuntimeModules() {
     createDaemonWorkspaceService: workspaceModule.createDaemonWorkspaceService,
     WorkspaceSettingsPartialPersistError:
       workspaceTypesModule.WorkspaceSettingsPartialPersistError,
+    WorkspaceSkillNotToggleableError:
+      workspaceTypesModule.WorkspaceSkillNotToggleableError,
     createDaemonStatusProvider:
       daemonStatusProviderModule.createDaemonStatusProvider,
     createWorkspaceProvidersStatusProvider:
       workspaceProvidersStatusModule.createWorkspaceProvidersStatusProvider,
     createWorkspaceSkillsStatusProvider:
       workspaceSkillsStatusModule.createWorkspaceSkillsStatusProvider,
+    createTotalSessionAdmissionController:
+      totalSessionAdmissionModule.createTotalSessionAdmissionController,
+    createWorkspaceRegistry: workspaceRegistryModule.createWorkspaceRegistry,
+    createWorkspaceSessionOwnerIndex:
+      workspaceRegistryModule.createWorkspaceSessionOwnerIndex,
   };
 }
 
@@ -803,6 +972,8 @@ function sessionIdleTimeoutMs(value: number | undefined): number {
 function currentServeFeaturesForrunHopCodeServe(
   opts: ServeOptions,
   sessionShellCommandEnabled: boolean,
+  sessionArtifactsPersistenceAvailable: boolean,
+  env: Readonly<Record<string, string | undefined>>,
 ): string[] {
   return getAdvertisedServeFeatures(undefined, {
     requireAuth: opts.requireAuth === true,
@@ -817,12 +988,19 @@ function currentServeFeaturesForrunHopCodeServe(
       : {}),
     persistSettingAvailable: true,
     sessionShellCommandEnabled,
+    sessionArtifactsPersistenceAvailable,
+    sessionGenerationAvailable: true,
     rateLimit: opts.rateLimit === true,
     reloadAvailable: true,
+    channelReloadAvailable: opts.channelSelection !== undefined,
+    channelControlAvailable: true,
+    persistentWorkspaceRegistrationAvailable: true,
+    workspaceRuntimeRemovalAvailable: true,
     // Advertise the same WS feature flags as the runtime path (serve-features.ts)
     // so the bootstrap `/capabilities` window doesn't briefly under-report them.
     clientMcpOverWsEnabled: opts.clientMcpOverWs === true,
     cdpTunnelOverWsEnabled: opts.cdpTunnelOverWs === true,
+    browserAutomationMcpAvailable: isBrowserAutomationMcpAvailable(opts, env),
   });
 }
 
@@ -831,7 +1009,9 @@ function createBootstrapCapabilities(input: {
   boundWorkspace: string;
   HopCodeVersion?: string;
   sessionShellCommandEnabled: boolean;
+  sessionArtifactsPersistenceAvailable: boolean;
   permissionPolicy: PermissionPolicy | undefined;
+  env: Readonly<Record<string, string | undefined>>;
 }): CapabilitiesEnvelope {
   return {
     v: CAPABILITIES_SCHEMA_VERSION,
@@ -843,6 +1023,8 @@ function createBootstrapCapabilities(input: {
     features: currentServeFeaturesForrunHopCodeServe(
       input.opts,
       input.sessionShellCommandEnabled,
+      input.sessionArtifactsPersistenceAvailable,
+      input.env,
     ),
     modelServices: [],
     workspaceCwd: input.boundWorkspace,
@@ -1018,11 +1200,14 @@ function createBootstrapServeApp(input: {
   daemonLog: DaemonLogger;
   HopCodeVersion?: string;
   sessionShellCommandEnabled: boolean;
+  sessionArtifactsPersistenceAvailable: boolean;
   permissionPolicy: PermissionPolicy | undefined;
+  multiWorkspaceCapabilitiesRequireRuntime: boolean;
   getRuntimeError: () => string | undefined;
   getChannelWorkerSnapshot: () => ReturnType<
     ChannelWorkerSupervisor['snapshot']
   >;
+  getChannelWorkerSnapshots: () => ChannelWorkerGroupSnapshot[];
   onHealthServed?: () => void;
 }): Application {
   const {
@@ -1033,9 +1218,12 @@ function createBootstrapServeApp(input: {
     daemonLog,
     HopCodeVersion,
     sessionShellCommandEnabled,
+    sessionArtifactsPersistenceAvailable,
     permissionPolicy,
+    multiWorkspaceCapabilitiesRequireRuntime,
     getRuntimeError,
     getChannelWorkerSnapshot,
+    getChannelWorkerSnapshots,
     onHealthServed,
   } = input;
   const app = express();
@@ -1048,7 +1236,7 @@ function createBootstrapServeApp(input: {
   }
   app.use(hostAllowlist(opts.hostname, getPort));
 
-  const healthHandler = (_req: Request, res: Response): void => {
+  const healthHandler = (req: Request, res: Response): void => {
     const runtimeError = getRuntimeError();
     if (runtimeError !== undefined) {
       res.status(503).json({
@@ -1060,6 +1248,11 @@ function createBootstrapServeApp(input: {
 
     if (onHealthServed) {
       res.once('finish', onHealthServed);
+    }
+    if (isDeepHealthQuery(req.query['deep'])) {
+      res.setHeader('Retry-After', '1');
+      res.status(503).json({ status: 'degraded', reason: 'bootstrap' });
+      return;
     }
     res.status(200).json({ status: 'ok' });
   };
@@ -1076,13 +1269,30 @@ function createBootstrapServeApp(input: {
   }
 
   app.get(BOOTSTRAP_CAPABILITIES_PATH, (_req: Request, res: Response): void => {
+    if (multiWorkspaceCapabilitiesRequireRuntime) {
+      const runtimeError = getRuntimeError();
+      if (runtimeError === undefined) {
+        res.setHeader('Retry-After', '1');
+      }
+      res.status(503).json({
+        error: runtimeError
+          ? 'Daemon runtime failed to start'
+          : 'Daemon runtime is still starting',
+        code: runtimeError
+          ? 'daemon_runtime_failed'
+          : 'daemon_runtime_starting',
+      });
+      return;
+    }
     res.status(200).json(
       createBootstrapCapabilities({
         opts,
         boundWorkspace,
         HopCodeVersion,
         sessionShellCommandEnabled,
+        sessionArtifactsPersistenceAvailable,
         permissionPolicy,
+        env: process.env,
       }),
     );
   });
@@ -1098,6 +1308,7 @@ function createBootstrapServeApp(input: {
     }
     const runtimeError = getRuntimeError();
     const channelWorker = getChannelWorkerSnapshot();
+    const channelWorkers = getChannelWorkerSnapshots();
     const runtimeFailed = runtimeError !== undefined;
     const issue: DaemonStatusIssue = runtimeError
       ? {
@@ -1110,12 +1321,22 @@ function createBootstrapServeApp(input: {
           severity: 'warning',
           message: 'Daemon runtime is still starting.',
         };
+    const daemonLogStatus = daemonLog.getStatus();
+    const issues: DaemonStatusIssue[] = [issue];
+    if (daemonLogStatus.health === 'degraded') {
+      issues.push({
+        code: 'daemon_log_degraded',
+        severity: 'warning',
+        message:
+          'Daemon file logging is degraded; inspect full status for details.',
+      });
+    }
     const response: DaemonStatusResponse = {
       v: 1,
       detail: detail.detail,
       generatedAt: new Date().toISOString(),
       status: runtimeFailed ? 'error' : 'warning',
-      issues: [issue],
+      issues,
       daemon: {
         pid: process.pid,
         uptimeMs: Math.round(process.uptime() * 1000),
@@ -1129,8 +1350,18 @@ function createBootstrapServeApp(input: {
         ...(daemonLog.getDaemonId()
           ? { daemonId: daemonLog.getDaemonId() }
           : {}),
+        runId: daemonLogStatus.runId,
+        logMode: daemonLogStatus.mode,
+        logHealth: daemonLogStatus.health,
         ...(detail.detail === 'full' && daemonLog.getLogPath()
           ? { logPath: daemonLog.getLogPath() }
+          : {}),
+        ...(detail.detail === 'full'
+          ? {
+              logIssues: daemonLogStatus.issues,
+              logDroppedRecords: daemonLogStatus.droppedRecords,
+              logDroppedBytes: daemonLogStatus.droppedBytes,
+            }
           : {}),
       },
       security: {
@@ -1144,11 +1375,14 @@ function createBootstrapServeApp(input: {
       },
       limits: {
         maxSessions: advertisedMaxSessions(opts.maxSessions),
+        maxTotalSessions: positiveFiniteOrNull(opts.maxTotalSessions),
         maxPendingPromptsPerSession: advertisedMaxPendingPromptsPerSession(
           opts.maxPendingPromptsPerSession,
         ),
         listenerMaxConnections: listenerMaxConnections(opts.maxConnections),
         eventRingSize: opts.eventRingSize ?? DEFAULT_EVENT_RING_SIZE,
+        compactedReplayMaxBytes:
+          opts.compactedReplayMaxBytes ?? DEFAULT_COMPACTED_REPLAY_MAX_BYTES,
         promptDeadlineMs: positiveFiniteOrNull(opts.promptDeadlineMs),
         writerIdleTimeoutMs: positiveFiniteOrNull(opts.writerIdleTimeoutMs),
         channelIdleTimeoutMs: channelIdleTimeoutMs(opts.channelIdleTimeoutMs),
@@ -1160,6 +1394,8 @@ function createBootstrapServeApp(input: {
         features: currentServeFeaturesForrunHopCodeServe(
           opts,
           sessionShellCommandEnabled,
+          sessionArtifactsPersistenceAvailable,
+          process.env,
         ),
       },
       runtime: {
@@ -1172,6 +1408,7 @@ function createBootstrapServeApp(input: {
         },
         channel: { live: false },
         channelWorker,
+        ...(channelWorkers.length > 0 ? { channelWorkers } : {}),
         transport: {
           restSseActive: 0,
           acp: {
@@ -1237,9 +1474,10 @@ function createDelegatingServeApp(
   getRuntimeApp: () => Application | undefined,
   options: {
     waitForDeferredRuntimeRoutes?: boolean;
-    startRuntime?: () => void;
+    startRuntime?: () => boolean;
     runtimeReady?: Promise<void>;
     authenticateDeferredRuntimeRequest?: RequestHandler;
+    authenticateDeferredChannelWebhookRequest?: RequestHandler;
   } = {},
 ): Application {
   const app = express();
@@ -1254,22 +1492,32 @@ function createDelegatingServeApp(
         options.startRuntime &&
         options.runtimeReady
       ) {
-        if (
-          options.authenticateDeferredRuntimeRequest &&
-          !runSynchronousRequestGate(
-            options.authenticateDeferredRuntimeRequest,
-            req,
-            res,
-            next,
-          )
-        ) {
-          return;
+        const waitStartedAt = performance.now();
+        const timing: DeferredRuntimeRequestTiming = {
+          startedAt: new Date(),
+          path: 'joined',
+        };
+        const webhookRequest = isChannelWebhookRequest(req);
+        const authGate = webhookRequest
+          ? (options.authenticateDeferredChannelWebhookRequest ??
+            options.authenticateDeferredRuntimeRequest)
+          : options.authenticateDeferredRuntimeRequest;
+        if (authGate) {
+          if (!runSynchronousRequestGate(authGate, req, res, next)) {
+            return;
+          }
         }
-        options.startRuntime();
+        setDeferredRuntimeRequestTiming(req, timing);
+        if (options.startRuntime()) {
+          timing.path = 'started_on_request';
+        }
         try {
           await options.runtimeReady;
         } catch {
           // Fall through to the bootstrap app so it can report the startup error.
+        } finally {
+          timing.waitMs =
+            Math.round((performance.now() - waitStartedAt) * 100) / 100;
         }
         target = getRuntimeApp();
       }
@@ -1291,6 +1539,108 @@ function isBootstrapServeRoute(req: Request): boolean {
       ? req.path.slice(0, -1)
       : req.path;
   return BOOTSTRAP_SERVE_PATHS.has(path);
+}
+
+function isChannelWebhookRequest(req: Request): boolean {
+  return (
+    req.method === 'POST' &&
+    /^\/channels\/[^/]+\/webhooks\/[^/]+\/?$/u.test(req.path)
+  );
+}
+
+function createDeferredChannelWebhookAuth(
+  resolveSource: (channelName: string) => ChannelWebhookConfigSource,
+  runtime: ChannelWebhookConfigRuntime,
+  daemonLog: Pick<DaemonLogger, 'warn'>,
+): RequestHandler {
+  return (req, res, next) => {
+    const match = /^\/channels\/([^/]+)\/webhooks\/([^/]+)\/?$/u.exec(req.path);
+    const channelName = decodeDeferredWebhookPathSegment(match?.[1]);
+    const source = decodeDeferredWebhookPathSegment(match?.[2]);
+    if (!channelName || !source) {
+      daemonLog.warn('deferred webhook auth failed', {
+        channelName: channelName ?? 'unknown',
+        source: source ?? 'unknown',
+        reason: 'invalid webhook path',
+      });
+      res.status(401).json({ error: 'Invalid webhook secret' });
+      return;
+    }
+
+    const configSource = resolveSource(channelName);
+    const secret = readDeferredWebhookSecret(
+      runtime,
+      configSource.workspaceCwd,
+      channelName,
+      source,
+      configSource.env,
+    );
+    if (!matchesWebhookSecret(req.get('x-qwen-webhook-secret'), secret)) {
+      daemonLog.warn('deferred webhook auth failed', {
+        channelName,
+        source,
+        reason: secret ? 'secret mismatch' : 'source not configured',
+      });
+      res.status(401).json({ error: 'Invalid webhook secret' });
+      return;
+    }
+
+    next();
+  };
+}
+
+function decodeDeferredWebhookPathSegment(
+  segment: string | undefined,
+): string | undefined {
+  if (segment === undefined) return undefined;
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return undefined;
+  }
+}
+
+function readDeferredWebhookSecret(
+  runtime: ChannelWebhookConfigRuntime,
+  workspace: string,
+  channelName: string,
+  source: string,
+  env?: Readonly<Record<string, string | undefined>>,
+): string | undefined {
+  try {
+    const rawConfig = runtime.loadChannelsConfig(workspace)[channelName];
+    if (typeof rawConfig !== 'object' || rawConfig === null) {
+      return undefined;
+    }
+    return runtime.parseChannelWebhookConfig(
+      channelName,
+      rawConfig as Record<string, unknown>,
+      env,
+    )?.sources[source]?.secret;
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    writeStderrLine(
+      `[webhook-secret] failed to read deferred webhook secret for ${sanitizeLogText(channelName, 128)}/${sanitizeLogText(source, 128)}: ${sanitizeLogText(reason, 512)}`,
+    );
+    return undefined;
+  }
+}
+
+function matchesWebhookSecret(
+  candidate: string | undefined,
+  expected: string | undefined,
+): boolean {
+  if (
+    typeof candidate !== 'string' ||
+    typeof expected !== 'string' ||
+    expected.length === 0
+  ) {
+    return false;
+  }
+
+  const expectedDigest = createHash('sha256').update(expected).digest();
+  const candidateDigest = createHash('sha256').update(candidate).digest();
+  return timingSafeEqual(expectedDigest, candidateDigest);
 }
 
 function isCorsPreflightRequest(req: Request): boolean {
@@ -1332,9 +1682,49 @@ function runSynchronousRequestGate(
  * Boot refuses to start when bound beyond loopback without a token; this is a
  * hard rule, not a warning, per the threat model in the design issue.
  */
-export async function runHopCodeServe(
-  optsIn: Omit<ServeOptions, 'token'> & { token?: string },
-  deps: runHopCodeServeDeps = {},
+interface DaemonLoggerLifecycleCallbacks {
+  initialized(logger: DaemonLogger): void;
+  published(): void;
+  signalOwned(): void;
+}
+
+export async function runQwenServe(
+  optsIn: RunQwenServeOptions,
+  deps: RunQwenServeDeps = {},
+): Promise<RunHandle> {
+  let daemonLog: DaemonLogger | undefined;
+  let owner: 'startup' | 'handle' | 'signal' = 'startup';
+  try {
+    return await runQwenServeImpl(optsIn, deps, {
+      initialized: (logger) => {
+        daemonLog = logger;
+      },
+      published: () => {
+        if (owner === 'startup') owner = 'handle';
+      },
+      signalOwned: () => {
+        if (owner === 'startup') owner = 'signal';
+      },
+    });
+  } catch (error) {
+    if (daemonLog && owner === 'startup') {
+      const startupLog = daemonLog;
+      writeDaemonLifecycleBestEffort(() =>
+        startupLog.error(
+          'daemon startup failed',
+          error instanceof Error ? error : new Error(String(error)),
+        ),
+      );
+      await startupLog.close();
+    }
+    throw error;
+  }
+}
+
+async function runQwenServeImpl(
+  optsIn: RunQwenServeOptions,
+  deps: RunQwenServeDeps,
+  loggerLifecycle: DaemonLoggerLifecycleCallbacks,
 ): Promise<RunHandle> {
   const runStartedAt = performance.now();
   const shouldPreheat = !deps.bridge && shouldPreheatBridge(deps);
@@ -1351,6 +1741,9 @@ export async function runHopCodeServe(
     },
   };
   preResolveServeFastPathHomeEnvOverrides();
+  const daemonRuntimeBaseEnv: Readonly<NodeJS.ProcessEnv> = Object.freeze({
+    ...process.env,
+  });
 
   // Trim both sources. Common gotcha: `export HOPCODE_SERVER_TOKEN=$(cat
   // token.txt)` keeps the file's trailing `\n` in the env value, so the
@@ -1393,7 +1786,8 @@ export async function runHopCodeServe(
   const chromeExtensionOriginAllowed = hasChromeExtensionOrigin(
     optsIn.allowOrigins,
   );
-  const rawWorkspace = resolveSingleWorkspaceInput(optsIn.workspace);
+  const rawWorkspaces = resolveWorkspaceInputs(optsIn.workspace);
+  const rawWorkspace = rawWorkspaces[0]!;
   const opts: ServeOptions = {
     ...optsIn,
     token,
@@ -1409,18 +1803,33 @@ export async function runHopCodeServe(
       (!envFlagDisabled(cdpTunnelOverWsEnv) &&
         (cdpTunnelOverWsEnv !== undefined || chromeExtensionOriginAllowed)),
   };
-  const channelRuntime = opts.channelSelection
+  let channelRuntime = opts.channelSelection
     ? await loadChannelWorkerRuntime()
     : undefined;
-  const channelServicePidfile =
+  let channelServicePidfile =
     deps.channelServicePidfile ?? channelRuntime?.channelServicePidfile;
+  const ensureChannelRuntime = async (): Promise<ChannelWorkerRuntime> => {
+    channelRuntime ??= await loadChannelWorkerRuntime();
+    channelServicePidfile ??= channelRuntime.channelServicePidfile;
+    return channelRuntime;
+  };
   let channelPidfileReserved = false;
   const removeCurrentServePidfile = (): void => {
-    if (!opts.channelSelection || !channelServicePidfile) return;
+    if (!channelServicePidfile) return;
     if (!channelPidfileReserved) return;
     if (channelServicePidfile.removeServeServiceInfo) {
       if (channelServicePidfile.removeServeServiceInfo(process.pid)) {
         channelPidfileReserved = false;
+      } else {
+        const info = channelServicePidfile.readServiceInfo();
+        if (
+          !info ||
+          info.owner !== 'serve' ||
+          info.pid !== process.pid ||
+          info.servePid !== process.pid
+        ) {
+          channelPidfileReserved = false;
+        }
       }
       return;
     }
@@ -1431,15 +1840,22 @@ export async function runHopCodeServe(
       info.servePid === process.pid
     ) {
       channelServicePidfile.removeServiceInfo();
+      const remaining = channelServicePidfile.readServiceInfo();
+      channelPidfileReserved =
+        remaining?.owner === 'serve' &&
+        remaining.pid === process.pid &&
+        remaining.servePid === process.pid;
+    } else {
       channelPidfileReserved = false;
     }
   };
-  const reserveChannelServicePidfile = (): void => {
-    if (!opts.channelSelection) return;
+  const reserveChannelServicePidfile = (
+    selection: ServeChannelSelection,
+  ): void => {
     if (!channelServicePidfile) {
       throw new Error('Channel service pidfile runtime is not available.');
     }
-    const channelPidfileNames = channelSelectionNames(opts.channelSelection);
+    const channelPidfileNames = channelSelectionNames(selection);
     const existingChannelService = channelServicePidfile.readServiceInfo();
     if (existingChannelService) {
       throw channelServicePidfileConflictError(existingChannelService);
@@ -1469,9 +1885,7 @@ export async function runHopCodeServe(
               'code' in retryErr &&
               (retryErr as { code?: unknown }).code === 'EEXIST'
             ) {
-              throw new Error(
-                'Channel service is already starting. Retry after the current startup finishes.',
-              );
+              throw channelServiceStartingConflictError();
             }
             throw retryErr;
           }
@@ -1632,49 +2046,178 @@ export async function runHopCodeServe(
     );
   }
 
-  // Resolve the bound workspace (1 daemon = 1 workspace).
-  // Explicit `--workspace` wins; otherwise default to process.cwd().
-  // `POST /session` with a mismatched `cwd` is rejected by the bridge
-  // with `WorkspaceMismatchError`. Multi-workspace deployments use
-  // multiple daemon processes, not intra-daemon routing.
-  //
-  // Boot-loud validation: absolute path, exists, is a directory.
-  if (!path.isAbsolute(rawWorkspace)) {
-    throw new Error(
-      `Invalid --workspace "${rawWorkspace}": must be an absolute path.`,
-    );
-  }
-  try {
-    const stats = fs.statSync(rawWorkspace);
-    if (!stats.isDirectory()) {
+  const validateAndCanonicalizeWorkspace = (workspace: string): string => {
+    if (!path.isAbsolute(workspace)) {
       throw new Error(
-        `Invalid --workspace "${rawWorkspace}": exists but is not a directory.`,
+        `Invalid --workspace "${workspace}": must be an absolute path.`,
       );
     }
-  } catch (err) {
-    if (err && typeof err === 'object' && 'code' in err) {
-      const code = (err as { code?: unknown }).code;
-      if (code === 'ENOENT') {
+    try {
+      const stats = fs.statSync(workspace);
+      if (!stats.isDirectory()) {
         throw new Error(
-          `Invalid --workspace "${rawWorkspace}": directory does not exist.`,
+          `Invalid --workspace "${workspace}": exists but is not a directory.`,
         );
       }
-      // EACCES / EPERM: the path exists but the current user can't
-      // stat it (typical for SIP-protected paths on macOS, root-owned
-      // dirs the daemon's user can't traverse, etc.). The raw Node
-      // SystemError has the path AND the syscall but no operator-
-      // facing breadcrumb that this came from `--workspace`. Wrap
-      // both codes so the boot failure points at the flag the
-      // operator actually set.
-      if (code === 'EACCES' || code === 'EPERM') {
+    } catch (err) {
+      if (err && typeof err === 'object' && 'code' in err) {
+        const code = (err as { code?: unknown }).code;
+        if (code === 'ENOENT') {
+          throw new Error(
+            `Invalid --workspace "${workspace}": directory does not exist.`,
+          );
+        }
+        // EACCES / EPERM: the path exists but the current user can't
+        // stat it (typical for SIP-protected paths on macOS, root-owned
+        // dirs the daemon's user can't traverse, etc.). The raw Node
+        // SystemError has the path AND the syscall but no operator-
+        // facing breadcrumb that this came from `--workspace`. Wrap
+        // both codes so the boot failure points at the flag the
+        // operator actually set.
+        if (code === 'EACCES' || code === 'EPERM') {
+          throw new Error(
+            `Invalid --workspace "${workspace}": permission denied ` +
+              `(${String(code)}). The path exists but cannot be stat'd ` +
+              `by the current user.`,
+          );
+        }
+      }
+      throw err;
+    }
+    return canonicalizeWorkspace(workspace);
+  };
+
+  // Resolve the bound workspace list. The first explicit workspace remains the
+  // primary workspace for legacy APIs; later workspaces are isolated secondary
+  // runtimes.
+  const workspaceInputs = rawWorkspaces.map((workspace) => ({
+    raw: workspace,
+    cwd: validateAndCanonicalizeWorkspace(workspace),
+    removable: false,
+    registrationIds: [] as string[],
+  }));
+  const boundWorkspace = workspaceInputs[0]!.cwd;
+
+  // Keep duplicate/nested rejection after realpath canonicalization so symlink
+  // aliases cannot create two runtimes for one physical workspace.
+  const seenCanonicalWorkspaces = new Set<string>();
+  for (const workspace of workspaceInputs) {
+    if (seenCanonicalWorkspaces.has(workspace.cwd)) {
+      throw new Error(
+        `Duplicate --workspace value resolves to ${JSON.stringify(
+          workspace.cwd,
+        )}.`,
+      );
+    }
+    seenCanonicalWorkspaces.add(workspace.cwd);
+  }
+  for (let i = 0; i < workspaceInputs.length; i++) {
+    for (let j = i + 1; j < workspaceInputs.length; j++) {
+      const first = workspaceInputs[i]!.cwd;
+      const second = workspaceInputs[j]!.cwd;
+      const firstRel = path.relative(first, second);
+      const secondRel = path.relative(second, first);
+      if (
+        firstRel &&
+        !firstRel.startsWith('..') &&
+        !path.isAbsolute(firstRel)
+      ) {
         throw new Error(
-          `Invalid --workspace "${rawWorkspace}": permission denied ` +
-            `(${String(code)}). The path exists but cannot be stat'd ` +
-            `by the current user.`,
+          `Nested --workspace values are not supported: ` +
+            `${JSON.stringify(second)} is inside ${JSON.stringify(first)}.`,
+        );
+      }
+      if (
+        secondRel &&
+        !secondRel.startsWith('..') &&
+        !path.isAbsolute(secondRel)
+      ) {
+        throw new Error(
+          `Nested --workspace values are not supported: ` +
+            `${JSON.stringify(first)} is inside ${JSON.stringify(second)}.`,
         );
       }
     }
-    throw err;
+  }
+  if (workspaceInputs.length > MAX_REGISTERED_WORKSPACES) {
+    throw new Error(
+      `At most ${MAX_REGISTERED_WORKSPACES} --workspace values may be registered.`,
+    );
+  }
+  let workspaceRegistrationStore = deps.workspaceRegistrationStore;
+  if (
+    workspaceRegistrationStore === undefined &&
+    process.env['QWEN_SERVE_NO_PERSISTENT_REGISTRATION'] !== '1'
+  ) {
+    const { WorkspaceRegistrationStore } = await import(
+      './workspace-registration-store.js'
+    );
+    workspaceRegistrationStore = new WorkspaceRegistrationStore(boundWorkspace);
+  }
+  if (workspaceRegistrationStore) {
+    try {
+      const stored = await workspaceRegistrationStore.read();
+      for (const storedWorkspace of stored.workspaces) {
+        const registrationId = workspaceRegistrationId(storedWorkspace);
+        let cwd: string;
+        try {
+          cwd = validateAndCanonicalizeWorkspace(storedWorkspace);
+        } catch (err) {
+          writeStderrLine(
+            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+              storedWorkspace,
+            )}: ${err instanceof Error ? err.message : String(err)}`,
+          );
+          continue;
+        }
+        const existingInput = workspaceInputs.find(
+          (workspace) => workspace.cwd === cwd,
+        );
+        if (existingInput) {
+          existingInput.registrationIds.push(registrationId);
+          continue;
+        }
+        const nested = workspaceInputs.some(
+          (workspace) =>
+            isWithinRoot(cwd, workspace.cwd) ||
+            isWithinRoot(workspace.cwd, cwd),
+        );
+        if (nested) {
+          writeStderrLine(
+            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+              storedWorkspace,
+            )}: path nests with an explicit or earlier restored workspace`,
+          );
+          continue;
+        }
+        if (workspaceInputs.length >= MAX_REGISTERED_WORKSPACES) {
+          writeStderrLine(
+            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+              storedWorkspace,
+            )}: workspace limit reached`,
+          );
+          continue;
+        }
+        workspaceInputs.push({
+          raw: storedWorkspace,
+          cwd,
+          removable: true,
+          registrationIds: [registrationId],
+        });
+      }
+    } catch (err) {
+      writeStderrLine(
+        `qwen serve: failed to read persisted workspace registrations: ${
+          err instanceof Error ? err.message : String(err)
+        }; continuing with explicit workspaces only`,
+      );
+    }
+  }
+  if (workspaceInputs.length > 1 && deps.bridge) {
+    throw new Error(
+      'Injected bridge dependencies are only supported with a single workspace; ' +
+        'multiple --workspace values require runQwenServe to construct one bridge per workspace.',
+    );
   }
   // Canonicalize ONCE here so `/capabilities` and the POST /session
   // fallback (both via server.ts) AND the bridge agree on the same
@@ -1683,7 +2226,6 @@ export async function runHopCodeServe(
   // filesystems the bridge's `realpathSync.native` form diverges from
   // server.ts's raw `opts.workspace` and clients see one path on
   // `/capabilities` but another on `POST /session` responses.
-  const boundWorkspace = canonicalizeWorkspace(rawWorkspace);
 
   // Read a lightweight settings summary once at boot for startup-time fields
   // used before the full runtime settings loader is allowed onto the hot path.
@@ -1691,9 +2233,12 @@ export async function runHopCodeServe(
   let permissionPolicy: PermissionPolicy | undefined;
   let permissionConsensusQuorum: number | undefined;
   let bootSettings: ServeFastPathSettings | undefined;
+  let sessionArtifactsPersistenceAvailable = true;
   try {
     bootSettings =
       deps.bootSettings ?? loadServeFastPathSettings(boundWorkspace);
+    sessionArtifactsPersistenceAvailable =
+      sessionArtifactsPersistenceAvailableFromSettings(bootSettings);
     contextFilenameForInit = extractContextFilename(
       bootSettings.context?.fileName,
     );
@@ -1724,10 +2269,13 @@ export async function runHopCodeServe(
     bootSettings,
     boundWorkspace,
   });
-  const daemonLog: DaemonLogger = initDaemonLogger({
+  const daemonLog: DaemonLogger = await initDaemonLogger({
     boundWorkspace,
     baseDir: daemonLogBaseDir,
   });
+  loggerLifecycle.initialized(daemonLog);
+  let loggerPublished = false;
+  let loggerSignalOwned = false;
   writeStderrLine(
     `hopcode serve: daemon log → ${daemonLog.getLogPath() || '(disabled)'}`,
   );
@@ -1776,6 +2324,14 @@ export async function runHopCodeServe(
       );
     }
   }
+  if (opts.maxTotalSessions !== undefined) {
+    if (!isNonNegativeIntegerOrInfinity(opts.maxTotalSessions)) {
+      throw new TypeError(
+        `Invalid maxTotalSessions: ${opts.maxTotalSessions}. Must be a non-negative integer ` +
+          `(0 / Infinity = unlimited).`,
+      );
+    }
+  }
   if (opts.maxPendingPromptsPerSession !== undefined) {
     if (!isNonNegativeIntegerOrInfinity(opts.maxPendingPromptsPerSession)) {
       throw new TypeError(
@@ -1794,6 +2350,9 @@ export async function runHopCodeServe(
           `Must be a positive integer in [1, ${MAX_EVENT_RING_SIZE}].`,
       );
     }
+  }
+  if (opts.compactedReplayMaxBytes !== undefined) {
+    normalizeCompactedReplayMaxBytes(opts.compactedReplayMaxBytes);
   }
   if (opts.writerIdleTimeoutMs !== undefined) {
     if (!isPositiveIntegerMs(opts.writerIdleTimeoutMs)) {
@@ -1843,6 +2402,10 @@ export async function runHopCodeServe(
       );
     }
   }
+  opts.maxTotalSessions ??= deriveDefaultMaxTotalSessions(
+    opts.maxSessions,
+    workspaceInputs.length,
+  );
   // Per-handle env overrides: `undefined` value means "scrub this
   // var from the child env" — important when a different daemon
   // in the same process set the var globally previously. Always
@@ -1918,6 +2481,7 @@ export async function runHopCodeServe(
   let runtimeApp: Application | undefined;
   let runtimeAppForCleanup: Application | undefined;
   let bridgeRef: AcpSessionBridge | undefined = deps.bridge;
+  const internalRuntimeBridgesForCleanup: AcpSessionBridge[] = [];
   let daemonEventLoopMonitor:
     | ReturnType<CoreRuntime['startEventLoopLagMonitor']>
     | undefined;
@@ -1931,7 +2495,7 @@ export async function runHopCodeServe(
   let markRuntimeFailed!: (err: Error) => void;
   let runtimeStartupSettled = false;
   let startRuntimeAfterHealth: (() => void) | undefined;
-  let startRuntimeForRequest: (() => void) | undefined;
+  let startRuntimeForRequest: (() => boolean) | undefined;
   const deferRuntimeUntilFirstHealth =
     deps.resolveOnListen === true && deps.deferRuntimeUntilFirstHealth === true;
   const runtimeReady = new Promise<void>((resolve, reject) => {
@@ -1940,26 +2504,176 @@ export async function runHopCodeServe(
   });
   void runtimeReady.catch(() => {});
   const disposeDaemonEventLoopMonitor = (): void => {
-    daemonEventLoopMonitor?.dispose();
+    const eventLoopMonitor = daemonEventLoopMonitor;
     daemonEventLoopMonitor = undefined;
-    daemonMetricsSampler?.dispose();
+    const metricsSampler = daemonMetricsSampler;
     daemonMetricsSampler = undefined;
+    try {
+      eventLoopMonitor?.dispose();
+    } catch (err) {
+      daemonLog.warn(
+        `event loop monitor dispose error: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      );
+    }
+    try {
+      metricsSampler?.dispose();
+    } catch (err) {
+      daemonLog.warn(
+        `metrics sampler dispose error: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      );
+    }
   };
-  let channelWorker: ChannelWorkerSupervisor =
-    createDisabledChannelWorkerSupervisor();
-  const getChannelWorkerSnapshot = () => channelWorker.snapshot();
-  const writeChannelWorkerPidfile = (
-    snapshot = channelWorker.snapshot(),
-    options: { clearWorkerPid?: boolean } = {},
-  ): void => {
-    if (!opts.channelSelection || !channelServicePidfile) return;
+  let channelWorkerManager: ChannelWorkerManager | undefined;
+  let channelWorkerManagerStarting: Promise<ChannelWorkerManager> | undefined;
+  let channelControlDraining = false;
+  let channelWorkspaceGroups: readonly ChannelWorkspaceGroup[] | undefined;
+  const channelWebhookEnvByWorkspace = new Map<
+    string,
+    Readonly<Record<string, string | undefined>>
+  >();
+  let channelWebhookConfigVersion = 0;
+  let refreshChannelWebhookConfigs: (() => void) | undefined;
+  let ensureChannelWorkerManager:
+    | (() => Promise<ChannelWorkerManager>)
+    | undefined;
+  const getChannelWebhookConfigSources = (): ChannelWebhookConfigSource[] => {
+    const app = runtimeApp ?? runtimeAppForCleanup;
+    const registry = app?.locals?.['workspaceRegistry'] as
+      | WorkspaceRegistry
+      | undefined;
+    return (channelWorkspaceGroups ?? []).map((group) => {
+      const env =
+        registry?.getByWorkspaceCwd(group.workspaceCwd)?.env.effectiveEnv ??
+        channelWebhookEnvByWorkspace.get(group.workspaceCwd);
+      return {
+        workspaceCwd: group.workspaceCwd,
+        ...(group.selection.mode === 'names'
+          ? { channelNames: group.selection.names }
+          : {}),
+        ...(env ? { env } : {}),
+      };
+    });
+  };
+  const resolveChannelWebhookConfigSource = (
+    channelName: string,
+  ): ChannelWebhookConfigSource => {
+    const source = getChannelWebhookConfigSources().find(
+      (source) =>
+        !source.channelNames || source.channelNames.includes(channelName),
+    );
+    if (source) return source;
+    const env = channelWebhookEnvByWorkspace.get(boundWorkspace);
+    return {
+      workspaceCwd: boundWorkspace,
+      ...(env ? { env } : {}),
+    };
+  };
+  let closeServerAfterChannelWorkerStartupFailure = false;
+  let runtimeFailureListenerClose: Promise<void> | undefined;
+  const getChannelWorkerSnapshot = (): ChannelWorkerSnapshot =>
+    channelWorkerManager?.primarySnapshot() ?? {
+      enabled: false,
+      state: 'disabled',
+      channels: [],
+    };
+  const getChannelWorkerSnapshots = (): ChannelWorkerGroupSnapshot[] =>
+    channelWorkerManager?.snapshots() ?? [];
+  const getChannelWorkerControl = (): ChannelWorkerControlState =>
+    channelWorkerManager?.state() ?? {
+      enabled: false,
+      selection: null,
+      transition: 'idle',
+      workers: [],
+    };
+  const daemonDrainingError = () =>
+    Object.assign(new Error('Daemon is shutting down.'), {
+      code: 'daemon_draining',
+    });
+  const setChannelWorkerSelection = async (
+    selection: ServeChannelSelection,
+  ): Promise<ChannelWorkerSetResult> => {
+    if (channelControlDraining) throw daemonDrainingError();
+    const manager = await ensureChannelWorkerManager?.();
+    if (!manager) throw new Error('Channel worker manager is unavailable.');
+    if (channelControlDraining) {
+      await manager.shutdown().catch(() => undefined);
+      throw daemonDrainingError();
+    }
+    return manager.setSelection(selection);
+  };
+  const stopChannelWorker = async (): Promise<ChannelWorkerStopResult> => {
+    if (channelControlDraining) throw daemonDrainingError();
+    const manager =
+      channelWorkerManager ?? (await channelWorkerManagerStarting);
+    if (channelControlDraining) {
+      await manager?.shutdown().catch(() => undefined);
+      throw daemonDrainingError();
+    }
+    if (!manager) {
+      return { changed: false, state: getChannelWorkerControl() };
+    }
+    return manager.stopSelection();
+  };
+  const reloadChannelWorker = async (): Promise<ChannelWorkerSnapshot> => {
+    if (channelControlDraining) throw daemonDrainingError();
+    const manager =
+      channelWorkerManager ?? (await channelWorkerManagerStarting);
+    if (channelControlDraining) {
+      await manager?.shutdown().catch(() => undefined);
+      throw daemonDrainingError();
+    }
+    if (!manager) {
+      return { enabled: false, state: 'disabled' as const, channels: [] };
+    }
+    try {
+      return await manager.reload();
+    } finally {
+      writeChannelWorkerPidfile();
+    }
+  };
+  // Rewrite the full worker list from the current group snapshots on every
+  // ready/exit. A synchronous full rewrite (rather than a read-modify-write of
+  // a single entry) keeps concurrent per-worker updates from losing each other.
+  const isLiveWorker = (snapshot: ChannelWorkerGroupSnapshot): boolean =>
+    snapshot.state === 'running' || snapshot.state === 'starting';
+  let channelWorkerPidfileUsesWorkers = workspaceInputs.length > 1;
+  const writeChannelWorkerPidfile = (): void => {
+    if (runtimeStartupError !== undefined) return;
+    if (!channelPidfileReserved || !channelServicePidfile) return;
+    const snapshots = getChannelWorkerSnapshots();
+    const workers: ServiceInfoWorker[] = snapshots.map((snapshot) => ({
+      workspaceId: snapshot.workspaceId,
+      workspaceCwd: snapshot.workspaceCwd,
+      channels: snapshot.channels,
+      // Drop a stale pid (worker exited/failed/stopped) so readers never signal
+      // a dead process — mirrors the pre-4b clear-on-exit behavior.
+      ...(isLiveWorker(snapshot) && snapshot.pid !== undefined
+        ? { workerPid: snapshot.pid }
+        : {}),
+    }));
+    const channels = [
+      ...new Set(snapshots.flatMap((snapshot) => snapshot.channels)),
+    ];
+    const primary = snapshots.find((snapshot) => snapshot.primary);
+    // Only surface the per-workspace worker list in multi-workspace mode; a
+    // single-workspace daemon keeps the byte-identical channels/workerPid shape.
+    if (workers.length > 1 || snapshots.some((snapshot) => !snapshot.primary)) {
+      channelWorkerPidfileUsesWorkers = true;
+    }
+    const includeWorkers =
+      channelWorkerPidfileUsesWorkers && workers.length > 0;
     try {
       channelServicePidfile.writeServeServiceInfo({
-        channels: snapshot.channels,
+        channels,
         servePid: process.pid,
-        ...(!options.clearWorkerPid && snapshot.pid !== undefined
-          ? { workerPid: snapshot.pid }
+        ...(primary && isLiveWorker(primary) && primary.pid !== undefined
+          ? { workerPid: primary.pid }
           : {}),
+        ...(includeWorkers ? { workers } : {}),
       });
     } catch (err) {
       daemonLog.warn(
@@ -1976,6 +2690,114 @@ export async function runHopCodeServe(
       () => bridgeRef,
       () => runtimeStartupError,
     );
+  const shutdownBridges = new WeakSet<AcpSessionBridge>();
+  const disposedRuntimeApps = new WeakSet<Application>();
+  const stoppedRuntimeAppProducers = new WeakSet<Application>();
+  const stoppedExtensionReconcilers = new WeakSet<Application>();
+  const stopExtensionReconciler = (app: Application | undefined): void => {
+    if (!app || stoppedExtensionReconcilers.has(app)) return;
+    stoppedExtensionReconcilers.add(app);
+    const stopExtensionGenerationReconciler = app.locals?.[
+      'stopExtensionGenerationReconciler'
+    ] as (() => void) | undefined;
+    try {
+      stopExtensionGenerationReconciler?.();
+    } catch (err) {
+      daemonLog.warn(
+        `extension generation reconciler dispose error: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
+      );
+    }
+  };
+  const stopRuntimeAppProducers = (app: Application | undefined): void => {
+    if (!app || stoppedRuntimeAppProducers.has(app)) return;
+    stoppedRuntimeAppProducers.add(app);
+    const locals = app.locals as {
+      stopScheduledTaskKeepalive?: () => void;
+      stopWorkspaceGitState?: () => void;
+      subSessionStoppers?: Array<() => void>;
+    };
+    const stopSafely = (name: string, stop: (() => void) | undefined) => {
+      try {
+        stop?.();
+      } catch (err) {
+        daemonLog.warn(
+          `${name} dispose error: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+      }
+    };
+    stopSafely('scheduled-task keepalive', locals.stopScheduledTaskKeepalive);
+    stopSafely('workspace git state', locals.stopWorkspaceGitState);
+    for (const stop of locals.subSessionStoppers ?? []) {
+      stopSafely('sub-session launcher', stop);
+    }
+    stopExtensionReconciler(app);
+  };
+  const disposeRuntimeAppResources = (app: Application | undefined): void => {
+    if (!app || disposedRuntimeApps.has(app)) return;
+    disposedRuntimeApps.add(app);
+    stopRuntimeAppProducers(app);
+
+    // Cancel IdP polling before disposing transports that may share its HTTP
+    // agents.
+    const deviceFlowRegistry = getDeviceFlowRegistry(app);
+    if (deviceFlowRegistry) {
+      try {
+        deviceFlowRegistry.dispose();
+      } catch (err) {
+        daemonLog.warn(
+          `device-flow registry dispose error: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+      }
+    }
+
+    const acpHandle = app.locals?.['acpHandle'] as AcpHttpHandle | undefined;
+    if (acpHandle?.dispose) {
+      try {
+        acpHandle.dispose();
+      } catch (err) {
+        daemonLog.warn(
+          `ACP handle dispose error: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+      }
+    }
+
+    const rateLimiter = getRateLimiter(app);
+    if (rateLimiter) {
+      try {
+        rateLimiter.setDraining(true);
+        rateLimiter.dispose();
+      } catch (err) {
+        daemonLog.warn(
+          `rate limiter dispose error: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+      }
+    }
+    disposeDaemonEventLoopMonitor();
+  };
+  const getRuntimeBridgesForCleanup = (): AcpSessionBridge[] => {
+    const appForCleanup = runtimeApp ?? runtimeAppForCleanup;
+    const registry = appForCleanup?.locals?.['workspaceRegistry'] as
+      | WorkspaceRegistry
+      | undefined;
+    const bridges = [
+      ...(registry
+        ? registry.listManaged().map((runtime) => runtime.bridge)
+        : []),
+      ...(bridgeRef ? [bridgeRef] : []),
+      ...internalRuntimeBridgesForCleanup,
+    ];
+    return [...new Set(bridges)];
+  };
 
   const buildRuntime = async (): Promise<{
     app: Application;
@@ -2019,6 +2841,64 @@ export async function runHopCodeServe(
         { workspace: boundWorkspace },
       );
     }
+    const runtimeEnvSnapshot = runtimeBootSettings
+      ? settingsRuntime.environment.buildRuntimeEnvironment(
+          runtimeBootSettings.merged,
+          boundWorkspace,
+          daemonRuntimeBaseEnv,
+        )
+      : {
+          effectiveEnv: { ...daemonRuntimeBaseEnv },
+          overlayKeys: Object.freeze([] as string[]),
+          envFilePaths: Object.freeze([] as string[]),
+          envFileReadFailed: false,
+          envFileReadFailures: Object.freeze([]),
+        };
+    const logRuntimeEnvFileReadFailures = (
+      workspace: string,
+      snapshot: {
+        readonly envFileReadFailed: boolean;
+        readonly envFileReadFailures?: ReadonlyArray<{
+          readonly path: string;
+          readonly error: string;
+        }>;
+      },
+    ): void => {
+      if (!snapshot.envFileReadFailed) return;
+      const failedFiles = snapshot.envFileReadFailures ?? [];
+      daemonLog.warn('one or more runtime env files could not be read', {
+        workspace,
+        ...(failedFiles.length > 0 ? { failedFiles } : {}),
+      });
+    };
+    logRuntimeEnvFileReadFailures(boundWorkspace, runtimeEnvSnapshot);
+    const runtimeEffectiveEnv: NodeJS.ProcessEnv = {
+      ...runtimeEnvSnapshot.effectiveEnv,
+    };
+    const replaceRuntimeEffectiveEnv = (
+      nextEnv: Readonly<NodeJS.ProcessEnv>,
+    ): void => {
+      for (const key of Object.keys(runtimeEffectiveEnv)) {
+        delete runtimeEffectiveEnv[key];
+      }
+      Object.assign(runtimeEffectiveEnv, nextEnv);
+    };
+    const primaryRuntimeEnv: {
+      mode: 'runtime-overlay';
+      overlayKeys: string[];
+      envFilePaths: string[];
+      effectiveEnv: NodeJS.ProcessEnv;
+      envFileReadFailed: boolean;
+      envFileReadFailures: Array<{ path: string; error: string }>;
+      fallbackReason?: string;
+    } = {
+      mode: 'runtime-overlay' as const,
+      overlayKeys: [...runtimeEnvSnapshot.overlayKeys],
+      effectiveEnv: runtimeEffectiveEnv,
+      envFilePaths: [...runtimeEnvSnapshot.envFilePaths],
+      envFileReadFailed: runtimeEnvSnapshot.envFileReadFailed,
+      envFileReadFailures: [...runtimeEnvSnapshot.envFileReadFailures],
+    };
     const daemonWorkspaceHash = core.hashDaemonWorkspace(boundWorkspace);
     let daemonTelemetrySettings: TelemetrySettings;
     try {
@@ -2102,60 +2982,73 @@ export async function runHopCodeServe(
       promptQueueWaitStats.lastMs = durationMs;
       core.recordDaemonPromptQueueWait(durationMs);
     };
-    const daemonTelemetry = core.createDaemonBridgeTelemetry();
-    daemonTelemetry.metrics = {
-      sessionLifecycle(action) {
-        core.recordDaemonSessionLifecycle(action);
-        core.emitDaemonLog(
-          `Session ${action}.`,
-          {
-            'hopcode.workspace.hash': daemonWorkspaceHash,
-          },
-          {
-            eventName: `hopcode.daemon.session.${action}`,
-          },
-        );
-      },
-      channelLifecycle(action, expected) {
-        core.recordDaemonChannelLifecycle(action, expected);
-        core.emitDaemonLog(
-          action === 'spawn'
-            ? 'ACP channel spawned.'
-            : `ACP channel exited (expected=${expected ?? true}).`,
-          {
-            ...(action === 'exit'
-              ? { 'hopcode.daemon.channel.expected': expected ?? true }
-              : {}),
-          },
-          {
-            eventName: `hopcode.daemon.channel.${action}`,
-            ...(expected === false && action === 'exit'
-              ? { severityNumber: 13 }
-              : {}),
-          },
-        );
-      },
-      promptQueueWait(durationMs) {
-        recordPromptQueueWait(durationMs);
-        metricsRing.recordPromptQueueWait(durationMs);
-      },
-      promptDuration(durationMs) {
-        core.recordDaemonPromptDuration(durationMs);
-        metricsRing.recordPromptDuration(durationMs);
-      },
-      cancelled: core.recordDaemonCancel,
-      // Per-round model token usage + LLM round-trip time sniffed off
-      // `agent_message_chunk._meta` (`usage` + `durationMs`) at the bridge's
-      // single session/update fan-in. Increments (not cumulative), so the ring
-      // sums tokens per window (token-burn chart) and pools the round-trip times
-      // for the LLM-latency percentiles.
-      tokenUsage(inputTokens, outputTokens, durationMs) {
-        metricsRing.recordTokens(inputTokens, outputTokens);
-        if (typeof durationMs === 'number') {
-          metricsRing.recordLlmDuration(durationMs);
-        }
-      },
+    const createRuntimeBridgeTelemetry = (workspaceHash: string) => {
+      const telemetry = core.createDaemonBridgeTelemetry();
+      telemetry.metrics = {
+        sessionLifecycle(action) {
+          core.recordDaemonSessionLifecycle(action);
+          core.emitDaemonLog(
+            `Session ${action}.`,
+            {
+              'qwen-code.workspace.hash': workspaceHash,
+            },
+            {
+              eventName: `qwen-code.daemon.session.${action}`,
+            },
+          );
+        },
+        channelLifecycle(action, expected) {
+          core.recordDaemonChannelLifecycle(action, expected);
+          core.emitDaemonLog(
+            action === 'spawn'
+              ? 'ACP channel spawned.'
+              : `ACP channel exited (expected=${expected ?? true}).`,
+            {
+              ...(action === 'exit'
+                ? { 'qwen-code.daemon.channel.expected': expected ?? true }
+                : {}),
+            },
+            {
+              eventName: `qwen-code.daemon.channel.${action}`,
+              ...(expected === false && action === 'exit'
+                ? { severityNumber: 13 }
+                : {}),
+            },
+          );
+        },
+        promptQueueWait(durationMs) {
+          recordPromptQueueWait(durationMs);
+          metricsRing.recordPromptQueueWait(durationMs);
+        },
+        promptDuration(durationMs) {
+          core.recordDaemonPromptDuration(durationMs);
+          metricsRing.recordPromptDuration(durationMs);
+        },
+        cancelled: core.recordDaemonCancel,
+        // Per-round model token usage + LLM round-trip time sniffed off
+        // `agent_message_chunk._meta` (`usage` + `durationMs`) at the bridge's
+        // single session/update fan-in. Increments (not cumulative), so the ring
+        // sums tokens per window (token-burn chart) and pools the round-trip times
+        // for the LLM-latency percentiles. `apiErrors` / `apiRetries` ride the
+        // same frame (per-round increments, 0 when none) and window into the
+        // model-API-health chart.
+        tokenUsage(
+          inputTokens,
+          outputTokens,
+          durationMs,
+          apiErrors,
+          apiRetries,
+        ) {
+          metricsRing.recordTokens(inputTokens, outputTokens);
+          if (typeof durationMs === 'number') {
+            metricsRing.recordLlmDuration(durationMs);
+          }
+          metricsRing.recordApiActivity(apiErrors ?? 0, apiRetries ?? 0);
+        },
+      };
+      return telemetry;
     };
+    const daemonTelemetry = createRuntimeBridgeTelemetry(daemonWorkspaceHash);
     // Allocate the audit ring + publisher in the daemon host (here)
     // rather than inside the bridge factory, because the ring is the
     // seam for exposing `GET /workspace/permission/audit` in the future.
@@ -2207,7 +3100,17 @@ export async function runHopCodeServe(
       pathLocks: sharedPathLocks,
       ...(customIgnoreFiles !== undefined ? { customIgnoreFiles } : {}),
     });
+    const routeFsFactory = runtime.resolveBridgeFsFactory({
+      // REST routes still return primary-relative paths, so keep their
+      // filesystem boundary primary-only until responses carry root IDs.
+      boundWorkspaces: [boundWorkspace],
+      trusted: trustedWorkspace,
+      emit: deps.fsAuditEmit,
+      pathLocks: sharedPathLocks,
+      ...(customIgnoreFiles !== undefined ? { customIgnoreFiles } : {}),
+    });
     const channelFactory = runtime.createSpawnChannelFactory({
+      sourceEnv: runtimeEffectiveEnv,
       onDiagnosticLine: diagnosticSink,
       pipeHooks: {
         onMessageSent: (bytes) => recordPipeMessage('outbound', bytes),
@@ -2223,9 +3126,13 @@ export async function runHopCodeServe(
         ? { extraArgs: ['--experimental-lsp'] }
         : {}),
     });
-    const statusProvider = runtime.createDaemonStatusProvider();
+    const statusProvider = runtime.createDaemonStatusProvider({
+      env: runtimeEffectiveEnv,
+    });
     const workspaceProvidersStatusProvider =
-      runtime.createWorkspaceProvidersStatusProvider();
+      runtime.createWorkspaceProvidersStatusProvider({
+        env: runtimeEffectiveEnv,
+      });
     const workspaceSkillsStatusProvider =
       runtime.createWorkspaceSkillsStatusProvider();
     // Reverse tool channel (issue #5626, Phase 2). ONE sender registry shared
@@ -2234,6 +3141,19 @@ export async function runHopCodeServe(
     // (which registers a per-connection `ClientMcpRegistrar`'s sender on
     // `mcp_register`). Inert unless `opts.clientMcpOverWs` is on.
     const clientMcpSenderRegistry = new ClientMcpSenderRegistry();
+    const runtimeBridges: AcpSessionBridge[] = [];
+    const totalSessionAdmission = runtime.createTotalSessionAdmissionController(
+      {
+        maxTotalSessions: opts.maxTotalSessions,
+        getBridges: () =>
+          runtimeBridges.length > 0
+            ? runtimeBridges
+            : bridgeRef
+              ? [bridgeRef]
+              : [],
+      },
+    );
+    const sessionOwnerIndex = runtime.createWorkspaceSessionOwnerIndex();
     const persistDisabledToolsFn = (
       workspace: string,
       toolName: string,
@@ -2254,6 +3174,75 @@ export async function runHopCodeServe(
           'tools.disabled',
           [...next].sort(),
         );
+      });
+    const persistDisabledSkillsFn = (
+      workspace: string,
+      skillName: string,
+      enabled: boolean,
+    ) =>
+      withSettingsLock(workspace, async () => {
+        const fresh = settingsRuntime.settings.loadSettings(workspace);
+        const normalizedName = skillName.trim().toLowerCase();
+        const disabledNames = (value: unknown): string[] =>
+          Array.isArray(value)
+            ? value.filter(
+                (entry): entry is string => typeof entry === 'string',
+              )
+            : [];
+        const lockedScopes = [
+          ['system', fresh.system.settings.skills?.disabled],
+          ['user', fresh.user.settings.skills?.disabled],
+          ['systemDefaults', fresh.systemDefaults.settings.skills?.disabled],
+        ] as const;
+        for (const [scope, names] of lockedScopes) {
+          if (
+            disabledNames(names).some(
+              (name) => name.trim().toLowerCase() === normalizedName,
+            )
+          ) {
+            throw new runtime.WorkspaceSkillNotToggleableError(
+              skillName,
+              'locked',
+              scope,
+            );
+          }
+        }
+
+        const workspaceDisabled = disabledNames(
+          fresh.workspace.settings.skills?.disabled,
+        );
+        const next: string[] = [];
+        let found = false;
+        let changed = false;
+        for (const name of workspaceDisabled) {
+          if (name.trim().toLowerCase() !== normalizedName) {
+            next.push(name);
+            continue;
+          }
+          if (enabled) {
+            changed = true;
+            continue;
+          }
+          if (!found) {
+            next.push(skillName);
+            found = true;
+            if (name !== skillName) changed = true;
+          } else {
+            changed = true;
+          }
+        }
+        if (!enabled && !found) {
+          next.push(skillName);
+          changed = true;
+        }
+        if (!changed) return { changed: false, disabled: workspaceDisabled };
+
+        fresh.setValue(
+          WORKSPACE_SETTING_SCOPE,
+          'skills.disabled',
+          next.length > 0 ? next : undefined,
+        );
+        return { changed: true, disabled: next };
       });
     const persistSettingFn = (
       workspace: string,
@@ -2306,18 +3295,38 @@ export async function runHopCodeServe(
           );
         }
       });
+    // `create_sub_session` tool: spawn a fresh top-level sub-session on request
+    // from a child's agent turn and (for 'first-turn') return its result.
+    // Dynamic-imported (not at module scope) so the serve fast-path bundle
+    // closure check doesn't trace create-sub-session's transitive deps.
+    const { createSubSessionLauncher } = await import(
+      './create-sub-session.js'
+    );
+    // Late-binds the bridge (constructed just below) via `() => bridgeRef`. Only
+    // wired on the daemon-created bridge — an injected `deps.bridge` (embed/test)
+    // brings its own options.
+    const subSessionLauncher = createSubSessionLauncher({
+      getBridge: () => bridgeRef,
+      boundWorkspace,
+    });
     const bridge =
       deps.bridge ??
       runtime.createAcpSessionBridge({
         // Reverse tool channel: let `BridgeClient.extMethod` reach the WS
         // connection that hosts a named client MCP server (#5626).
         clientMcpSender: clientMcpSenderRegistry.lookup,
+        onCreateSubSession: subSessionLauncher.launch,
         maxSessions: opts.maxSessions,
+        freshSessionAdmission: totalSessionAdmission.admit,
+        sessionLifecycle: sessionOwnerIndex.handleBridgeSessionLifecycle,
         ...(opts.maxPendingPromptsPerSession !== undefined
           ? { maxPendingPromptsPerSession: opts.maxPendingPromptsPerSession }
           : {}),
         ...(opts.eventRingSize !== undefined
           ? { eventRingSize: opts.eventRingSize }
+          : {}),
+        ...(opts.compactedReplayMaxBytes !== undefined
+          ? { compactedReplayMaxBytes: opts.compactedReplayMaxBytes }
           : {}),
         ...(opts.channelIdleTimeoutMs !== undefined
           ? { channelIdleTimeoutMs: opts.channelIdleTimeoutMs }
@@ -2352,26 +3361,87 @@ export async function runHopCodeServe(
       });
     if (!deps.bridge) {
       bridgeRef = bridge;
+      internalRuntimeBridgesForCleanup.push(bridge);
     }
+    runtimeBridges.push(bridge);
+    let invalidatePrimaryServeFeaturesCache = () => {};
     const workspaceService = runtime.createDaemonWorkspaceService({
       boundWorkspace,
       contextFilename: contextFilenameForInit ?? 'QWEN.md',
       statusProvider,
       workspaceProvidersStatusProvider,
       workspaceSkillsStatusProvider,
+      skillInstallEnv: runtimeEffectiveEnv,
+      voiceEnv: runtimeEffectiveEnv,
       isChannelLive: () => bridge.isChannelLive(),
       persistDisabledTools: persistDisabledToolsFn,
+      persistDisabledSkills: persistDisabledSkillsFn,
       persistSetting: persistSettingFn,
       persistSettings: persistSettingsFn,
+      preheatAcpChild: () => bridge.preheat(),
       reloadDaemonEnv: (workspace) =>
         withSettingsLock(workspace, async () => {
           const fresh = settingsRuntime.settings.loadSettings(workspace, {
             skipLoadEnvironment: true,
           });
-          return settingsRuntime.settings.reloadEnvironment(
+          const result = settingsRuntime.settings.reloadEnvironment(
             fresh.merged,
             workspace,
           );
+          let refreshedRuntimeEnv: ReturnType<
+            EnvironmentRuntime['buildRuntimeEnvironment']
+          >;
+          let fallbackReason: string | undefined;
+          try {
+            refreshedRuntimeEnv =
+              settingsRuntime.environment.buildRuntimeEnvironment(
+                fresh.merged,
+                workspace,
+                daemonRuntimeBaseEnv,
+              );
+          } catch (err) {
+            fallbackReason = err instanceof Error ? err.message : String(err);
+            daemonLog.warn(
+              'failed to rebuild runtime env snapshot after daemon env reload; preserving previous runtime env',
+              {
+                error: fallbackReason,
+              },
+            );
+            refreshedRuntimeEnv = {
+              effectiveEnv: { ...runtimeEffectiveEnv },
+              overlayKeys: [...primaryRuntimeEnv.overlayKeys],
+              envFilePaths: [...primaryRuntimeEnv.envFilePaths],
+              envFileReadFailed: primaryRuntimeEnv.envFileReadFailed ?? false,
+              envFileReadFailures: [
+                ...(primaryRuntimeEnv.envFileReadFailures ?? []),
+              ],
+            };
+          }
+          logRuntimeEnvFileReadFailures(workspace, refreshedRuntimeEnv);
+          replaceRuntimeEffectiveEnv(refreshedRuntimeEnv.effectiveEnv);
+          if (fallbackReason) {
+            primaryRuntimeEnv.fallbackReason = fallbackReason;
+          } else {
+            delete primaryRuntimeEnv.fallbackReason;
+          }
+          primaryRuntimeEnv.envFileReadFailed =
+            refreshedRuntimeEnv.envFileReadFailed;
+          primaryRuntimeEnv.envFileReadFailures.splice(
+            0,
+            primaryRuntimeEnv.envFileReadFailures.length,
+            ...refreshedRuntimeEnv.envFileReadFailures,
+          );
+          primaryRuntimeEnv.overlayKeys.splice(
+            0,
+            primaryRuntimeEnv.overlayKeys.length,
+            ...refreshedRuntimeEnv.overlayKeys,
+          );
+          primaryRuntimeEnv.envFilePaths.splice(
+            0,
+            primaryRuntimeEnv.envFilePaths.length,
+            ...refreshedRuntimeEnv.envFilePaths,
+          );
+          return result;
         }),
       queryWorkspaceStatus: (method, idle) =>
         bridge.queryWorkspaceStatus(method, idle),
@@ -2379,11 +3449,338 @@ export async function runHopCodeServe(
         bridge.invokeWorkspaceCommand(method, params, invokeOpts),
       refreshExtensionsForAllSessions: () =>
         bridge.refreshExtensionsForAllSessions(),
-      publishWorkspaceEvent: (event) => bridge.publishWorkspaceEvent(event),
+      publishWorkspaceEvent: (event) => {
+        if (
+          event.type === 'settings_changed' ||
+          event.type === 'settings_reloaded'
+        ) {
+          invalidatePrimaryServeFeaturesCache();
+        }
+        bridge.publishWorkspaceEvent(event);
+      },
     });
 
+    const workspaceRuntimes: WorkspaceRuntime[] = [
+      {
+        workspaceId: daemonWorkspaceHash,
+        workspaceCwd: boundWorkspace,
+        primary: true,
+        trusted: trustedWorkspace,
+        removable: false,
+        registrationIds: workspaceInputs[0]?.registrationIds ?? [],
+        env: primaryRuntimeEnv,
+        bridge,
+        workspaceService,
+        routeFileSystemFactory: routeFsFactory,
+        clientMcpSenderRegistry,
+      },
+    ];
+
+    const createRuntimeEnvMetadata = (
+      workspace: string,
+      settings: ReturnType<SettingsRuntime['loadSettings']> | undefined,
+    ): {
+      metadata: {
+        mode: 'runtime-overlay';
+        overlayKeys: string[];
+        envFilePaths: string[];
+        effectiveEnv: NodeJS.ProcessEnv;
+        envFileReadFailed: boolean;
+        envFileReadFailures: Array<{ path: string; error: string }>;
+        fallbackReason?: string;
+      };
+      effectiveEnv: NodeJS.ProcessEnv;
+      replace: (nextEnv: Readonly<NodeJS.ProcessEnv>) => void;
+    } => {
+      const snapshot = settings
+        ? settingsRuntime.environment.buildRuntimeEnvironment(
+            settings.merged,
+            workspace,
+            daemonRuntimeBaseEnv,
+          )
+        : {
+            effectiveEnv: { ...daemonRuntimeBaseEnv },
+            overlayKeys: Object.freeze([] as string[]),
+            envFilePaths: Object.freeze([] as string[]),
+            envFileReadFailed: false,
+            envFileReadFailures: Object.freeze([]),
+          };
+      logRuntimeEnvFileReadFailures(workspace, snapshot);
+      const effectiveEnv: NodeJS.ProcessEnv = { ...snapshot.effectiveEnv };
+      const metadata: {
+        mode: 'runtime-overlay';
+        overlayKeys: string[];
+        envFilePaths: string[];
+        effectiveEnv: NodeJS.ProcessEnv;
+        envFileReadFailed: boolean;
+        envFileReadFailures: Array<{ path: string; error: string }>;
+        fallbackReason?: string;
+      } = {
+        mode: 'runtime-overlay',
+        overlayKeys: [...snapshot.overlayKeys],
+        effectiveEnv,
+        envFilePaths: [...snapshot.envFilePaths],
+        envFileReadFailed: snapshot.envFileReadFailed,
+        envFileReadFailures: [...snapshot.envFileReadFailures],
+      };
+      return {
+        metadata,
+        effectiveEnv,
+        replace(nextEnv) {
+          for (const key of Object.keys(effectiveEnv)) {
+            delete effectiveEnv[key];
+          }
+          Object.assign(effectiveEnv, nextEnv);
+        },
+      };
+    };
+
+    // Collects stop() callbacks from every per-workspace sub-session launcher
+    // (primary + secondaries). Called during shutdown so no new sub-sessions
+    // are admitted while bridges are being torn down.
+    const subSessionStoppers: Array<() => void> = [];
+    const subSessionStoppersByWorkspace = new Map<string, () => void>();
+    const runtimeCleanupPromises = new WeakMap<
+      WorkspaceRuntime,
+      Promise<void>
+    >();
+    const removeArrayValue = <T>(values: T[], value: T): void => {
+      const index = values.indexOf(value);
+      if (index >= 0) values.splice(index, 1);
+    };
+
+    for (const workspaceInput of workspaceInputs.slice(1)) {
+      let secondarySettings:
+        | ReturnType<SettingsRuntime['loadSettings']>
+        | undefined;
+      try {
+        secondarySettings = settingsRuntime.settings.loadSettings(
+          workspaceInput.cwd,
+        );
+      } catch (err) {
+        writeStderrLine(
+          `qwen serve: could not read full settings for secondary workspace ` +
+            `${workspaceInput.cwd} (${err instanceof Error ? err.message : String(err)}); ` +
+            `falling back to defaults.`,
+        );
+      }
+      const secondaryTrusted = secondarySettings
+        ? settingsRuntime.trustedFolders.getWorkspaceTrustStatus(
+            secondarySettings.merged,
+            workspaceInput.cwd,
+          ).effective.state === 'trusted'
+        : false;
+      if (!secondaryTrusted) {
+        daemonLog.warn('secondary workspace is not trusted', {
+          workspace: workspaceInput.cwd,
+          trustSettingsAvailable: secondarySettings !== undefined,
+        });
+      }
+      const secondaryEnv = createRuntimeEnvMetadata(
+        workspaceInput.cwd,
+        secondarySettings,
+      );
+      const secondaryWorkspaceHash = core.hashDaemonWorkspace(
+        workspaceInput.cwd,
+      );
+      const secondaryStatusProvider = runtime.createDaemonStatusProvider({
+        env: secondaryEnv.effectiveEnv,
+      });
+      const secondaryBridgeFsFactory = runtime.resolveBridgeFsFactory({
+        boundWorkspaces: [workspaceInput.cwd],
+        trusted: secondaryTrusted,
+        emit: deps.fsAuditEmit,
+        pathLocks: sharedPathLocks,
+        ...(customIgnoreFiles !== undefined ? { customIgnoreFiles } : {}),
+      });
+      const secondaryChannelFactory = runtime.createSpawnChannelFactory({
+        sourceEnv: secondaryEnv.effectiveEnv,
+        onDiagnosticLine: diagnosticSink,
+        pipeHooks: {
+          onMessageSent: (bytes) => recordPipeMessage('outbound', bytes),
+          onMessageReceived: (bytes) => recordPipeMessage('inbound', bytes),
+          onMessageObserved: ({ direction, bytes, message }) =>
+            observeLargePipeFrame({
+              direction: daemonPipeDirection(direction),
+              bytes,
+              message,
+            }),
+        },
+        ...(opts.experimentalLsp === true
+          ? { extraArgs: ['--experimental-lsp'] }
+          : {}),
+      });
+      const secondaryClientMcpSenderRegistry = new ClientMcpSenderRegistry();
+      // Wire sub-session support for the secondary workspace too — without
+      // this, create_sub_session calls from sessions bound to a secondary
+      // workspace hit methodNotFound.
+      // eslint-disable-next-line prefer-const -- assigned once after bridge creation; `let` required because the launcher closure captures it before the assignment.
+      let secondaryBridgeRef:
+        | ReturnType<typeof runtime.createAcpSessionBridge>
+        | undefined;
+      const secondarySubSessionLauncher = createSubSessionLauncher({
+        getBridge: () => secondaryBridgeRef,
+        boundWorkspace: workspaceInput.cwd,
+      });
+      const secondaryBridge = runtime.createAcpSessionBridge({
+        clientMcpSender: secondaryClientMcpSenderRegistry.lookup,
+        onCreateSubSession: secondarySubSessionLauncher.launch,
+        maxSessions: opts.maxSessions,
+        freshSessionAdmission: totalSessionAdmission.admit,
+        sessionLifecycle: sessionOwnerIndex.handleBridgeSessionLifecycle,
+        ...(opts.maxPendingPromptsPerSession !== undefined
+          ? { maxPendingPromptsPerSession: opts.maxPendingPromptsPerSession }
+          : {}),
+        ...(opts.eventRingSize !== undefined
+          ? { eventRingSize: opts.eventRingSize }
+          : {}),
+        ...(opts.compactedReplayMaxBytes !== undefined
+          ? { compactedReplayMaxBytes: opts.compactedReplayMaxBytes }
+          : {}),
+        ...(opts.channelIdleTimeoutMs !== undefined
+          ? { channelIdleTimeoutMs: opts.channelIdleTimeoutMs }
+          : {}),
+        ...(opts.sessionReapIntervalMs !== undefined
+          ? { sessionReapIntervalMs: opts.sessionReapIntervalMs }
+          : {}),
+        ...(opts.sessionIdleTimeoutMs !== undefined
+          ? { sessionIdleTimeoutMs: opts.sessionIdleTimeoutMs }
+          : {}),
+        ...(opts.permissionResponseTimeoutMs !== undefined
+          ? { permissionResponseTimeoutMs: opts.permissionResponseTimeoutMs }
+          : {}),
+        boundWorkspace: workspaceInput.cwd,
+        sessionShellCommandEnabled,
+        childEnvOverrides,
+        channelFactory: secondaryChannelFactory,
+        onDiagnosticLine: diagnosticSink,
+        telemetry: createRuntimeBridgeTelemetry(secondaryWorkspaceHash),
+        ...(permissionPolicy !== undefined ? { permissionPolicy } : {}),
+        ...(permissionConsensusQuorum !== undefined
+          ? {
+              permissionConsensusQuorum,
+            }
+          : {}),
+        permissionAudit: permissionAuditPublisher,
+        statusProvider: secondaryStatusProvider,
+        fileSystem: createBridgeFileSystemAdapter(secondaryBridgeFsFactory),
+        persistApprovalMode: (workspace, mode) =>
+          withSettingsLock(workspace, async () => {
+            const fresh = settingsRuntime.settings.loadSettings(workspace);
+            fresh.setValue(WORKSPACE_SETTING_SCOPE, 'tools.approvalMode', mode);
+          }),
+      });
+      secondaryBridgeRef = secondaryBridge;
+      runtimeBridges.push(secondaryBridge);
+      internalRuntimeBridgesForCleanup.push(secondaryBridge);
+      subSessionStoppers.push(secondarySubSessionLauncher.stop);
+      subSessionStoppersByWorkspace.set(
+        workspaceInput.cwd,
+        secondarySubSessionLauncher.stop,
+      );
+      const secondaryWorkspaceService = runtime.createDaemonWorkspaceService({
+        boundWorkspace: workspaceInput.cwd,
+        contextFilename: contextFilenameForInit ?? 'QWEN.md',
+        statusProvider: secondaryStatusProvider,
+        workspaceProvidersStatusProvider:
+          runtime.createWorkspaceProvidersStatusProvider({
+            env: secondaryEnv.effectiveEnv,
+          }),
+        workspaceSkillsStatusProvider:
+          runtime.createWorkspaceSkillsStatusProvider(),
+        skillInstallEnv: secondaryEnv.effectiveEnv,
+        voiceEnv: secondaryEnv.effectiveEnv,
+        voiceSettingsScope: WORKSPACE_SETTING_SCOPE,
+        isChannelLive: () => secondaryBridge.isChannelLive(),
+        preheatAcpChild: () => secondaryBridge.preheat(),
+        persistDisabledTools: persistDisabledToolsFn,
+        persistDisabledSkills: persistDisabledSkillsFn,
+        persistSetting: persistSettingFn,
+        persistSettings: persistSettingsFn,
+        reloadDaemonEnv: (workspace) =>
+          withSettingsLock(workspace, async () => {
+            const fresh = settingsRuntime.settings.loadSettings(workspace, {
+              skipLoadEnvironment: true,
+            });
+            const result = settingsRuntime.settings.reloadEnvironment(
+              fresh.merged,
+              workspace,
+            );
+            try {
+              const refreshedRuntimeEnv =
+                settingsRuntime.environment.buildRuntimeEnvironment(
+                  fresh.merged,
+                  workspace,
+                  daemonRuntimeBaseEnv,
+                );
+              logRuntimeEnvFileReadFailures(workspace, refreshedRuntimeEnv);
+              secondaryEnv.replace(refreshedRuntimeEnv.effectiveEnv);
+              secondaryEnv.metadata.envFileReadFailed =
+                refreshedRuntimeEnv.envFileReadFailed;
+              secondaryEnv.metadata.envFileReadFailures.splice(
+                0,
+                secondaryEnv.metadata.envFileReadFailures.length,
+                ...refreshedRuntimeEnv.envFileReadFailures,
+              );
+              secondaryEnv.metadata.overlayKeys.splice(
+                0,
+                secondaryEnv.metadata.overlayKeys.length,
+                ...refreshedRuntimeEnv.overlayKeys,
+              );
+              secondaryEnv.metadata.envFilePaths.splice(
+                0,
+                secondaryEnv.metadata.envFilePaths.length,
+                ...refreshedRuntimeEnv.envFilePaths,
+              );
+              delete secondaryEnv.metadata.fallbackReason;
+            } catch (err) {
+              secondaryEnv.metadata.fallbackReason =
+                err instanceof Error ? err.message : String(err);
+              daemonLog.warn(
+                'failed to rebuild secondary runtime env snapshot after daemon env reload; preserving previous runtime env',
+                {
+                  workspace,
+                  error: secondaryEnv.metadata.fallbackReason,
+                },
+              );
+            }
+            return result;
+          }),
+        queryWorkspaceStatus: (method, idle) =>
+          secondaryBridge.queryWorkspaceStatus(method, idle),
+        invokeWorkspaceCommand: (method, params, invokeOpts) =>
+          secondaryBridge.invokeWorkspaceCommand(method, params, invokeOpts),
+        refreshExtensionsForAllSessions: () =>
+          secondaryBridge.refreshExtensionsForAllSessions(),
+        publishWorkspaceEvent: (event) =>
+          secondaryBridge.publishWorkspaceEvent(event),
+      });
+      workspaceRuntimes.push({
+        workspaceId: secondaryWorkspaceHash,
+        workspaceCwd: workspaceInput.cwd,
+        primary: false,
+        trusted: secondaryTrusted,
+        removable: workspaceInput.removable,
+        registrationIds: workspaceInput.registrationIds,
+        env: secondaryEnv.metadata,
+        bridge: secondaryBridge,
+        workspaceService: secondaryWorkspaceService,
+        routeFileSystemFactory: secondaryBridgeFsFactory,
+        clientMcpSenderRegistry: secondaryClientMcpSenderRegistry,
+      });
+    }
+
+    const workspaceRegistry: WorkspaceRegistry =
+      runtime.createWorkspaceRegistry(workspaceRuntimes, {
+        sessionOwnerIndex,
+      });
+    const workspaceVoiceCoordinator = new WorkspaceVoiceCoordinator();
+
     core.registerDaemonGaugeCallbacks({
-      sessionCount: () => bridge.sessionCount,
+      sessionCount: () =>
+        workspaceRegistry
+          .list()
+          .reduce((sum, item) => sum + item.bridge.sessionCount, 0),
       sseCount: () => runtime.getActiveSseCount(),
       heapUsed: () => process.memoryUsage().heapUsed,
     });
@@ -2439,7 +3836,7 @@ export async function runHopCodeServe(
         // limiter are both toggleable).
         const acp = (
           app.locals?.['acpHandle'] as AcpHttpHandle | undefined
-        )?.registry.getSnapshot();
+        )?.getSnapshot();
         const hits = getRateLimiter(app)?.getHitCounts();
         const rejectedTotal = hits
           ? hits.prompt + hits.mutation + hits.read
@@ -2465,9 +3862,21 @@ export async function runHopCodeServe(
           cpuPercent,
           rssBytes: mem.rss,
           heapUsedBytes: mem.heapUsed,
-          activeSessions: bridge.sessionCount,
-          activePrompts: bridge.activePromptCount,
-          queuedPrompts: bridge.pendingPromptTotal ?? 0,
+          activeSessions: workspaceRegistry
+            .list()
+            .reduce((sum, item) => sum + item.bridge.sessionCount, 0),
+          activePrompts: workspaceRegistry
+            .list()
+            .reduce(
+              (sum, item) => sum + (item.bridge.activePromptCount ?? 0),
+              0,
+            ),
+          queuedPrompts: workspaceRegistry
+            .list()
+            .reduce(
+              (sum, item) => sum + (item.bridge.pendingPromptTotal ?? 0),
+              0,
+            ),
           eventLoopLagP99Ms,
           sseConnections: runtime.getActiveSseCount(),
           wsConnections: acp?.wsStreams ?? 0,
@@ -2522,23 +3931,423 @@ export async function runHopCodeServe(
       },
     };
 
+    // Factory for dynamically creating workspace runtimes (POST /workspaces).
+    const createDynamicWorkspaceRuntime = async (
+      cwd: string,
+    ): Promise<import('./workspace-registry.js').WorkspaceRuntime> => {
+      let wsSettings: ReturnType<SettingsRuntime['loadSettings']> | undefined;
+      try {
+        wsSettings = settingsRuntime.settings.loadSettings(cwd);
+      } catch (err) {
+        // Match the startup secondary-workspace path: surface why full settings
+        // couldn't be read instead of silently falling back to defaults.
+        writeStderrLine(
+          `qwen serve: could not read full settings for dynamic workspace ` +
+            `${cwd} (${err instanceof Error ? err.message : String(err)}); ` +
+            `falling back to defaults.`,
+        );
+      }
+      const trusted = wsSettings
+        ? settingsRuntime.trustedFolders.getWorkspaceTrustStatus(
+            wsSettings.merged,
+            cwd,
+          ).effective.state === 'trusted'
+        : false;
+      const wsEnv = createRuntimeEnvMetadata(cwd, wsSettings);
+      const wsHash = core.hashDaemonWorkspace(cwd);
+      const wsFsFactory = runtime.resolveBridgeFsFactory({
+        boundWorkspaces: [cwd],
+        trusted,
+        emit: deps.fsAuditEmit,
+        pathLocks: sharedPathLocks,
+        ...(customIgnoreFiles !== undefined ? { customIgnoreFiles } : {}),
+      });
+      const wsChannelFactory = runtime.createSpawnChannelFactory({
+        sourceEnv: wsEnv.effectiveEnv,
+        onDiagnosticLine: diagnosticSink,
+        pipeHooks: {
+          onMessageSent: (bytes) => recordPipeMessage('outbound', bytes),
+          onMessageReceived: (bytes) => recordPipeMessage('inbound', bytes),
+          onMessageObserved: ({ direction, bytes, message }) =>
+            observeLargePipeFrame({
+              direction: daemonPipeDirection(direction),
+              bytes,
+              message,
+            }),
+        },
+        ...(opts.experimentalLsp === true
+          ? { extraArgs: ['--experimental-lsp'] }
+          : {}),
+      });
+      const wsClientMcpRegistry = new ClientMcpSenderRegistry();
+      // eslint-disable-next-line prefer-const
+      let wsBridgeRef:
+        | ReturnType<typeof runtime.createAcpSessionBridge>
+        | undefined;
+      const wsSubSessionLauncher = createSubSessionLauncher({
+        getBridge: () => wsBridgeRef,
+        boundWorkspace: cwd,
+      });
+      let wsBridge: ReturnType<typeof runtime.createAcpSessionBridge>;
+      try {
+        wsBridge = runtime.createAcpSessionBridge({
+          clientMcpSender: wsClientMcpRegistry.lookup,
+          onCreateSubSession: wsSubSessionLauncher.launch,
+          maxSessions: opts.maxSessions,
+          freshSessionAdmission: totalSessionAdmission.admit,
+          sessionLifecycle: sessionOwnerIndex.handleBridgeSessionLifecycle,
+          ...(opts.maxPendingPromptsPerSession !== undefined
+            ? { maxPendingPromptsPerSession: opts.maxPendingPromptsPerSession }
+            : {}),
+          ...(opts.eventRingSize !== undefined
+            ? { eventRingSize: opts.eventRingSize }
+            : {}),
+          ...(opts.compactedReplayMaxBytes !== undefined
+            ? { compactedReplayMaxBytes: opts.compactedReplayMaxBytes }
+            : {}),
+          ...(opts.channelIdleTimeoutMs !== undefined
+            ? { channelIdleTimeoutMs: opts.channelIdleTimeoutMs }
+            : {}),
+          ...(opts.sessionReapIntervalMs !== undefined
+            ? { sessionReapIntervalMs: opts.sessionReapIntervalMs }
+            : {}),
+          ...(opts.sessionIdleTimeoutMs !== undefined
+            ? { sessionIdleTimeoutMs: opts.sessionIdleTimeoutMs }
+            : {}),
+          ...(opts.permissionResponseTimeoutMs !== undefined
+            ? { permissionResponseTimeoutMs: opts.permissionResponseTimeoutMs }
+            : {}),
+          boundWorkspace: cwd,
+          sessionShellCommandEnabled,
+          childEnvOverrides,
+          channelFactory: wsChannelFactory,
+          onDiagnosticLine: diagnosticSink,
+          telemetry: createRuntimeBridgeTelemetry(wsHash),
+          ...(permissionPolicy !== undefined ? { permissionPolicy } : {}),
+          ...(permissionConsensusQuorum !== undefined
+            ? { permissionConsensusQuorum }
+            : {}),
+          permissionAudit: permissionAuditPublisher,
+          statusProvider: runtime.createDaemonStatusProvider({
+            env: wsEnv.effectiveEnv,
+          }),
+          fileSystem: createBridgeFileSystemAdapter(wsFsFactory),
+          persistApprovalMode: (workspace, mode) =>
+            withSettingsLock(workspace, async () => {
+              const fresh = settingsRuntime.settings.loadSettings(workspace);
+              fresh.setValue(
+                WORKSPACE_SETTING_SCOPE,
+                'tools.approvalMode',
+                mode,
+              );
+            }),
+        });
+      } catch (err) {
+        wsSubSessionLauncher.stop();
+        throw err;
+      }
+      wsBridgeRef = wsBridge;
+      let wsService: ReturnType<typeof runtime.createDaemonWorkspaceService>;
+      try {
+        wsService = runtime.createDaemonWorkspaceService({
+          boundWorkspace: cwd,
+          contextFilename: contextFilenameForInit ?? 'QWEN.md',
+          statusProvider: runtime.createDaemonStatusProvider({
+            env: wsEnv.effectiveEnv,
+          }),
+          workspaceProvidersStatusProvider:
+            runtime.createWorkspaceProvidersStatusProvider({
+              env: wsEnv.effectiveEnv,
+            }),
+          workspaceSkillsStatusProvider:
+            runtime.createWorkspaceSkillsStatusProvider(),
+          skillInstallEnv: wsEnv.effectiveEnv,
+          voiceEnv: wsEnv.effectiveEnv,
+          voiceSettingsScope: WORKSPACE_SETTING_SCOPE,
+          isChannelLive: () => wsBridge.isChannelLive(),
+          preheatAcpChild: () => wsBridge.preheat(),
+          persistDisabledTools: persistDisabledToolsFn,
+          persistDisabledSkills: persistDisabledSkillsFn,
+          persistSetting: persistSettingFn,
+          persistSettings: persistSettingsFn,
+          reloadDaemonEnv: (workspace) =>
+            withSettingsLock(workspace, async () => {
+              const fresh = settingsRuntime.settings.loadSettings(workspace, {
+                skipLoadEnvironment: true,
+              });
+              const result = settingsRuntime.settings.reloadEnvironment(
+                fresh.merged,
+                workspace,
+              );
+              // Mirror the startup secondary-workspace path: rebuild the runtime
+              // env snapshot and update the metadata so `.env` changes actually
+              // propagate to child processes spawned by this workspace's bridge.
+              try {
+                const refreshedRuntimeEnv =
+                  settingsRuntime.environment.buildRuntimeEnvironment(
+                    fresh.merged,
+                    workspace,
+                    daemonRuntimeBaseEnv,
+                  );
+                logRuntimeEnvFileReadFailures(workspace, refreshedRuntimeEnv);
+                wsEnv.replace(refreshedRuntimeEnv.effectiveEnv);
+                wsEnv.metadata.envFileReadFailed =
+                  refreshedRuntimeEnv.envFileReadFailed;
+                wsEnv.metadata.envFileReadFailures.splice(
+                  0,
+                  wsEnv.metadata.envFileReadFailures.length,
+                  ...refreshedRuntimeEnv.envFileReadFailures,
+                );
+                wsEnv.metadata.overlayKeys.splice(
+                  0,
+                  wsEnv.metadata.overlayKeys.length,
+                  ...refreshedRuntimeEnv.overlayKeys,
+                );
+                wsEnv.metadata.envFilePaths.splice(
+                  0,
+                  wsEnv.metadata.envFilePaths.length,
+                  ...refreshedRuntimeEnv.envFilePaths,
+                );
+                delete wsEnv.metadata.fallbackReason;
+              } catch (err) {
+                wsEnv.metadata.fallbackReason =
+                  err instanceof Error ? err.message : String(err);
+                daemonLog.warn(
+                  'failed to rebuild dynamic runtime env snapshot after daemon env reload; preserving previous runtime env',
+                  {
+                    workspace,
+                    error: wsEnv.metadata.fallbackReason,
+                  },
+                );
+              }
+              return result;
+            }),
+          queryWorkspaceStatus: (method, idle) =>
+            wsBridge.queryWorkspaceStatus(method, idle),
+          invokeWorkspaceCommand: (method, params, invokeOpts) =>
+            wsBridge.invokeWorkspaceCommand(method, params, invokeOpts),
+          refreshExtensionsForAllSessions: () =>
+            wsBridge.refreshExtensionsForAllSessions(),
+          publishWorkspaceEvent: (event) =>
+            wsBridge.publishWorkspaceEvent(event),
+        });
+      } catch (err) {
+        wsSubSessionLauncher.stop();
+        await wsBridge.shutdown().catch(() => {
+          try {
+            wsBridge.killAllSync();
+          } catch {
+            // Preserve the workspace-service construction error.
+          }
+        });
+        throw err;
+      }
+      // Register shared-array cleanup only after the runtime is fully built, so
+      // a throw during createDaemonWorkspaceService (or any later step) can't
+      // leave an orphaned bridge/channel in the shutdown arrays.
+      runtimeBridges.push(wsBridge);
+      internalRuntimeBridgesForCleanup.push(wsBridge);
+      subSessionStoppers.push(wsSubSessionLauncher.stop);
+      subSessionStoppersByWorkspace.set(cwd, wsSubSessionLauncher.stop);
+      return {
+        workspaceId: wsHash,
+        workspaceCwd: cwd,
+        primary: false,
+        trusted,
+        removable: true,
+        registrationIds: [],
+        env: wsEnv.metadata,
+        bridge: wsBridge,
+        workspaceService: wsService,
+        routeFileSystemFactory: wsFsFactory,
+        clientMcpSenderRegistry: wsClientMcpRegistry,
+      };
+    };
+
+    const workspaceRuntimeRemoval = {
+      async runtimeAdded(runtimeAdded: WorkspaceRuntime): Promise<void> {
+        const app = runtimeApp ?? runtimeAppForCleanup;
+        const startScheduledTaskKeepaliveForWorkspace = app?.locals?.[
+          'startScheduledTaskKeepaliveForWorkspace'
+        ] as ((runtime: WorkspaceRuntime) => void) | undefined;
+        startScheduledTaskKeepaliveForWorkspace?.(runtimeAdded);
+        if (!channelWorkerManager) return;
+        try {
+          await channelWorkerManager.restoreWorkspace(
+            runtimeAdded.workspaceCwd,
+          );
+          await channelWorkerManager.refreshWorkspaces();
+        } catch (err) {
+          daemonLog.error(
+            'workspace channel worker startup error',
+            err instanceof Error ? err : null,
+          );
+        } finally {
+          writeChannelWorkerPidfile();
+        }
+      },
+      beginDrain(runtimeToDrain: WorkspaceRuntime): void {
+        totalSessionAdmission.beginWorkspaceDrain(runtimeToDrain.workspaceCwd);
+        channelWorkerManager?.beginWorkspaceDrain(runtimeToDrain.workspaceCwd);
+        workspaceVoiceCoordinator.beginWorkspaceDrain(runtimeToDrain);
+      },
+      cancelDrain(runtimeToDrain: WorkspaceRuntime): void {
+        channelWorkerManager?.cancelWorkspaceDrain(runtimeToDrain.workspaceCwd);
+        totalSessionAdmission.cancelWorkspaceDrain(runtimeToDrain.workspaceCwd);
+        workspaceVoiceCoordinator.cancelWorkspaceDrain(runtimeToDrain);
+      },
+      completeDrain(runtimeToDrain: WorkspaceRuntime): void {
+        totalSessionAdmission.completeWorkspaceDrain(
+          runtimeToDrain.workspaceCwd,
+        );
+        workspaceVoiceCoordinator.completeWorkspaceDrain(runtimeToDrain);
+      },
+      getActivity(runtimeToDrain: WorkspaceRuntime) {
+        return {
+          pendingSessionStarts: totalSessionAdmission.snapshotForWorkspace(
+            runtimeToDrain.workspaceCwd,
+          ).inFlight,
+          channelWorkers:
+            channelWorkerManager?.workspaceActivity(
+              runtimeToDrain.workspaceCwd,
+            ) ?? 0,
+          voiceSessions:
+            workspaceVoiceCoordinator.getWorkspaceActivity(runtimeToDrain),
+        };
+      },
+      disposeRuntime(
+        runtimeToDrain: WorkspaceRuntime,
+        reason: 'daemon_shutdown' | 'workspace_removed' = 'workspace_removed',
+      ): Promise<void> {
+        const existing = runtimeCleanupPromises.get(runtimeToDrain);
+        if (existing) return existing;
+        const cleanup = (async () => {
+          await workspaceVoiceCoordinator.disposeRuntime(
+            runtimeToDrain,
+            reason,
+          );
+          const stopSubSessions = subSessionStoppersByWorkspace.get(
+            runtimeToDrain.workspaceCwd,
+          );
+          try {
+            stopSubSessions?.();
+          } catch {
+            // Continue to bridge teardown.
+          }
+          if (reason === 'workspace_removed' && channelWorkerManager) {
+            await channelWorkerManager
+              .removeWorkspace(runtimeToDrain.workspaceCwd)
+              .catch((err) => {
+                daemonLog.error(
+                  'workspace channel worker cleanup error',
+                  err instanceof Error ? err : null,
+                );
+              });
+            try {
+              await channelWorkerManager.refreshWorkspaces();
+            } catch (err) {
+              channelWorkspaceGroups = (channelWorkspaceGroups ?? []).filter(
+                (group) => group.workspaceCwd !== runtimeToDrain.workspaceCwd,
+              );
+              channelWebhookConfigVersion += 1;
+              refreshChannelWebhookConfigs?.();
+              daemonLog.error(
+                'workspace channel worker topology refresh error',
+                err instanceof Error ? err : null,
+              );
+            }
+            writeChannelWorkerPidfile();
+          }
+          if (reason === 'workspace_removed') {
+            const app = runtimeApp ?? runtimeAppForCleanup;
+            const stopWorkspaceGitStateForWorkspace = app?.locals?.[
+              'stopWorkspaceGitStateForWorkspace'
+            ] as ((workspaceCwd: string) => void) | undefined;
+            const stopScheduledTaskKeepaliveForWorkspace = app?.locals?.[
+              'stopScheduledTaskKeepaliveForWorkspace'
+            ] as ((workspaceCwd: string) => void) | undefined;
+            stopWorkspaceGitStateForWorkspace?.(runtimeToDrain.workspaceCwd);
+            stopScheduledTaskKeepaliveForWorkspace?.(
+              runtimeToDrain.workspaceCwd,
+            );
+          }
+          let bridgeStopped = false;
+          try {
+            if (!shutdownBridges.has(runtimeToDrain.bridge)) {
+              await runtimeToDrain.bridge.shutdown({ reason });
+            }
+            bridgeStopped = true;
+          } finally {
+            if (bridgeStopped || reason === 'workspace_removed') {
+              subSessionStoppersByWorkspace.delete(runtimeToDrain.workspaceCwd);
+              if (stopSubSessions) {
+                removeArrayValue(subSessionStoppers, stopSubSessions);
+              }
+              removeArrayValue(runtimeBridges, runtimeToDrain.bridge);
+              removeArrayValue(
+                internalRuntimeBridgesForCleanup,
+                runtimeToDrain.bridge,
+              );
+              shutdownBridges.add(runtimeToDrain.bridge);
+            }
+          }
+        })();
+        runtimeCleanupPromises.set(runtimeToDrain, cleanup);
+        void cleanup.catch(() => {
+          if (
+            reason === 'daemon_shutdown' &&
+            runtimeCleanupPromises.get(runtimeToDrain) === cleanup
+          ) {
+            runtimeCleanupPromises.delete(runtimeToDrain);
+          }
+        });
+        return cleanup;
+      },
+    };
+
     const app = runtime.createServeApp(opts, () => actualPort, {
+      workspaceRegistry,
+      createWorkspaceRuntime: createDynamicWorkspaceRuntime,
+      workspaceRegistrationStore,
+      workspaceRuntimeRemoval,
+      voiceCoordinator: workspaceVoiceCoordinator,
       bridge,
       webShellDir,
       boundWorkspace,
       HopCodeVersion: resolvedCliVersion,
       startup,
-      fsFactory: runtime.resolveBridgeFsFactory({
-        // REST routes still return primary-relative paths, so keep their
-        // filesystem boundary primary-only until responses carry root IDs.
-        boundWorkspaces: [boundWorkspace],
-        trusted: trustedWorkspace,
-        emit: deps.fsAuditEmit,
-        pathLocks: sharedPathLocks,
-        ...(customIgnoreFiles !== undefined ? { customIgnoreFiles } : {}),
-      }),
+      // The real long-running daemon keeps scheduled-task sessions resident
+      // (keepalive) and reloads them on boot (rehydration). Off by default so
+      // direct createServeApp embeds/tests don't spawn sessions.
+      manageScheduledTaskSessions: true,
+      fsFactory: routeFsFactory,
+      primaryWorkspaceTrusted: trustedWorkspace,
+      primaryRuntimeEnv,
+      daemonEnv: daemonRuntimeBaseEnv,
       daemonLog,
       getChannelWorkerSnapshot,
+      getChannelWorkerSnapshots,
+      getChannelWorkerControl,
+      isChannelControlDraining: () => channelControlDraining,
+      isChannelControlInitializing: () =>
+        channelWorkerManagerStarting !== undefined,
+      setChannelWorkerSelection,
+      stopChannelWorker,
+      getChannelWebhookConfigSources,
+      getChannelWebhookConfigVersion: () => channelWebhookConfigVersion,
+      registerChannelWebhookConfigRefresh: (refresh) => {
+        refreshChannelWebhookConfigs = refresh;
+      },
+      enqueueChannelWebhookTask: async (task) => {
+        if (!channelWorkerManager) {
+          throw new ChannelWebhookEnqueueError(
+            'channel_worker_unavailable',
+            'Channel worker is not running.',
+          );
+        }
+        return channelWorkerManager.enqueueWebhookTask(task);
+      },
+      reloadChannelWorker,
       getPerfSnapshot: () => ({
         eventLoop: currentDaemonEventLoopMonitor.snapshot(),
         promptQueueWait: {
@@ -2556,6 +4365,7 @@ export async function runHopCodeServe(
         },
       }),
       getMetricsSeries: () => metricsRing.snapshot(),
+      getTotalSessionAdmissionSnapshot: totalSessionAdmission.snapshot,
       recordDaemonRequest: (durationMs, statusCode) =>
         metricsRing.recordRequest(durationMs, statusCode),
       workspace: workspaceService,
@@ -2563,8 +4373,13 @@ export async function runHopCodeServe(
       // so the WS provider and the child-answering bridge share one sender map.
       clientMcpSenderRegistry,
       persistDisabledTools: persistDisabledToolsFn,
+      persistDisabledSkills: persistDisabledSkillsFn,
       persistSetting: persistSettingFn,
       persistSettings: persistSettingsFn,
+      sessionArtifactsPersistenceAvailable:
+        sessionArtifactsPersistenceAvailableFromSettings(
+          runtimeBootSettings?.merged,
+        ),
       installAuthProvider: (req) =>
         withSettingsLock(
           boundWorkspace,
@@ -2610,15 +4425,30 @@ export async function runHopCodeServe(
           },
         ),
     });
+    invalidatePrimaryServeFeaturesCache =
+      (
+        app.locals as {
+          invalidateServeFeaturesCache?: () => void;
+        }
+      ).invalidateServeFeaturesCache ?? invalidatePrimaryServeFeaturesCache;
+    // Park the sub-session launcher's stop on app.locals so the close handler
+    // can flip it off before tearing down the bridge it spawns into (symmetric
+    // with stopScheduledTaskKeepalive). Defensive: a launch during drain would
+    // otherwise just fail its spawnOrAttach against the shutting-down bridge.
+    (
+      app.locals as { subSessionStoppers?: Array<() => void> }
+    ).subSessionStoppers = subSessionStoppers;
+    subSessionStoppers.push(subSessionLauncher.stop);
+    subSessionStoppersByWorkspace.set(boundWorkspace, subSessionLauncher.stop);
     return { app, bridge };
   };
 
   if (deps.bridge) {
     const runtime = await buildRuntime();
     runtimeAppForCleanup = runtime.app;
-    runtimeApp = runtime.app;
     bridgeRef = runtime.bridge;
     if (!opts.channelSelection) {
+      runtimeApp = runtime.app;
       runtimeStartupSettled = true;
       markRuntimeReady();
     }
@@ -2634,20 +4464,31 @@ export async function runHopCodeServe(
     daemonLog,
     HopCodeVersion: cliVersion,
     sessionShellCommandEnabled,
+    sessionArtifactsPersistenceAvailable,
     permissionPolicy,
+    multiWorkspaceCapabilitiesRequireRuntime: workspaceInputs.length > 1,
     getRuntimeError: () => runtimeStartupError,
     getChannelWorkerSnapshot,
+    getChannelWorkerSnapshots,
     onHealthServed: deferRuntimeUntilFirstHealth
       ? () => startRuntimeAfterHealth?.()
       : undefined,
   });
+  const deferredChannelWebhookAuth = deferRuntimeUntilFirstHealth
+    ? createDeferredChannelWebhookAuth(
+        resolveChannelWebhookConfigSource,
+        await loadChannelWebhookConfigRuntime(),
+        daemonLog,
+      )
+    : undefined;
   const app =
     runtimeApp ??
     createDelegatingServeApp(bootstrapApp, () => runtimeApp, {
       waitForDeferredRuntimeRoutes: deferRuntimeUntilFirstHealth,
-      startRuntime: () => startRuntimeForRequest?.(),
+      startRuntime: () => startRuntimeForRequest?.() ?? false,
       runtimeReady,
       authenticateDeferredRuntimeRequest: bearerAuth(opts.token),
+      authenticateDeferredChannelWebhookRequest: deferredChannelWebhookAuth,
     });
 
   // Node's `app.listen()` wants the unbracketed IPv6 literal (`::1`) but
@@ -2698,7 +4539,83 @@ export async function runHopCodeServe(
     );
   }
 
-  reserveChannelServicePidfile();
+  const channelValidationSettingsRuntime = opts.channelSelection
+    ? await loadSettingsRuntimeModules()
+    : undefined;
+  const resolveChannelWorkspaceGroupsAtListen = () => {
+    if (
+      !opts.channelSelection ||
+      !channelValidationSettingsRuntime ||
+      !channelRuntime
+    ) {
+      return undefined;
+    }
+    const settingsByWorkspace = new Map<
+      string,
+      ReturnType<SettingsRuntime['loadSettings']>
+    >();
+    if (workspaceInputs.length === 1) {
+      const workspace = workspaceInputs[0]!;
+      const settings = channelValidationSettingsRuntime.settings.loadSettings(
+        workspace.cwd,
+      );
+      channelWebhookEnvByWorkspace.set(
+        workspace.cwd,
+        channelValidationSettingsRuntime.environment.buildRuntimeEnvironment(
+          settings.merged,
+          workspace.cwd,
+          daemonRuntimeBaseEnv,
+        ).effectiveEnv,
+      );
+      return undefined;
+    }
+    const workspaces = workspaceInputs.map((workspace, index) => {
+      const settings = channelValidationSettingsRuntime.settings.loadSettings(
+        workspace.cwd,
+      );
+      settingsByWorkspace.set(workspace.cwd, settings);
+      channelWebhookEnvByWorkspace.set(
+        workspace.cwd,
+        channelValidationSettingsRuntime.environment.buildRuntimeEnvironment(
+          settings.merged,
+          workspace.cwd,
+          daemonRuntimeBaseEnv,
+        ).effectiveEnv,
+      );
+      const trusted =
+        index === 0 && deps.trustedWorkspace !== undefined
+          ? deps.trustedWorkspace
+          : channelValidationSettingsRuntime.trustedFolders.getWorkspaceTrustStatus(
+              settings.merged,
+              workspace.cwd,
+            ).effective.state === 'trusted';
+      return {
+        workspaceCwd: workspace.cwd,
+        primary: index === 0,
+        trusted,
+      };
+    });
+    const grouping = resolveChannelWorkspaceGroups({
+      workspaces,
+      selection: opts.channelSelection,
+      loadChannelsConfig: (cwd) => {
+        const settings = settingsByWorkspace.get(cwd);
+        if (!settings) return {};
+        return channelRuntime!.loadChannelsConfig(cwd, settings);
+      },
+    });
+    if (!grouping.ok) {
+      throw Object.assign(new Error(grouping.error.message), {
+        code: grouping.error.code,
+        ...(grouping.error.channel ? { channel: grouping.error.channel } : {}),
+      });
+    }
+    return grouping.groups;
+  };
+
+  if (opts.channelSelection) {
+    reserveChannelServicePidfile(opts.channelSelection);
+  }
 
   return await new Promise<RunHandle>((resolve, reject) => {
     // When TLS is configured, wrap the Express app in an HTTPS listener
@@ -2745,57 +4662,34 @@ export async function runHopCodeServe(
       const scheme = tlsOptions ? 'https' : 'http';
       const url = `${scheme}://${formatHostForUrl(opts.hostname)}:${actualPort}`;
       try {
-        if (opts.channelSelection) {
-          const createSupervisor =
-            deps.channelWorkerSupervisorFactory ??
-            channelRuntime?.createChannelWorkerSupervisor;
-          if (!createSupervisor) {
-            throw new Error(
-              'Channel worker supervisor runtime is not available.',
-            );
-          }
-          channelWorker = createSupervisor({
-            cliEntryPath: findCliEntryPath(),
-            daemonUrl: formatChannelWorkerDaemonUrl(opts.hostname, actualPort),
-            ...(token ? { daemonToken: token } : {}),
-            workspace: boundWorkspace,
-            selection: opts.channelSelection,
-            onReady: (snapshot) => {
-              writeChannelWorkerPidfile(snapshot);
-            },
-            onLog: ({ stream, line }) => {
-              const message = `channel worker ${stream}: ${line}`;
-              if (stream === 'stderr') {
-                daemonLog.warn(message);
-              } else {
-                daemonLog.info(message);
-              }
-            },
-            onExit: (snapshot) => {
-              daemonLog.warn(
-                `channel worker exited (state=${snapshot.state}, pid=${snapshot.pid ?? 'unknown'}, ` +
-                  `code=${snapshot.exitCode ?? 'null'}, signal=${snapshot.signal ?? 'null'}, ` +
-                  `error=${snapshot.error ?? 'none'}, restartCount=${snapshot.restartCount ?? 0}, ` +
-                  `nextRestartAt=${snapshot.nextRestartAt ?? 'none'}, ` +
-                  `staleHeartbeatAt=${snapshot.staleHeartbeatAt ?? 'none'})`,
-              );
-              writeChannelWorkerPidfile(snapshot, { clearWorkerPid: true });
-            },
-          });
-        }
+        channelWorkspaceGroups = resolveChannelWorkspaceGroupsAtListen();
       } catch (err) {
         removeCurrentServePidfile();
         const error = err instanceof Error ? err : new Error(String(err));
         server.close((closeErr) => {
           if (closeErr) {
             daemonLog.error(
-              'server close after channel worker setup error failed',
+              'server close after channel worker validation error failed',
               closeErr,
             );
           }
           reject(error);
         });
         return;
+      }
+      if (channelWorkspaceGroups) {
+        for (const group of channelWorkspaceGroups) {
+          daemonLog.info('channel worker group assigned', {
+            workspace: group.workspaceCwd,
+            channels:
+              group.selection.mode === 'all' ? ['all'] : group.selection.names,
+          });
+        }
+        if (opts.channelSelection?.mode === 'all') {
+          writeStderrLine(
+            'qwen serve: --channel all is primary-workspace only; non-primary workspace channels are not hosted.',
+          );
+        }
       }
       writeStdoutLine(
         `hopcode serve listening on ${url} (mode=${opts.mode}, ` +
@@ -2884,6 +4778,8 @@ export async function runHopCodeServe(
         bridge: AcpSessionBridge | undefined,
       ): Promise<void> => {
         if (!bridge || deps.bridge) return;
+        if (shutdownBridges.has(bridge)) return;
+        shutdownBridges.add(bridge);
         try {
           await bridge.shutdown();
         } catch (shutdownErr) {
@@ -2897,24 +4793,33 @@ export async function runHopCodeServe(
           }
         }
       };
-      const stopChannelWorkerAfterFailedStartup = async (): Promise<void> => {
-        await channelWorker.stop().catch((stopErr) => {
-          daemonLog.error(
-            'channel worker stop after runtime startup error failed',
-            stopErr instanceof Error ? stopErr : null,
-          );
-        });
-      };
+      const stopChannelWorkerAfterFailedStartup =
+        async (): Promise<boolean> => {
+          if (!channelWorkerManager) return true;
+          try {
+            await channelWorkerManager.shutdown();
+            return true;
+          } catch (stopErr) {
+            daemonLog.error(
+              'channel worker stop after runtime startup error failed',
+              stopErr instanceof Error ? stopErr : null,
+            );
+            return false;
+          }
+        };
       const failRuntimeStartup = async (
         err: unknown,
         bridgeForCleanup?: AcpSessionBridge,
       ): Promise<void> => {
         const error = err instanceof Error ? err : new Error(String(err));
         if (runtimeStartupSettled) {
+          disposeRuntimeAppResources(runtimeApp ?? runtimeAppForCleanup);
           await shutdownBridgeAfterFailedStartup(bridgeForCleanup);
           return;
         }
         runtimeStartupSettled = true;
+        disposeRuntimeAppResources(runtimeApp ?? runtimeAppForCleanup);
+        runtimeApp = undefined;
         clearRuntimeStartupTimer();
         const message = error.message;
         runtimeStartupError = message;
@@ -2927,11 +4832,31 @@ export async function runHopCodeServe(
         }
         writeStderrLine(`hopcode serve: runtime startup failed: ${message}`);
         daemonLog.error('runtime startup failed', error);
-        await stopChannelWorkerAfterFailedStartup();
-        disposeDaemonEventLoopMonitor();
-        removeCurrentServePidfile();
-        await shutdownBridgeAfterFailedStartup(bridgeForCleanup ?? bridgeRef);
         markRuntimeFailed(error);
+        if (closeServerAfterChannelWorkerStartupFailure && server.listening) {
+          runtimeFailureListenerClose = new Promise((resolve) => {
+            server.close((closeErr) => {
+              if (closeErr) {
+                daemonLog.error(
+                  'server close after runtime startup error failed',
+                  closeErr,
+                );
+              }
+              resolve();
+            });
+          });
+          server.closeAllConnections();
+        }
+        const channelWorkerStopped =
+          await stopChannelWorkerAfterFailedStartup();
+        disposeDaemonEventLoopMonitor();
+        if (channelWorkerStopped) removeCurrentServePidfile();
+        const bridgesForCleanup = bridgeForCleanup
+          ? [bridgeForCleanup, ...getRuntimeBridgesForCleanup()]
+          : getRuntimeBridgesForCleanup();
+        for (const bridge of [...new Set(bridgesForCleanup)]) {
+          await shutdownBridgeAfterFailedStartup(bridge);
+        }
       };
       const armRuntimeStartupTimer = (): void => {
         if (runtimeStartupTimeoutMs <= 0 || runtimeStartupTimer) return;
@@ -2944,10 +4869,186 @@ export async function runHopCodeServe(
         }, runtimeStartupTimeoutMs);
         runtimeStartupTimer.unref();
       };
-      const completeRuntimeStartup = async (): Promise<void> => {
+      const resolveRuntimeChannelGroups = async (
+        channelSelection: ServeChannelSelection,
+        candidateApp: Application,
+        operation: 'initial' | 'set' | 'reload',
+      ): Promise<readonly ChannelWorkspaceGroup[]> => {
+        const registry = candidateApp.locals?.['workspaceRegistry'] as
+          | WorkspaceRegistry
+          | undefined;
+        if (!registry) {
+          throw new Error(
+            'Workspace registry is not available for channel workers.',
+          );
+        }
+        const runtimes = registry.list();
+        if (runtimes.length <= 1 && operation === 'initial') {
+          return [
+            {
+              workspaceCwd: registry.primary.workspaceCwd,
+              selection: channelSelection,
+            },
+          ];
+        }
+        const workerRuntime = await ensureChannelRuntime();
+        const settingsRuntime = await loadSettingsRuntimeModules();
+        const settingsByWorkspace = new Map<
+          string,
+          ReturnType<SettingsRuntime['loadSettings']>
+        >();
+        const grouping = resolveChannelWorkspaceGroups({
+          workspaces: runtimes.map((runtime) => {
+            const settings = settingsRuntime.settings.loadSettings(
+              runtime.workspaceCwd,
+            );
+            settingsByWorkspace.set(runtime.workspaceCwd, settings);
+            return {
+              workspaceCwd: runtime.workspaceCwd,
+              primary: runtime.primary,
+              trusted: runtime.trusted,
+            };
+          }),
+          selection: channelSelection,
+          loadChannelsConfig: (cwd) => {
+            const settings = settingsByWorkspace.get(cwd);
+            return settings
+              ? workerRuntime.loadChannelsConfig(cwd, settings)
+              : {};
+          },
+        });
+        if (!grouping.ok) {
+          throw Object.assign(new Error(grouping.error.message), {
+            code: grouping.error.code,
+            ...(grouping.error.channel
+              ? { channel: grouping.error.channel }
+              : {}),
+          });
+        }
+        return grouping.groups;
+      };
+
+      ensureChannelWorkerManager = (): Promise<ChannelWorkerManager> => {
+        if (channelWorkerManager) return Promise.resolve(channelWorkerManager);
+        if (channelWorkerManagerStarting) return channelWorkerManagerStarting;
+        const starting = (async () => {
+          const candidateApp = runtimeApp ?? runtimeAppForCleanup;
+          const registry = candidateApp?.locals?.['workspaceRegistry'] as
+            | WorkspaceRegistry
+            | undefined;
+          if (!candidateApp || !registry) {
+            throw new Error(
+              'Workspace registry is not available for channels.',
+            );
+          }
+          const workerRuntime = await ensureChannelRuntime();
+          const createSupervisor =
+            deps.channelWorkerSupervisorFactory ??
+            workerRuntime.createChannelWorkerSupervisor;
+          const createGroup = (groups: readonly ChannelWorkspaceGroup[]) =>
+            workerRuntime.createChannelWorkerGroup({
+              groups,
+              registry,
+              createSupervisor,
+              shared: {
+                cliEntryPath: workerRuntime.findCliEntryPath(),
+                daemonUrl: formatChannelWorkerDaemonUrl(
+                  opts.hostname,
+                  actualPort,
+                ),
+                ...(token ? { daemonToken: token } : {}),
+              },
+              onReady: (snapshot) => {
+                if (runtimeStartupError !== undefined) return;
+                if (workspaceInputs.length > 1) {
+                  daemonLog.info('channel worker ready', {
+                    workspace: snapshot.workspaceCwd,
+                    pid: snapshot.pid,
+                    channels: snapshot.channels,
+                  });
+                }
+                channelWorkerManager?.workerChanged();
+                if (!runtimeStartupSettled) writeChannelWorkerPidfile();
+              },
+              onExit: (snapshot) => {
+                const workspacePrefix =
+                  workspaceInputs.length > 1
+                    ? `workspace=${snapshot.workspaceCwd}, `
+                    : '';
+                daemonLog.warn(
+                  `channel worker exited (${workspacePrefix}state=${snapshot.state}, pid=${snapshot.pid ?? 'unknown'}, ` +
+                    `code=${snapshot.exitCode ?? 'null'}, signal=${snapshot.signal ?? 'null'}, ` +
+                    `error=${snapshot.error ?? 'none'}, restartCount=${snapshot.restartCount ?? 0}, ` +
+                    `nextRestartAt=${snapshot.nextRestartAt ?? 'none'}, ` +
+                    `staleHeartbeatAt=${snapshot.staleHeartbeatAt ?? 'none'})`,
+                );
+                channelWorkerManager?.workerChanged();
+                if (!runtimeStartupSettled) writeChannelWorkerPidfile();
+              },
+              onStateChange: () => {
+                channelWorkerManager?.workerChanged();
+                if (!runtimeStartupSettled) writeChannelWorkerPidfile();
+              },
+              onLog: ({ stream, line, workspaceCwd }) => {
+                const message =
+                  workspaceInputs.length > 1
+                    ? `channel worker [${workspaceCwd}] ${stream}: ${line}`
+                    : `channel worker ${stream}: ${line}`;
+                if (stream === 'stderr') daemonLog.warn(message);
+                else daemonLog.info(message);
+              },
+            });
+          channelWorkerManager = workerRuntime.createChannelWorkerManager({
+            resolveGroups: (selection, operation) =>
+              resolveRuntimeChannelGroups(selection, candidateApp, operation),
+            createGroup,
+            reserveLease: reserveChannelServicePidfile,
+            releaseLease: () => {
+              removeCurrentServePidfile();
+              if (channelPidfileReserved) {
+                throw new Error('Failed to release the channel service lease.');
+              }
+            },
+            initialLeaseReserved: channelPidfileReserved,
+            onCommittedSelection: (_selection, groups) => {
+              channelWorkspaceGroups = groups;
+              channelWebhookConfigVersion += 1;
+              refreshChannelWebhookConfigs?.();
+            },
+            onStateChange: () => {
+              if (runtimeStartupSettled) writeChannelWorkerPidfile();
+            },
+          });
+          return channelWorkerManager;
+        })();
+        channelWorkerManagerStarting = starting;
+        void starting.then(
+          () => {
+            if (channelWorkerManagerStarting === starting) {
+              channelWorkerManagerStarting = undefined;
+            }
+          },
+          () => {
+            if (channelWorkerManagerStarting === starting) {
+              channelWorkerManagerStarting = undefined;
+            }
+          },
+        );
+        return starting;
+      };
+      const completeRuntimeStartup = async (
+        candidateApp: Application,
+      ): Promise<void> => {
         if (runtimeStartupSettled) return;
+        runtimeApp = candidateApp;
+        const acpHandle = candidateApp.locals?.['acpHandle'] as
+          | AcpHttpHandle
+          | undefined;
+        acpHandle?.attachServer?.(server);
         if (opts.channelSelection) {
-          await channelWorker.start();
+          closeServerAfterChannelWorkerStartupFailure = true;
+          const manager = await ensureChannelWorkerManager!();
+          await manager.startInitial(opts.channelSelection);
           if (runtimeStartupSettled) return;
         }
         if (runtimeStartupSettled) return;
@@ -2978,14 +5079,15 @@ export async function runHopCodeServe(
             );
           });
       };
-      const startRuntime = (): void => {
-        if (runtimeStarting) return;
+      const startRuntime = (): boolean => {
+        if (runtimeStarting) return false;
         armRuntimeStartupTimer();
         clearRuntimeStartAfterHealthTimer();
         clearRuntimeStartFallbackTimer();
         runtimeStarting = buildRuntime()
           .then(async (runtime) => {
             if (runtimeStartupSettled) {
+              disposeRuntimeAppResources(runtime.app);
               await shutdownBridgeAfterFailedStartup(runtime.bridge);
               return;
             }
@@ -2998,17 +5100,13 @@ export async function runHopCodeServe(
               );
               return;
             }
-            runtimeApp = runtime.app;
-            const acpHandle = runtime.app.locals?.['acpHandle'] as
-              | AcpHttpHandle
-              | undefined;
-            acpHandle?.attachServer?.(server);
             if (shouldPreheat) {
               startBridgePreheat(runtime.bridge);
             }
-            await completeRuntimeStartup();
+            await completeRuntimeStartup(runtime.app);
           })
           .catch((err) => failRuntimeStartup(err));
+        return true;
       };
       startRuntimeForRequest = startRuntime;
       const scheduleRuntimeStartFallback = (): void => {
@@ -3059,32 +5157,51 @@ export async function runHopCodeServe(
           // `hopcode` processes in the operator's `ps` output.
           daemonLog.warn(`received ${signal} during drain — forcing exit`);
           try {
-            channelWorker.killAllSync();
-            bridgeRef?.killAllSync();
-            removeCurrentServePidfile();
+            channelWorkerManager?.killAllSync();
+            for (const runtimeBridge of getRuntimeBridgesForCleanup()) {
+              runtimeBridge.killAllSync();
+            }
           } catch (err) {
             daemonLog.error(
               'force-kill error',
               err instanceof Error ? err : null,
             );
           }
-          await daemonLog.flush().catch(() => {});
+          await flushDaemonLogBounded(
+            daemonLog,
+            DAEMON_LOG_FORCED_FLUSH_BUDGET_MS,
+          );
           process.exit(1);
           return;
+        }
+        if (!loggerPublished) {
+          loggerSignalOwned = true;
+          loggerLifecycle.signalOwned();
         }
         daemonLog.warn(`received ${signal}, draining`);
         try {
           await handle.close();
-          await daemonLog.flush();
-          process.exit(0);
+          process.exit(runtimeStartupError === undefined ? 0 : 1);
         } catch (err) {
           daemonLog.error('shutdown error', err instanceof Error ? err : null);
-          await daemonLog.flush().catch(() => {});
+          if (channelWorkerManager?.state().enabled) {
+            daemonLog.error(
+              'refusing to exit while a channel worker or service lease remains; signal again to retry after the child exits (another signal during that retry forces exit)',
+            );
+            return;
+          }
+          await flushDaemonLogBounded(
+            daemonLog,
+            DAEMON_LOG_FORCED_FLUSH_BUDGET_MS,
+          );
           process.exit(1);
         }
       };
       const onUncaughtExceptionMonitor = () => {
-        if (process.listenerCount('uncaughtException') === 0) {
+        if (
+          process.listenerCount('uncaughtException') === 0 &&
+          !channelWorkerManager?.state().enabled
+        ) {
           removeCurrentServePidfile();
         }
       };
@@ -3105,6 +5222,16 @@ export async function runHopCodeServe(
           if (closePromise) return closePromise;
           closePromise = new Promise<void>((res, rej) => {
             shuttingDown = true;
+            channelControlDraining = true;
+            const initiallyMountedApp = runtimeApp ?? runtimeAppForCleanup;
+            const initiallyMountedManagement = initiallyMountedApp?.locals?.[
+              'workspaceManagementHandle'
+            ] as { sealAndWait?: () => Promise<void> } | undefined;
+            // Calling an async function runs through its first await
+            // synchronously. Seal an already-mounted runtime before close()
+            // yields so no management request can enter the shutdown window.
+            const initialManagementWait =
+              initiallyMountedManagement?.sealAndWait?.();
             clearRuntimeStartAfterHealthTimer();
             clearRuntimeStartFallbackTimer();
             cancelDeferredRuntimeStartup();
@@ -3141,11 +5268,23 @@ export async function runHopCodeServe(
             // drained" — propagating the failure lets `onSignal`
             // exit 1 instead of 0, and lets embedders react.
             let bridgeShutdownError: Error | undefined;
+            let channelWorkerShutdownError: Error | undefined;
             const finish = (err?: Error | null) => {
               if (settled) return;
               settled = true;
-              process.removeListener('SIGINT', onSignal);
-              process.removeListener('SIGTERM', onSignal);
+              const accessLogController = (
+                (runtimeApp ?? runtimeAppForCleanup)?.locals as
+                  | AccessLogAppLocals
+                  | undefined
+              )?.[ACCESS_LOG_CONTROLLER_LOCAL];
+              accessLogController?.sealAndFlushSuppressed();
+              const preserveSignalHandlers =
+                channelWorkerShutdownError !== undefined &&
+                channelWorkerManager?.state().enabled === true;
+              if (!preserveSignalHandlers) {
+                process.removeListener('SIGINT', onSignal);
+                process.removeListener('SIGTERM', onSignal);
+              }
               process.removeListener(
                 'uncaughtExceptionMonitor',
                 onUncaughtExceptionMonitor,
@@ -3164,12 +5303,32 @@ export async function runHopCodeServe(
                     }`,
                   );
                 })
-                .finally(() => daemonLog.flush().catch(() => {}))
-                .finally(() => {
+                .finally(async () => {
                   // Server.close error takes precedence (operator-visible
                   // listener problem); fall back to the bridge error
                   // captured during shutdown if any.
-                  const finalErr = err ?? bridgeShutdownError;
+                  const finalErr =
+                    err ?? bridgeShutdownError ?? channelWorkerShutdownError;
+                  const retryableChannelClose =
+                    channelWorkerShutdownError !== undefined &&
+                    channelWorkerManager?.state().enabled === true;
+                  if (retryableChannelClose) {
+                    await flushDaemonLogBounded(
+                      daemonLog,
+                      DAEMON_LOG_FORCED_FLUSH_BUDGET_MS,
+                    );
+                    closePromise = undefined;
+                    shuttingDown = false;
+                    channelControlDraining = false;
+                    rej(finalErr);
+                    return;
+                  }
+                  if (loggerPublished || loggerSignalOwned) {
+                    writeDaemonLifecycleBestEffort(() =>
+                      daemonLog.info('daemon stopped'),
+                    );
+                    await daemonLog.close();
+                  }
                   if (finalErr) rej(finalErr);
                   else res();
                 });
@@ -3196,60 +5355,67 @@ export async function runHopCodeServe(
                   daemonLog,
                 );
                 const appForCleanup = runtimeApp ?? runtimeAppForCleanup;
-                // Dispose the device-flow registry FIRST so any
-                // in-flight IdP poll is cancelled and timers are cleared
-                // before the bridge tear-down (which would otherwise race
-                // with the still-polling registry on shared HTTP agents).
-                const deviceFlowRegistry = appForCleanup
-                  ? getDeviceFlowRegistry(appForCleanup)
-                  : undefined;
-                if (deviceFlowRegistry) {
-                  try {
-                    deviceFlowRegistry.dispose();
-                  } catch (err) {
-                    daemonLog.warn(
-                      `device-flow registry dispose error: ${
-                        err instanceof Error ? err.message : String(err)
-                      }`,
-                    );
-                  }
+                const workspaceManagementHandle = appForCleanup?.locals?.[
+                  'workspaceManagementHandle'
+                ] as { sealAndWait?: () => Promise<void> } | undefined;
+                await initialManagementWait;
+                if (workspaceManagementHandle !== initiallyMountedManagement) {
+                  await workspaceManagementHandle?.sealAndWait?.();
                 }
-                // Dispose ACP handle (close WebSocketServer + send close frames).
-                const acpHandle = appForCleanup?.locals?.['acpHandle'] as
-                  | AcpHttpHandle
-                  | undefined;
-                if (acpHandle?.dispose) {
-                  try {
-                    acpHandle.dispose();
-                  } catch (err) {
-                    daemonLog.warn(
-                      `ACP handle dispose error: ${
-                        err instanceof Error ? err.message : String(err)
-                      }`,
-                    );
-                  }
-                }
-                // Dispose rate limiter (clear GC timer + buckets).
-                const rl = appForCleanup
-                  ? getRateLimiter(appForCleanup)
-                  : undefined;
-                if (rl) {
-                  rl.setDraining(true);
-                  rl.dispose();
-                }
+                disposeRuntimeAppResources(appForCleanup);
                 disposeDaemonEventLoopMonitor();
                 // The worker owns daemon-backed sessions; disconnect it before
                 // tearing down the ACP bridge it is attached to.
-                await channelWorker.stop().catch((err) => {
-                  daemonLog.error(
-                    'channel worker stop error',
-                    err instanceof Error ? err : null,
+                if (channelWorkerManager) {
+                  await channelWorkerManager.shutdown().catch((err) => {
+                    daemonLog.error(
+                      'channel worker stop error',
+                      err instanceof Error ? err : null,
+                    );
+                    channelWorkerShutdownError =
+                      err instanceof Error ? err : new Error(String(err));
+                  });
+                } else {
+                  removeCurrentServePidfile();
+                }
+                const runtimeRemoval = appForCleanup?.locals?.[
+                  'workspaceRuntimeRemoval'
+                ] as WorkspaceRuntimeRemovalController | undefined;
+                const workspaceRegistry = appForCleanup?.locals?.[
+                  'workspaceRegistry'
+                ] as WorkspaceRegistry | undefined;
+                const managedRuntimeBridges = new Set<AcpSessionBridge>();
+                if (runtimeRemoval && workspaceRegistry) {
+                  const managedRuntimes = workspaceRegistry.listManaged();
+                  for (const workspaceRuntime of managedRuntimes) {
+                    managedRuntimeBridges.add(workspaceRuntime.bridge);
+                  }
+                  await Promise.all(
+                    managedRuntimes.map((workspaceRuntime) =>
+                      runtimeRemoval
+                        .disposeRuntime(workspaceRuntime, 'daemon_shutdown')
+                        .catch((err) => {
+                          daemonLog.error(
+                            'workspace runtime shutdown error',
+                            err instanceof Error ? err : null,
+                          );
+                          bridgeShutdownError =
+                            err instanceof Error ? err : new Error(String(err));
+                          try {
+                            workspaceRuntime.bridge.killAllSync();
+                          } catch {
+                            // Continue shutting down the remaining runtimes.
+                          }
+                        }),
+                    ),
                   );
-                });
-                removeCurrentServePidfile();
-                const bridgeForShutdown = bridgeRef;
-                if (bridgeForShutdown) {
+                }
+                for (const bridgeForShutdown of getRuntimeBridgesForCleanup()) {
+                  if (managedRuntimeBridges.has(bridgeForShutdown)) continue;
+                  if (shutdownBridges.has(bridgeForShutdown)) continue;
+                  shutdownBridges.add(bridgeForShutdown);
                   await bridgeForShutdown.shutdown().catch((err) => {
+                    shutdownBridges.delete(bridgeForShutdown);
                     daemonLog.error(
                       'bridge shutdown error',
                       err instanceof Error ? err : null,
@@ -3260,6 +5426,12 @@ export async function runHopCodeServe(
                 }
               })
               .finally(() => {
+                if (!server.listening) {
+                  void (runtimeFailureListenerClose ?? Promise.resolve()).then(
+                    () => finish(),
+                  );
+                  return;
+                }
                 // Phase 2: arm the force timer NOW so it only races
                 // server.close, not the bridge tear-down above.
                 // `RunHandle.close()` contract says "fully
@@ -3313,28 +5485,30 @@ export async function runHopCodeServe(
       process.on('uncaughtExceptionMonitor', onUncaughtExceptionMonitor);
 
       // Swap the boot-error listener for a runtime-error one
-      // before resolving. `server.once('error', reject)` at the
-      // bottom only catches errors BEFORE listening; post-listen
-      // errors (EMFILE after FD exhaustion, runtime errors on the
-      // listener) would be unhandled and crash the daemon. Use a
-      // persistent listener that logs to stderr instead.
+      // before resolving. `tryListen`'s `server.once('error', ...)`
+      // only catches errors BEFORE listening; post-listen errors
+      // (EMFILE after FD exhaustion, runtime errors on the listener)
+      // would be unhandled and crash the daemon. Use a persistent
+      // listener that logs to stderr instead.
       server.removeAllListeners('error');
       server.on('error', (err) => {
         daemonLog.error('server error', err instanceof Error ? err : null);
       });
-      if (runtimeApp && bridgeRef) {
-        const acpHandle = runtimeApp.locals?.['acpHandle'] as
-          | AcpHttpHandle
-          | undefined;
-        acpHandle?.attachServer?.(server);
+      const preparedRuntimeApp = runtimeApp ?? runtimeAppForCleanup;
+      if (preparedRuntimeApp && bridgeRef && deps.bridge) {
         if (shouldPreheat) {
           startBridgePreheat(bridgeRef);
         }
         if (opts.channelSelection && !runtimeStartupSettled) {
           armRuntimeStartupTimer();
-          runtimeStarting = completeRuntimeStartup().catch((err) =>
-            failRuntimeStartup(err, bridgeRef),
+          runtimeStarting = completeRuntimeStartup(preparedRuntimeApp).catch(
+            (err) => failRuntimeStartup(err, bridgeRef),
           );
+        } else {
+          const acpHandle = preparedRuntimeApp.locals?.['acpHandle'] as
+            | AcpHttpHandle
+            | undefined;
+          acpHandle?.attachServer?.(server);
         }
       } else if (deferRuntimeUntilFirstHealth) {
         scheduleRuntimeStartFallback();
@@ -3343,29 +5517,46 @@ export async function runHopCodeServe(
       }
 
       if (deps.resolveOnListen) {
+        loggerPublished = true;
+        loggerLifecycle.published();
         resolve(handle);
       } else {
         void runtimeReady.then(
-          () => resolve(handle),
+          () => {
+            loggerPublished = true;
+            loggerLifecycle.published();
+            resolve(handle);
+          },
           (err) => {
-            void handle
-              .close()
-              .catch((closeErr) => {
-                daemonLog.error(
-                  'shutdown after runtime startup error failed',
-                  closeErr instanceof Error ? closeErr : null,
-                );
-              })
-              .finally(() => {
+            void handle.close().then(
+              () => {
                 reject(err instanceof Error ? err : new Error(String(err)));
-              });
+              },
+              (closeErr) => {
+                writeDaemonLifecycleBestEffort(() =>
+                  daemonLog.error(
+                    'shutdown after runtime startup error failed',
+                    closeErr instanceof Error ? closeErr : null,
+                  ),
+                );
+                if (channelWorkerManager?.state().enabled) {
+                  writeDaemonLifecycleBestEffort(() =>
+                    daemonLog.error(
+                      'runtime startup failed, but qwen serve remains alive to retain the channel service lease until worker exit is confirmed',
+                    ),
+                  );
+                  return;
+                }
+                reject(err instanceof Error ? err : new Error(String(err)));
+              },
+            );
           },
         );
       }
     };
     let server: Server;
+    let httpsServer: https.Server | undefined;
     if (tlsOptions) {
-      let httpsServer: https.Server;
       try {
         httpsServer = https.createServer(tlsOptions, app);
       } catch (err) {
@@ -3382,13 +5573,53 @@ export async function runHopCodeServe(
         );
         return;
       }
-      server = httpsServer.listen(opts.port, listenHostname, onListening);
-    } else {
-      server = app.listen(opts.port, listenHostname, onListening);
     }
-    server.once('error', (err) => {
-      removeCurrentServePidfile();
-      reject(err);
-    });
+
+    const tryListen = (attemptPort: number, attempt: number): void => {
+      try {
+        if (httpsServer) {
+          // server.listen(port, host, cb) registers `cb` as a one-time
+          // `listening` listener. On failed attempts (EADDRINUSE),
+          // `listening` never fires so the listener accumulates. Clear
+          // stale listeners before each retry.
+          httpsServer.removeAllListeners('listening');
+          server = httpsServer.listen(attemptPort, listenHostname, onListening);
+        } else {
+          server = app.listen(attemptPort, listenHostname, onListening);
+        }
+      } catch (err) {
+        // Synchronous listen failure (e.g. invalid address) — not
+        // recoverable via port bump.
+        removeCurrentServePidfile();
+        reject(err instanceof Error ? err : new Error(String(err)));
+        return;
+      }
+
+      server.once('error', (err: NodeJS.ErrnoException) => {
+        server.close();
+        const nextPort = attemptPort + 1;
+        if (
+          err.code === 'EADDRINUSE' &&
+          opts.port !== 0 &&
+          nextPort <= 65535 &&
+          attempt < MAX_PORT_ATTEMPTS - 1
+        ) {
+          writeStderrLine(
+            `qwen serve: port ${attemptPort} is in use, trying ${nextPort}...`,
+          );
+          tryListen(nextPort, attempt + 1);
+        } else {
+          if (err.code === 'EADDRINUSE' && attempt > 0) {
+            writeStderrLine(
+              `qwen serve: all ports ${opts.port}–${attemptPort} are in use`,
+            );
+          }
+          removeCurrentServePidfile();
+          reject(err);
+        }
+      });
+    };
+
+    tryListen(opts.port, 0);
   });
 }

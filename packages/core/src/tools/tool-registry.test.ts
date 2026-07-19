@@ -217,6 +217,47 @@ describe('ToolRegistry', () => {
       expect(registry.getTool('mcp__github__create_issue')).toBeUndefined();
     });
 
+    it('honors a legacy dotted disabled MCP tool name', () => {
+      const legacyName = 'mcp__zybio__literature.search_pubmed';
+      const disabledConfig = new Config({
+        ...baseConfigParams,
+        disabledTools: [legacyName],
+      });
+      const registry = new ToolRegistry(disabledConfig);
+      const mcpTool = new DiscoveredMCPTool(
+        {} as CallableTool,
+        'zybio',
+        'literature.search_pubmed',
+        'description',
+        {},
+      );
+
+      expect(mcpTool.name).not.toBe(legacyName);
+      registry.registerTool(mcpTool);
+      expect(registry.getTool(mcpTool.name)).toBeUndefined();
+    });
+
+    it('honors a legacy truncated disabled MCP tool name', () => {
+      const rawName = `mcp__server__${'x'.repeat(80)}`;
+      const legacyName = rawName.slice(0, 28) + '___' + rawName.slice(-32);
+      const disabledConfig = new Config({
+        ...baseConfigParams,
+        disabledTools: [legacyName],
+      });
+      const registry = new ToolRegistry(disabledConfig);
+      const mcpTool = new DiscoveredMCPTool(
+        {} as CallableTool,
+        'server',
+        'x'.repeat(80),
+        'description',
+        {},
+      );
+
+      expect(mcpTool.name).not.toBe(legacyName);
+      registry.registerTool(mcpTool);
+      expect(registry.getTool(mcpTool.name)).toBeUndefined();
+    });
+
     it('skips lazy factories whose name is in Config.disabledTools', async () => {
       const disabledConfig = new Config({
         ...baseConfigParams,
@@ -568,6 +609,99 @@ describe('ToolRegistry', () => {
 
       toolRegistry.removeMcpToolsByServer('slack');
       expect(toolRegistry.isDeferredToolRevealed(toolName)).toBe(false);
+    });
+
+    it('includes deferred tools listed in visibleTools in function declarations', () => {
+      const visibleConfig = new Config({
+        ...baseConfigParams,
+        visibleTools: ['should-appear'],
+      });
+      const registry = new ToolRegistry(visibleConfig);
+      registry.registerTool(new MockTool({ name: 'always-visible' }));
+      registry.registerTool(
+        new MockTool({ name: 'should-appear', shouldDefer: true }),
+      );
+      registry.registerTool(
+        new MockTool({ name: 'still-hidden', shouldDefer: true }),
+      );
+
+      const names = registry.getFunctionDeclarations().map((d) => d.name);
+      expect(names).toContain('always-visible');
+      expect(names).toContain('should-appear');
+      expect(names).not.toContain('still-hidden');
+    });
+
+    it('excludes visibleTools items from deferred tool summary', () => {
+      const visibleConfig = new Config({
+        ...baseConfigParams,
+        visibleTools: ['alpha'],
+      });
+      const registry = new ToolRegistry(visibleConfig);
+      registry.registerTool(
+        new MockTool({ name: 'alpha', description: 'a', shouldDefer: true }),
+      );
+      registry.registerTool(
+        new MockTool({ name: 'beta', description: 'b', shouldDefer: true }),
+      );
+
+      const summary = registry.getDeferredToolSummary();
+      expect(summary).toEqual([{ name: 'beta', description: 'b' }]);
+    });
+
+    it('visibleTools has no effect on non-deferred tools', () => {
+      const visibleConfig = new Config({
+        ...baseConfigParams,
+        visibleTools: ['regular'],
+      });
+      const registry = new ToolRegistry(visibleConfig);
+      registry.registerTool(new MockTool({ name: 'regular' }));
+
+      const names = registry.getFunctionDeclarations().map((d) => d.name);
+      expect(names).toContain('regular');
+
+      const summary = registry.getDeferredToolSummary();
+      expect(summary).toEqual([]);
+    });
+
+    it('disabledTools takes priority over visibleTools', () => {
+      const config = new Config({
+        ...baseConfigParams,
+        disabledTools: ['contested'],
+        visibleTools: ['contested'],
+      });
+      const registry = new ToolRegistry(config);
+      registry.registerTool(
+        new MockTool({ name: 'contested', shouldDefer: true }),
+      );
+
+      const names = registry.getFunctionDeclarations().map((d) => d.name);
+      expect(names).not.toContain('contested');
+    });
+
+    it('visible tool survives clearRevealedDeferredTools', () => {
+      const visibleConfig = new Config({
+        ...baseConfigParams,
+        visibleTools: ['web_fetch'],
+      });
+      const registry = new ToolRegistry(visibleConfig);
+      registry.registerTool(
+        new MockTool({ name: 'web_fetch', shouldDefer: true }),
+      );
+      registry.registerTool(
+        new MockTool({ name: 'monitor', shouldDefer: true }),
+      );
+
+      // Both start visible (web_fetch via visibleTools, monitor is hidden)
+      expect(registry.getFunctionDeclarations().map((d) => d.name)).toContain(
+        'web_fetch',
+      );
+
+      registry.clearRevealedDeferredTools();
+
+      // web_fetch stays — it's not in revealedDeferred
+      expect(registry.getFunctionDeclarations().map((d) => d.name)).toContain(
+        'web_fetch',
+      );
     });
   });
 

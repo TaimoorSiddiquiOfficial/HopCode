@@ -109,9 +109,43 @@ hopcode -p "run the test suite"
 
   For a custom image, build it using the canonical image as a base:
 
-  ```dockerfile
-  FROM ghcr.io/hoptrendy/hopcode:latest
-  ```
+`settings.env.QWEN_SANDBOX_IMAGE` also works as a generic env injection mechanism, but `tools.sandboxImage` is the preferred persistent setting.
+
+Custom images are user-managed. Rebuild them with an up-to-date Qwen Code installation to receive the safe update handoff; older images may still use their original in-process updater.
+
+### macOS Seatbelt profiles
+
+Built-in profiles (set via `SEATBELT_PROFILE` env var):
+
+- `permissive-open` (default): Write restrictions, network allowed
+- `permissive-closed`: Write restrictions, no network
+- `permissive-proxied`: Write restrictions, network via proxy
+- `restrictive-open`: Strict restrictions, network allowed
+- `restrictive-closed`: Maximum restrictions
+- `restrictive-proxied`: Strict restrictions, network via proxy
+
+> [!tip]
+>
+> Start with `permissive-open`, then tighten to `restrictive-closed` if your workflow still works.
+
+### Custom Seatbelt profiles (macOS)
+
+To use a custom Seatbelt profile:
+
+1. Create a file named `.qwen/sandbox-macos-<profile_name>.sb` in your project.
+2. Set `SEATBELT_PROFILE=<profile_name>`.
+
+### Custom Sandbox Flags
+
+For container-based sandboxing, you can inject custom flags into the `docker` or `podman` command using the `SANDBOX_FLAGS` environment variable. This is useful for advanced configurations, such as disabling security features for specific use cases.
+
+**Example (Podman)**:
+
+To disable SELinux labeling for volume mounts, you can set the following:
+
+```bash
+export SANDBOX_FLAGS="--security-opt label=disable"
+```
 
 Multiple flags can be provided as a space-separated string:
 

@@ -65,6 +65,7 @@ import { authCommand } from '../commands/auth.js';
 import { reviewCommand } from '../commands/review.js';
 import { serveCommand } from '../commands/serve.js';
 import { sessionsCommand } from '../commands/sessions.js';
+import { updateCommand } from '../commands/update.js';
 
 // UUID v4 regex pattern for validation
 const SESSION_ID_REGEX =
@@ -898,7 +899,7 @@ export async function parseArguments(): Promise<CliArgs> {
         })
         .option('max-session-turns', {
           type: 'number',
-          description: 'Maximum number of session turns',
+          description: 'Maximum number of session turns (must be an integer)',
         })
         .option('max-wall-time', {
           type: 'string',
@@ -1090,7 +1091,9 @@ export async function parseArguments(): Promise<CliArgs> {
     // Register `hopcode serve` (Stage 1 daemon)
     .command(serveCommand)
     // Register sessions subcommands
-    .command(sessionsCommand);
+    .command(sessionsCommand)
+    // Register update command
+    .command(updateCommand);
 
   yargsInstance
     .version(await getCliVersion()) // This will enable the --version flag based on package.json
@@ -1115,7 +1118,8 @@ export async function parseArguments(): Promise<CliArgs> {
       result._[0] === 'hooks' ||
       result._[0] === 'channel' ||
       result._[0] === 'review' ||
-      result._[0] === 'sessions')
+      result._[0] === 'sessions' ||
+      result._[0] === 'update')
   ) {
     // Note: `serve` is intentionally NOT in this list. Its handler blocks
     // forever (after the listener is up); SIGINT/SIGTERM in runHopCodeServe
@@ -1124,7 +1128,7 @@ export async function parseArguments(): Promise<CliArgs> {
     // execution and exit. Returning here would let the main interactive
     // flow run, which would prompt for stdin input despite the user
     // having already invoked a subcommand.
-    process.exit(0);
+    process.exit(process.exitCode ?? 0);
   }
 
   // Normalize query args: handle both quoted "@path file" and unquoted @path file
@@ -1502,6 +1506,9 @@ export async function loadCliConfig(
   settingsWatcher?: { stopWatching(): void },
 ): Promise<Config> {
   const debugMode = isDebugMode(argv);
+  if (debugMode && process.env['QWEN_DEBUG_LOG_FILE'] === undefined) {
+    process.env['QWEN_DEBUG_LOG_FILE'] = '1';
+  }
   const bareMode = isBareMode(argv.bare);
   const safeMode =
     argv.safeMode !== undefined ? argv.safeMode : isSafeModeEnv();
@@ -1616,8 +1623,13 @@ export async function loadCliConfig(
     approvalMode = ApprovalMode.IZN;
   } else if (!bareMode && settings.tools?.approvalMode) {
     approvalMode = parseApprovalModeValue(settings.tools.approvalMode);
-  } else {
+  } else if (bareMode || safeMode) {
+    // Restricted modes strip permissions/allowlists and are meant to be
+    // maximally restrictive, so they keep manual approval rather than the
+    // AUTO default that normal sessions now get.
     approvalMode = ApprovalMode.DEFAULT;
+  } else {
+    approvalMode = ApprovalMode.AUTO;
   }
 
   // Force approval mode to default if the folder is not trusted.
@@ -1755,6 +1767,10 @@ export async function loadCliConfig(
     bareMode || safeMode
       ? []
       : normalizeDisabledToolList(settings.tools?.disabled);
+  const visibleTools =
+    bareMode || safeMode
+      ? []
+      : normalizeDisabledToolList(settings.tools?.visible);
 
   // Helper: check if a tool is explicitly covered by an allow rule OR by the
   // coreTools whitelist. Uses alias matching for coreTools (via isToolEnabled)
@@ -2021,6 +2037,7 @@ export async function loadCliConfig(
     disabledSkillNamesProvider:
       bareMode || safeMode ? undefined : disabledSkillNamesProvider,
     disabledTools: disabledTools.length > 0 ? disabledTools : undefined,
+    visibleTools: visibleTools.length > 0 ? visibleTools : undefined,
     // New unified permissions (PermissionManager source of truth).
     permissions: {
       allow: mergedAllow.length > 0 ? mergedAllow : undefined,
@@ -2072,6 +2089,12 @@ export async function loadCliConfig(
     showResponseTokensPerSecond:
       settings.ui?.showResponseTokensPerSecond === true,
     telemetry: telemetrySettings,
+    // Ordinary interactive TUI defers telemetry until after first paint. Auth
+    // events emitted before the deferred init are an accepted startup-latency
+    // tradeoff. This intentionally differs from IDE deferral: `qwen -i
+    // "prompt"` must await IDE context before auto-submit, but telemetry can
+    // still initialize after render unless an initial prompt is present.
+    deferTelemetryInitialization: interactive && !isAcpMode && !question,
     outboundCorrelation: settings.outboundCorrelation,
     usageStatisticsEnabled: settings.privacy?.usageStatisticsEnabled ?? true,
     clearContextOnIdle: settings.context?.clearContextOnIdle,
@@ -2100,7 +2123,7 @@ export async function loadCliConfig(
     cronEnabled: settings.experimental?.cron ?? true,
     cronRecurringMaxAgeDays: settings.experimental?.cronRecurringMaxAgeDays,
     agentTeamEnabled: settings.experimental?.agentTeam ?? false,
-    artifactEnabled: settings.experimental?.artifact ?? false,
+    artifactEnabled: settings.experimental?.artifact ?? true,
     artifactAutoOpen: settings.artifact?.autoOpen ?? true,
     artifactPublisher: settings.artifact?.publisher ?? 'local',
     artifactHost: settings.artifact?.host
@@ -2151,6 +2174,7 @@ export async function loadCliConfig(
     providerProtocolConfig,
     generationConfigSources: resolvedCliConfig.sources,
     generationConfig: resolvedCliConfig.generationConfig,
+    initialModelRegistryBaseUrl: resolvedCliConfig.registryBaseUrl,
     warnings: resolvedCliConfig.warnings,
     bareMode,
     safeMode,
@@ -2168,6 +2192,8 @@ export async function loadCliConfig(
     useRipgrep: settings.tools?.useRipgrep,
     useBuiltinRipgrep: settings.tools?.useBuiltinRipgrep,
     shouldUseNodePtyShell: settings.tools?.shell?.enableInteractiveShell,
+    shellDefaultTimeoutMs: settings.tools?.shell?.defaultTimeoutMs,
+    shellHeartbeatIntervalMs: settings.tools?.shell?.heartbeatIntervalMs,
     preventSystemSleep: settings.general?.preventSystemSleep ?? true,
     skipNextSpeakerCheck: settings.model?.skipNextSpeakerCheck,
     skipWorkflowUsageWarning: settings.model?.skipWorkflowUsageWarning ?? false,
@@ -2199,13 +2225,17 @@ export async function loadCliConfig(
         ? false
         : (settings.memory?.enableTeamMemorySync ?? false),
     enableAutoSkill:
-      bareMode || safeMode ? false : (settings.memory?.enableAutoSkill ?? true),
+      bareMode || safeMode
+        ? false
+        : (settings.memory?.enableAutoSkill ?? false),
     autoSkillConfirm:
       bareMode || safeMode
         ? false
         : (settings.memory?.autoSkillConfirm ?? true),
+    memoryAgentTimeoutMinutes: settings.memory?.agentTimeoutMinutes,
     fastModel: settings.fastModel || undefined,
     visionModel: settings.visionModel || undefined,
+    visionBridgeTimeoutMs: settings.visionBridgeTimeoutMs,
     modelFallbacks: resolveModelFallbacks(
       argv.fallbackModel,
       settings.modelFallbacks,
@@ -2241,6 +2271,13 @@ export async function loadCliConfig(
     },
     agents: settings.agents
       ? {
+          builtin: settings.agents.builtin
+            ? {
+                exploreModel: settings.agents.builtin.exploreModel,
+              }
+            : undefined,
+          maxParallelAgents: settings.agents.maxParallelAgents,
+          maxParallelAgentsByModel: settings.agents.maxParallelAgentsByModel,
           displayMode: settings.agents.displayMode,
           arena: settings.agents.arena
             ? {

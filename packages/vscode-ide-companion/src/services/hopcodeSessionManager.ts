@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { logger } from '../utils/logger.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
@@ -59,19 +60,17 @@ export class HopCodeSessionManager {
       const filePath = path.join(sessionDir, filename);
 
       if (!fs.existsSync(filePath)) {
-        console.log(
-          `[HopCodeSessionManager] Session file not found: ${filePath}`,
-        );
+        logger.log(`[QwenSessionManager] Session file not found: ${filePath}`);
         return null;
       }
 
       const content = fs.readFileSync(filePath, 'utf-8');
       const session = JSON.parse(content) as HopCodeSession;
 
-      console.log(`[HopCodeSessionManager] Session loaded: ${filePath}`);
+      logger.log(`[QwenSessionManager] Session loaded: ${filePath}`);
       return session;
     } catch (error) {
-      console.error('[HopCodeSessionManager] Failed to load session:', error);
+      logger.error('[QwenSessionManager] Failed to load session:', error);
       return null;
     }
   }
@@ -104,8 +103,8 @@ export class HopCodeSessionManager {
           const session = JSON.parse(content) as HopCodeSession;
           sessions.push(session);
         } catch (error) {
-          console.error(
-            `[HopCodeSessionManager] Failed to read session file ${file}:`,
+          logger.error(
+            `[QwenSessionManager] Failed to read session file ${file}:`,
             error,
           );
         }
@@ -119,7 +118,7 @@ export class HopCodeSessionManager {
 
       return sessions;
     } catch (error) {
-      console.error('[HopCodeSessionManager] Failed to list sessions:', error);
+      logger.error('[QwenSessionManager] Failed to list sessions:', error);
       return [];
     }
   }
@@ -139,13 +138,13 @@ export class HopCodeSessionManager {
 
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        console.log(`[HopCodeSessionManager] Session deleted: ${filePath}`);
+        logger.log(`[QwenSessionManager] Session deleted: ${filePath}`);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error('[HopCodeSessionManager] Failed to delete session:', error);
+      logger.error('[QwenSessionManager] Failed to delete session:', error);
       return false;
     }
   }

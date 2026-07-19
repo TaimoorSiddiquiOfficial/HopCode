@@ -11,8 +11,60 @@ HopCode Web Shell 是面向浏览器的 daemon 会话终端 UI，可以作为 Re
 - `@hoptrendy/sdk`：`>=0.1.8`
 - 浏览器环境需要能访问 HopCode daemon serve 的 HTTP 接口。
 
-组件包会自动注入自身样式，样式已通过 CSS Modules 和组件作用域隔离；
-接入方不需要额外引入全局 CSS。
+组件包会自动注入自身的 CSS（包括 Tailwind 编译产物），接入方不需要配置
+Tailwind 或额外引入全局 CSS。
+
+## Tailwind 与 shadcn/ui
+
+Web Shell 已配置 Tailwind CSS v4 和 shadcn/ui。shadcn 的 token 仅用于新增的
+Tailwind/shadcn 组件；现有 CSS Modules 的主题色值保持不变。组件代码在仓库内，
+可直接修改。
+
+### 新增 UI 的约定
+
+- 新增通用 UI 或交互组件时，优先使用 shadcn/ui 已提供的组件，再根据 Web Shell
+  的需求修改生成到仓库中的源码。已有且稳定的 CSS Modules 组件不要求为了统一而
+  重写。
+- Tailwind class 使用标准的无前缀写法，例如 `flex gap-2`。发布构建会通过 PostCSS
+  将生成的选择器限制在 Web Shell root 和 portal root，并为全局动画、CSS property
+  注册增加 Web Shell 前缀，避免与接入方样式冲突。
+- shadcn 颜色必须使用 `background`、`primary`、`muted` 等语义 token，不要直接
+  引用 Web Shell 原有颜色变量。原有 CSS Modules 继续使用原来的 token，两套色值
+  各自维护。
+- Dialog、Popover、DropdownMenu、Tooltip 等包含 Portal 的组件，必须将内容挂载到
+  Web Shell 的 portal root。新增 shadcn 组件后，应参考现有 `dialog.tsx`，使用
+  `useWebShellPortalRoot()` 向 Radix Portal 传入 `container`。这样主题、旧 CSS
+  变量以及外部配置的 z-index 才能正确继承。
+- 保留组件上的 `data-web-shell-*` 属性和公开 CSS 变量。接入方可能通过这些属性或
+  `--web-shell-dialog-backdrop-z-index`、`--web-shell-popover-z-index`、
+  `--web-shell-tooltip-z-index` 等变量定制样式和层级。
+
+在 `packages/web-shell` 目录添加后续组件，例如：
+
+```bash
+npx shadcn@latest add button
+```
+
+生成后需要检查 diff。shadcn CLI 可能更新 `globals.css`、依赖或生成默认 Portal
+实现，不应覆盖现有的 CSS scope、语义 token 和 portal root 适配。组件默认仅供
+Web Shell 内部使用；没有明确的公共 API 需求时，不要从包入口导出。
+
+Tailwind 会在发布前编译并内联到 npm 包，接入方不需要安装或配置 Tailwind，也不
+需要额外引入 `globals.css`。
+
+### 图标约定
+
+- 新增图标统一优先使用 `lucide-react`，不要为已有的常见图标重复编写 SVG。
+- 使用具名静态导入，确保 Vite/Rollup 可以按需打包：
+
+```tsx
+import { CheckIcon, XIcon } from 'lucide-react';
+```
+
+- 不要使用 `import * as Icons` 后按名称动态取图标，这可能把整个图标库打入产物。
+- 图标默认使用 `currentColor`，尺寸优先交给 shadcn 组件或 Tailwind class 控制，
+  避免在每个调用处重复添加颜色、margin 和 padding。
+- 只有 Lucide 没有对应图标或需要产品专属图形时，才新增自定义 SVG。
 
 ## 安装
 
@@ -46,6 +98,9 @@ export function HopCodePanel() {
       sessionId="838e1811-9f84-4848-9915-d9a7f01ff5c6"
       onSessionIdChange={(sessionId) => {
         console.log('current session:', sessionId);
+      }}
+      onSessionCreated={async (sessionId) => {
+        await registerSession(sessionId);
       }}
       theme="dark"
       language="zh-CN"
@@ -81,27 +136,79 @@ export function App() {
 > **注意**：不要在已有 `DaemonSessionProvider` 下使用
 > `WebShellWithProviders`，否则会创建嵌套的重复 Provider。
 
+### 3. 只读 ChatRecord JSONL
+
+`WebShellTranscript` 只接收已经投影完成的 blocks，不连接 daemon，也不提供 composer、
+审批或 session mutation。浏览器宿主可以逐行解析 JSONL，再通过 SDK 的 opt-in facade
+投影：
+
+```tsx
+import { projectChatRecordsToDaemonTranscript } from '@qwen-code/sdk/daemon/transcript';
+import { WebShellTranscript } from '@qwen-code/web-shell';
+
+const records = jsonl
+  .split(/\r?\n/)
+  .filter((line) => line.trim())
+  .map((line) => JSON.parse(line) as unknown);
+const projection = projectChatRecordsToDaemonTranscript(records);
+
+<WebShellTranscript
+  blocks={projection.blocks}
+  theme="dark"
+  language="zh-CN"
+  style={{ height: 640 }}
+/>;
+```
+
+宿主应显示 `projection.diagnostics`，并在 `complete=false` 或 `truncated=true` 时提示
+历史可能不完整。组件需要一个可用高度；自定义 renderer 的副作用仍由宿主负责。
+
 ## Props
 
 ### WebShellWithProviders
 
 包含 `WebShell` 的所有 Props，加上 Provider 配置：
 
-| 属性        | 类型     | 说明                                                 |
-| ----------- | -------- | ---------------------------------------------------- |
-| `baseUrl`   | `string` | daemon API 地址，未传时使用 `window.location.origin` |
-| `token`     | `string` | daemon API Bearer token                              |
-| `sessionId` | `string` | 要连接的 session id；未传或 `undefined` 时保持空页面 |
+| 属性                 | 类型      | 说明                                                                                 |
+| -------------------- | --------- | ------------------------------------------------------------------------------------ |
+| `baseUrl`            | `string`  | daemon API 地址，未传时使用 `window.location.origin`                                 |
+| `token`              | `string`  | daemon API Bearer token                                                              |
+| `sessionId`          | `string`  | 要连接的 session id；未传或 `undefined` 时保持空页面                                 |
+| `workspaceId`        | `string`  | 已注册工作区 id，主要用于定位已有 session；不会注册或锁定工作区                      |
+| `workspaceCwd`       | `string`  | 已注册工作区路径，语义同 `workspaceId`；不会注册或锁定工作区，且优先于 `workspaceId` |
+| `lockWorkspaceCwd`   | `string`  | 锁定到指定工作区路径；未注册时自动持久注册，并隐藏其他工作区及添加、移除和选择入口   |
+| `restartSseOnPrompt` | `boolean` | 每次 prompt 被 daemon 接收后重建 SSE；默认关闭                                       |
 
 ### WebShell
 
-| 属性                | 类型                                       | 说明                              |
-| ------------------- | ------------------------------------------ | --------------------------------- |
-| `onSessionIdChange` | `(sessionId: string \| undefined) => void` | 当前 session id 变化或清空时触发  |
-| `theme`             | `'dark' \| 'light'`                        | UI 主题，默认 `dark`              |
-| `onThemeChange`     | `(theme: WebShellTheme) => void`           | `/theme` 命令切换主题后触发       |
-| `language`          | `'en' \| 'zh-CN' \| 'zh' \| 'zh-cn'`       | UI 语言                           |
-| `onLanguageChange`  | `(language: WebShellLanguage) => void`     | `/language ui` 切换 UI 语言后触发 |
+| 属性                | 类型                                                                                    | 说明                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `onSessionIdChange` | `(sessionId: string \| undefined, workspaceId?: string, workspaceCwd?: string) => void` | 当前 session 或工作区变化时触发                                                  |
+| `onSessionCreated`  | `(sessionId: string) => Promise<void> \| void`                                          | 新 session 创建后触发；完成前会阻塞 session 初始化和 prompt 提交，最长等待 30 秒 |
+| `theme`             | `'dark' \| 'light'`                                                                     | UI 主题，默认 `dark`                                                             |
+| `onThemeChange`     | `(theme: WebShellTheme) => void`                                                        | `/theme` 命令切换主题后触发                                                      |
+| `language`          | `'en' \| 'zh-CN' \| 'zh' \| 'zh-cn'`                                                    | UI 语言                                                                          |
+| `onLanguageChange`  | `(language: WebShellLanguage) => void`                                                  | `/language ui` 切换 UI 语言后触发                                                |
+
+锁定工作区时，可以自定义 Sidebar 文件夹行的内容：
+
+```tsx
+<WebShellWithProviders
+  lockWorkspaceCwd="/path/to/workspace"
+  sidebar={{
+    lockedWorkspace: {
+      render: (workspace, { expanded }) => (
+        <span>
+          {expanded ? '📂' : '📁'} {workspace.cwd}
+        </span>
+      ),
+    },
+  }}
+/>
+```
+
+自定义内容仍使用内置的展开、收起行为，`expanded` 会随状态更新；文件夹行右侧的内置操作不会渲染。
+未提供 `lockWorkspaceCwd` 时，该 renderer 不会执行。
 
 ## 可选图表 Renderer
 
@@ -168,6 +275,7 @@ normalize 成原生 ECharts option，并注入 `option.dataset`，再渲染图�
 | ---------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `/help`          | 本地实现            | 打开帮助弹窗，支持键盘浏览命令和快捷键。                                                                                |
 | `/theme`         | 本地实现            | 打开主题选择弹窗；支持 `/theme light`、`/theme dark`。                                                                  |
+| `/settings`      | 本地实现            | 打开设置面板，管理工作区与用户级（`~/.qwen/settings.json`）配置；两个作用域均可编辑并写回对应的 settings.json。         |
 | `/language`      | 本地实现 + ACP 透传 | `/language ui <lang>` 会切换 web-shell UI 语言并同步给 daemon；其他语言能力由 daemon 执行。包含 `ui`、`output` 子命令。 |
 | `/model`         | 本地实现 + 部分透传 | 无参数打开模型弹窗；普通参数直接切换模型；`/model --fast <model>` 透传给 daemon。                                       |
 | `/plan`          | 本地实现            | 切换到 `plan` approval mode，并可继续发送后续 prompt。                                                                  |

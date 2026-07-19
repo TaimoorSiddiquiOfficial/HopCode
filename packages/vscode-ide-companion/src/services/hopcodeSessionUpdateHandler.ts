@@ -10,6 +10,7 @@
  * Handles session updates from ACP and dispatches them to appropriate callbacks
  */
 
+import { logger } from '../utils/logger.js';
 import type {
   SessionNotification,
   AvailableCommand,
@@ -49,10 +50,6 @@ export class HopCodeSessionUpdateHandler {
   handleSessionUpdate(data: SessionNotification): void {
     const update = data.update;
     const sessionUpdate = (update as { sessionUpdate?: string }).sessionUpdate;
-    console.log(
-      '[SessionUpdateHandler] Processing update type:',
-      sessionUpdate,
-    );
 
     switch (sessionUpdate) {
       case 'user_message_chunk': {
@@ -115,8 +112,8 @@ export class HopCodeSessionUpdateHandler {
             this.callbacks.onThoughtChunk(text);
           } else if (this.callbacks.onStreamChunk) {
             // Fallback to regular stream processing
-            console.log(
-              '[SessionUpdateHandler] ?? Falling back to onStreamChunk',
+            logger.log(
+              '[SessionUpdateHandler] 🧠 Falling back to onStreamChunk',
             );
             this.callbacks.onStreamChunk(text);
           }
@@ -212,7 +209,7 @@ export class HopCodeSessionUpdateHandler {
             this.callbacks.onModeChanged(modeId);
           }
         } catch (err) {
-          console.warn(
+          logger.warn(
             '[SessionUpdateHandler] Failed to handle mode update',
             err,
           );
@@ -230,7 +227,7 @@ export class HopCodeSessionUpdateHandler {
             this.callbacks.onAvailableCommands(commands);
           }
         } catch (err) {
-          console.warn(
+          logger.warn(
             '[SessionUpdateHandler] Failed to handle available commands update',
             err,
           );
@@ -239,7 +236,10 @@ export class HopCodeSessionUpdateHandler {
       }
 
       default:
-        console.log('[HopCodeAgentManager] Unhandled session update type');
+        logger.log(
+          '[SessionUpdateHandler] Unhandled session update type:',
+          sessionUpdate,
+        );
         break;
     }
   }

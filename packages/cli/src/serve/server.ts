@@ -6,21 +6,25 @@
 
 import path from 'node:path';
 import express from 'express';
-import type { Application, Request, Response } from 'express';
-import type { ApprovalMode } from '@hoptrendy/hopcode-core';
-import {
-  APPROVAL_MODES,
-  BTW_MAX_INPUT_LENGTH,
-  SessionService,
-  addDaemonRequestAttribute,
-} from '@hoptrendy/hopcode-core';
-import { writeStderrLine } from '../utils/stdioHelpers.js';
-import {
-  SubscriberLimitExceededError,
-  type BridgeEvent,
-} from '@hoptrendy/acp-bridge/eventBus';
-import type { DaemonStatusProvider } from '@hoptrendy/acp-bridge/bridgeOptions';
+import type { Application } from 'express';
+import type { DaemonStatusProvider } from '@qwen-code/acp-bridge';
+import { hashDaemonWorkspace } from '@qwen-code/qwen-code-core';
 import type { DaemonLogger } from './daemon-logger.js';
+import type {
+  DaemonMetricsBucket,
+  DaemonPerfSnapshot,
+  DaemonStartupSnapshot,
+} from './daemon-status.js';
+import type {
+  ChannelWorkerSnapshot,
+  ChannelWorkerSupervisor,
+} from './channel-worker-supervisor.js';
+import type { ChannelWorkerGroupSnapshot } from './channel-worker-group.js';
+import type {
+  ChannelWorkerControlState,
+  ChannelWorkerSetResult,
+  ChannelWorkerStopResult,
+} from './channel-worker-manager.js';
 import {
   allowOriginCors,
   bearerAuth,
@@ -40,8 +44,6 @@ import {
   type DeviceFlowProviderId,
   type DeviceFlowPublicView,
 } from './auth/device-flow.js';
-import { mapDomainErrorToErrorKind } from '@hoptrendy/acp-bridge';
-import { HopCodeOAuthDeviceFlowProvider } from './auth/hopcode-device-flow-provider.js';
 import { createBridgeFileSystemAdapter } from './bridge-file-system-adapter.js';
 import { createDaemonStatusProvider } from './daemon-status-provider.js';
 import { getDemoHtml } from './demo.js';
@@ -72,40 +74,94 @@ import {
   type CapabilitiesEnvelope,
   type ServeAuthProviderInstallRequest,
   type ServeAuthProviderInstallResult,
+  type ServeChannelSelection,
+  type ChannelWebhookConfigSource,
   type ServeOptions,
 } from './types.js';
-import { mountWorkspaceMemoryRoutes } from './workspace-memory.js';
+import {
+  mountWebShellAssets,
+  mountWebShellSpaFallback,
+} from './web-shell-static.js';
+import {
+  mountWorkspaceMemoryRoutes,
+  mountWorkspaceQualifiedMemoryRoutes,
+} from './workspace-memory.js';
 import {
   mountWorkspaceMemoryRememberRoutes,
   WorkspaceRememberTaskLane,
 } from './workspace-remember.js';
-import { mountWorkspaceAgentsRoutes } from './workspace-agents.js';
+import {
+  mountWorkspaceAgentsRoutes,
+  mountWorkspaceQualifiedAgentsRoutes,
+} from './workspace-agents.js';
+import { registerDaemonStatusRoutes } from './routes/daemon-status.js';
+import { createHealthDemoRoutes } from './routes/health-demo.js';
+import { registerWorkspaceAuthRoutes } from './routes/workspace-auth.js';
 import { registerWorkspaceExtensionRoutes } from './routes/workspace-extensions.js';
 import type { WorkspaceFileSystemFactory } from './fs/index.js';
-import { registerWorkspaceFileReadRoutes } from './routes/workspace-file-read.js';
-import { registerWorkspaceFileWriteRoutes } from './routes/workspace-file-write.js';
+import {
+  registerWorkspaceFileReadRoutes,
+  registerWorkspaceQualifiedFileReadRoutes,
+} from './routes/workspace-file-read.js';
+import {
+  registerWorkspaceFileWriteRoutes,
+  registerWorkspaceQualifiedFileWriteRoutes,
+} from './routes/workspace-file-write.js';
 import { registerWorkspaceSetupGithubRoutes } from './routes/workspace-setup-github.js';
-import { registerWorkspaceTrustRoutes } from './routes/workspace-trust.js';
+import {
+  registerWorkspaceQualifiedTrustRoutes,
+  registerWorkspaceTrustRoutes,
+} from './routes/workspace-trust.js';
 import { registerPermissionRoutes } from './routes/permission.js';
 import { registerSessionRoutes } from './routes/session.js';
-import { registerScheduledTasksRoutes } from './routes/scheduled-tasks.js';
+import {
+  registerScheduledTasksRoutes,
+  registerWorkspaceQualifiedScheduledTasksRoutes,
+} from './routes/scheduled-tasks.js';
+import { registerGoalsRoutes } from './routes/goals.js';
 import { registerUsageStatsRoutes } from './routes/usage-stats.js';
 import {
+  startScheduledTaskKeepalive,
+  rehydrateScheduledTaskSessions,
+} from './scheduled-task-keepalive.js';
+import {
   registerWorkspaceDiagnosticStatusRoutes,
+  registerWorkspaceQualifiedDiagnosticStatusRoutes,
+  registerWorkspaceQualifiedStatusRoutes,
   registerWorkspaceStatusRoutes,
 } from './routes/workspace-status.js';
 import {
   createDaemonWorkspaceService,
   type DaemonWorkspaceService,
+  type DaemonWorkspaceServiceDeps,
 } from './workspace-service/index.js';
-import { registerWorkspacePermissionsRoutes } from './routes/workspace-permissions.js';
-import { registerWorkspaceSettingsRoutes } from './routes/workspace-settings.js';
+import { registerCapabilitiesRoutes } from './routes/capabilities.js';
 import {
+  registerWorkspacePermissionsRoutes,
+  registerWorkspaceQualifiedPermissionsRoutes,
+} from './routes/workspace-permissions.js';
+import {
+  registerWorkspaceQualifiedSettingsRoutes,
+  registerWorkspaceSettingsRoutes,
+} from './routes/workspace-settings.js';
+import {
+  getActiveSseCount,
+  registerSseEventsRoutes,
+} from './routes/sse-events.js';
+import {
+  registerWorkspaceQualifiedVoiceRoutes,
   registerWorkspaceVoiceRoutes,
   type WorkspaceVoiceRouteDeps,
 } from './routes/workspace-voice.js';
+import { registerWorkspaceModelsRoutes } from './routes/workspace-models.js';
+import { WorkspaceVoiceCoordinator } from './voice/workspace-voice-coordinator.js';
 import { registerA2uiActionRoutes } from './routes/a2ui-action.js';
 import { setRateLimiter } from './rate-limit.js';
+import { resolveAcpHttpEnabled } from './acp-http-enabled.js';
+import {
+  createTotalSessionAdmissionController,
+  type TotalSessionAdmissionSnapshot,
+} from './total-session-admission.js';
 import {
   sendBridgeError as sendBridgeErrorResponse,
   sendPermissionVoteError as sendPermissionVoteErrorResponse,
@@ -117,24 +173,56 @@ import { daemonTelemetryMiddleware } from './server/telemetry.js';
 import { installJsonBodyParser } from './server/error-handlers.js';
 import { installRateLimiter } from './server/rate-limiter-setup.js';
 import {
-  advertisedMaxPendingPromptsPerSession,
-  createServeFeatures,
-  SERVE_LANGUAGE_CODES as LANGUAGE_CODES,
-} from './server/serve-features.js';
-import { installSelfOriginStripMiddleware } from './server/self-origin.js';
-import { getServeProtocolVersions } from './capabilities.js';
+  createSingleWorkspaceRegistry,
+  createWorkspaceSessionOwnerIndex,
+  type WorkspaceRegistry,
+  type WorkspaceRuntime,
+  type WorkspaceRuntimeEnvMetadata,
+} from './workspace-registry.js';
 import {
-  PromptDeadlineExceededError,
-  resolvePromptDeadlineMs,
-} from './server/prompt-deadline.js';
+  isPortableAbsolutePath,
+  resolveRegisteredWorkspaceRuntimeByPathSelector,
+} from './workspace-route-runtime.js';
 import {
-  InvalidCursorError,
-  listWorkspaceSessionsForResponse,
-} from './server/session-list.js';
-import { registerWorkspaceLifecycleRoutes } from './routes/workspace-lifecycle.js';
-import { registerWorkspaceMcpControlRoutes } from './routes/workspace-mcp-control.js';
-import { registerWorkspaceToolsRoutes } from './routes/workspace-tools.js';
-import { createVoiceWsConnectionHandler } from './voice/voice-ws.js';
+  registerWorkspaceLifecycleRoutes,
+  registerWorkspaceQualifiedLifecycleRoutes,
+} from './routes/workspace-lifecycle.js';
+import {
+  registerWorkspaceManagementRoutes,
+  type WorkspaceManagementHandle,
+  type WorkspaceRuntimeRemovalController,
+} from './routes/workspace-management.js';
+import type { WorkspaceRegistrationStore } from './workspace-registration-store.js';
+import {
+  registerWorkspaceGitRoutes,
+  registerWorkspaceQualifiedGitRoutes,
+} from './routes/workspace-git.js';
+import {
+  registerWorkspaceGitDiffRoutes,
+  registerWorkspaceQualifiedGitDiffRoutes,
+} from './routes/workspace-git-diff.js';
+import { WorkspaceGitState } from './workspace-git-state.js';
+import {
+  registerWorkspaceMcpControlRoutes,
+  registerWorkspaceQualifiedMcpControlRoutes,
+} from './routes/workspace-mcp-control.js';
+import { registerWorkspaceChannelControlRoutes } from './routes/workspace-channel-control.js';
+import { registerWorkspaceChannelObservedContactRoutes } from './routes/workspace-channel-observed-contacts.js';
+import {
+  registerWorkspaceQualifiedToolsRoutes,
+  registerWorkspaceToolsRoutes,
+} from './routes/workspace-tools.js';
+import {
+  registerWorkspaceQualifiedSkillsRoutes,
+  registerWorkspaceSkillsRoutes,
+} from './routes/workspace-skills.js';
+import { registerChannelWebhookRoutes } from './routes/channel-webhooks.js';
+import {
+  parseChannelWebhookConfigLenient,
+  type parseChannelWebhookConfig,
+} from '../commands/channel/config-utils.js';
+import { loadChannelsConfig } from '../commands/channel/runtime.js';
+import { writeStderrLine } from '../utils/stdioHelpers.js';
 
 export { resolveBridgeFsFactory } from './server/fs-factory.js';
 export {
@@ -143,11 +231,14 @@ export {
 } from './server/prompt-deadline.js';
 export {
   InvalidCursorError,
+  getWorkspaceSessionInfoForResponse,
   listWorkspaceSessionsForResponse,
 } from './server/session-list.js';
 export type {
   ListWorkspaceSessionsOptions,
+  ListWorkspaceSessionsReadOptions,
   ListWorkspaceSessionsResult,
+  WorkspaceSessionInfoResult,
 } from './server/session-list.js';
 
 /**
@@ -204,10 +295,108 @@ export function getActiveSseCount(): number {
   return activeSseCount;
 }
 
+function loadServeChannelWebhookConfigs(
+  sources: readonly ChannelWebhookConfigSource[],
+): Record<string, { webhooks?: ReturnType<typeof parseChannelWebhookConfig> }> {
+  const parsed: Record<
+    string,
+    { webhooks?: ReturnType<typeof parseChannelWebhookConfig> }
+  > = {};
+
+  for (const source of sources) {
+    let channelsConfig: ReturnType<typeof loadChannelsConfig>;
+    try {
+      channelsConfig = loadChannelsConfig(source.workspaceCwd);
+    } catch (error) {
+      writeStderrLine(
+        `[daemon] Skipping webhook config source ${JSON.stringify(source.workspaceCwd)}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      continue;
+    }
+    const selectedChannels = source.channelNames
+      ? new Set(source.channelNames)
+      : undefined;
+    for (const [channelName, rawConfig] of Object.entries(channelsConfig)) {
+      if (
+        (selectedChannels && !selectedChannels.has(channelName)) ||
+        typeof rawConfig !== 'object' ||
+        rawConfig === null
+      ) {
+        continue;
+      }
+      let webhooks: ReturnType<typeof parseChannelWebhookConfig>;
+      try {
+        webhooks = parseChannelWebhookConfigLenient(
+          channelName,
+          rawConfig as Record<string, unknown>,
+          (webhookSource, sourceError) => {
+            const sourceMessage =
+              sourceError instanceof Error
+                ? sourceError.message
+                : String(sourceError);
+            writeStderrLine(
+              `[daemon] Skipping malformed webhook source "${webhookSource}" for channel "${channelName}": ${sourceMessage}`,
+            );
+          },
+          source.env,
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        writeStderrLine(
+          `[daemon] Skipping malformed webhook config for channel "${channelName}": ${message}`,
+        );
+        continue;
+      }
+      if (webhooks) {
+        parsed[channelName] = { webhooks };
+      }
+    }
+  }
+
+  return parsed;
+}
+
+function describeRegistryPrimaryForConflict(
+  registry: WorkspaceRegistry,
+): string {
+  return (
+    `registry primary cwd=${JSON.stringify(registry.primary.workspaceCwd)}, ` +
+    `workspaceId=${JSON.stringify(registry.primary.workspaceId)}`
+  );
+}
+
+function getRuntimeEffectiveEnv(
+  metadata: WorkspaceRuntimeEnvMetadata | undefined,
+): Readonly<Record<string, string | undefined>> | undefined {
+  if (!metadata || metadata.mode === 'parent-process') {
+    return metadata?.effectiveEnv;
+  }
+  return metadata.effectiveEnv ?? {};
+}
+
 export interface ServeAppDeps {
   /** Bridge instance; tests inject a fake. Defaults to a fresh real one. */
   bridge?: AcpSessionBridge;
-  /** Built Web Shell assets directory (`index.html` + `assets/`). */
+  /**
+   * Enables resident management of scheduled-task-owned sessions: a periodic
+   * keepalive (so their schedulers aren't idle-reaped) and a boot-time
+   * rehydration (so they re-arm after a restart). Opt-in — only the real
+   * long-running daemon (`runQwenServe`) sets it. Tests and direct embeds
+   * leave it off so `createServeApp` neither spawns sessions on boot nor holds
+   * a heartbeat timer.
+   */
+  manageScheduledTaskSessions?: boolean;
+  /**
+   * Directory of the built Web Shell SPA (`index.html` + `assets/`). When
+   * set (and `opts.serveWebShell !== false`), `createServeApp` mounts the
+   * UI at the daemon root before `bearerAuth`. Production `runQwenServe`
+   * resolves this via `resolveWebShellDir()` and injects it here; direct
+   * embeds / tests opt in by passing a fixture dir, so the default
+   * `createServeApp` (no injection) stays API-only and existing route tests
+   * are unaffected.
+   */
   webShellDir?: string;
   /**
    * HopCode version advertised to web/SDK clients. Production passes the
@@ -268,9 +457,29 @@ export interface ServeAppDeps {
   daemonLog?: DaemonLogger;
   startup?: DaemonStartupSnapshot;
   getChannelWorkerSnapshot?: () => ChannelWorkerSnapshot;
+  getChannelWorkerSnapshots?: () => ChannelWorkerGroupSnapshot[];
+  getChannelWorkerControl?: () => ChannelWorkerControlState;
+  isChannelControlDraining?: () => boolean;
+  isChannelControlInitializing?: () => boolean;
+  setChannelWorkerSelection?: (
+    selection: ServeChannelSelection,
+  ) => Promise<ChannelWorkerSetResult>;
+  stopChannelWorker?: () => Promise<ChannelWorkerStopResult>;
+  enqueueChannelWebhookTask?: ChannelWorkerSupervisor['enqueueWebhookTask'];
+  channelWebhookConfigSources?: readonly ChannelWebhookConfigSource[];
+  getChannelWebhookConfigSources?: () => readonly ChannelWebhookConfigSource[];
+  getChannelWebhookConfigVersion?: () => number;
+  registerChannelWebhookConfigRefresh?: (refresh: () => void) => void;
+  /**
+   * Stop and relaunch the daemon-managed channel worker so it re-reads
+   * settings.json. Its presence mounts the compatibility reload route;
+   * `channel_reload` is advertised only while the control state is enabled.
+   */
+  reloadChannelWorker?: () => Promise<ChannelWorkerSnapshot>;
   getPerfSnapshot?: () => DaemonPerfSnapshot;
   /** Rolling metrics series for the Daemon Status charts (oldest→newest). */
   getMetricsSeries?: () => DaemonMetricsBucket[];
+  getTotalSessionAdmissionSnapshot?: () => TotalSessionAdmissionSnapshot;
   /**
    * Sink fed one (durationMs, statusCode) per matched daemon HTTP request, so
    * the metrics ring can bucket request rate and latency for the charts.
@@ -283,6 +492,7 @@ export interface ServeAppDeps {
     toolName: string,
     enabled: boolean,
   ) => Promise<void>;
+  persistDisabledSkills?: DaemonWorkspaceServiceDeps['persistDisabledSkills'];
   contextFilename?: string;
   persistSetting?: (
     workspace: string,
@@ -298,6 +508,7 @@ export interface ServeAppDeps {
       value: unknown;
     }>,
   ) => Promise<void>;
+  sessionArtifactsPersistenceAvailable?: boolean;
   /**
    * Reverse tool channel (issue #5626, Phase 2). Shared sender registry that
    * bridges the daemon WS (per-connection `ClientMcpRegistrar`) and the ACP
@@ -309,7 +520,15 @@ export interface ServeAppDeps {
    * builds its own registry and wires it into the bridge it creates.
    */
   clientMcpSenderRegistry?: ClientMcpSenderRegistry;
+  workspaceRegistry?: WorkspaceRegistry;
+  createWorkspaceRuntime?: (cwd: string) => Promise<WorkspaceRuntime>;
+  workspaceRegistrationStore?: WorkspaceRegistrationStore;
+  workspaceRuntimeRemoval?: WorkspaceRuntimeRemovalController;
+  primaryWorkspaceTrusted?: boolean;
+  primaryRuntimeEnv?: WorkspaceRuntimeEnvMetadata;
+  daemonEnv?: Readonly<NodeJS.ProcessEnv>;
   voiceTranscriber?: WorkspaceVoiceRouteDeps['transcribe'];
+  voiceCoordinator?: WorkspaceVoiceCoordinator;
 }
 
 /**
@@ -341,11 +560,43 @@ export interface ServeAppDeps {
  * a "healthy"-looking daemon whose every spawn fails with cryptic
  * child-process ENOENT.
  */
+// Mirrors the bridge's session-idle reaper default (30 min). Used only to
+// size the scheduled-task keepalive interval when no explicit timeout is set.
+const DEFAULT_SESSION_IDLE_TIMEOUT_MS = 30 * 60_000;
+// Bounds for the keepalive interval: ≥30s (avoid busy-looping on a tiny custom
+// timeout) and ≤10min (stay well inside the 30-min default reaper window).
+const KEEPALIVE_MIN_INTERVAL_MS = 30_000;
+const KEEPALIVE_MAX_INTERVAL_MS = 10 * 60_000;
+
+/**
+ * Sizes the keepalive heartbeat interval so a resident task session is beaten
+ * BEFORE the idle reaper closes it. Targets a third of the reaper window, but
+ * never exceeds HALF of it — so at least one heartbeat lands in time even for a
+ * small custom timeout, where the 30s floor would otherwise overshoot the whole
+ * window and let the session be reaped before the first beat. When the reaper is
+ * disabled (idle timeout ≤ 0) sessions are never reaped, so heartbeats aren't
+ * needed — the loop still runs (to revive re-enabled bound sessions) but at the
+ * relaxed max cadence.
+ */
+export function computeKeepaliveIntervalMs(idleTimeoutMs: number): number {
+  if (idleTimeoutMs <= 0) return KEEPALIVE_MAX_INTERVAL_MS;
+  const target = Math.min(
+    Math.max(KEEPALIVE_MIN_INTERVAL_MS, Math.floor(idleTimeoutMs / 3)),
+    KEEPALIVE_MAX_INTERVAL_MS,
+  );
+  return Math.max(1, Math.min(target, Math.floor(idleTimeoutMs / 2)));
+}
+
 export function createServeApp(
   opts: ServeOptions,
   getPort: () => number = () => opts.port,
   deps: ServeAppDeps = {},
 ): Application {
+  if (deps.workspaceRuntimeRemoval && !deps.voiceCoordinator) {
+    throw new Error(
+      'createServeApp: deps.workspaceRuntimeRemoval requires the matching deps.voiceCoordinator.',
+    );
+  }
   const app = express();
   // Forward `maxSessions` into the default-constructed bridge so
   // direct callers of `createServeApp` (tests, embeds) get the same
@@ -353,20 +604,76 @@ export function createServeApp(
   // bridge silently fell back to `DEFAULT_MAX_SESSIONS` (20) and
   // only the `runHopCodeServe` path piped the option through.
   //
-  // The daemon is bound to exactly one workspace. The value advertised
-  // on `/capabilities`, used for the `POST /session` cwd fallback,
-  // AND passed into the bridge must be the SAME canonical form.
+  // The primary workspace value advertised on `/capabilities`, used for the
+  // `POST /session` cwd fallback, AND passed into the primary bridge must be
+  // the SAME canonical form.
   // `deps.boundWorkspace` is the pre-canonicalized fast-path from
-  // `runHopCodeServe`; when omitted we canonicalize ourselves.
+  // `runQwenServe`; when omitted we canonicalize ourselves.
+  const injectedWorkspaceRegistry = deps.workspaceRegistry;
   const boundWorkspace =
+    injectedWorkspaceRegistry?.primary.workspaceCwd ??
     deps.boundWorkspace ??
     canonicalizeWorkspace(opts.workspace ?? process.cwd());
+  if (injectedWorkspaceRegistry) {
+    const primary = injectedWorkspaceRegistry.primary;
+    const registryConflictCandidates = [
+      {
+        depName: 'deps.boundWorkspace',
+        depValue: deps.boundWorkspace,
+        registryValue: primary.workspaceCwd,
+        detail: `deps.boundWorkspace=${JSON.stringify(deps.boundWorkspace)}`,
+      },
+      {
+        depName: 'deps.bridge',
+        depValue: deps.bridge,
+        registryValue: primary.bridge,
+        detail: 'deps.bridge is a different object',
+      },
+      {
+        depName: 'deps.workspace',
+        depValue: deps.workspace,
+        registryValue: primary.workspaceService,
+        detail: 'deps.workspace is a different object',
+      },
+      {
+        depName: 'deps.fsFactory',
+        depValue: deps.fsFactory,
+        registryValue: primary.routeFileSystemFactory,
+        detail: 'deps.fsFactory is a different object',
+      },
+      {
+        depName: 'deps.clientMcpSenderRegistry',
+        depValue: deps.clientMcpSenderRegistry,
+        registryValue: primary.clientMcpSenderRegistry,
+        detail: 'deps.clientMcpSenderRegistry is a different object',
+      },
+    ];
+    for (const candidate of registryConflictCandidates) {
+      if (
+        candidate.depValue === undefined ||
+        candidate.depValue === candidate.registryValue
+      ) {
+        continue;
+      }
+      throw new Error(
+        'createServeApp: workspaceRegistry conflicts with ' +
+          `${candidate.depName}: ${describeRegistryPrimaryForConflict(
+            injectedWorkspaceRegistry,
+          )}; ${candidate.detail}.`,
+      );
+    }
+  }
   // Construct `fsFactory` BEFORE the bridge so the bridge can wire it
   // through `BridgeFileSystem` for ACP-side writeTextFile/readTextFile.
   // Default trust is `false` (test-safe). Embeds without `deps.fsFactory`
   // or `deps.bridge` will see agent writes rejected with
   // `untrusted_workspace` — warn once so the asymmetry is visible.
-  if (!deps.fsFactory && !deps.bridge && !warnedDefaultTrust) {
+  if (
+    !injectedWorkspaceRegistry &&
+    !deps.fsFactory &&
+    !deps.bridge &&
+    !warnedDefaultTrust
+  ) {
     warnedDefaultTrust = true;
     process.stderr.write(
       'hopcode serve: createServeApp default fsFactory uses trusted=false ' +
@@ -374,11 +681,13 @@ export function createServeApp(
         'Inject deps.fsFactory (with explicit trust) or deps.bridge to override.\n',
     );
   }
-  const fsFactory = resolveBridgeFsFactory({
-    boundWorkspaces: [boundWorkspace],
-    injected: deps.fsFactory,
-    trusted: false,
-  });
+  const fsFactory =
+    injectedWorkspaceRegistry?.primary.routeFileSystemFactory ??
+    resolveBridgeFsFactory({
+      boundWorkspaces: [boundWorkspace],
+      injected: deps.fsFactory,
+      trusted: false,
+    });
   const tokenConfigured =
     typeof opts.token === 'string' && opts.token.length > 0;
   const sessionShellCommandEnabled =
@@ -401,6 +710,7 @@ export function createServeApp(
   if (
     opts.clientMcpOverWs === true &&
     deps.bridge &&
+    !injectedWorkspaceRegistry &&
     !deps.clientMcpSenderRegistry
   ) {
     throw new Error(
@@ -410,22 +720,99 @@ export function createServeApp(
     );
   }
   const clientMcpSenderRegistry =
-    deps.clientMcpSenderRegistry ?? new ClientMcpSenderRegistry();
+    injectedWorkspaceRegistry?.primary.clientMcpSenderRegistry ??
+    deps.clientMcpSenderRegistry ??
+    new ClientMcpSenderRegistry();
+  const primaryRuntimeEnvMetadata =
+    injectedWorkspaceRegistry?.primary.env ?? deps.primaryRuntimeEnv;
+  const primaryEffectiveEnv = getRuntimeEffectiveEnv(primaryRuntimeEnvMetadata);
   const { languageCodes, currentServeFeatures, invalidateServeFeaturesCache } =
     createServeFeatures({
       opts,
       boundWorkspace,
       persistSettingAvailable: deps.persistSetting !== undefined,
-      reloadAvailable: deps.workspace !== undefined,
+      sessionArtifactsPersistenceAvailable:
+        deps.sessionArtifactsPersistenceAvailable !== false,
+      sessionGenerationAvailable: () => {
+        const runtimes = workspaceRegistry.list();
+        return (
+          runtimes.length > 0 &&
+          runtimes.every(
+            (runtime) => runtime.bridge.generateSessionContent !== undefined,
+          )
+        );
+      },
+      // Registry injection supplies the primary workspace service through the
+      // runtime, so it has the same reload surface as legacy deps.workspace.
+      reloadAvailable:
+        deps.workspace !== undefined || injectedWorkspaceRegistry !== undefined,
+      channelControlAvailable:
+        deps.getChannelWorkerControl !== undefined &&
+        deps.setChannelWorkerSelection !== undefined &&
+        deps.stopChannelWorker !== undefined,
+      channelReloadAvailable: () => {
+        if (deps.reloadChannelWorker === undefined) return false;
+        const control = deps.getChannelWorkerControl?.();
+        if (control) {
+          return (
+            control.enabled &&
+            control.selection !== null &&
+            control.workers.length > 0
+          );
+        }
+        return (
+          deps.getChannelWorkerSnapshots?.().some((worker) => worker.enabled) ||
+          deps.getChannelWorkerSnapshot?.().enabled ||
+          false
+        );
+      },
       sessionShellCommandEnabled,
+      multiWorkspaceSessionsEnabled: () => workspaceRegistry.list().length > 1,
+      persistentWorkspaceRegistrationAvailable:
+        deps.workspaceRegistrationStore !== undefined,
+      workspaceRuntimeRemovalAvailable:
+        deps.workspaceRuntimeRemoval !== undefined,
+      ...(primaryEffectiveEnv ? { env: primaryEffectiveEnv } : {}),
     });
-  const statusProvider = deps.statusProvider ?? createDaemonStatusProvider();
+  (
+    app.locals as {
+      invalidateServeFeaturesCache?: () => void;
+    }
+  ).invalidateServeFeaturesCache = invalidateServeFeaturesCache;
+  const statusProvider =
+    deps.statusProvider ??
+    createDaemonStatusProvider(
+      primaryEffectiveEnv ? { env: primaryEffectiveEnv } : {},
+    );
+  let defaultBridgeForAdmission: AcpSessionBridge | undefined;
+  const totalSessionAdmission =
+    !deps.bridge && !injectedWorkspaceRegistry
+      ? createTotalSessionAdmissionController({
+          maxTotalSessions: opts.maxTotalSessions,
+          getBridges: () =>
+            defaultBridgeForAdmission ? [defaultBridgeForAdmission] : [],
+        })
+      : undefined;
+  const defaultSessionOwnerIndex = !injectedWorkspaceRegistry
+    ? createWorkspaceSessionOwnerIndex()
+    : undefined;
   const bridge =
+    injectedWorkspaceRegistry?.primary.bridge ??
     deps.bridge ??
     createAcpSessionBridge({
       maxSessions: opts.maxSessions,
+      ...(totalSessionAdmission
+        ? { freshSessionAdmission: totalSessionAdmission.admit }
+        : {}),
+      ...(defaultSessionOwnerIndex
+        ? {
+            sessionLifecycle:
+              defaultSessionOwnerIndex.handleBridgeSessionLifecycle,
+          }
+        : {}),
       maxPendingPromptsPerSession: opts.maxPendingPromptsPerSession,
       eventRingSize: opts.eventRingSize,
+      compactedReplayMaxBytes: opts.compactedReplayMaxBytes,
       permissionResponseTimeoutMs: opts.permissionResponseTimeoutMs,
       boundWorkspace,
       sessionShellCommandEnabled,
@@ -439,6 +826,9 @@ export function createServeApp(
       // ext-method by reaching the WS connection that hosts the named server.
       clientMcpSender: clientMcpSenderRegistry.lookup,
     });
+  if (!injectedWorkspaceRegistry && !deps.bridge) {
+    defaultBridgeForAdmission = bridge;
+  }
   const archiveCoordinator = new SessionArchiveCoordinator();
 
   installSelfOriginStripMiddleware(app, getPort);
@@ -452,67 +842,26 @@ export function createServeApp(
   // compute workspace-relative response paths without re-resolving.
   (app.locals as { boundWorkspace?: string }).boundWorkspace = boundWorkspace;
 
-  // Wire the device-flow registry. Default builds a single HopCode
-  // provider; tests inject `deps.deviceFlowRegistry` or
-  // `deps.deviceFlowProviders` to stub the OAuth client only.
-  const deviceFlowProviderMap = new Map<
-    DeviceFlowProviderId,
-    DeviceFlowProvider
-  >();
-  for (const provider of deps.deviceFlowProviders ?? []) {
-    deviceFlowProviderMap.set(provider.providerId, provider);
-  }
-  if (!deviceFlowProviderMap.has('hopcode-oauth')) {
-    deviceFlowProviderMap.set(
-      'hopcode-oauth',
-      new HopCodeOAuthDeviceFlowProvider(),
-    );
-  }
-  const deviceFlowEventSink: DeviceFlowEventSink = {
-    publish(emission, originatorClientId) {
-      bridge.publishWorkspaceEvent({
-        type: `auth_device_flow_${emission.type}`,
-        data: emission.data,
-        ...(originatorClientId ? { originatorClientId } : {}),
-      });
-    },
-  };
-  const deviceFlowRegistry =
-    deps.deviceFlowRegistry ??
-    new DeviceFlowRegistry({
-      events: deviceFlowEventSink,
-      audit: {
-        record(line) {
-          // Structured stderr breadcrumb; deviceFlowId truncated to first
-          // 8 chars so log
-          // skimmers can follow a flow without retaining full uuids.
-          const id = line.deviceFlowId.slice(0, 8);
-          const parts = [
-            `[serve] auth.device-flow:`,
-            `provider=${line.providerId}`,
-            `deviceFlowId=${id}...`,
-            line.clientId ? `clientId=${line.clientId}` : 'clientId=-',
-            `status=${line.status}`,
-          ];
-          if (line.errorKind) parts.push(`errorKind=${line.errorKind}`);
-          if (line.expiresInMs !== undefined) {
-            parts.push(`expiresInMs=${Math.max(0, line.expiresInMs)}`);
-          }
-          // Include `line.hint` for operator-only breadcrumbs that
-          // aren't surfaced over SSE. Bound at 1 KiB.
-          if (line.hint) {
-            const STDERR_HINT_MAX = 1_024;
-            const hint =
-              line.hint.length > STDERR_HINT_MAX
-                ? `${line.hint.slice(0, STDERR_HINT_MAX)}…[+${line.hint.length - STDERR_HINT_MAX} bytes truncated]`
-                : line.hint;
-            // Quote the hint so multi-word values stay parseable.
-            parts.push(`hint=${JSON.stringify(hint)}`);
-          }
-          writeStderrLine(parts.join(' '));
-        },
+  const { deviceFlowRegistry, getSupportedDeviceFlowProviders } =
+    setupDeviceFlowRegistry({
+      app,
+      bridge,
+      registry: deps.deviceFlowRegistry,
+      providers: deps.deviceFlowProviders,
+      // Phase 4: fan device-flow events out to the primary and every trusted
+      // secondary runtime bridge, so workspace-qualified ACP clients receive
+      // their own flow's events. Resolved lazily: the registry is created
+      // before the workspace registry exists, but by the time a flow emits,
+      // `app.locals` holds the populated registry.
+      resolveEventBridges: () => {
+        const reg = (app.locals as { workspaceRegistry?: WorkspaceRegistry })
+          .workspaceRegistry;
+        if (!reg) return [bridge];
+        return reg
+          .list()
+          .filter((rt) => rt.primary || rt.trusted)
+          .map((rt) => rt.bridge);
       },
-      resolveProvider: (providerId) => deviceFlowProviderMap.get(providerId),
     });
   // Park the registry on `app.locals` so request handlers can reach it.
   // Typed accessor prevents a string-key typo from silently detaching
@@ -530,11 +879,18 @@ export function createServeApp(
   ) => sendPermissionVoteErrorResponse(res, err, ctx, daemonLog);
 
   const workspace: DaemonWorkspaceService =
+    injectedWorkspaceRegistry?.primary.workspaceService ??
     deps.workspace ??
     createDaemonWorkspaceService({
       boundWorkspace,
-      contextFilename: deps.contextFilename ?? 'HOPCODE.md',
-      statusProvider: createDaemonStatusProvider(),
+      contextFilename: deps.contextFilename ?? 'QWEN.md',
+      statusProvider,
+      workspaceProvidersStatusProvider: createWorkspaceProvidersStatusProvider(
+        primaryEffectiveEnv ? { env: primaryEffectiveEnv } : {},
+      ),
+      workspaceSkillsStatusProvider: createWorkspaceSkillsStatusProvider(),
+      ...(primaryEffectiveEnv ? { skillInstallEnv: primaryEffectiveEnv } : {}),
+      ...(primaryEffectiveEnv ? { voiceEnv: primaryEffectiveEnv } : {}),
       isChannelLive: () => bridge.isChannelLive(),
       persistDisabledTools:
         deps.persistDisabledTools ??
@@ -543,10 +899,18 @@ export function createServeApp(
             'setWorkspaceToolEnabled requires persistDisabledTools in ServeAppDeps',
           );
         }),
+      persistDisabledSkills:
+        deps.persistDisabledSkills ??
+        (async () => {
+          throw new Error(
+            'setWorkspaceSkillEnabled requires persistDisabledSkills in ServeAppDeps',
+          );
+        }),
       queryWorkspaceStatus: (method, idle) =>
         bridge.queryWorkspaceStatus(method, idle),
       invokeWorkspaceCommand: (method, params, invokeOpts) =>
         bridge.invokeWorkspaceCommand(method, params, invokeOpts),
+      preheatAcpChild: () => bridge.preheat(),
       refreshExtensionsForAllSessions: () =>
         bridge.refreshExtensionsForAllSessions(),
       ...(deps.persistSetting ? { persistSetting: deps.persistSetting } : {}),
@@ -563,20 +927,49 @@ export function createServeApp(
         bridge.publishWorkspaceEvent(event);
       },
     });
-  const workspaceRegistry = createSingleWorkspaceRegistry({
-    workspaceCwd: boundWorkspace,
-    bridge,
-    workspaceService: workspace,
-    routeFileSystemFactory: fsFactory,
-    clientMcpSenderRegistry,
-  });
+  const workspaceRegistry =
+    injectedWorkspaceRegistry ??
+    createSingleWorkspaceRegistry(
+      {
+        workspaceId: hashDaemonWorkspace(boundWorkspace),
+        workspaceCwd: boundWorkspace,
+        primary: true,
+        trusted: deps.primaryWorkspaceTrusted ?? false,
+        env: primaryRuntimeEnvMetadata ?? {
+          mode: 'parent-process',
+          overlayKeys: [],
+        },
+        bridge,
+        workspaceService: workspace,
+        routeFileSystemFactory: fsFactory,
+        clientMcpSenderRegistry,
+      },
+      defaultSessionOwnerIndex
+        ? { sessionOwnerIndex: defaultSessionOwnerIndex }
+        : {},
+    );
   (app.locals as { workspaceRegistry?: WorkspaceRegistry }).workspaceRegistry =
     workspaceRegistry;
   const primaryRuntime = workspaceRegistry.primary;
+  const daemonEnv = deps.daemonEnv ?? process.env;
+  const primaryRuntimeEffectiveEnv =
+    getRuntimeEffectiveEnv(primaryRuntime.env) ?? daemonEnv;
+  const voiceCoordinator =
+    deps.voiceCoordinator ?? new WorkspaceVoiceCoordinator();
   const primaryBoundWorkspace = primaryRuntime.workspaceCwd;
   const primaryBridge = primaryRuntime.bridge;
   const primaryWorkspace = primaryRuntime.workspaceService;
   const primaryRouteFileSystemFactory = primaryRuntime.routeFileSystemFactory;
+  const workspaceGitState = new WorkspaceGitState();
+  (app.locals as { stopWorkspaceGitState?: () => void }).stopWorkspaceGitState =
+    () => workspaceGitState.dispose();
+  (
+    app.locals as {
+      stopWorkspaceGitStateForWorkspace?: (workspaceCwd: string) => void;
+    }
+  ).stopWorkspaceGitStateForWorkspace = (workspaceCwd) =>
+    workspaceGitState.disposeWorkspace(workspaceCwd);
+  const workspaceQualifiedAcpEnabled = resolveAcpHttpEnabled();
 
   // Order matters: rejection guards (CORS / Host allowlist / bearer auth)
   // run BEFORE the JSON body parser. Otherwise an unauthenticated POST
@@ -606,105 +999,20 @@ export function createServeApp(
     app.use(denyBrowserOriginCors);
   }
   app.use(hostAllowlist(opts.hostname, getPort));
+  const rateLimiter = installRateLimiter(app, opts, daemonLog, {
+    mount: false,
+    workspaceQualifiedAcpEnabled,
+  });
 
-  // --- Demo page: mirrors the `/health` loopback-gating pattern.
-  // On loopback binds, registered BEFORE bearerAuth so browsers can
-  // reach the page via address-bar navigation (which cannot attach
-  // Authorization headers). On non-loopback binds, registered AFTER
-  // bearerAuth — an unauthenticated `/demo` on a public interface
-  // would leak the full API surface (route enumeration + interactive
-  // console), far more than `/health`'s `{"status":"ok"}`.
-  // X-Frame-Options: DENY + CSP frame-ancestors 'none' prevent
-  // clickjacking — a malicious site embedding the demo in an iframe
-  // could trick a user into performing daemon actions via transparent
-  // overlay (the iframe's same-origin fetches bypass CORS).
-  const demoHandler = (
-    _req: import('express').Request,
-    res: import('express').Response,
-  ) => {
-    try {
-      res
-        .type('html')
-        .set('X-Frame-Options', 'DENY')
-        .set(
-          'Content-Security-Policy',
-          "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'",
-        )
-        .send(getDemoHtml(getPort()));
-    } catch (err) {
-      writeStderrLine(
-        `hopcode serve: /demo render failed: ${err instanceof Error ? err.message : String(err)}`,
-      );
-      res.status(500).json({ error: 'Failed to render demo page' });
-    }
-  };
-
-  // `/health` is exempted from `bearerAuth` ONLY on loopback binds —
-  // the canonical liveness-probe case (k8s/Compose probes don't
-  // carry the daemon's bearer; round-tripping a 401 just to know
-  // the listener is up is waste). On non-loopback binds the
-  // exemption becomes a low-severity info leak (attacker can probe
-  // arbitrary IP:port to confirm a `hopcode serve` is listening), so
-  // we register `/health` AFTER `bearerAuth` and let it 401 like
-  // every other route. Operators using the loopback default get the
-  // probe-friendly behavior; operators exposing the daemon publicly
-  // gate `/health` behind their token alongside everything else.
-  // CORS deny + Host allowlist still apply to `/health` in both
-  // cases.
-  // Shared handler so loopback (pre-auth) and non-loopback (post-auth)
-  // routes return the same shape. `?deep=1` exposes bridge counters
-  // (`sessions`, `pendingPermissions`) for observability — it is
-  // INFORMATIONAL only, not a true liveness probe. Counter getters
-  // are size accessors that don't perform per-session/channel pings,
-  // so a wedged child (stuck on a request, leaked FD, etc.) won't
-  // change the response. We retain the try/catch + 503 as a
-  // defense-in-depth net for custom bridge impls whose getters MAY
-  // throw — but the real bridge's getters never do, so under normal
-  // operation the 503 path is unreachable. The docs
-  // (`docs/users/hopcode-serve.md` + `hopcode-serve-protocol.md`) clarify
-  // that deep is for counters, not health verification. Default (no
-  // query) stays cheap so high-frequency liveness probes don't load
-  // the bridge.
-  const healthHandler = (
-    req: import('express').Request,
-    res: import('express').Response,
-  ): void => {
-    const deepQuery = req.query['deep'];
-    const deep = deepQuery === '1' || deepQuery === 'true' || deepQuery === '';
-    if (!deep) {
-      res.status(200).json({ status: 'ok' });
-      return;
-    }
-    try {
-      const lastActivity = bridge.lastActivityAt;
-      const now = Date.now();
-      res.status(200).json({
-        status: 'ok',
-        sessions: bridge.sessionCount,
-        pendingPermissions: bridge.pendingPermissionCount,
-        activePrompts: bridge.activePromptCount,
-        connectedClients: getActiveSseCount(),
-        channelAlive: bridge.isChannelLive(),
-        lastActivityAt:
-          lastActivity !== null ? new Date(lastActivity).toISOString() : null,
-        idleSinceMs: lastActivity !== null ? now - lastActivity : null,
-        ...(rateLimiter ? { rateLimitHits: rateLimiter.getHitCounts() } : {}),
-      });
-    } catch (err) {
-      writeStderrLine(
-        `hopcode serve: /health deep probe failed: ${err instanceof Error ? err.message : String(err)}`,
-      );
-      res.status(503).json({ status: 'degraded' });
-    }
-  };
-
-  const loopback = isLoopbackBind(opts.hostname);
-  // `--require-auth` extends the non-loopback "gate /health behind
-  // bearer too" rule to loopback.
-  const exposeHealthPreAuth = loopback && !opts.requireAuth;
-  if (exposeHealthPreAuth) {
-    app.get('/health', healthHandler);
-    app.get('/demo', demoHandler);
+  const healthDemoRoutes = createHealthDemoRoutes({
+    opts,
+    getPort,
+    workspaceRegistry,
+    getActiveSseCount,
+    getRateLimiter: () => rateLimiter,
+  });
+  if (healthDemoRoutes.exposeHealthPreAuth) {
+    healthDemoRoutes.register(app);
   }
 
   // Access-log middleware. Registered BEFORE bearerAuth and JSON parser
@@ -760,12 +1068,59 @@ export function createServeApp(
     });
   }
 
+  if (deps.enqueueChannelWebhookTask) {
+    let channelWebhookConfigVersion = -1;
+    let channelWebhookConfigs: Record<
+      string,
+      { webhooks?: ReturnType<typeof parseChannelWebhookConfig> }
+    > = {};
+    const refreshChannelWebhookConfigs = () => {
+      const version = deps.getChannelWebhookConfigVersion?.() ?? 0;
+      try {
+        // A mutable manager must provide committed routing explicitly;
+        // falling back to every primary-workspace webhook would keep old
+        // secrets active after DELETE or a failed replacement.
+        const sources =
+          deps.getChannelWebhookConfigSources?.() ??
+          (deps.getChannelWorkerControl
+            ? []
+            : (deps.channelWebhookConfigSources ?? [
+                { workspaceCwd: primaryBoundWorkspace },
+              ]));
+        channelWebhookConfigs = loadServeChannelWebhookConfigs(sources);
+        channelWebhookConfigVersion = version;
+      } catch (error) {
+        channelWebhookConfigs = {};
+        daemonLog?.warn(
+          `failed to refresh channel webhook configuration: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    };
+    deps.registerChannelWebhookConfigRefresh?.(refreshChannelWebhookConfigs);
+    registerChannelWebhookRoutes(app, {
+      getChannelsConfig: () => {
+        const version = deps.getChannelWebhookConfigVersion?.() ?? 0;
+        if (channelWebhookConfigVersion !== version) {
+          refreshChannelWebhookConfigs();
+        }
+        return channelWebhookConfigs;
+      },
+      safeBody,
+      enqueueWebhookTask: deps.enqueueChannelWebhookTask,
+      rateLimiter,
+      daemonLog,
+    });
+  }
+
   app.use(bearerAuth(opts.token));
 
-  // Rate limiter: after auth (only count authenticated requests),
-  // before body parser (reject early without burning JSON.parse CPU).
-  const rateLimiter = installRateLimiter(app, opts, daemonLog);
-  installJsonBodyParser(app);
+  // Rate limiter: after auth (only count authenticated requests), except
+  // webhook routes which use their own shared-secret auth before bearerAuth.
+  if (rateLimiter) {
+    app.use(rateLimiter.middleware);
+  }
 
   if (!exposeHealthPreAuth) {
     // Non-loopback OR loopback with `--require-auth`: register
@@ -777,6 +1132,8 @@ export function createServeApp(
     app.get('/demo', demoHandler);
   }
 
+  installJsonBodyParser(app);
+
   // Mutation-route gate factory. Non-strict mode is passthrough;
   // `{ strict: true }` requires a token even on loopback defaults.
   const mutate = createMutationGate({
@@ -785,16 +1142,36 @@ export function createServeApp(
   });
 
   app.use(
-    daemonTelemetryMiddleware(
-      () => primaryBoundWorkspace,
-      deps.recordDaemonRequest,
-    ),
+    daemonTelemetryMiddleware((req) => {
+      const match = req.path.match(/^\/workspaces\/([^/]+)/);
+      const rawSelector = match?.[1];
+      if (rawSelector) {
+        try {
+          const selector = decodeURIComponent(rawSelector);
+          const byId = workspaceRegistry.getByWorkspaceId(selector);
+          if (byId) return byId.workspaceCwd;
+          if (isPortableAbsolutePath(selector)) {
+            const runtime = resolveRegisteredWorkspaceRuntimeByPathSelector(
+              workspaceRegistry,
+              selector,
+            );
+            if (runtime) return runtime.workspaceCwd;
+          }
+        } catch {
+          return primaryBoundWorkspace;
+        }
+      }
+      return primaryBoundWorkspace;
+    }, deps.recordDaemonRequest),
   );
 
   const buildWorkspaceCtx = createBuildWorkspaceCtx(primaryBoundWorkspace);
 
   const acpHandleRef: { current?: AcpHttpHandle } = {};
-  const workspaceRememberLane = new WorkspaceRememberTaskLane(primaryBridge);
+  const workspaceRememberLane = new WorkspaceRememberTaskLane(
+    primaryBridge,
+    primaryBoundWorkspace,
+  );
 
   // Plan C CDP tunnel (issue #5626): process-scoped registry pairing the
   // extension `/acp` connection with the `/cdp` puppeteer endpoint. Inert until
@@ -802,80 +1179,71 @@ export function createServeApp(
   const cdpTunnelRegistry =
     opts.cdpTunnelOverWs === true ? new CdpTunnelRegistry() : undefined;
 
-  app.get('/daemon/status', async (req, res) => {
-    const detail = parseDaemonStatusDetail(req.query['detail']);
-    if (!detail.ok || !detail.detail) {
-      res.status(400).json({
-        error: 'detail must be one of: summary, full',
-        code: 'invalid_detail',
-      });
-      return;
-    }
-    try {
-      res.status(200).json(
-        await buildDaemonStatusResponse(detail.detail, {
-          opts,
-          boundWorkspace,
-          bridge,
-          workspace,
-          daemonLog,
-          hopCodeVersion: deps.HopCodeVersion,
-          acpHandle: acpHandleRef.current,
-          rateLimiter,
-          getRestSseActive: getActiveSseCount,
-          features: currentServeFeatures(),
-          protocolVersions: getServeProtocolVersions(),
-          supportedDeviceFlowProviders: Array.from(
-            deviceFlowProviderMap.keys(),
-          ),
-          deviceFlowRegistry,
-          sessionShellCommandEnabled,
-        }),
-      );
-    } catch (err) {
-      writeStderrLine(
-        `hopcode serve: /daemon/status failed: ${err instanceof Error ? err.message : String(err)}`,
-      );
-      res.status(500).json({
-        error: 'Failed to build daemon status',
-        code: 'daemon_status_failed',
-      });
-    }
+  registerDaemonStatusRoutes(app, {
+    opts,
+    boundWorkspace: primaryBoundWorkspace,
+    bridge: primaryBridge,
+    workspaceRegistry,
+    workspace: primaryWorkspace,
+    daemonLog,
+    startup: deps.startup,
+    qwenCodeVersion: deps.qwenCodeVersion,
+    getAcpHandle: () => acpHandleRef.current,
+    getRateLimiter: () => rateLimiter,
+    getRestSseActive: getActiveSseCount,
+    currentServeFeatures,
+    getSupportedDeviceFlowProviders,
+    deviceFlowRegistry,
+    sessionShellCommandEnabled,
+    getChannelWorkerSnapshot: deps.getChannelWorkerSnapshot,
+    getChannelWorkerSnapshots: deps.getChannelWorkerSnapshots,
+    getPerfSnapshot: deps.getPerfSnapshot,
+    getMetricsSeries: deps.getMetricsSeries,
+    getTotalSessionAdmissionSnapshot:
+      deps.getTotalSessionAdmissionSnapshot ?? totalSessionAdmission?.snapshot,
   });
 
-  app.get('/capabilities', (_req, res) => {
-    const envelope: CapabilitiesEnvelope = {
-      v: CAPABILITIES_SCHEMA_VERSION,
-      protocolVersions: getServeProtocolVersions(),
-      ...(deps.HopCodeVersion ? { HopCodeVersion: deps.HopCodeVersion } : {}),
-      mode: opts.mode,
-      features: currentServeFeatures(),
-      modelServices: [],
-      // Surface the bound workspace so clients can detect mismatch
-      // pre-flight and omit `cwd` on `POST /session`.
-      workspaceCwd: boundWorkspace,
-      // Advertise supported transport families so SDK clients can
-      // auto-negotiate the best available transport via
-      // `negotiateTransport()`. REST is always available; future PRs
-      // will add 'acp-http' / 'acp-ws' entries when the corresponding
-      // routes are wired.
-      transports: ['rest'],
-      // Active mediation policy under the `policy` namespace.
-      policy: { permission: bridge.permissionPolicy },
-      limits: {
-        maxPendingPromptsPerSession: advertisedMaxPendingPromptsPerSession(
-          opts.maxPendingPromptsPerSession,
-        ),
-      },
-      supportedLanguages: LANGUAGE_CODES,
-    };
-    res.status(200).json(envelope);
+  registerCapabilitiesRoutes(app, {
+    qwenCodeVersion: deps.qwenCodeVersion,
+    mode: opts.mode,
+    currentServeFeatures,
+    boundWorkspace: primaryBoundWorkspace,
+    workspaceRegistry,
+    permissionPolicy: primaryBridge.permissionPolicy,
+    maxSessionsPerWorkspace: opts.maxSessions,
+    maxTotalSessions: opts.maxTotalSessions,
+    maxPendingPromptsPerSession: opts.maxPendingPromptsPerSession,
+    languageCodes,
   });
 
   registerWorkspaceStatusRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
     bridge: primaryBridge,
     workspace: primaryWorkspace,
+    mutate,
+    sendBridgeError,
+  });
+  registerWorkspaceQualifiedStatusRoutes(app, {
+    workspaceRegistry,
+    sendBridgeError,
+  });
+  registerWorkspaceGitRoutes(app, {
+    boundWorkspace: primaryBoundWorkspace,
+    bridge: primaryBridge,
+    gitState: workspaceGitState,
+    sendBridgeError,
+  });
+  registerWorkspaceQualifiedGitRoutes(app, {
+    workspaceRegistry,
+    gitState: workspaceGitState,
+    sendBridgeError,
+  });
+  registerWorkspaceGitDiffRoutes(app, {
+    boundWorkspace: primaryBoundWorkspace,
+    sendBridgeError,
+  });
+  registerWorkspaceQualifiedGitDiffRoutes(app, {
+    workspaceRegistry,
     sendBridgeError,
   });
 
@@ -883,6 +1251,12 @@ export function createServeApp(
   mountWorkspaceMemoryRoutes(app, {
     bridge: primaryBridge,
     boundWorkspace: primaryBoundWorkspace,
+    mutate,
+    parseClientId: parseClientIdHeader,
+    safeBody,
+  });
+  mountWorkspaceQualifiedMemoryRoutes(app, {
+    workspaceRegistry,
     mutate,
     parseClientId: parseClientIdHeader,
     safeBody,
@@ -901,11 +1275,22 @@ export function createServeApp(
     parseClientId: parseClientIdHeader,
     safeBody,
   });
+  mountWorkspaceQualifiedAgentsRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    parseClientId: parseClientIdHeader,
+    safeBody,
+  });
 
   registerWorkspaceDiagnosticStatusRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
     bridge: primaryBridge,
     workspace: primaryWorkspace,
+    mutate,
+    sendBridgeError,
+  });
+  registerWorkspaceQualifiedDiagnosticStatusRoutes(app, {
+    workspaceRegistry,
     sendBridgeError,
   });
 
@@ -916,6 +1301,7 @@ export function createServeApp(
     mutate,
     safeBody,
     sendBridgeError,
+    workspaceRegistry,
     ...(deps.maxExtensionOperationHistory === undefined
       ? {}
       : { maxExtensionOperationHistory: deps.maxExtensionOperationHistory }),
@@ -925,15 +1311,27 @@ export function createServeApp(
   registerWorkspaceFileReadRoutes(app, {
     parseClientId: parseClientIdHeader,
   });
+  registerWorkspaceQualifiedFileReadRoutes(app, {
+    parseClientId: parseClientIdHeader,
+    workspaceRegistry,
+  });
   registerWorkspaceFileWriteRoutes(app, {
     bridge: primaryBridge,
     mutate,
     parseClientId: parseClientIdHeader,
     safeBody,
   });
+  registerWorkspaceQualifiedFileWriteRoutes(app, {
+    bridge: primaryBridge,
+    mutate,
+    parseClientId: parseClientIdHeader,
+    safeBody,
+    workspaceRegistry,
+  });
   registerWorkspaceSetupGithubRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
     bridge: primaryBridge,
+    env: primaryRuntimeEffectiveEnv,
     mutate,
     parseClientId: parseClientIdHeader,
     safeBody,
@@ -946,6 +1344,30 @@ export function createServeApp(
     parseAndValidateClientId: (req, res) =>
       parseAndValidateWorkspaceClientId(req, res, primaryBridge),
   });
+  registerWorkspaceQualifiedTrustRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+  });
+
+  // Dynamic workspace registration.
+  const workspaceManagementHandle = registerWorkspaceManagementRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+    createWorkspaceRuntime: deps.createWorkspaceRuntime,
+    workspaceRegistrationStore: deps.workspaceRegistrationStore,
+    getAcpHandle: () => acpHandleRef.current,
+    runtimeRemoval: deps.workspaceRuntimeRemoval,
+  });
+  (
+    app.locals as { workspaceManagementHandle?: WorkspaceManagementHandle }
+  ).workspaceManagementHandle = workspaceManagementHandle;
+  (
+    app.locals as {
+      workspaceRuntimeRemoval?: WorkspaceRuntimeRemovalController;
+    }
+  ).workspaceRuntimeRemoval = deps.workspaceRuntimeRemoval;
 
   const broadcastSettingsChanged = (
     key: string,
@@ -974,6 +1396,15 @@ export function createServeApp(
       parseAndValidateClientId: (req, res) =>
         parseAndValidateWorkspaceClientId(req, res, primaryBridge),
     });
+    registerWorkspaceQualifiedSettingsRoutes(app, {
+      workspaceRegistry,
+      mutate,
+      safeBody,
+      persistSetting: async (...args) => {
+        await persistSetting(...args);
+      },
+      invalidateServeFeaturesCache,
+    });
   }
   registerWorkspacePermissionsRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
@@ -983,6 +1414,11 @@ export function createServeApp(
     parseAndValidateClientId: (req, res) =>
       parseAndValidateWorkspaceClientId(req, res, primaryBridge),
   });
+  registerWorkspaceQualifiedPermissionsRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+  });
   registerWorkspaceVoiceRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
     mutate,
@@ -990,10 +1426,35 @@ export function createServeApp(
     persistSetting: deps.persistSetting,
     persistSettings: deps.persistSettings,
     transcribe: deps.voiceTranscriber,
+    env: getRuntimeEffectiveEnv(primaryRuntime.env),
+    acquireVoiceLease: () => voiceCoordinator.acquire(primaryRuntime),
     broadcastSettingsChanged,
     parseAndValidateClientId: (req, res) =>
       parseAndValidateWorkspaceClientId(req, res, primaryBridge),
   });
+  registerWorkspaceQualifiedVoiceRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+    persistSetting: deps.persistSetting,
+    persistSettings: deps.persistSettings,
+    transcribe: deps.voiceTranscriber,
+    acquireVoiceLease: (runtime) => voiceCoordinator.acquire(runtime),
+    parseAndValidateClientId: (req, res, runtime) =>
+      parseAndValidateWorkspaceClientId(req, res, runtime.bridge),
+    invalidateServeFeaturesCache,
+  });
+  if (deps.persistSettings) {
+    registerWorkspaceModelsRoutes(app, {
+      boundWorkspace: primaryBoundWorkspace,
+      mutate,
+      safeBody,
+      persistSettings: deps.persistSettings,
+      broadcastSettingsChanged,
+      parseAndValidateClientId: (req, res) =>
+        parseAndValidateWorkspaceClientId(req, res, primaryBridge),
+    });
+  }
 
   // A2UI action inbound (the upstream half of A2UI-over-MCP): user
   // interactions from web clients are proxied to the UI MCP server's
@@ -1002,6 +1463,7 @@ export function createServeApp(
     boundWorkspace: primaryBoundWorkspace,
     mutate,
     safeBody,
+    env: getRuntimeEffectiveEnv(primaryRuntime.env),
     // UI-server discovery uses the daemon's workspace MCP status, which
     // includes servers registered at runtime.
     getMcpServers: async () => {
@@ -1163,6 +1625,7 @@ export function createServeApp(
   registerSessionRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
     bridge: primaryBridge,
+    workspaceRegistry,
     archiveCoordinator,
     mutate,
     sendBridgeError,
@@ -1182,6 +1645,62 @@ export function createServeApp(
     parseAndValidateClientId: (req, res) =>
       parseAndValidateWorkspaceClientId(req, res, primaryBridge),
   });
+  registerWorkspaceQualifiedMcpControlRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+    sendBridgeError,
+  });
+  const channelWorkerControl =
+    deps.getChannelWorkerControl ??
+    (deps.getChannelWorkerSnapshot
+      ? () => {
+          const workers = deps.getChannelWorkerSnapshots?.() ?? [];
+          const primary = deps.getChannelWorkerSnapshot!();
+          return {
+            enabled:
+              workers.length > 0
+                ? workers.some((worker) => worker.enabled)
+                : primary.enabled,
+            selection: null,
+            transition: 'idle' as const,
+            workers,
+          };
+        }
+      : undefined);
+  if (
+    channelWorkerControl &&
+    (deps.reloadChannelWorker ||
+      (deps.setChannelWorkerSelection && deps.stopChannelWorker))
+  ) {
+    registerWorkspaceChannelControlRoutes(app, {
+      getChannelWorkerControl: channelWorkerControl,
+      ...(deps.isChannelControlDraining
+        ? { isDaemonDraining: deps.isChannelControlDraining }
+        : {}),
+      ...(deps.isChannelControlInitializing
+        ? { isManagerInitializing: deps.isChannelControlInitializing }
+        : {}),
+      ...(deps.setChannelWorkerSelection
+        ? { setChannelWorkerSelection: deps.setChannelWorkerSelection }
+        : {}),
+      ...(deps.stopChannelWorker
+        ? { stopChannelWorker: deps.stopChannelWorker }
+        : {}),
+      ...(deps.reloadChannelWorker
+        ? { reloadChannelWorker: deps.reloadChannelWorker }
+        : {}),
+      mutate,
+      safeBody,
+      sendBridgeError,
+      parseAndValidateClientId: (req, res) =>
+        parseAndValidateWorkspaceClientId(req, res, primaryBridge),
+    });
+  }
+  registerWorkspaceChannelObservedContactRoutes(app, {
+    primaryWorkspace: primaryBoundWorkspace,
+    workspaceRegistry,
+  });
   registerWorkspaceLifecycleRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
     workspace: primaryWorkspace,
@@ -1192,6 +1711,13 @@ export function createServeApp(
     parseAndValidateClientId: (req, res) =>
       parseAndValidateWorkspaceClientId(req, res, primaryBridge),
   });
+  registerWorkspaceQualifiedLifecycleRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+    sendBridgeError,
+    invalidateServeFeaturesCache,
+  });
   registerWorkspaceToolsRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
     workspace: primaryWorkspace,
@@ -1201,1700 +1727,175 @@ export function createServeApp(
     parseAndValidateClientId: (req, res) =>
       parseAndValidateWorkspaceClientId(req, res, primaryBridge),
   });
+  registerWorkspaceQualifiedToolsRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+    sendBridgeError,
+  });
+  registerWorkspaceSkillsRoutes(app, {
+    workspaceRuntime: primaryRuntime,
+    mutate,
+    safeBody,
+    sendBridgeError,
+    parseAndValidateClientId: (req, res) =>
+      parseAndValidateWorkspaceClientId(req, res, primaryBridge),
+  });
+  registerWorkspaceQualifiedSkillsRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+    sendBridgeError,
+  });
 
   // Durable scheduled-tasks CRUD (the Web Shell "Scheduled tasks" page).
   // Reads/writes the per-project cron file only; firing stays with the
   // session-side scheduler. Non-strict mutate: creating a scheduled prompt
   // is the same capability class as POST /session/:id/prompt.
+  //
+  // The bridge is passed ONLY when resident task-session management is enabled.
+  // Binding a task to a dedicated session is only safe when something keeps that
+  // session resident and reloads it after a restart (the keepalive + rehydration
+  // below); without it, a bound task would fire only inside a session nothing
+  // revives and silently go dormant. So embedders that leave the manager off
+  // get UNBOUND tasks (shared-owner firing) instead.
   registerScheduledTasksRoutes(app, {
     boundWorkspace: primaryBoundWorkspace,
     mutate,
     safeBody,
+    bridge: deps.manageScheduledTaskSessions ? bridge : undefined,
+  });
+
+  // Workspace-wide active-goal listing (the Web Shell "Goals" page). Read-only
+  // GET like /daemon/status: it fans out to the live sessions and reports what
+  // their in-memory goal stores hold.
+  registerGoalsRoutes(app, {
+    boundWorkspace: primaryBoundWorkspace,
+    bridge: primaryBridge,
+  });
+
+  // The same CRUD surface, workspace-qualified, so a multi-workspace Web Shell
+  // manages every registered project's schedule against that project's own cron
+  // file (and its own session bridge) rather than always the primary's. Each
+  // request resolves + trust-checks `:workspace` before any read/write.
+  registerWorkspaceQualifiedScheduledTasksRoutes(app, {
+    workspaceRegistry,
+    mutate,
+    safeBody,
+    manageScheduledTaskSessions: deps.manageScheduledTaskSessions === true,
   });
 
   // Read-only token-usage dashboard (Daemon Status "统计" tab). Aggregate local
   // usage only; open GET like /daemon/status, with its own short TTL cache.
   registerUsageStatsRoutes(app);
 
+  // Resident management of scheduled-task-owned sessions — opt-in, so tests and
+  // embeds that call createServeApp neither spawn sessions on boot nor hold a
+  // heartbeat timer (both would read the bound workspace's real tasks file).
+  if (deps.manageScheduledTaskSessions) {
+    // Keepalive: keep task sessions resident so their in-child schedulers keep
+    // ticking rather than being idle-reaped, AND revive a re-enabled bound
+    // session the reaper already let go. The revive loop is needed even when the
+    // reaper is disabled (idle timeout ≤ 0), because archiving a task closes its
+    // session — so this always runs when task sessions are managed, not only
+    // when a reaper is active.
+    const idleTimeoutMs =
+      opts.sessionIdleTimeoutMs ?? DEFAULT_SESSION_IDLE_TIMEOUT_MS;
+    const keepaliveIntervalMs = computeKeepaliveIntervalMs(idleTimeoutMs);
+
+    // Rehydrate task-owned sessions on boot so their schedulers re-arm after a
+    // restart (a bound task fires only in its own session, which nothing else
+    // reloads). Fire-and-forget so it never delays the server coming up; a
+    // no-op when there are no bound tasks. Deliberately not awaited.
+    const rehydrateWorkspace = (
+      taskBridge: AcpSessionBridge,
+      workspaceCwd: string,
+    ) => {
+      void rehydrateScheduledTaskSessions({
+        bridge: taskBridge,
+        boundWorkspace: workspaceCwd,
+        onError: (sessionId, err) => {
+          process.stderr.write(
+            `qwen serve: failed to rehydrate scheduled-task session ${sessionId}: ${
+              err instanceof Error ? err.message : String(err)
+            }\n`,
+          );
+        },
+        // Outer catch is defense-in-depth: rehydrateScheduledTaskSessions already
+        // catches readCronTasks failures and per-session load errors internally
+        // (returning { loaded, failed }), so this only guards an unexpected throw
+        // from the function entry itself. Log rather than swallow it — a silent
+        // failure here leaves every bound task dormant with no diagnostic.
+      }).catch((err) => {
+        process.stderr.write(
+          `qwen serve: unexpected scheduled-task rehydration failure: ${
+            err instanceof Error ? err.message : String(err)
+          }\n`,
+        );
+      });
+    };
+
+    // Every registered workspace gets its own keepalive + rehydration against
+    // its own cron file + bridge, so a bound task created through the
+    // workspace-qualified route fires (and survives a restart) exactly like a
+    // primary-workspace one — otherwise a secondary workspace's tasks would be
+    // written to disk but silently never revived.
+    const keepaliveStops = new Map<string, () => void>();
+    const startKeepaliveForWorkspace = (runtime: WorkspaceRuntime) => {
+      if (keepaliveStops.has(runtime.workspaceCwd)) return;
+      const keepalive = startScheduledTaskKeepalive({
+        bridge: runtime.bridge,
+        boundWorkspace: runtime.workspaceCwd,
+        intervalMs: keepaliveIntervalMs,
+      });
+      rehydrateWorkspace(runtime.bridge, runtime.workspaceCwd);
+      keepaliveStops.set(runtime.workspaceCwd, keepalive.stop);
+    };
+    for (const runtime of workspaceRegistry.list()) {
+      startKeepaliveForWorkspace(runtime);
+    }
+
+    // Park a combined stop fn on `app.locals` (same pattern as `fsFactory` /
+    // `boundWorkspace` / `acpHandle` above) so the shutdown sequence in
+    // run-qwen-serve.ts can invoke it without threading it back through the
+    // createServeApp return type. Stopping all is idempotent per keepalive.
+    (
+      app.locals as { stopScheduledTaskKeepalive?: () => void }
+    ).stopScheduledTaskKeepalive = () => {
+      for (const stop of keepaliveStops.values()) stop();
+      keepaliveStops.clear();
+    };
+    (
+      app.locals as {
+        stopScheduledTaskKeepaliveForWorkspace?: (workspaceCwd: string) => void;
+      }
+    ).stopScheduledTaskKeepaliveForWorkspace = (workspaceCwd) => {
+      keepaliveStops.get(workspaceCwd)?.();
+      keepaliveStops.delete(workspaceCwd);
+    };
+    (
+      app.locals as {
+        startScheduledTaskKeepaliveForWorkspace?: (
+          runtime: WorkspaceRuntime,
+        ) => void;
+      }
+    ).startScheduledTaskKeepaliveForWorkspace = startKeepaliveForWorkspace;
+  }
+
   registerPermissionRoutes(app, {
     bridge: primaryBridge,
+    workspaceRegistry,
+    daemonLog,
     mutate,
     sendPermissionVoteError,
   });
 
-  app.get('/session/:id/context', async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    try {
-      res.status(200).json(await bridge.getSessionContextStatus(sessionId));
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'GET /session/:id/context',
-        sessionId,
-      });
-    }
-  });
-
-  app.get('/session/:id/context-usage', async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    try {
-      res.status(200).json(
-        await bridge.getSessionContextUsageStatus(sessionId, {
-          detail: req.query['detail'] === 'true',
-        }),
-      );
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'GET /session/:id/context-usage',
-        sessionId,
-      });
-    }
-  });
-
-  app.get('/session/:id/stats', async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    try {
-      res.status(200).json(await bridge.getSessionStatsStatus(sessionId));
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'GET /session/:id/stats',
-        sessionId,
-      });
-    }
-  });
-
-  app.get('/session/:id/supported-commands', async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    try {
-      res
-        .status(200)
-        .json(await bridge.getSessionSupportedCommandsStatus(sessionId));
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'GET /session/:id/supported-commands',
-        sessionId,
-      });
-    }
-  });
-
-  app.get('/session/:id/tasks', async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    try {
-      res.status(200).json(await bridge.getSessionTasksStatus(sessionId));
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'GET /session/:id/tasks',
-        sessionId,
-      });
-    }
-  });
-
-  // GET /session/:id/hooks — read-only session-scoped hook status.
-  app.get('/session/:id/hooks', async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    try {
-      res.status(200).json(await bridge.getSessionHooksStatus(sessionId));
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'GET /session/:id/hooks', sessionId });
-    }
-  });
-
-  app.post(
-    '/session/:id/tasks/:taskId/cancel',
-    mutate({ strict: true }),
-    async (req, res) => {
-      const sessionId = req.params['id'];
-      const taskId = req.params['taskId'];
-      if (!sessionId || !taskId) {
-        res.status(400).json({
-          error: '`sessionId` and `taskId` route parameters are required',
-        });
-        return;
-      }
-      const body = safeBody(req);
-      const kind = body['kind'];
-      if (kind !== 'agent' && kind !== 'shell' && kind !== 'monitor') {
-        res
-          .status(400)
-          .json({ error: '`kind` must be "agent", "shell", or "monitor"' });
-        return;
-      }
-      try {
-        res
-          .status(200)
-          .json(await bridge.cancelSessionTask(sessionId, taskId, kind));
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'POST /session/:id/tasks/:taskId/cancel',
-          sessionId,
-        });
-      }
-    },
-  );
-
-  app.post(
-    '/session/:id/goal/clear',
-    mutate({ strict: true }),
-    async (req, res) => {
-      const sessionId = req.params['id'];
-      if (!sessionId) {
-        res
-          .status(400)
-          .json({ error: '`sessionId` route parameter is required' });
-        return;
-      }
-      try {
-        res.status(200).json(await bridge.clearSessionGoal(sessionId));
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'POST /session/:id/goal/clear',
-          sessionId,
-        });
-      }
-    },
-  );
-
-  app.post('/session/:id/prompt', mutate(), async (req, res) => {
-    const sessionId = req.params['id'];
-    const body = safeBody(req);
-    const prompt = body['prompt'];
-    if (!Array.isArray(prompt) || prompt.length === 0) {
-      res.status(400).json({
-        error:
-          '`prompt` is required and must be a non-empty array of content blocks',
-      });
-      return;
-    }
-    if (
-      !prompt.every(
-        (item: unknown) =>
-          typeof item === 'object' && item !== null && !Array.isArray(item),
-      )
-    ) {
-      res.status(400).json({
-        error: 'each `prompt` element must be an object (content block)',
-      });
-      return;
-    }
-    const rawRequestDeadline = body['deadlineMs'];
-    let requestDeadlineMs: number | undefined;
-    if (rawRequestDeadline !== undefined && rawRequestDeadline !== null) {
-      if (
-        typeof rawRequestDeadline !== 'number' ||
-        !Number.isFinite(rawRequestDeadline) ||
-        !Number.isInteger(rawRequestDeadline) ||
-        rawRequestDeadline <= 0
-      ) {
-        res.status(400).json({
-          error: '`deadlineMs` must be a positive integer (milliseconds)',
-          code: 'invalid_deadline_ms',
-        });
-        return;
-      }
-      requestDeadlineMs = rawRequestDeadline;
-    }
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-
-    const promptId = crypto.randomUUID();
-    const forwardedBody = { ...body };
-    delete forwardedBody['deadlineMs'];
-
-    let lastEventId: number;
-    try {
-      lastEventId = bridge.getSessionLastEventId(sessionId);
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/prompt',
-        sessionId,
-      });
-      return;
-    }
-    addDaemonRequestAttribute('hopcode.prompt_id', promptId);
-
-    const abort = new AbortController();
-    const effectiveDeadlineMs = resolvePromptDeadlineMs(
-      opts.promptDeadlineMs,
-      requestDeadlineMs,
-    );
-    let deadlineTimer: NodeJS.Timeout | undefined;
-    if (effectiveDeadlineMs !== undefined) {
-      deadlineTimer = setTimeout(() => {
-        if (!abort.signal.aborted) {
-          abort.abort(new PromptDeadlineExceededError(effectiveDeadlineMs));
-        }
-      }, effectiveDeadlineMs);
-      deadlineTimer.unref();
-    }
-
-    let promptPromise: ReturnType<AcpSessionBridge['sendPrompt']>;
-    try {
-      promptPromise = bridge.sendPrompt(
-        sessionId,
-        {
-          ...forwardedBody,
-          sessionId,
-          prompt,
-        } as Parameters<AcpSessionBridge['sendPrompt']>[1],
-        abort.signal,
-        {
-          ...(clientId !== undefined ? { clientId } : {}),
-          promptId,
-        },
-      );
-    } catch (err) {
-      if (deadlineTimer !== undefined) clearTimeout(deadlineTimer);
-      if (daemonLog && err instanceof PromptQueueFullError) {
-        daemonLog.warn('prompt admission rejected: queue full', {
-          sessionId,
-          promptId,
-          ...(clientId !== undefined ? { clientId } : {}),
-          limit: err.limit,
-          pendingCount: err.pendingCount,
-        });
-      }
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/prompt',
-        sessionId,
-      });
-      return;
-    }
-
-    promptPromise
-      .then(
-        () => {
-          if (daemonLog) {
-            daemonLog.info('prompt turn completed', {
-              sessionId,
-              promptId,
-              clientId,
-            });
-          }
-        },
-        (err) => {
-          if (daemonLog) {
-            const errName = err instanceof Error ? err.name : undefined;
-            daemonLog.warn(
-              `prompt turn failed: ${errName ? `[${errName}] ` : ''}${err instanceof Error ? err.message : String(err)}`,
-              { sessionId, promptId, clientId },
-            );
-          }
-        },
-      )
-      .finally(() => {
-        if (deadlineTimer !== undefined) clearTimeout(deadlineTimer);
-      })
-      .catch(() => {});
-
-    if (daemonLog) {
-      daemonLog.info('prompt enqueued', { sessionId, promptId, clientId });
-    }
-    res.status(202).json({ promptId, lastEventId });
-  });
-
-  app.post('/session/:id/heartbeat', mutate(), (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      const result = bridge.recordHeartbeat(
-        sessionId,
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      res.status(200).json(result);
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/heartbeat',
-        sessionId,
-      });
-    }
-  });
-
-  app.post('/session/:id/detach', mutate(), async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      await bridge.detachClient(sessionId, clientId);
-      res.status(204).end();
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/detach',
-        sessionId,
-      });
-    }
-  });
-
-  app.post('/session/:id/cancel', mutate(), async (req, res) => {
-    const sessionId = req.params['id'];
-    const body = safeBody(req);
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      await bridge.cancelSession(
-        sessionId,
-        {
-          ...(body as object),
-          sessionId,
-        } as Parameters<AcpSessionBridge['cancelSession']>[1],
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      if (daemonLog) {
-        daemonLog.info('cancel sent', { sessionId, clientId });
-      }
-      res.status(204).end();
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/cancel',
-        sessionId,
-      });
-    }
-  });
-
-  app.delete('/session/:id', async (req, res) => {
-    const sessionId = req.params['id'];
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      await bridge.closeSession(
-        sessionId,
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      res.status(204).end();
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'DELETE /session/:id',
-        sessionId,
-      });
-    }
-  });
-
-  app.post('/sessions/delete', mutate(), async (req, res) => {
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    const body = safeBody(req);
-    const sessionIds: unknown = body['sessionIds'];
-    if (
-      !Array.isArray(sessionIds) ||
-      sessionIds.length === 0 ||
-      sessionIds.length > 100 ||
-      !sessionIds.every((id) => typeof id === 'string')
-    ) {
-      res.status(400).json({
-        error: '`sessionIds` must be a non-empty string array (max 100)',
-        code: 'invalid_request',
-      });
-      return;
-    }
-    try {
-      const uniqueIds = [...new Set(sessionIds as string[])];
-      const closeResults = await Promise.allSettled(
-        uniqueIds.map(async (id) => {
-          // Intentional: no clientId — batch delete bypasses per-tab ownership.
-          await bridge.closeSession(id);
-          return id;
-        }),
-      );
-      const closeErrors: Array<{ sessionId: string; error: string }> = [];
-      const closedIds: string[] = [];
-      for (let i = 0; i < closeResults.length; i++) {
-        const r = closeResults[i];
-        const id = uniqueIds[i];
-        if (r.status === 'fulfilled') {
-          closedIds.push(id);
-        } else {
-          const closeErr = r.reason;
-          if (closeErr instanceof SessionNotFoundError) {
-            // Session not active in bridge — still attempt to remove its transcript file
-            closedIds.push(id);
-          } else {
-            const msg =
-              closeErr instanceof Error ? closeErr.message : String(closeErr);
-            writeStderrLine(
-              `hopcode serve: closeSession failed for ${safeLogValue(id)}: ${safeLogValue(msg)}`,
-            );
-            closeErrors.push({ sessionId: id, error: msg });
-          }
-        }
-      }
-      const result = await new SessionService(boundWorkspace).removeSessions(
-        closedIds,
-      );
-      for (const e of result.errors) {
-        const msg =
-          e.error instanceof Error ? e.error.message : String(e.error);
-        writeStderrLine(
-          `hopcode serve: removeSession failed for ${safeLogValue(e.sessionId)}: ${safeLogValue(msg)}`,
-        );
-      }
-      res.status(200).json({
-        removed: result.removed,
-        notFound: result.notFound,
-        errors: [
-          ...closeErrors,
-          ...result.errors.map((e) => ({
-            sessionId: e.sessionId,
-            error: e.error instanceof Error ? e.error.message : String(e.error),
-          })),
-        ],
-      });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      writeStderrLine(
-        `hopcode serve: failed to batch delete sessions: ${safeLogValue(message)}`,
-      );
-      res.status(500).json({
-        error: 'Failed to delete sessions',
-        code: 'sessions_delete_failed',
-      });
-    }
-  });
-
-  app.patch('/session/:id/metadata', async (req, res) => {
-    const sessionId = req.params['id'];
-    const body = safeBody(req);
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    const rawDisplayName = body['displayName'];
-    if (rawDisplayName !== undefined && typeof rawDisplayName !== 'string') {
-      res.status(400).json({
-        error: '`displayName` must be a string',
-        code: 'invalid_metadata',
-        field: 'displayName',
-      });
-      return;
-    }
-    const displayName =
-      typeof rawDisplayName === 'string'
-        ? rawDisplayName.slice(0, 256)
-        : undefined;
-    try {
-      const effective = bridge.updateSessionMetadata(
-        sessionId,
-        { displayName },
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      if (displayName !== undefined) {
-        try {
-          await new SessionService(boundWorkspace).renameSession(
-            sessionId,
-            displayName,
-          );
-        } catch {
-          // Best-effort: session file may not exist yet (fresh session
-          // with no turns written). The in-memory update still applies
-          // for the lifetime of this daemon process.
-        }
-      }
-      res.status(200).json({ sessionId, ...effective });
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'PATCH /session/:id/metadata',
-        sessionId,
-      });
-    }
-  });
-
-  app.get('/workspace/:id/sessions', async (req, res) => {
-    // Express decodes URL-encoded path params automatically; clients pass
-    // the absolute workspace cwd encoded (e.g.
-    // GET /workspace/%2Fwork%2Fa/sessions).
-    const workspaceCwd = req.params['id'] ?? '';
-    if (!path.isAbsolute(workspaceCwd)) {
-      res
-        .status(400)
-        .json({ error: '`:id` must decode to an absolute workspace path' });
-      return;
-    }
-    // Reject cross-workspace queries so orchestrators don't mistake
-    // "no sessions here" for "workspace is idle".
-    const key = canonicalizeWorkspace(workspaceCwd);
-    if (key !== boundWorkspace) {
-      res.status(400).json({
-        error: `Workspace mismatch: daemon is bound to "${boundWorkspace}"`,
-        code: 'workspace_mismatch',
-        boundWorkspace,
-        requestedWorkspace: key,
-      });
-      return;
-    }
-    try {
-      const cursor =
-        typeof req.query['cursor'] === 'string'
-          ? req.query['cursor']
-          : undefined;
-      const sizeParam = req.query['size'];
-      const size =
-        typeof sizeParam === 'string' ? parseInt(sizeParam, 10) : undefined;
-      const result = await listWorkspaceSessionsForResponse(bridge, key, {
-        cursor,
-        size: Number.isFinite(size) ? size : undefined,
-      });
-      res.status(200).json({
-        sessions: result.sessions,
-        ...(result.nextCursor != null ? { nextCursor: result.nextCursor } : {}),
-      });
-    } catch (err) {
-      if (err instanceof InvalidCursorError) {
-        res.status(400).json({
-          error: err.message,
-          code: 'invalid_cursor',
-        });
-        return;
-      }
-      writeStderrLine(
-        `hopcode serve: failed to list sessions for workspace ${safeLogValue(
-          key,
-        )}: ${safeLogValue(err instanceof Error ? err.message : String(err))}`,
-      );
-      res.status(500).json({
-        error: 'Failed to list sessions',
-        code: 'session_list_failed',
-      });
-    }
-  });
-
-  app.post('/session/:id/model', mutate(), async (req, res) => {
-    const sessionId = req.params['id'];
-    const body = safeBody(req);
-    const modelId = body['modelId'];
-    if (typeof modelId !== 'string' || !modelId) {
-      res.status(400).json({
-        error: '`modelId` is required and must be a non-empty string',
-      });
-      return;
-    }
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      const response = await bridge.setSessionModel(
-        sessionId,
-        {
-          ...(body as object),
-          sessionId,
-          modelId,
-        } as Parameters<AcpSessionBridge['setSessionModel']>[1],
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      res.status(200).json(response);
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/model',
-        sessionId,
-      });
-    }
-  });
-
-  app.post('/session/:id/recap', mutate(), async (req, res) => {
-    // Wraps `generateSessionRecap` so daemon clients can fetch a
-    // one-sentence "where did I leave off" summary without a full
-    // prompt turn. Best-effort — `recap: null` on short history or
-    // transient model failure is a normal 200, not an error.
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      const response = await bridge.generateSessionRecap(
-        sessionId,
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      if (daemonLog) {
-        const recap = response.recap;
-        daemonLog.info(
-          recap ? `recap generated len=${recap.length}` : 'recap returned null',
-          { sessionId, clientId },
-        );
-      }
-      res.status(200).json(response);
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/recap',
-        sessionId,
-      });
-    }
-  });
-
-  app.post('/session/:id/btw', mutate(), async (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    const body = safeBody(req);
-    const question = body['question'];
-    if (
-      typeof question !== 'string' ||
-      question.trim().length === 0 ||
-      question.length > BTW_MAX_INPUT_LENGTH
-    ) {
-      res.status(400).json({
-        error: `\`question\` is required, must be a non-empty string, and at most ${BTW_MAX_INPUT_LENGTH} characters`,
-      });
-      return;
-    }
-    const abort = new AbortController();
-    const onResClose = () => {
-      if (!res.writableEnded) abort.abort();
-    };
-    res.once('close', onResClose);
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) {
-      res.off('close', onResClose);
-      return;
-    }
-    try {
-      const result = await bridge.generateSessionBtw(
-        sessionId,
-        question.trim(),
-        abort.signal,
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      res.status(200).json(result);
-    } catch (err) {
-      if (
-        err instanceof DOMException &&
-        err.name === 'AbortError' &&
-        abort.signal.aborted
-      ) {
-        return;
-      }
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/btw',
-        sessionId,
-      });
-    } finally {
-      res.off('close', onResClose);
-    }
-  });
-
-  // Queue a user message typed while the session's turn is still running. The
-  // ACP child drains it between tool batches (`craft/drainMidTurnQueue`) so the
-  // model sees it before the turn ends, instead of waiting for the next turn.
-  // Returns `{ accepted }`: `false` when the session is idle (or the per-session
-  // queue is full), so the browser keeps the message in its own queue and sends
-  // it as a normal next-turn prompt. Synchronous — the bridge only pushes onto
-  // an in-memory queue.
-  //
-  // Per-message abuse guard. The sibling `/btw` caps its field; without this
-  // only the global 10 MB body limit applies. Not a UX limit — a rejected
-  // message stays in the browser's own queue and is sent as the (uncapped)
-  // next-turn prompt — it only bounds how much a single mid-turn push can pin in
-  // the in-memory queue (the queue DEPTH is bounded in `enqueueMidTurnMessage`).
-  const MID_TURN_MESSAGE_MAX_LENGTH = 16 * 1024;
-  app.post('/session/:id/mid-turn-message', mutate(), (req, res) => {
-    const sessionId = requireSessionId(req, res);
-    if (sessionId === null) return;
-    const body = safeBody(req);
-    const message = body['message'];
-    // Validate (and length-check, and enqueue) the TRIMMED value — the bridge
-    // stores the trimmed string, so checking the raw length would reject input
-    // whose real content fits but is padded with whitespace.
-    const trimmed = typeof message === 'string' ? message.trim() : '';
-    if (trimmed.length === 0) {
-      res.status(400).json({
-        error: '`message` is required and must be a non-empty string',
-      });
-      return;
-    }
-    if (trimmed.length > MID_TURN_MESSAGE_MAX_LENGTH) {
-      res.status(400).json({
-        error: `\`message\` must be at most ${MID_TURN_MESSAGE_MAX_LENGTH} characters`,
-      });
-      return;
-    }
-    // Forward the client id so the bridge authorizes it against the session
-    // (like `/prompt` and `/btw`) — a token-holding client bound to another
-    // session must not push into this one — and records it as the message's
-    // originator for SSE echo routing. `null` = malformed id (already answered).
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    try {
-      const result = bridge.enqueueMidTurnMessage(
-        sessionId,
-        trimmed,
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      res.status(200).json(result);
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/mid-turn-message',
-        sessionId,
-      });
-    }
-  });
-
-  app.post('/session/:id/shell', mutate({ strict: true }), async (req, res) => {
-    const sessionId = req.params['id'];
-    if (!sessionShellCommandEnabled) {
-      sendBridgeError(res, new SessionShellDisabledError(), {
-        route: 'POST /session/:id/shell',
-        sessionId,
-      });
-      return;
-    }
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) {
-      return;
-    }
-    if (clientId === undefined) {
-      sendBridgeError(res, new SessionShellClientRequiredError(), {
-        route: 'POST /session/:id/shell',
-        sessionId,
-      });
-      return;
-    }
-    const body = safeBody(req);
-    const command = body['command'];
-    if (typeof command !== 'string' || command.trim().length === 0) {
-      res.status(400).json({
-        error: '`command` is required and must be a non-empty string',
-      });
-      return;
-    }
-    const abort = new AbortController();
-    const onResClose = () => {
-      if (!res.writableEnded) abort.abort();
-    };
-    res.once('close', onResClose);
-    try {
-      const result = await bridge.executeShellCommand(
-        sessionId,
-        command.trim(),
-        abort.signal,
-        { clientId },
-      );
-      if (daemonLog) {
-        daemonLog.info('shell command completed', {
-          sessionId,
-          clientId,
-          exitCode: result.exitCode,
-        });
-      }
-      res.status(200).json(result);
-    } catch (err) {
-      if (
-        err instanceof DOMException &&
-        err.name === 'AbortError' &&
-        abort.signal.aborted
-      ) {
-        return;
-      }
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/shell',
-        sessionId,
-      });
-    } finally {
-      res.off('close', onResClose);
-    }
-  });
-
-  app.get('/session/:id/rewind/snapshots', async (req, res) => {
-    const sessionId = req.params['id'];
-    if (!sessionId) {
-      res
-        .status(400)
-        .json({ error: '`sessionId` route parameter is required' });
-      return;
-    }
-    try {
-      res.status(200).json(await bridge.getRewindSnapshots(sessionId));
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'GET /session/:id/rewind/snapshots',
-        sessionId,
-      });
-    }
-  });
-
-  app.post(
-    '/session/:id/rewind',
-    mutate({ strict: true }),
-    async (req, res) => {
-      const sessionId = req.params['id'];
-      const body = safeBody(req);
-      const promptId = body['promptId'];
-      if (typeof promptId !== 'string' || promptId.length === 0) {
-        res.status(400).json({
-          error: '`promptId` is required and must be a non-empty string',
-          code: 'missing_prompt_id',
-        });
-        return;
-      }
-      const clientId = parseClientIdHeader(req, res);
-      if (clientId === null) return;
-      try {
-        const response = await bridge.rewindSession(
-          sessionId,
-          { promptId },
-          clientId !== undefined ? { clientId } : undefined,
-        );
-        res.status(200).json(response);
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'POST /session/:id/rewind',
-          sessionId,
-        });
-      }
-    },
-  );
-
-  app.post(
-    '/session/:id/approval-mode',
-    mutate({ strict: true }),
-    async (req, res) => {
-      // Validates `mode` against `APPROVAL_MODES` and an optional
-      // `persist: boolean` flag.
-      const sessionId = req.params['id'];
-      const body = safeBody(req);
-      const mode = body['mode'];
-      const persist = body['persist'];
-      if (
-        typeof mode !== 'string' ||
-        !APPROVAL_MODES.includes(mode as ApprovalMode)
-      ) {
-        res.status(400).json({
-          error: '`mode` is required and must be one of the allowed values',
-          code: 'invalid_approval_mode',
-          allowed: APPROVAL_MODES,
-        });
-        return;
-      }
-      if (persist !== undefined && typeof persist !== 'boolean') {
-        res.status(400).json({
-          error: '`persist` must be a boolean when provided',
-          code: 'invalid_persist_flag',
-        });
-        return;
-      }
-      const clientId = parseClientIdHeader(req, res);
-      if (clientId === null) return;
-      try {
-        const response = await bridge.setSessionApprovalMode(
-          sessionId,
-          mode as ApprovalMode,
-          { persist: persist === true },
-          clientId !== undefined ? { clientId } : undefined,
-        );
-        res.status(200).json(response);
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'POST /session/:id/approval-mode',
-          sessionId,
-        });
-      }
-    },
-  );
-
-  app.post('/session/:id/language', mutate(), async (req, res) => {
-    const sessionId = req.params['id'];
-    const body = safeBody(req);
-    const language = body['language'];
-    const syncOutputLanguage = body['syncOutputLanguage'];
-
-    if (typeof language !== 'string' || !LANGUAGE_CODES.includes(language)) {
-      res.status(400).json({
-        error:
-          '`language` is required and must be one of: ' +
-          LANGUAGE_CODES.join(', '),
-        code: 'invalid_language',
-        allowed: LANGUAGE_CODES,
-      });
-      return;
-    }
-
-    if (
-      syncOutputLanguage !== undefined &&
-      typeof syncOutputLanguage !== 'boolean'
-    ) {
-      res.status(400).json({
-        error: '`syncOutputLanguage` must be a boolean when provided',
-        code: 'invalid_sync_flag',
-      });
-      return;
-    }
-
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-
-    try {
-      const response = await bridge.setSessionLanguage(
-        sessionId,
-        {
-          language,
-          syncOutputLanguage: syncOutputLanguage === true,
-        },
-        clientId !== undefined ? { clientId } : undefined,
-      );
-      res.status(200).json(response);
-    } catch (err) {
-      sendBridgeError(res, err, {
-        route: 'POST /session/:id/language',
-        sessionId,
-      });
-    }
-  });
-
-  app.post(
-    '/workspace/mcp/:server/restart',
-    mutate({ strict: true }),
-    async (req, res) => {
-      // Single-server MCP restart with budget pre-check. Soft refusals
-      // are 200 OK with `{restarted:false, skipped:true, reason}`.
-      const serverName = req.params['server'];
-      if (!serverName || typeof serverName !== 'string') {
-        res.status(400).json({
-          error: 'Server name path parameter is required',
-          code: 'invalid_server_name',
-        });
-        return;
-      }
-      // Cap server name length to prevent unbounded path-parameter input.
-      if (serverName.length > MAX_SERVER_NAME_LENGTH) {
-        res.status(400).json({
-          error: `Server name exceeds ${MAX_SERVER_NAME_LENGTH}-character limit`,
-          code: 'invalid_server_name',
-        });
-        return;
-      }
-      // Validate `x-hopcode-client-id` against known client ids.
-      const clientId = parseAndValidateWorkspaceClientId(req, res, bridge);
-      if (clientId === null) return;
-      // Parse `?entryIndex=` for pool-mode targeted restarts. Accepts
-      // a non-negative integer or `*` / omitted (restart all).
-      let entryIndex: number | undefined;
-      const rawEntryIndex = req.query['entryIndex'];
-      if (rawEntryIndex !== undefined && rawEntryIndex !== '*') {
-        const candidate =
-          typeof rawEntryIndex === 'string' ? rawEntryIndex : undefined;
-        const parsed =
-          candidate !== undefined ? Number.parseInt(candidate, 10) : NaN;
-        if (
-          !Number.isInteger(parsed) ||
-          parsed < 0 ||
-          String(parsed) !== candidate
-        ) {
-          res.status(400).json({
-            error:
-              '`entryIndex` query parameter must be a non-negative integer or "*"',
-            code: 'invalid_entry_index',
-          });
-          return;
-        }
-        entryIndex = parsed;
-      }
-      try {
-        const ctx = buildWorkspaceCtx(
-          'POST /workspace/mcp/:server/restart',
-          clientId,
-        );
-        const result = await workspace.restartMcpServer(
-          ctx,
-          serverName,
-          entryIndex !== undefined ? { entryIndex } : undefined,
-        );
-        res.status(200).json(result);
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'POST /workspace/mcp/:server/restart',
-        });
-      }
-    },
-  );
-
-  for (const [routeAction, bridgeAction] of [
-    ['enable', 'enable'],
-    ['disable', 'disable'],
-    ['authenticate', 'authenticate'],
-    ['clear-auth', 'clear-auth'],
-  ] as const) {
-    app.post(
-      `/workspace/mcp/:server/${routeAction}`,
-      mutate({ strict: true }),
-      async (req, res) => {
-        const serverName = req.params['server'];
-        if (!serverName || typeof serverName !== 'string') {
-          res.status(400).json({
-            error: 'Server name path parameter is required',
-            code: 'invalid_server_name',
-          });
-          return;
-        }
-        if (serverName.length > MAX_SERVER_NAME_LENGTH) {
-          res.status(400).json({
-            error: `Server name exceeds ${MAX_SERVER_NAME_LENGTH}-character limit`,
-            code: 'invalid_server_name',
-          });
-          return;
-        }
-        const clientId = parseAndValidateWorkspaceClientId(req, res, bridge);
-        if (clientId === null) return;
-        try {
-          const result = await bridge.manageMcpServer(
-            serverName,
-            bridgeAction,
-            clientId,
-          );
-          res.status(200).json(result);
-        } catch (err) {
-          sendBridgeError(res, err, {
-            route: `POST /workspace/mcp/:server/${routeAction}`,
-          });
-        }
-      },
-    );
-  }
-
-  // Add a runtime MCP server.
-  app.post(
-    '/workspace/mcp/servers',
-    mutate({ strict: true }),
-    async (req, res) => {
-      const body = safeBody(req);
-      const name = body['name'];
-      if (!validateMcpRuntimeServerName(name, res)) return;
-      // Validate config: must be a non-null object
-      const config = body['config'];
-      if (
-        typeof config !== 'object' ||
-        config === null ||
-        Array.isArray(config)
-      ) {
-        res.status(400).json({
-          error: '`config` must be a non-null object',
-          code: 'missing_required_field',
-          field: 'config',
-        });
-        return;
-      }
-      // Validate client identity (required for runtime MCP mutation)
-      const clientId = parseAndValidateWorkspaceClientId(req, res, bridge);
-      if (clientId === null) return;
-      if (!clientId) {
-        res.status(400).json({
-          error:
-            '`x-hopcode-client-id` header is required for runtime MCP mutation',
-          code: 'missing_client_id',
-        });
-        return;
-      }
-      try {
-        const result = await bridge.addRuntimeMcpServer(
-          name,
-          config as Record<string, unknown>,
-          clientId,
-        );
-        res.status(200).json(result);
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'POST /workspace/mcp/servers',
-        });
-      }
-    },
-  );
-
-  // Remove a runtime MCP server. Idempotent.
-  app.delete(
-    '/workspace/mcp/servers/:name',
-    mutate({ strict: true }),
-    async (req, res) => {
-      const name = req.params['name'] ?? '';
-      if (!validateMcpRuntimeServerName(name, res)) return;
-      // Validate client identity (required for runtime MCP mutation)
-      const clientId = parseAndValidateWorkspaceClientId(req, res, bridge);
-      if (clientId === null) return;
-      if (!clientId) {
-        res.status(400).json({
-          error:
-            '`x-hopcode-client-id` header is required for runtime MCP mutation',
-          code: 'missing_client_id',
-        });
-        return;
-      }
-      try {
-        const result = await bridge.removeRuntimeMcpServer(name, clientId);
-        res.status(200).json(result);
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'DELETE /workspace/mcp/servers/:name',
-        });
-      }
-    },
-  );
-
-  app.post('/workspace/init', mutate({ strict: true }), async (req, res) => {
-    // #4175 Wave 4 PR 17. Scaffold-only init: the workspace service
-    // writes an empty HOPCODE.md without invoking the LLM. Default refuses
-    // overwrite (409); body `{force: true}` overrides.
-    const body = safeBody(req);
-    const force = body['force'];
-    if (force !== undefined && typeof force !== 'boolean') {
-      res.status(400).json({
-        error: '`force` must be a boolean when provided',
-        code: 'invalid_force_flag',
-      });
-      return;
-    }
-    // Validate against known client ids.
-    const clientId = parseAndValidateWorkspaceClientId(req, res, bridge);
-    if (clientId === null) return;
-    try {
-      const ctx = buildWorkspaceCtx('POST /workspace/init', clientId);
-      const result = await workspace.initWorkspace(ctx, {
-        force: force === true,
-      });
-      res.status(200).json(result);
-    } catch (err) {
-      sendBridgeError(res, err, { route: 'POST /workspace/init' });
-    }
-  });
-
-  app.post(
-    '/workspace/reload',
-    mutate({ strict: true }),
-    async (req: Request, res: Response) => {
-      const clientId = parseAndValidateWorkspaceClientId(req, res, bridge);
-      if (clientId === null) return;
-      try {
-        const ctx = buildWorkspaceCtx('POST /workspace/reload', clientId);
-        const result = await workspace.reload(ctx);
-        res.status(200).json(result);
-      } catch (err) {
-        sendBridgeError(res, err, { route: 'POST /workspace/reload' });
-      }
-    },
-  );
-
-  app.post(
-    '/workspace/tools/:name/enable',
-    mutate({ strict: true }),
-    async (req, res) => {
-      // Toggles a tool name in the workspace `tools.disabled` settings
-      // list. Strict-gated alongside other
-      // mutation routes; bridge writes the file directly (no
-      // ACP roundtrip) and fan-outs `tool_toggled` to every live
-      // session SSE bus. Already-registered tools in live sessions
-      // are NOT retroactively unregistered — toggling takes effect on
-      // the next ACP child spawn or session refresh.
-      const rawToolName = req.params['name'];
-      if (!rawToolName || typeof rawToolName !== 'string') {
-        res.status(400).json({
-          error: 'Tool name path parameter is required',
-          code: 'invalid_tool_name',
-        });
-        return;
-      }
-      // Trim before persistence so the write path matches the read path.
-      const toolName = rawToolName.trim();
-      if (toolName.length === 0) {
-        res.status(400).json({
-          error: 'Tool name path parameter is required',
-          code: 'invalid_tool_name',
-        });
-        return;
-      }
-      // Cap tool name length to prevent settings file bloat.
-      if (toolName.length > MAX_TOOL_NAME_LENGTH) {
-        res.status(400).json({
-          error: `Tool name exceeds ${MAX_TOOL_NAME_LENGTH}-character limit`,
-          code: 'invalid_tool_name',
-        });
-        return;
-      }
-      const body = safeBody(req);
-      const enabled = body['enabled'];
-      if (typeof enabled !== 'boolean') {
-        res.status(400).json({
-          error: '`enabled` is required and must be a boolean',
-          code: 'invalid_enabled_flag',
-        });
-        return;
-      }
-      // Validate against known client ids.
-      const clientId = parseAndValidateWorkspaceClientId(req, res, bridge);
-      if (clientId === null) return;
-      try {
-        const ctx = buildWorkspaceCtx(
-          'POST /workspace/tools/:name/enable',
-          clientId,
-        );
-        const result = await workspace.setWorkspaceToolEnabled(
-          ctx,
-          toolName,
-          enabled,
-        );
-        res.status(200).json(result);
-      } catch (err) {
-        sendBridgeError(res, err, {
-          route: 'POST /workspace/tools/:name/enable',
-        });
-      }
-    },
-  );
-
-  app.post('/session/:id/permission/:requestId', mutate(), (req, res) => {
-    const sessionId = req.params['id'];
-    const requestId = req.params['requestId'];
-    const response = parsePermissionVoteBody(req, res);
-    if (response === undefined) return;
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    // Thread the kernel-stamped peer-IP loopback bit through the bridge
-    // context so the `local-only` policy can gate votes by transport.
-    const fromLoopback = detectFromLoopback(req);
-    const context = {
-      ...(clientId !== undefined ? { clientId } : {}),
-      fromLoopback,
-    };
-    let accepted: boolean;
-    try {
-      accepted = bridge.respondToSessionPermission(
-        sessionId,
-        requestId,
-        response,
-        context,
-      );
-    } catch (err) {
-      sendPermissionVoteError(res, err, {
-        route: 'POST /session/:id/permission/:requestId',
-        sessionId,
-      });
-      return;
-    }
-    if (!accepted) {
-      res.status(404).json({
-        error: 'No pending permission request for session',
-        sessionId,
-        requestId,
-      });
-      return;
-    }
-    res.status(200).json({});
-  });
-
-  app.post('/permission/:requestId', mutate(), (req, res) => {
-    const requestId = req.params['requestId'];
-    const response = parsePermissionVoteBody(req, res);
-    if (response === undefined) return;
-    const clientId = parseClientIdHeader(req, res);
-    if (clientId === null) return;
-    // Same loopback bit threading as the session-scoped route above.
-    const fromLoopback = detectFromLoopback(req);
-    const context = {
-      ...(clientId !== undefined ? { clientId } : {}),
-      fromLoopback,
-    };
-    let accepted: boolean;
-    try {
-      accepted = bridge.respondToPermission(requestId, response, context);
-    } catch (err) {
-      sendPermissionVoteError(res, err, {
-        route: 'POST /permission/:requestId',
-      });
-      return;
-    }
-    if (!accepted) {
-      // Either the requestId never existed or another client already won
-      // the race. Stage 1 doesn't distinguish — both surface as 404.
-      res
-        .status(404)
-        .json({ error: 'No pending permission request', requestId });
-      return;
-    }
-    res.status(200).json({});
-  });
-
-  app.get('/session/:id/events', (req, res) => {
-    const sessionId = req.params['id'];
-    const lastEventId = parseLastEventId(req.headers['last-event-id']);
-    const maxQueued = parseMaxQueuedQuery(req.query['maxQueued'], res);
-    // `parseMaxQueuedQuery` sends its own 400 + JSON body on rejection
-    // (returns `null`) so the SSE handshake doesn't get half-written.
-    // `undefined` means "client didn't ask for an override; use bus
-    // default 256" — proceed as before.
-    if (maxQueued === null) return;
-
-    let iter: AsyncIterator<BridgeEvent> | undefined;
-    const abort = new AbortController();
-    try {
-      const snapshot = req.query['snapshot'] === '1';
-      const iterable = bridge.subscribeEvents(sessionId, {
-        signal: abort.signal,
-        lastEventId,
-        ...(maxQueued !== undefined ? { maxQueued } : {}),
-        ...(snapshot ? { snapshot: true } : {}),
-      });
-      iter = iterable[Symbol.asyncIterator]();
-    } catch (err) {
-      // `EventBus` throws `SubscriberLimitExceededError` when the
-      // per-session subscriber cap (default 64) is reached.
-      //
-      // Surface as `429 Too Many Requests` + `Retry-After`
-      // header rather than `200 + stream_error`. The previous
-      // SSE-shaped response triggered `EventSource`'s
-      // auto-reconnect (which honors the `retry:` directive AND
-      // default-reconnects on any closed stream). The reconnect hit
-      // the same cap, looped, amplifying the exact load the limit
-      // exists to prevent.
-      //
-      // `429` is the standard "back off" signal — browsers'
-      // `EventSource` treats `4xx` as terminal and does NOT
-      // auto-reconnect on it, unlike `200 + close` which DOES
-      // reconnect. Body shape mirrors the SSE frame's data field so
-      // a raw-fetch client gets the same structured error.
-      if (err instanceof SubscriberLimitExceededError) {
-        writeStderrLine(
-          `hopcode serve: subscriber limit reached for session ${sessionId} (limit=${err.limit}); rejecting new SSE client with 429`,
-        );
-        res.setHeader('Retry-After', '5');
-        res.status(429).json({
-          error: err.message,
-          code: 'subscriber_limit_exceeded',
-          limit: err.limit,
-        });
-        return;
-      }
-      sendBridgeError(res, err, {
-        route: 'GET /session/:id/events',
-        sessionId,
-      });
-      return;
-    }
-
-    if (daemonLog) {
-      const sseOpenedAt = Date.now();
-      const sseClientId = req.headers['x-hopcode-client-id'] as
-        | string
-        | undefined;
-      daemonLog.info('SSE stream opened', { sessionId, clientId: sseClientId });
-      res.on('close', () => {
-        try {
-          daemonLog.info('SSE stream closed', {
-            sessionId,
-            clientId: sseClientId,
-            durationMs: Date.now() - sseOpenedAt,
-          });
-        } catch {
-          /* logger failure must not prevent counter decrement */
-        }
-      });
-    }
-
-    res.status(200);
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache, no-transform');
-    res.setHeader('Connection', 'keep-alive');
-    // Disable proxy buffering (nginx); event-stream content type alone
-    // doesn't always reach the client through every proxy.
-    res.setHeader('X-Accel-Buffering', 'no');
-    // Always present on the supported Node versions (engines.node >=22).
-    res.flushHeaders();
-
-    activeSseCount++;
-    let sseCounted = true;
-    res.on('close', () => {
-      if (sseCounted) {
-        sseCounted = false;
-        activeSseCount--;
-      }
-    });
-
-    // Backpressure helper: `res.write` returns false when the kernel send
-    // buffer is full. Without awaiting `drain` Node accumulates the
-    // payload in user-space memory unboundedly — a slow consumer on a
-    // chatty session can balloon daemon RSS. Wait for `drain` (or
-    // close/error) before scheduling the next write.
-    //
-    // Concurrency: serialize ALL writes through a per-connection chain
-    // so the heartbeat (fire-and-forget interval, see below) can't
-    // interleave with the main event-write loop. Without serialization,
-    // the heartbeat firing while the main loop is mid-`drain` await
-    // would issue a second `res.write()` that bypasses the
-    // backpressure guard — and could even interleave bytes between two
-    // SSE frames on the wire. The chain is single-flight: each call
-    // waits for the previous write to settle before scheduling its own.
-    let writeChain: Promise<void> = Promise.resolve();
-    // T2.9: epoch (ms) of the last write that fully resolved — either
-    // synchronous `res.write` returned `true`, or the async `drain`
-    // fired. The idle-timeout interval below compares
-    // `Date.now() - lastWriteAt` against the configured budget; a
-    // writer that stalls indefinitely on `drain` will never refresh
-    // this stamp, so the timer fires and forces cleanup. Initialized
-    // to "now" because cleanup runs only after the FIRST stall, and
-    // the SSE handshake itself counts as activity.
-    //
-    // Gated on `trackWriterIdle` so the default (flag unset) avoids
-    // a per-chunk `Date.now()` on a chatty stream — SSE writers can
-    // be in the hundreds-to-thousands of frames per session.
-    const trackWriterIdle =
-      opts.writerIdleTimeoutMs !== undefined && opts.writerIdleTimeoutMs > 0;
-    let lastWriteAt = trackWriterIdle ? Date.now() : 0;
-    const doWrite = (chunk: string): Promise<void> =>
-      new Promise((resolve, reject) => {
-        if (res.writableEnded) {
-          resolve();
-          return;
-        }
-        // `res.write` can throw synchronously when the socket is
-        // already destroyed (typical EPIPE shape). Wrap in try/catch
-        // so that surfaces as a rejection on this promise instead of
-        // escaping the executor and turning into an unhandled
-        // exception. Async failures still arrive via the `'error'`
-        // event handler below — Node's Writable.write callback isn't
-        // documented to receive an error argument (errors come on
-        // the event), so we don't rely on it.
-        let ok: boolean;
-        try {
-          ok = res.write(chunk);
-        } catch (err) {
-          reject(err);
-          return;
-        }
-        if (ok) {
-          if (trackWriterIdle) lastWriteAt = Date.now();
-          resolve();
-          return;
-        }
-        const onDrain = () => {
-          res.off('close', onClose);
-          res.off('error', onError);
-          if (trackWriterIdle) lastWriteAt = Date.now();
-          resolve();
-        };
-        const onClose = () => {
-          res.off('drain', onDrain);
-          res.off('error', onError);
-          resolve();
-        };
-        const onError = (err: Error) => {
-          res.off('drain', onDrain);
-          res.off('close', onClose);
-          reject(err);
-        };
-        res.once('drain', onDrain);
-        res.once('close', onClose);
-        res.once('error', onError);
-      });
-    const writeWithBackpressure = (chunk: string): Promise<void> => {
-      const next = writeChain.then(() => doWrite(chunk));
-      // Tail-swallow rejections on the chain itself so a single failed
-      // write doesn't poison every subsequent call. The CALLER's
-      // returned promise still rejects — chain-internal failures are
-      // someone else's problem, not blockers for queueing.
-      writeChain = next.catch(() => undefined);
-      return next;
-    };
-
-    // Tell EventSource to retry after 3s on disconnect. Awaiting drain on
-    // the very first write is overkill but cheap — `ok` is true the
-    // overwhelming majority of the time. Always swallow rejection: a
-    // socket that errors before the very first write would otherwise
-    // surface as an unhandled promise rejection (the `res.on('error')`
-    // hook below is what we actually rely on for cleanup).
-    void writeWithBackpressure('retry: 3000\n\n').catch(() => {});
-
-    // Heartbeat keeps NAT/proxy connections alive and lets the server
-    // notice a dead client through write-back-pressure. Comment frame is
-    // ignored by EventSource.
-    //
-    // The 15s heartbeat detects a TCP-dead writer
-    // via `drain` back-pressure on the comment frame itself. The
-    // `--writer-idle-timeout-ms` flag below adds the orthogonal
-    // application-level guard: if the LAST SUCCESSFUL FLUSH (any
-    // write — heartbeat, replay frame, live event) is older than the
-    // configured budget, the writer is considered stuck (NAT silently
-    // dropping flows, peer process frozen, etc.) and we force a
-    // terminal `client_evicted` frame + cleanup. The historical "Stage
-    // 2 may add an explicit application-level idle timeout" gap
-    // referenced here is now closed when the flag is set.
-    const heartbeatTimer = setInterval(() => {
-      if (!res.writableEnded) {
-        // Heartbeat writes are best-effort; failure swallowed via the
-        // `res.on('error')` hook below.
-        void writeWithBackpressure(': heartbeat\n\n').catch(() => {});
-      }
-    }, 15_000);
-    heartbeatTimer.unref();
-
-    // T2.9: declare the idle-timer slot up-front so `cleanup` below can
-    // clear it unconditionally. The actual interval is armed only when
-    // `--writer-idle-timeout-ms` is configured.
-    let idleTimer: NodeJS.Timeout | undefined;
-
-    const cleanup = () => {
-      clearInterval(heartbeatTimer);
-      if (idleTimer !== undefined) clearInterval(idleTimer);
-      abort.abort();
-    };
-
-    // T2.9: arm the SSE writer idle timeout (if configured). Distinct
-    // from the heartbeat above: heartbeat = "try to ping every 15s";
-    // this = "if no write SUCCEEDED for N ms, force-evict." Values
-    // BELOW the 15s heartbeat interval WILL evict otherwise-healthy
-    // idle connections before the first heartbeat fires — they're not
-    // a no-op. Production deployments should pick a value comfortably
-    // above 15s (e.g. 30000–300000ms) so legitimate idle streams stay
-    // alive and only genuinely stuck writers are reaped; small values
-    // are useful for tests / short-lived dev sessions. The interval
-    // polls at 1/4 the budget (bounded by [250ms, 5s]) so tests
-    // using short budgets still detect promptly, while long
-    // production budgets stay cheap. Values below roughly 1000ms all
-    // use the 250ms polling floor, so eviction can lag until the next
-    // tick instead of landing at exact millisecond precision.
-    if (trackWriterIdle) {
-      // Narrowed by `trackWriterIdle`; the const assertion keeps
-      // TypeScript happy inside the closure without re-reading opts.
-      const writerIdleTimeoutMs = opts.writerIdleTimeoutMs as number;
-      const checkIntervalMs = Math.max(
-        250,
-        Math.min(5_000, Math.floor(writerIdleTimeoutMs / 4)),
-      );
-      idleTimer = setInterval(() => {
-        if (res.writableEnded) return;
-        const idleForMs = Date.now() - lastWriteAt;
-        if (idleForMs < writerIdleTimeoutMs) return;
-        // Reuse the existing `client_evicted` taxonomy from
-        // `eventBus.ts` so SDK reducers branch on the same frame type
-        // they already handle for queue-overflow eviction; the new
-        // `reason` slot is the differentiator. Write DIRECTLY here
-        // (bypassing `writeWithBackpressure`) because the chain may
-        // already be stuck on a `drain` that will never come — which
-        // is the exact scenario this timer exists to catch. If the
-        // kernel send buffer has room the client sees the frame; if
-        // not, the client gets EPIPE on next read. Either way the
-        // socket is closed in the next two statements, so any drop
-        // is bounded.
-        try {
-          res.write(
-            formatSseFrame({
-              v: 1,
-              type: 'client_evicted',
-              data: {
-                reason: 'writer_idle_timeout',
-                errorKind: 'writer_idle_timeout',
-                idleForMs,
-                timeoutMs: writerIdleTimeoutMs,
-              },
-            }),
-          );
-        } catch {
-          /* socket already destroyed; nothing to send. */
-        }
-        // Wrap stderr + res.end so an
-        // EPIPE on the stderr pipe (or a synchronous throw from
-        // `res.end()` against a destroyed socket) can't escape this
-        // interval callback. If it did, `cleanup()` wouldn't run, the
-        // heartbeat + idle timers would never clear, and every
-        // subsequent tick would re-throw — turning one transient
-        // failure into a permanent uncaughtException loop.
-        try {
-          writeStderrLine(
-            `hopcode serve: evicting SSE client (session ${sessionId}) — ` +
-              `writer idle for ${idleForMs}ms > ${writerIdleTimeoutMs}ms timeout`,
-          );
-        } catch {
-          /* stderr pipe closed; eviction is still happening. */
-        }
-        cleanup();
-        try {
-          if (!res.writableEnded) res.end();
-        } catch {
-          /* socket already destroyed; nothing more to do. */
-        }
-      }, checkIntervalMs);
-      idleTimer.unref();
-    }
-    req.on('close', cleanup);
-    // Swallow socket-level write errors. When the underlying TCP connection
-    // dies (RST, mid-flight kill -9), the next `res.write` throws EPIPE.
-    // Without an `error` listener Express forwards it to its default error
-    // handler which logs noisily. The req.on('close') path above is what we
-    // actually rely on to tear down the subscription; this listener just
-    // suppresses the noise + ensures cleanup runs even if for some reason
-    // the close event doesn't fire first.
-    res.on('error', (err) => {
-      // Without this log the daemon side is blind to SSE disconnects
-      // (RST, mid-flight kill -9, network blip). Cleanup still runs —
-      // the listener exists primarily so Node doesn't crash on EPIPE
-      // — but operators get a breadcrumb when chasing flaky clients.
-      writeStderrLine(
-        `hopcode serve: SSE socket error (session ${sessionId}): ${err.message}`,
-      );
-      cleanup();
-    });
-
-    void (async () => {
-      try {
-        while (true) {
-          const next = await iter!.next();
-          if (next.done) break;
-          if (res.writableEnded) break;
-          // Log ring eviction events for operator observability.
-          if (next.value.type === 'state_resync_required') {
-            const data = next.value.data as {
-              lastDeliveredId?: number;
-              earliestAvailableId?: number;
-              reason?: string;
-            };
-            const gap =
-              typeof data.earliestAvailableId === 'number' &&
-              typeof data.lastDeliveredId === 'number'
-                ? data.earliestAvailableId - data.lastDeliveredId - 1
-                : undefined;
-            writeStderrLine(
-              `hopcode serve: SSE ring eviction detected (session ${sessionId}): ` +
-                `lastEventId=${data.lastDeliveredId ?? '?'}, ` +
-                `earliestInRing=${data.earliestAvailableId ?? '?'}, ` +
-                `gap=${gap ?? '?'} events, ` +
-                `reason=${data.reason ?? '?'}. ` +
-                `Consumer must call loadSession to recover.`,
-            );
-          }
-          await writeWithBackpressure(formatSseFrame(next.value));
-        }
-      } catch (err) {
-        if (!res.writableEnded) {
-          // Don't burn an `id:` slot — `stream_error` is a terminal frame
-          // emitted on the daemon side when the bridge iterator throws, so
-          // it has no place in the per-session monotonic sequence and a
-          // hard-coded `id: 0` would regress the client's `Last-Event-ID`
-          // tracker. `formatSseFrame` omits the `id:` line when the input
-          // event has no id.
-          //
-          // Stamp the classified error kind so UIs can render typed responses
-          // (auth retry / file picker / proxy hint / etc.) rather than
-          // regex-matching the human-readable `error` string. Returns
-          // `undefined` for unclassified errors — SDK falls back to
-          // rendering `error` text as before, so adding `errorKind` is
-          // strictly additive / backward-compatible.
-          const errorKind = mapDomainErrorToErrorKind(err);
-          // Log bridge iterator errors to daemon stderr for
-          // operator observability.
-          writeStderrLine(
-            `hopcode serve: bridge iterator error (session ${sessionId}): ` +
-              `${errorMessage(err)}` +
-              (errorKind ? ` [${errorKind}]` : ''),
-          );
-          await writeWithBackpressure(
-            formatSseFrame({
-              v: 1,
-              type: 'stream_error',
-              data: {
-                error: errorMessage(err),
-                ...(errorKind ? { errorKind } : {}),
-              },
-            }),
-          ).catch(() => {});
-        }
-      } finally {
-        cleanup();
-        if (!res.writableEnded) res.end();
-      }
-    })();
+  registerSseEventsRoutes(app, {
+    bridge: primaryBridge,
+    workspaceRegistry,
+    daemonLog,
+    writerIdleTimeoutMs: opts.writerIdleTimeoutMs,
+    sendBridgeError,
   });
 
   // Official ACP Streamable HTTP transport (RFD #721) mounted at `/acp`
@@ -2906,6 +1907,10 @@ export function createServeApp(
   // route through the JSON error contract below.
   acpHandleRef.current = mountAcpHttp(app, primaryBridge, {
     boundWorkspace: primaryBoundWorkspace,
+    daemonEnv,
+    // Phase 4 (issue #6378): pass the registry so `/workspaces/:workspace/acp`
+    // mounts a per-runtime ACP dispatcher for each registered workspace.
+    workspaceRegistry,
     archiveCoordinator,
     workspace: primaryWorkspace,
     fsFactory: primaryRouteFileSystemFactory,
@@ -2948,9 +1953,17 @@ export function createServeApp(
     extraWsRoutes: [
       {
         path: '/voice/stream',
-        onConnection: createVoiceWsConnectionHandler(primaryBoundWorkspace),
+        onConnection: createVoiceWsConnectionHandler(primaryBoundWorkspace, {
+          env: getRuntimeEffectiveEnv(primaryRuntime.env),
+          acquireVoiceLease: () => voiceCoordinator.acquire(primaryRuntime),
+        }),
       },
     ],
+    workspaceVoiceConnection: (runtime, ws, req) =>
+      createVoiceWsConnectionHandler(runtime.workspaceCwd, {
+        env: getRuntimeEffectiveEnv(runtime.env),
+        acquireVoiceLease: () => voiceCoordinator.acquire(runtime),
+      })(ws, req),
   });
   if (acpHandleRef.current) {
     app.locals['acpHandle'] = acpHandleRef.current;

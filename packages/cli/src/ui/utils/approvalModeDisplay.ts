@@ -9,10 +9,16 @@ import { t } from '../../i18n/index.js';
 
 export function formatApprovalModeName(mode: ApprovalMode): string {
   switch (mode) {
+    case ApprovalMode.PLAN:
+      return t('plan mode');
     case ApprovalMode.DEFAULT:
       return t('Ask permissions');
-    case ApprovalMode.IZN:
-      return 'izn';
+    case ApprovalMode.AUTO_EDIT:
+      return t('auto-accept edits');
+    case ApprovalMode.AUTO:
+      return t('Auto mode');
+    case ApprovalMode.YOLO:
+      return t('YOLO mode');
     default:
       return mode;
   }

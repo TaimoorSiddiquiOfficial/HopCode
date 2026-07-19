@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd' # v6.0.2
+        uses: 'actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10'  # v6.0.3
         with:
           ref: '${{ github.event.release.tag_name || github.event.inputs.ref || github.sha }}'
           fetch-depth: 0
@@ -203,7 +203,7 @@ jobs:
 
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd' # v6.0.2
+        uses: 'actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10'  # v6.0.3
         with:
           ref: '${{ github.event.release.tag_name || github.event.inputs.ref || github.sha }}'
           fetch-depth: 0
@@ -288,7 +288,7 @@ jobs:
 
     steps:
       - name: 'Checkout'
-        uses: 'actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd' # v6.0.2
+        uses: 'actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10'  # v6.0.3
         with:
           ref: '${{ github.event.release.tag_name || github.event.inputs.ref || github.sha }}'
 
@@ -317,7 +317,17 @@ jobs:
           echo "Publishing to Microsoft Marketplace..."
           for vsix in vsix-artifacts/*.vsix; do
             echo "Publishing: ${vsix}"
-            vsce publish --packagePath "${vsix}" --pat "${VSCE_PAT}" --skip-duplicate
+            for attempt in 1 2 3; do
+              if vsce publish --packagePath "${vsix}" --pat "${VSCE_PAT}" --skip-duplicate; then
+                break
+              fi
+              if [[ ${attempt} -eq 3 ]]; then
+                echo "Failed to publish ${vsix} after 3 attempts"
+                exit 1
+              fi
+              echo "Attempt ${attempt} failed, retrying in 15s..."
+              sleep 15
+            done
           done
 
       - name: 'Publish to OpenVSX'
@@ -328,11 +338,22 @@ jobs:
           echo "Publishing to OpenVSX..."
           for vsix in vsix-artifacts/*.vsix; do
             echo "Publishing: ${vsix}"
-            if [[ "${{ needs.prepare.outputs.is_preview }}" == "true" ]]; then
-              ovsx publish "${vsix}" --pat "${OVSX_TOKEN}" --pre-release || echo "Skipping duplicate: ${vsix}"
-            else
-              ovsx publish "${vsix}" --pat "${OVSX_TOKEN}" || echo "Skipping duplicate: ${vsix}"
-            fi
+            for attempt in 1 2 3; do
+              if [[ "${{ needs.prepare.outputs.is_preview }}" == "true" ]]; then
+                publish_cmd=(ovsx publish "${vsix}" --pat "${OVSX_TOKEN}" --pre-release --skip-duplicate)
+              else
+                publish_cmd=(ovsx publish "${vsix}" --pat "${OVSX_TOKEN}" --skip-duplicate)
+              fi
+              if "${publish_cmd[@]}"; then
+                break
+              fi
+              if [[ ${attempt} -eq 3 ]]; then
+                echo "Failed to publish ${vsix} after 3 attempts"
+                exit 1
+              fi
+              echo "Attempt ${attempt} failed, retrying in 15s..."
+              sleep 15
+            done
           done
 
       - name: 'Upload all VSIXes as release artifacts (dry run)'

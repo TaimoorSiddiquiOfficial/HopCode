@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import type { DaemonSettingDescriptor } from '@hoptrendy/webui/daemon-react-sdk';
 import type { ACPToolCall } from '../../adapters/types';
 import { I18nProvider } from '../../i18n';
+import { WebShellCustomizationProvider } from '../../customization';
+import { TranscriptRenderModeProvider } from '../../transcriptRenderMode';
 
 vi.mock('../../App', async () => {
   const { createContext } = await import('react');
@@ -17,7 +19,6 @@ const {
   extractDiff,
   fencedCodeBlock,
   formatSingleToolSummary,
-  formatRunningSingleToolSummary,
   formatToolGroupSummary,
   getActiveTool,
   getRawFileDiff,
@@ -54,14 +55,17 @@ function makeTool(overrides: Partial<ACPToolCall> = {}): ACPToolCall {
   };
 }
 
-function renderToolLine(tool: ACPToolCall): HTMLElement {
+function renderToolLine(
+  tool: ACPToolCall,
+  props: Partial<Parameters<typeof ToolLine>[0]> = {},
+): HTMLElement {
   const container = document.createElement('div');
   document.body.appendChild(container);
   const root = createRoot(container);
   act(() => {
     root.render(
       <I18nProvider language="en">
-        <ToolLine tool={tool} />
+        <ToolLine tool={tool} {...props} />
       </I18nProvider>,
     );
   });
@@ -69,14 +73,19 @@ function renderToolLine(tool: ACPToolCall): HTMLElement {
   return container;
 }
 
-function renderToolGroup(tools: ACPToolCall[]): HTMLElement {
+function renderToolGroup(
+  tools: ACPToolCall[],
+  customization = {},
+): HTMLElement {
   const container = document.createElement('div');
   document.body.appendChild(container);
   const root = createRoot(container);
   act(() => {
     root.render(
       <I18nProvider language="en">
-        <ToolGroup tools={tools} />
+        <WebShellCustomizationProvider value={customization}>
+          <ToolGroup tools={tools} />
+        </WebShellCustomizationProvider>
       </I18nProvider>,
     );
   });
@@ -108,8 +117,11 @@ const t = (key: string, values?: Record<string, string | number>): string => {
   if (key === 'toolGroup.summary.updatedTodos') {
     return `Updated todos ${values?.count ?? 0} times`;
   }
-  if (key === 'toolGroup.summary.askedUser') {
-    return 'Asked user';
+  if (key === 'toolGroup.summary.provideInformation') {
+    return 'Provide information';
+  }
+  if (key === 'toolGroup.summary.askedQuestions') {
+    return `Asked ${values?.count ?? 0} question${values?.count === 1 ? '' : 's'}`;
   }
   if (key === 'toolGroup.summary.otherTools') {
     return `Called ${values?.count ?? 0} other tools`;
@@ -158,6 +170,18 @@ describe('tool group summary logic', () => {
     expect(formatToolGroupSummary(tools, zhT)).toBe('Running 读取文件');
   });
 
+  it('asks for information while AskUserQuestion is running', () => {
+    const tools = [
+      makeTool({
+        toolName: 'ask_user_question',
+        status: 'in_progress',
+        args: { questions: [{}, {}] },
+      }),
+    ];
+
+    expect(formatToolGroupSummary(tools, t)).toBe('Provide information');
+  });
+
   it('summarizes completed tool groups by common action type', () => {
     const tools = [
       makeTool({ callId: 'shell', status: 'completed' }),
@@ -173,26 +197,60 @@ describe('tool group summary logic', () => {
         callId: 'ask',
         toolName: 'ask_user_question',
         status: 'completed',
+        args: { questions: [{}, {}] },
       }),
     ];
 
     expect(hasActiveTool(tools)).toBe(false);
     expect(getActiveTool(tools).callId).toBe('ask');
     expect(formatToolGroupSummary(tools, t)).toBe(
-      'Edited 1 files Ran 1 commands Read 1 files Searched 1 times Updated todos 1 times Asked user',
+      'Edited 1 files Ran 1 commands Read 1 files Searched 1 times Updated todos 1 times Asked 2 questions',
     );
   });
 
-  it('formats a single tool summary from the tool itself', () => {
+  it('formats a single shell summary as only the semantic description', () => {
+    expect(
+      formatSingleToolSummary(
+        makeTool({
+          toolName: 'run_shell_command',
+          args: {
+            command: 'dataworks-infra workspace list',
+            description: '查询用户工作空间列表',
+            timeout: 30000,
+          },
+        }),
+        t,
+      ),
+    ).toBe('查询用户工作空间列表');
+  });
+
+  it('falls back to command text for shell summaries without descriptions', () => {
     expect(
       formatSingleToolSummary(
         makeTool({
           toolName: 'Shell',
-          args: { command: 'npm run build' },
+          args: { command: 'npm run build', timeout: 30000 },
         }),
         t,
       ),
     ).toBe('Shell npm run build');
+  });
+
+  it('uses only skill names in single tool summaries', () => {
+    expect(
+      formatSingleToolSummary(
+        makeTool({
+          toolName: 'skill',
+          title:
+            'Skill: Use skill: "qc-helper" with args: "weather in Hangzhou next 5 days"',
+          args: {
+            skill: 'qc-helper',
+            args: 'weather in Hangzhou next 5 days',
+          },
+        }),
+        t,
+      ),
+    ).toBe('Skill qc-helper');
   });
 
   it('uses action summaries for single todo and ask-user tools', () => {
@@ -200,22 +258,39 @@ describe('tool group summary logic', () => {
       formatSingleToolSummary(makeTool({ toolName: 'todo_write' }), t),
     ).toBe('Updated todos 1 times');
     expect(
-      formatSingleToolSummary(makeTool({ toolName: 'ask_user_question' }), t),
-    ).toBe('Asked user');
-  });
-
-  it('keeps running state and command details for a single active tool', () => {
-    expect(
-      formatRunningSingleToolSummary(
+      formatSingleToolSummary(
         makeTool({
-          toolName: 'Shell',
-          status: 'in_progress',
-          args: { command: 'npm run build' },
+          toolName: 'ask_user_question',
+          args: { questions: [{}, {}, {}] },
         }),
         t,
-        '0:03',
       ),
-    ).toBe('Running Shell npm run build 0:03');
+    ).toBe('Asked 3 questions');
+    expect(
+      formatSingleToolSummary(
+        makeTool({
+          toolName: 'ask_user_question',
+          status: 'in_progress',
+          args: { questions: [{}, {}, {}] },
+        }),
+        t,
+      ),
+    ).toBe('Provide information');
+  });
+
+  it('counts legacy or empty AskUserQuestion inputs as one question', () => {
+    expect(
+      formatSingleToolSummary(makeTool({ toolName: 'ask_user_question' }), t),
+    ).toBe('Asked 1 question');
+    expect(
+      formatSingleToolSummary(
+        makeTool({
+          toolName: 'ask_user_question',
+          args: { questions: [] },
+        }),
+        t,
+      ),
+    ).toBe('Asked 1 question');
   });
 
   it('truncates long single tool descriptions in the chat summary', () => {
@@ -229,6 +304,118 @@ describe('tool group summary logic', () => {
 
     expect(summary.length).toBeLessThan(140);
     expect(summary).toContain('...');
+  });
+
+  it('lets custom tool header extras render single-tool chat summaries', () => {
+    const container = renderToolGroup(
+      [
+        makeTool({
+          toolName: 'run_shell_command',
+          args: {
+            command: 'dataworks-infra workspace list',
+            description: '查询用户工作空间列表',
+            timeout: 30000,
+          },
+        }),
+      ],
+      {
+        renderToolHeaderExtra: (info) => (
+          <span data-testid="custom-summary">
+            {info.kind}:{info.description}
+          </span>
+        ),
+      },
+    );
+
+    const summary = container.querySelector('button');
+    expect(summary?.textContent).not.toContain('Shell');
+    expect(summary?.textContent).toContain('shell:查询用户工作空间列表');
+    expect(summary?.textContent).not.toContain('timeout: 30000ms');
+  });
+
+  it('uses action descriptions for shell rows inside grouped summaries', () => {
+    const container = renderToolGroup([
+      makeTool({
+        callId: 'shell',
+        toolName: 'run_shell_command',
+        title:
+          'Shell: dataworks-infra workspace list [timeout: 30000ms] (查询用户工作空间列表)',
+        args: {
+          command: 'dataworks-infra workspace list',
+          description: '查询用户工作空间列表',
+          timeout: 30000,
+        },
+      }),
+      makeTool({
+        callId: 'read',
+        toolName: 'read_file',
+        args: { file_path: 'README.md' },
+      }),
+    ]);
+
+    expect(container.textContent).toContain('Shell');
+    expect(container.textContent).toContain('查询用户工作空间列表');
+    expect(container.textContent).not.toContain(
+      'dataworks-infra workspace list',
+    );
+    expect(container.textContent).not.toContain('timeout: 30000ms');
+  });
+});
+
+describe('tool output session links', () => {
+  function renderSessionLinkTool(readonly: boolean): HTMLElement {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    const toolLine = (
+      <ToolLine
+        tool={makeTool({
+          toolName: 'custom_tool',
+          rawOutput: '[child](qwen-session://child-session)',
+        })}
+        forceExpanded
+      />
+    );
+    act(() => {
+      root.render(
+        <I18nProvider language="en">
+          {readonly ? (
+            <TranscriptRenderModeProvider value="readonly">
+              {toolLine}
+            </TranscriptRenderModeProvider>
+          ) : (
+            toolLine
+          )}
+        </I18nProvider>,
+      );
+    });
+    mounted.push({ root, container });
+    return container;
+  }
+
+  it('keeps interactive tool session links clickable by default', () => {
+    const handler = vi.fn();
+    window.addEventListener('qwen:open-session', handler);
+    const container = renderSessionLinkTool(false);
+    const link = container.querySelector('a[role="button"]');
+    expect(link?.textContent).toBe('child');
+    act(() => {
+      link?.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true }),
+      );
+    });
+    expect(handler).toHaveBeenCalledOnce();
+    window.removeEventListener('qwen:open-session', handler);
+  });
+
+  it('renders tool session links as inert text in readonly mode', () => {
+    const handler = vi.fn();
+    window.addEventListener('qwen:open-session', handler);
+    const container = renderSessionLinkTool(true);
+    expect(container.querySelector('a[role="button"]')).toBeNull();
+    expect(container.textContent).toContain('child');
+    expect(handler).not.toHaveBeenCalled();
+    window.removeEventListener('qwen:open-session', handler);
   });
 });
 
@@ -250,6 +437,32 @@ describe('tool expandability', () => {
         }),
       ),
     ).toBe(false);
+  });
+
+  it('does not expand skill rows that only have the skill name', () => {
+    expect(
+      hasExpandableContent(
+        makeTool({
+          toolName: 'skill',
+          title: 'Skill: Use skill: "review"',
+          args: { skill: 'review' },
+        }),
+      ),
+    ).toBe(false);
+    expect(
+      hasExpandableContent(
+        makeTool({
+          toolName: 'skill',
+          args: { skill: 'review' },
+          content: [
+            {
+              type: 'content',
+              content: { type: 'text', text: '# Code Review' },
+            },
+          ],
+        }),
+      ),
+    ).toBe(true);
   });
 });
 
@@ -296,6 +509,14 @@ describe('tool kind logic', () => {
 });
 
 describe('tool row rendering', () => {
+  it('shows failed status in the collapsed chat summary', () => {
+    const container = renderToolGroup([
+      makeTool({ toolName: 'Shell', status: 'failed' }),
+    ]);
+
+    expect(container.querySelector('button')?.textContent).toContain('Failed');
+  });
+
   it('renders ANSI shell output as styled spans instead of escape text', () => {
     const container = renderToolLine(
       makeTool({
@@ -360,6 +581,84 @@ describe('tool row rendering', () => {
     act(() => header.click());
     expect(header.textContent).toContain(pattern);
     expect(header.textContent).toContain('packages/web-shell/client');
+  });
+
+  it('uses the shell tool name for expanded cards from action summaries', () => {
+    const container = renderToolLine(
+      makeTool({
+        toolName: 'run_shell_command',
+        args: {
+          command: 'dataworks-infra workspace list',
+          description: '查询用户工作空间列表',
+          timeout: 30000,
+        },
+        content: [
+          {
+            type: 'content',
+            content: { type: 'text', text: 'failed\nwith details' },
+          },
+        ],
+      }),
+      { summaryOnly: true },
+    );
+    const header = container.querySelector('[role="button"]') as HTMLElement;
+
+    expect(header.textContent).toContain('Shell');
+    expect(header.textContent).toContain('查询用户工作空间列表');
+
+    act(() => header.click());
+
+    const cardTitle = container.querySelector('[class*="expandedCardTitle"]');
+    expect(cardTitle?.textContent).toBe('Shell');
+  });
+
+  it('shows complete skill content in the expanded card body', () => {
+    const container = renderToolLine(
+      makeTool({
+        toolName: 'skill',
+        title: 'Skill: Use skill: "review" with args: "check the current diff"',
+        args: {
+          skill: 'review',
+        },
+        content: [
+          {
+            type: 'content',
+            content: {
+              type: 'text',
+              text: 'Base directory for this skill: /repo\n# Code Review',
+            },
+          },
+        ],
+      }),
+    );
+    const header = container.querySelector('[role="button"]') as HTMLElement;
+
+    expect(header.textContent).toContain('Skill');
+    expect(header.textContent).toContain('review');
+    expect(header.textContent).not.toContain('check the current diff');
+
+    act(() => header.click());
+
+    const output = container.querySelector('pre');
+    expect(output?.textContent).toBe(
+      'Base directory for this skill: /repo\n# Code Review',
+    );
+  });
+
+  it('keeps running state for single todo summaries', () => {
+    const container = renderToolGroup([
+      makeTool({
+        toolName: 'todo_write',
+        status: 'in_progress',
+        args: {
+          todos: [{ id: '1', content: 'Check UI', status: 'in_progress' }],
+        },
+      }),
+    ]);
+    const summary = container.querySelector('button');
+
+    expect(summary?.textContent).toContain('Running');
+    expect(summary?.textContent).toContain('Updated task list');
   });
 });
 

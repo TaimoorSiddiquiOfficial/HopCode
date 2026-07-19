@@ -14,7 +14,10 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
-import { writeSha256Sums } from './create-standalone-package.js';
+import {
+  TARGET_CLIPBOARD_PACKAGE,
+  writeSha256Sums,
+} from './create-standalone-package.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -83,6 +86,7 @@ async function main() {
     const checksumsPath = path.join(runtimeDir, 'SHASUMS256.txt');
     await downloadFile(`${nodeDistUrl}/SHASUMS256.txt`, checksumsPath);
     const checksums = parseChecksums(fs.readFileSync(checksumsPath, 'utf8'));
+    const nativeModulesDir = stageClipboardPackages(runtimeDir);
 
     for (const target of RELEASE_TARGETS) {
       await packageTarget({
@@ -93,6 +97,7 @@ async function main() {
         releaseVersion: args.version,
         runtimeDir,
         checksums,
+        nativeModulesDir,
       });
     }
 
@@ -117,6 +122,7 @@ async function packageTarget({
   releaseVersion,
   runtimeDir,
   checksums,
+  nativeModulesDir,
 }) {
   const archiveName = `node-v${nodeVersion}-${nodeTarget}.${nodeArchiveExtension}`;
   const archivePath = path.join(runtimeDir, archiveName);
@@ -130,6 +136,8 @@ async function packageTarget({
     hopcodeTarget,
     '--node-archive',
     archivePath,
+    '--native-modules-dir',
+    nativeModulesDir,
     '--out-dir',
     outDir,
     '--skip-checksums',
@@ -142,6 +150,63 @@ async function packageTarget({
     cwd: rootDir,
     stdio: 'inherit',
   });
+}
+
+function readClipboardPackageSpecs() {
+  const packageLock = JSON.parse(
+    fs.readFileSync(path.join(rootDir, 'package-lock.json'), 'utf8'),
+  );
+  const cliPackage = JSON.parse(
+    fs.readFileSync(
+      path.join(rootDir, 'packages', 'cli', 'package.json'),
+      'utf8',
+    ),
+  );
+  const packageNames = [
+    '@teddyzhu/clipboard',
+    ...new Set(TARGET_CLIPBOARD_PACKAGE.values()),
+  ];
+
+  return packageNames.map((packageName) => {
+    const version =
+      packageLock.packages?.[`node_modules/${packageName}`]?.version;
+    const declaredVersion = cliPackage.optionalDependencies?.[packageName];
+    if (!version || ![version, `^${version}`].includes(declaredVersion)) {
+      fail(`Clipboard package version is not locked for ${packageName}`);
+    }
+    return `${packageName}@${version}`;
+  });
+}
+
+function stageClipboardPackages(runtimeDir) {
+  const installDir = path.join(runtimeDir, 'clipboard-modules');
+  fs.mkdirSync(installDir, { recursive: true });
+  console.log('Staging standalone clipboard native packages');
+  const npmExecPath = process.env.npm_execpath;
+  if (!npmExecPath) {
+    fail('npm_execpath is unavailable; run package:standalone:release via npm');
+  }
+  execFileSync(
+    process.execPath,
+    [
+      npmExecPath,
+      'install',
+      '--prefix',
+      installDir,
+      '--package-lock=false',
+      '--no-save',
+      '--ignore-scripts',
+      '--force',
+      '--no-audit',
+      '--no-fund',
+      ...readClipboardPackageSpecs(),
+    ],
+    {
+      cwd: rootDir,
+      stdio: 'inherit',
+    },
+  );
+  return path.join(installDir, 'node_modules');
 }
 
 async function downloadFile(url, destination) {
@@ -301,4 +366,9 @@ function fail(message) {
   throw new Error(`ERROR: ${message}`);
 }
 
-export { assertStandaloneOutput, parseChecksums, RELEASE_TARGETS };
+export {
+  assertStandaloneOutput,
+  parseChecksums,
+  readClipboardPackageSpecs,
+  RELEASE_TARGETS,
+};

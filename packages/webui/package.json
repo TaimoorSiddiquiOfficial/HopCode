@@ -1,7 +1,7 @@
 {
-  "name": "@hoptrendy/webui",
-  "version": "0.30.6",
-  "description": "Shared UI components for HopCode packages",
+  "name": "@qwen-code/webui",
+  "version": "0.19.12",
+  "description": "Shared UI components for Qwen Code packages",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -51,8 +51,8 @@
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "dependencies": {
-    "markdown-it": "^14.1.0",
-    "@hoptrendy/sdk": "~0.30.2"
+    "@qwen-code/sdk": "file:../sdk-typescript",
+    "markdown-it": "^14.1.0"
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { logger } from '../../utils/logger.js';
 import * as vscode from 'vscode';
 import { Storage } from '@hoptrendy/hopcode-core';
 
@@ -52,7 +53,7 @@ export class PanelManager {
    * Set Panel (for restoration)
    */
   setPanel(panel: vscode.WebviewPanel): void {
-    console.log('[PanelManager] Setting panel for restoration');
+    logger.log('[PanelManager] Setting panel for restoration');
     this.panel = panel;
   }
 
@@ -69,9 +70,9 @@ export class PanelManager {
     const existingGroup = this.findExistingHopCodeGroup();
 
     if (existingGroup) {
-      // If HopCode webview already exists in a locked group, create the new panel in that same group
-      console.log(
-        '[PanelManager] Found existing HopCode group, creating panel in same group',
+      // If Qwen Code webview already exists in a locked group, create the new panel in that same group
+      logger.log(
+        '[PanelManager] Found existing Qwen Code group, creating panel in same group',
       );
       this.panel = vscode.window.createWebviewPanel(
         'HopCode.chat',
@@ -94,7 +95,7 @@ export class PanelManager {
         // Create a new group to the right of the current active group
         await vscode.commands.executeCommand('workbench.action.newGroupRight');
       } catch (error) {
-        console.warn(
+        logger.warn(
           '[PanelManager] Failed to create right editor group (continuing):',
           error,
         );
@@ -174,8 +175,8 @@ export class PanelManager {
           isWebviewInput(input) &&
           input.viewType === 'mainThreadWebview-HopCode.chat'
         ) {
-          // Found an existing HopCode tab
-          console.log('[PanelManager] Found existing HopCode group:', {
+          // Found an existing Qwen Code tab
+          logger.log('[PanelManager] Found existing Qwen Code group:', {
             viewColumn: group.viewColumn,
             tabCount: group.tabs.length,
             isActive: group.isActive,
@@ -207,9 +208,9 @@ export class PanelManager {
       // The newly created panel is focused (preserveFocus: false), so this
       // locks the correct, active editor group.
       await vscode.commands.executeCommand('workbench.action.lockEditorGroup');
-      console.log('[PanelManager] Group locked after panel creation');
+      logger.log('[PanelManager] Group locked after panel creation');
     } catch (error) {
-      console.warn('[PanelManager] Failed to lock editor group:', error);
+      logger.warn('[PanelManager] Failed to lock editor group:', error);
     }
   }
 
@@ -336,16 +337,16 @@ export class PanelManager {
                       'workbench.action.removeActiveEditorGroup',
                     );
                   } catch (err) {
-                    console.warn(
-                      '[PanelManager] Failed to close empty group after HopCode panel disposed:',
+                    logger.warn(
+                      '[PanelManager] Failed to close empty group after Qwen panel disposed:',
                       err,
                     );
                   }
                 }
               }
             } catch (err) {
-              console.warn(
-                '[PanelManager] Error while trying to close empty HopCode group:',
+              logger.warn(
+                '[PanelManager] Error while trying to close empty Qwen group:',
                 err,
               );
             }

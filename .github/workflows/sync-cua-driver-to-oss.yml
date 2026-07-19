@@ -26,6 +26,12 @@ jobs:
     runs-on: 'ubuntu-latest'
     if: "github.repository == 'TaimoorSiddiquiOfficial/HopCode'"
     steps:
-      - name: 'No-op in HopCode fork'
+      - name: 'Checkout'
+        uses: 'actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10'  # v6.0.3
+
+      - name: 'Resolve cua-driver version'
+        id: 'meta'
+        env:
+          INPUT_VERSION: '${{ inputs.version }}'
         run: |-
           echo 'Skipping OSS mirror — HopCode uses the hopcode-assets public mirror.'

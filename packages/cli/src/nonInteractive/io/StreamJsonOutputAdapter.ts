@@ -10,8 +10,9 @@ import type {
   ServerGeminiStreamEvent,
   ToolCallRequestInfo,
   McpToolProgressData,
-} from '@hoptrendy/hopcode-core';
-import { GeminiEventType } from '@hoptrendy/hopcode-core';
+  ShellProgressData,
+} from '@qwen-code/qwen-code-core';
+import { GeminiEventType } from '@qwen-code/qwen-code-core';
 import type {
   CLIAssistantMessage,
   CLIMessage,
@@ -310,7 +311,7 @@ export class StreamJsonOutputAdapter
    */
   override emitToolProgress(
     request: ToolCallRequestInfo,
-    progress: McpToolProgressData,
+    progress: McpToolProgressData | ShellProgressData,
   ): void {
     if (!this.includePartialMessages) {
       return;

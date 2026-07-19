@@ -24,6 +24,7 @@ const LABEL_WIDTH = 15;
 type ServerAction =
   | 'view-tools'
   | 'view-resources'
+  | 'approve'
   | 'reconnect'
   | 'toggle-disable'
   | 'authenticate'
@@ -33,6 +34,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
   server,
   onViewTools,
   onViewResources,
+  onApprove,
   onReconnect,
   onDisable,
   onAuthenticate,
@@ -88,7 +90,17 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
       });
     }
 
-    // ??????/????
+    // 受门控但未审批的 server 显示"审批"按钮，让用户可以在 /mcp 中直接审批
+    // 而不必等待启动时的弹窗。
+    if (awaitingApproval && onApprove) {
+      result.push({
+        key: 'approve',
+        label: t('Approve'),
+        value: 'approve',
+      });
+    }
+
+    // 始终显示启用/禁用选项（扩展提供的服务器走扩展级禁用记录）
     result.push({
       key: 'toggle-disable',
       label: server.isDisabled ? t('Enable') : t('Disable'),
@@ -114,7 +126,7 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
     }
 
     return result;
-  }, [server, onViewResources, awaitingApproval]);
+  }, [server, onViewResources, onApprove, awaitingApproval]);
 
   useKeypress(
     (key) => {
@@ -277,6 +289,9 @@ export const ServerDetailStep: React.FC<ServerDetailStepProps> = ({
                 break;
               case 'view-resources':
                 onViewResources?.();
+                break;
+              case 'approve':
+                onApprove?.();
                 break;
               case 'reconnect':
                 onReconnect?.();

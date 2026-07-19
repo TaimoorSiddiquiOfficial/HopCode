@@ -3,6 +3,32 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { ChannelBaseOptions } from '@hoptrendy/channel-base';
 
+const mockSetGlobalDispatcher = vi.hoisted(() => vi.fn());
+const mockEnvHttpProxyAgent = vi.hoisted(() =>
+  vi.fn((opts: { httpProxy: string; httpsProxy: string }) => ({
+    proxyUrl: opts.httpProxy,
+  })),
+);
+const mockNormalizeProxyUrl = vi.hoisted(() => vi.fn((url?: string) => url));
+const mockStorageGetGlobalQwenDir = vi.hoisted(() =>
+  vi.fn(() => '/tmp/qwen-home'),
+);
+const mockReadChannelMemory = vi.hoisted(() => vi.fn());
+const mockGetChannelMemoryRevision = vi.hoisted(() => vi.fn());
+const mockListChannelMemoryEntries = vi.hoisted(() => vi.fn());
+const mockAddChannelMemoryEntries = vi.hoisted(() => vi.fn());
+const mockUpdateChannelMemoryEntry = vi.hoisted(() => vi.fn());
+const mockRemoveChannelMemoryEntries = vi.hoisted(() => vi.fn());
+const mockClearChannelMemory = vi.hoisted(() => vi.fn());
+const mockParseCron = vi.hoisted(() => vi.fn());
+const mockNextFireTime = vi.hoisted(() =>
+  vi.fn((cron: string) => {
+    if (cron === '0 0 31 2 *') {
+      throw new Error('No next fire time');
+    }
+    return new Date('2026-01-01T00:00:00.000Z');
+  }),
+);
 const mockLoadSettings = vi.hoisted(() => vi.fn());
 const mockGetExtensionManager = vi.hoisted(() => vi.fn());
 const mockReadServiceInfo = vi.hoisted(() => vi.fn());
@@ -38,7 +64,7 @@ const mockSanitizeLogText = vi.hoisted(() =>
 );
 const mockRouterClearAll = vi.hoisted(() => vi.fn());
 const mockRouterGetTarget = vi.hoisted(() => vi.fn());
-const mockRouterRemoveSessionId = vi.hoisted(() => vi.fn());
+const mockRouterHandleSessionDied = vi.hoisted(() => vi.fn());
 const mockRouterRestoreSessions = vi.hoisted(() => vi.fn());
 const mockRouterSetBridge = vi.hoisted(() => vi.fn());
 const mockRouterSetChannelScope = vi.hoisted(() => vi.fn());
@@ -66,12 +92,33 @@ const mockSessionRouter = vi.hoisted(() =>
   vi.fn(() => ({
     clearAll: mockRouterClearAll,
     getTarget: mockRouterGetTarget,
-    removeSessionId: mockRouterRemoveSessionId,
+    handleSessionDied: mockRouterHandleSessionDied,
     restoreSessions: mockRouterRestoreSessions,
     setBridge: mockRouterSetBridge,
     setChannelScope: mockRouterSetChannelScope,
   })),
 );
+
+vi.mock('undici', () => ({
+  EnvHttpProxyAgent: mockEnvHttpProxyAgent,
+  setGlobalDispatcher: mockSetGlobalDispatcher,
+}));
+
+vi.mock('@qwen-code/qwen-code-core', () => ({
+  addChannelMemoryEntries: mockAddChannelMemoryEntries,
+  clearChannelMemory: mockClearChannelMemory,
+  getChannelMemoryRevision: mockGetChannelMemoryRevision,
+  listChannelMemoryEntries: mockListChannelMemoryEntries,
+  nextFireTime: mockNextFireTime,
+  normalizeProxyUrl: mockNormalizeProxyUrl,
+  parseCron: mockParseCron,
+  readChannelMemory: mockReadChannelMemory,
+  removeChannelMemoryEntries: mockRemoveChannelMemoryEntries,
+  updateChannelMemoryEntry: mockUpdateChannelMemoryEntry,
+  Storage: {
+    getGlobalQwenDir: mockStorageGetGlobalQwenDir,
+  },
+}));
 
 vi.mock('../../config/settings.js', () => ({
   loadSettings: mockLoadSettings,
@@ -302,6 +349,29 @@ describe('startCommand.handler', () => {
     expect(options?.loopController?.createForTarget).toBeDefined();
     await options!.loopController!.createForTarget!(input, 3);
     expect(mockChannelLoopStoreCreateForTarget).toHaveBeenCalledWith(input, 3);
+  });
+
+  it('uses available env-var resolution for single-channel config', async () => {
+    const channels = { telegram: { type: 'telegram', token: '$BOT_TOKEN' } };
+    mockLoadSettings.mockReturnValue({ merged: { channels } });
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
+      throw new Error(`process.exit: ${String(code)}`);
+    });
+
+    try {
+      await expect(invokeStartHandler({ name: 'telegram' })).rejects.toThrow(
+        'process.exit: 1',
+      );
+    } finally {
+      exitSpy.mockRestore();
+    }
+
+    expect(mockParseChannelConfig).toHaveBeenCalledWith(
+      'telegram',
+      channels.telegram,
+      process.cwd(),
+      { resolveEnvVars: 'available' },
+    );
   });
 
   it('rejects cron expressions that cannot fire', async () => {
@@ -567,9 +637,9 @@ describe('startCommand.handler', () => {
     expect(mockSanitizeLogText).toHaveBeenCalledWith('dead\nsession', 128);
     expect(mockSanitizeLogText).toHaveBeenCalledWith('boom\nreason', 512);
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      '[Channel] Session dead\\nsession died (boom\\nreason), removing routing state',
+      '[Channel] Session dead\\nsession died (boom\\nreason), updating routing state',
     );
-    expect(mockRouterRemoveSessionId).toHaveBeenCalledWith('dead\nsession');
+    expect(mockRouterHandleSessionDied).toHaveBeenCalledWith('dead\nsession');
     expect(mockChannelOnSessionDied).not.toHaveBeenCalled();
   });
 
@@ -649,7 +719,7 @@ describe('startCommand.handler', () => {
     sessionDiedListener!({ sessionId: 'dead-session' });
 
     expect(mockChannelOnSessionDied).toHaveBeenCalledWith('dead-session');
-    expect(mockRouterRemoveSessionId).not.toHaveBeenCalled();
+    expect(mockRouterHandleSessionDied).not.toHaveBeenCalled();
   });
 
   it('registers session cleanup on the replacement bridge before restoring sessions', async () => {
@@ -695,7 +765,7 @@ describe('startCommand.handler', () => {
 
       restartedSessionDiedListener({ sessionId: 'dead-after-restart' });
 
-      expect(mockRouterRemoveSessionId).toHaveBeenCalledWith(
+      expect(mockRouterHandleSessionDied).toHaveBeenCalledWith(
         'dead-after-restart',
       );
     } finally {
@@ -780,10 +850,17 @@ describe('startCommand.handler', () => {
       expect.any(Object),
       expect.objectContaining({
         channelMemory: {
-          appendChannelMemory: mockAppendChannelMemory,
-          clearChannelMemory: mockClearChannelMemory,
           readChannelMemory: mockReadChannelMemory,
+          getChannelMemoryRevision: mockGetChannelMemoryRevision,
+          listChannelMemoryEntries: mockListChannelMemoryEntries,
+          addChannelMemoryEntries: mockAddChannelMemoryEntries,
+          updateChannelMemoryEntry: mockUpdateChannelMemoryEntry,
+          removeChannelMemoryEntries: mockRemoveChannelMemoryEntries,
+          clearChannelMemory: mockClearChannelMemory,
         },
+        memoryIntentClassifier: expect.objectContaining({
+          classifyChannelMemoryIntent: expect.any(Function),
+        }),
       }),
     );
   });
@@ -815,10 +892,17 @@ describe('startCommand.handler', () => {
       expect.any(Object),
       expect.objectContaining({
         channelMemory: {
-          appendChannelMemory: mockAppendChannelMemory,
-          clearChannelMemory: mockClearChannelMemory,
           readChannelMemory: mockReadChannelMemory,
+          getChannelMemoryRevision: mockGetChannelMemoryRevision,
+          listChannelMemoryEntries: mockListChannelMemoryEntries,
+          addChannelMemoryEntries: mockAddChannelMemoryEntries,
+          updateChannelMemoryEntry: mockUpdateChannelMemoryEntry,
+          removeChannelMemoryEntries: mockRemoveChannelMemoryEntries,
+          clearChannelMemory: mockClearChannelMemory,
         },
+        memoryIntentClassifier: expect.objectContaining({
+          classifyChannelMemoryIntent: expect.any(Function),
+        }),
       }),
     );
     expect(mockCreateChannel).toHaveBeenNthCalledWith(
@@ -828,9 +912,13 @@ describe('startCommand.handler', () => {
       expect.any(Object),
       expect.objectContaining({
         channelMemory: {
-          appendChannelMemory: mockAppendChannelMemory,
-          clearChannelMemory: mockClearChannelMemory,
           readChannelMemory: mockReadChannelMemory,
+          getChannelMemoryRevision: mockGetChannelMemoryRevision,
+          listChannelMemoryEntries: mockListChannelMemoryEntries,
+          addChannelMemoryEntries: mockAddChannelMemoryEntries,
+          updateChannelMemoryEntry: mockUpdateChannelMemoryEntry,
+          removeChannelMemoryEntries: mockRemoveChannelMemoryEntries,
+          clearChannelMemory: mockClearChannelMemory,
         },
       }),
     );

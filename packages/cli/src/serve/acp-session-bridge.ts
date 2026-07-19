@@ -55,6 +55,11 @@ export type {
 } from '@hoptrendy/acp-bridge';
 
 export type {
+  BridgeFreshSessionAdmission,
+  BridgeFreshSessionAdmissionContext,
+  BridgeFreshSessionReservation,
+  BridgeSessionLifecycle,
+  BridgeSessionLifecycleEvent,
   BridgeOptions,
   DaemonStatusProvider,
 } from '@hoptrendy/acp-bridge/bridgeOptions';
@@ -67,6 +72,10 @@ export type {
   BridgeRestoreSessionRequest,
   BridgeSessionState,
   BridgeRestoredSession,
+  BridgeSessionTranscriptPage,
+  BridgeSessionTranscriptPageRequest,
+  BridgeGenerationModelSource,
+  BridgeGenerationStreamEvent,
   BridgeSessionSummary,
   SessionMetadataUpdate,
   BridgeClientRequestContext,
@@ -83,6 +92,7 @@ export type {
   BridgeDaemonStatusLimits,
   BridgeDaemonSessionDiagnostic,
   BridgeDaemonStatusSnapshot,
+  BridgeShutdownOptions,
   AcpSessionBridge,
   HttpAcpBridge,
 } from '@hoptrendy/acp-bridge/bridgeTypes';
@@ -93,6 +103,7 @@ export {
   SessionNotFoundError,
   RestoreInProgressError,
   SessionArchivedError,
+  SessionNotArchivedError,
   SessionConflictError,
   SessionArchivingError,
   InvalidSessionScopeError,
@@ -109,7 +120,9 @@ export {
   McpServerNotFoundError,
   McpServerRestartFailedError,
   SessionBusyError,
+  WorkspaceDrainingError,
   InvalidRewindTargetError,
+  TotalSessionLimitExceededError,
   NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE,
   // Multi-client permission coordination errors.
   CancelSentinelCollisionError,
@@ -122,4 +135,9 @@ export {
 export {
   MAX_WORKSPACE_PATH_LENGTH,
   canonicalizeWorkspace,
-} from '@hoptrendy/acp-bridge/workspacePaths';
+} from '@qwen-code/acp-bridge/workspacePaths';
+
+export {
+  SessionArtifactAuthorizationError,
+  SessionArtifactValidationError,
+} from '@qwen-code/acp-bridge/sessionArtifacts';

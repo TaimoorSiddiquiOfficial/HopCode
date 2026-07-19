@@ -11,8 +11,10 @@ import {
   McpClient,
   MCPDiscoveryState,
   MCPServerStatus,
+  attemptAutomaticMcpOAuth,
   getMCPServerStatus,
   populateMcpServerCommand,
+  probeMcpServerForOAuth,
   removeMCPServerStatus,
   setMCPDiscoveryState,
 } from './mcp-client.js';
@@ -38,6 +40,7 @@ import {
   McpServerSpawnFailedError,
   InvalidMcpConfigError,
 } from './mcp-errors.js';
+import { listDescendantPids, sigtermPids } from './pid-descendants.js';
 
 const debugLogger = createDebugLogger('MCP');
 export const RUNTIME_MCP_IF_ABSENT_CONFIG_FLAG = '__qwenRuntimeMcpIfAbsent';
@@ -698,6 +701,16 @@ export class McpClientManager {
     };
   }
 
+  /** Returns this manager's status for a server without consulting the
+   * process-wide compatibility status registry. */
+  getServerStatus(serverName: string): MCPServerStatus {
+    return (
+      this.pooledConnections.get(serverName)?.client.getStatus() ??
+      this.clients.get(serverName)?.getStatus() ??
+      MCPServerStatus.DISCONNECTED
+    );
+  }
+
   /** Resolved budget mode (env-var or constructor-supplied). */
   getMcpBudgetMode(): McpBudgetMode {
     return this.budgetMode;
@@ -1345,6 +1358,7 @@ export class McpClientManager {
     const existingClient = this.clients.get(serverName);
     if (existingClient) {
       try {
+        existingClient.clearOAuthState?.();
         await existingClient.disconnect();
       } catch (error) {
         debugLogger.error(
@@ -1710,6 +1724,10 @@ export class McpClientManager {
                   `budget=${err.budget}, reservedCount=${err.reservedCount})`,
               );
             } else {
+              // The shared pool is injected by the ACP daemon, where opening
+              // a local browser is invalid. Record the OAuth requirement so a
+              // mediated client can authenticate, but do not auto-retry here.
+              await probeMcpServerForOAuth(name, config);
               debugLogger.error(
                 `Pool acquire failed for ${name}: ${getErrorMessage(err)}`,
               );
@@ -1834,6 +1852,7 @@ export class McpClientManager {
     const disconnectionPromises = Array.from(this.clients.entries()).map(
       async ([name, client]) => {
         try {
+          client.clearOAuthState?.();
           await client.disconnect();
         } catch (error) {
           debugLogger.error(
@@ -1885,6 +1904,7 @@ export class McpClientManager {
     const client = this.clients.get(serverName);
     if (client) {
       try {
+        client.clearOAuthState?.();
         await client.disconnect();
       } catch (error) {
         debugLogger.error(
@@ -2248,6 +2268,18 @@ export class McpClientManager {
           await this.runWithDiscoveryTimeout(name, serverConfig, () =>
             this.discoverMcpToolsForServer(name, cliConfig),
           );
+          await probeMcpServerForOAuth(name, serverConfig);
+          const authenticated = await attemptAutomaticMcpOAuth(
+            name,
+            serverConfig,
+            cliConfig.isInteractive?.() === true &&
+              cliConfig.isBrowserLaunchSuppressed?.() !== true,
+          );
+          if (authenticated) {
+            await this.runWithDiscoveryTimeout(name, serverConfig, () =>
+              this.discoverMcpToolsForServer(name, cliConfig),
+            );
+          }
           // `discoverMcpToolsForServerInternal` swallows connect/discover
           // errors (best-effort discovery semantics — see its catch block),
           // so the try here resolves even for failed servers. Only the
@@ -2359,6 +2391,34 @@ export class McpClientManager {
         // vector" — `await` plus `removeMcpToolsByServer` closes it.
         const client = this.clients.get(serverName);
         if (client) {
+          try {
+            const rootPid = client.getTransportPid?.();
+            if (rootPid !== undefined) {
+              const descendants = await listDescendantPids(rootPid);
+              if (descendants.length > 0) {
+                const signaled = sigtermPids(descendants);
+                debugLogger.debug(
+                  `Sent SIGTERM to ${signaled}/${descendants.length} descendants ` +
+                    `of pid ${rootPid} for timed-out server '${serverName}'`,
+                );
+                if (signaled < descendants.length) {
+                  debugLogger.warn(
+                    `Partial signal for timed-out server '${serverName}': ` +
+                      `${signaled}/${descendants.length} descendants of pid ${rootPid} signaled. ` +
+                      'Remaining processes may leak.',
+                  );
+                }
+              }
+            } else {
+              debugLogger.debug(
+                `Skipping descendant pid sweep for timed-out server '${serverName}': transport pid unavailable`,
+              );
+            }
+          } catch (err) {
+            debugLogger.warn(
+              `Descendant pid sweep for timed-out server '${serverName}' threw: ${getErrorMessage(err)}. Proceeding with disconnect.`,
+            );
+          }
           try {
             await client.disconnect();
           } catch (err) {
@@ -2517,6 +2577,7 @@ export class McpClientManager {
     const client = this.clients.get(serverName);
     if (client) {
       try {
+        client.clearOAuthState?.();
         await client.disconnect();
       } catch (error) {
         debugLogger.error(
