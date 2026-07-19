@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/mobile-mcp",
-  "version": "0.19.12",
+  "version": "0.30.7",
   "description": "Mobile MCP with opt-in relative coordinate support",
   "repository": {
     "type": "git",

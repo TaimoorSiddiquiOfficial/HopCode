@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/hopcode",
-  "version": "0.19.12",
+  "version": "0.30.7",
   "description": "Qwen Code",
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
     "dist"
   ],
   "config": {
-    "sandboxImageUri": "ghcr.io/qwenlm/qwen-code:0.19.12"
+    "sandboxImageUri": "ghcr.io/qwenlm/qwen-code:0.30.7"
   },
   "dependencies": {
     "@agentclientprotocol/sdk": "^0.14.1",

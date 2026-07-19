@@ -168,6 +168,7 @@ import { shouldAttemptBrowserLaunch } from '../utils/browser.js';
 import { FileExclusions } from '../utils/ignorePatterns.js';
 import { shouldDefaultToNodePty } from '../utils/shell-utils.js';
 import { WorkspaceContext } from '../utils/workspaceContext.js';
+import { type PlanGateState, createPlanGateState } from '../plan-gate/state.js';
 import { type ToolName } from '../utils/tool-utils.js';
 import { FatalConfigError, getErrorMessage } from '../utils/errors.js';
 import { normalizeProxyUrl } from '../utils/proxyUtils.js';
@@ -278,6 +279,7 @@ export enum ApprovalMode {
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
   IZN = 'izn',
+  YOLO = 'yolo',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -337,6 +339,11 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
     id: ApprovalMode.IZN,
     name: 'IZN',
     description: 'Autonomous mode with scope reporting',
+  },
+  [ApprovalMode.YOLO]: {
+    id: ApprovalMode.YOLO,
+    name: 'YOLO',
+    description: 'Maximum autonomy, no confirmation prompts',
   },
 };
 
@@ -1725,6 +1732,8 @@ export class Config {
   private readonly contextRuleExcludes: string[];
   private approvalMode: ApprovalMode;
   private prePlanMode?: ApprovalMode;
+  private planGateState?: PlanGateState;
+  private planGateEntryCounter = 0;
   private approvalModeRevision = 0;
   private autoModeDenialState: AutoModeDenialState = createDenialState();
   private readonly accessibility: AccessibilitySettings;
@@ -5075,6 +5084,14 @@ export class Config {
     return this.prePlanMode ?? ApprovalMode.DEFAULT;
   }
 
+  /**
+   * Returns the current plan-gate state, or undefined when not in plan mode.
+   * Callers (planApprovalGate.ts) mutate the returned object in-place.
+   */
+  getPlanGateState(): PlanGateState | undefined {
+    return this.planGateState;
+  }
+
   getApprovalModeRevision(): number {
     return this.approvalModeRevision;
   }
@@ -5113,8 +5130,10 @@ export class Config {
     // succeeded, so callers never observe a partially applied mode change.
     if (mode === ApprovalMode.PLAN && fromMode !== ApprovalMode.PLAN) {
       this.prePlanMode = fromMode;
+      this.planGateState = createPlanGateState(this.planGateEntryCounter++);
     } else if (mode !== ApprovalMode.PLAN && fromMode === ApprovalMode.PLAN) {
       this.prePlanMode = undefined;
+      this.planGateState = undefined;
     }
     // Any deliberate mode change invalidates the AUTO denialTracking signal.
     if (fromMode !== mode) {

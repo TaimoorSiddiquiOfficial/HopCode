@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-qqbot",
-  "version": "0.19.12",
+  "version": "0.30.7",
   "description": "QQ Bot (QQ机器人) channel adapter for Qwen Code",
   "type": "module",
   "main": "dist/index.js",

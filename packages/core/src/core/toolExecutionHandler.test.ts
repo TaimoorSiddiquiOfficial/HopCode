@@ -9,7 +9,7 @@ import { ToolExecutionHandler } from '../core/toolExecutionHandler.js';
 import type { ToolExecutionHandlerDeps } from '../core/toolExecutionHandler.js';
 import type { ToolResult } from '../tools/tools.js';
 import { ToolErrorType } from '../tools/tool-error.js';
-import { ApprovalMode } from '../config/approvalConfig.js';
+import { ApprovalMode } from '../config/approval-config.js';
 
 // ---------------------------------------------------------------------------
 // Helpers

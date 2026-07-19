@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { ApprovalConfig, ApprovalMode } from './approvalConfig.js';
+import { ApprovalConfig, ApprovalMode } from './approval-config.js';
 
 describe('ApprovalConfig', () => {
   describe('getApprovalMode', () => {

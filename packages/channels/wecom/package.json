@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-wecom",
-  "version": "0.19.12",
+  "version": "0.30.7",
   "description": "WeCom channel adapter for Qwen Code",
   "type": "module",
   "main": "dist/index.js",

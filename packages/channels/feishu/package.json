@@ -1,6 +1,6 @@
 {
   "name": "@hoptrendy/channel-feishu",
-  "version": "0.19.12",
+  "version": "0.30.7",
   "description": "Feishu (Lark) channel adapter for Qwen Code",
   "type": "module",
   "main": "dist/index.js",

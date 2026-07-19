@@ -8,7 +8,7 @@ import type { ToolResult, ToolResultDisplay } from '../tools/tools.js';
 import type { ToolRegistry } from '../tools/tool-registry.js';
 import type { ShellExecutionConfig } from '../services/shellExecutionService.js';
 import { ToolErrorType } from '../tools/tool-error.js';
-import { ApprovalMode } from '../config/approvalConfig.js';
+import { ApprovalMode } from '../config/approval-config.js';
 import { ToolNames } from '../tools/tool-names.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import type { ConditionalRulesRegistry } from '../utils/rulesDiscovery.js';
