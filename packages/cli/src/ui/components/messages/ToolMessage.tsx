@@ -14,6 +14,7 @@ import { AnsiOutputText, ShellStatsBar } from '../AnsiOutput.js';
 import type { ShellStatsBarProps } from '../AnsiOutput.js';
 import { MaxSizedBox, MINIMUM_MAX_HEIGHT } from '../shared/MaxSizedBox.js';
 import { TodoDisplay } from '../TodoDisplay.js';
+import { ToolNames, ToolNamesMigration } from '@hoptrendy/hopcode-core';
 import type {
   TodoResultDisplay,
   AgentResultDisplay,

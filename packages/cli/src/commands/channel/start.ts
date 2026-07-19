@@ -1,22 +1,11 @@
 import type { CommandModule } from 'yargs';
-import { ProxyAgent, setGlobalDispatcher } from 'undici';
-import { normalizeProxyUrl, Storage } from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../../config/settings.js';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { AcpBridge, SessionRouter } from '@hoptrendy/channel-base';
-import type {
-  ChannelBase,
-  ChannelPlugin,
-  ToolCallEvent,
-} from '@hoptrendy/channel-base';
-import { getPlugin, registerPlugin } from './channel-registry.js';
+import type { ChannelBase } from '@hoptrendy/channel-base';
 import { findCliEntryPath, parseChannelConfig } from './config-utils.js';
 import { resolveProxy } from './proxy.js';
-import {
-  readServiceInfo,
-  writeServiceInfo,
-  removeServiceInfo,
-} from './pidfile.js';
+import { readServiceInfo, removeServiceInfo } from './pidfile.js';
 import {
   createChannel,
   channelLoopPath,
@@ -35,18 +24,6 @@ export { resolveProxy } from './proxy.js';
 const MAX_CRASH_RESTARTS = 3;
 const CRASH_WINDOW_MS = 5 * 60 * 1000; // 5-minute window for counting crashes
 const RESTART_DELAY_MS = 3000;
-
-function isFileExistsError(err: unknown): boolean {
-  return (
-    typeof err === 'object' &&
-    err !== null &&
-    (err as NodeJS.ErrnoException).code === 'EEXIST'
-  );
-}
-
-function sessionsPath(): string {
-  return path.join(Storage.getGlobalHopCodeDir(), 'channels', 'sessions.json');
-}
 
 function createLoopController(store: ChannelLoopStore): ChannelLoopController {
   return {
@@ -70,26 +47,6 @@ function isChannelCronEnabled(settings: {
 }): boolean {
   if (process.env['QWEN_CODE_DISABLE_CRON'] === '1') return false;
   return settings.merged.experimental?.cron !== false;
-}
-
-/**
- * Load channel plugins from active extensions.
- * Extensions declare channels in their hopcode-extension.json manifest.
- */
-async function loadChannelsFromExtensions(): Promise<number> {
-  let loaded = 0;
-  try {
-    writeServiceInfo(channels);
-  } catch (err) {
-    cleanup();
-    if (isFileExistsError(err)) {
-      writeStderrLine(
-        'Error: Channel service was started concurrently. Use "qwen channel status" to inspect it.',
-      );
-      process.exit(1);
-    }
-    throw err;
-  }
 }
 
 function cleanupStartedChannels(

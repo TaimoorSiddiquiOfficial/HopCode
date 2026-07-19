@@ -26,6 +26,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { reorderChildrenUnderParents } from '../components/background-view/agent-forest.js';
 import {
   type AgentTask,
   type Config,
