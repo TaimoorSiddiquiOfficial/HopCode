@@ -19,16 +19,6 @@ function makeInfo(content: string): MessageActionReturn {
   return { type: 'message', messageType: 'info', content };
 }
 
-    return {
-      type: 'message',
-      messageType: 'info',
-      content: t(
-        'History will be collapsed by default for future resumed sessions.',
-      ),
-    };
-  },
-};
-
 const expandOnResumeCommand: SlashCommand = {
   name: 'expand-on-resume',
   get description() {
