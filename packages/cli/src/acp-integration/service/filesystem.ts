@@ -12,10 +12,17 @@ import type {
   WriteTextFileResponse,
 } from '@agentclientprotocol/sdk';
 import { RequestError } from '@agentclientprotocol/sdk';
+import * as path from 'node:path';
+import { realpath } from 'node:fs/promises';
 import type {
   CoreReadTextFileRequest,
   FileSystemService,
   ReadTextFileResponse,
+} from '@hoptrendy/hopcode-core';
+import {
+  createDebugLogger,
+  getErrorMessage,
+  isSubpath,
 } from '@hoptrendy/hopcode-core';
 
 const RESOURCE_NOT_FOUND_CODE = -32002;

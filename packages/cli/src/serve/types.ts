@@ -68,7 +68,7 @@ export interface ServeOptions {
   maxSessions?: number;
   /**
    * Non-negative integer cap on concurrent live sessions across all workspace
-   * runtimes. `runQwenServe` derives a default once from the per-workspace cap
+   * runtimes. `runHopCodeServe` derives a default once from the per-workspace cap
    * and startup workspace count when several startup/restored workspaces are
    * present; direct embeds may leave it unlimited. Dynamic registration does
    * not recompute it. `0` or `Infinity` disables the cap.
@@ -245,7 +245,7 @@ export interface ServeOptions {
    * Phase 2 "reverse tool channel"). When enabled, a connected WS client may
    * send `mcp_register` / `mcp_message` / `mcp_unregister` frames so the
    * daemon's agent can call tools that execute in the client (e.g. the Chrome
-   * extension's browser tools). `runQwenServe` only enables this when a caller
+   * extension's browser tools). `runHopCodeServe` only enables this when a caller
    * or environment variable opts in.
    */
   clientMcpOverWs?: boolean;
@@ -253,7 +253,7 @@ export interface ServeOptions {
    * Tunnel raw CDP to a real browser tab over the reverse `/acp` WS
    * (Plan C "CDP tunnel", issue #5626). When enabled, a loopback CDP client can
    * connect to a new `/cdp` WebSocket and drive ONE real tab via the extension's
-   * `chrome.debugger`, reusing browser automation tools. `runQwenServe` enables this for
+   * `chrome.debugger`, reusing browser automation tools. `runHopCodeServe` enables this for
    * Chrome extension origins or explicit env opt-in; callers may pass `false`.
    */
   cdpTunnelOverWs?: boolean;

@@ -47,7 +47,7 @@ import type {
 import { createBridgeFileSystemAdapter } from './bridge-file-system-adapter.js';
 // Dynamic-imported below (not at module scope) so the serve fast-path bundle
 // closure check doesn't trace create-sub-session's transitive deps through
-// the run-qwen-serve chunk. The launcher is only needed after listen().
+// the run-hopcode-serve chunk. The launcher is only needed after listen().
 import { PathMutexRegistry } from './fs/path-mutex-registry.js';
 import { isDeepHealthQuery } from './health-query.js';
 import { isLoopbackBind } from './loopback-binds.js';
@@ -225,7 +225,7 @@ const DEFAULT_SESSION_IDLE_TIMEOUT_MS = 30 * 60_000;
 const WORKSPACE_SETTING_SCOPE =
   'Workspace' as import('../config/settings.js').SettingScope;
 
-type RunQwenServeOptions = Omit<ServeOptions, 'token' | 'workspace'> & {
+type RunHopCodeServeOptions = Omit<ServeOptions, 'token' | 'workspace'> & {
   token?: string;
   workspace?: string | string[];
 };
@@ -1688,14 +1688,14 @@ interface DaemonLoggerLifecycleCallbacks {
   signalOwned(): void;
 }
 
-export async function runQwenServe(
-  optsIn: RunQwenServeOptions,
-  deps: RunQwenServeDeps = {},
+export async function runHopCodeServe(
+  optsIn: RunHopCodeServeOptions,
+  deps: RunHopCodeServeDeps = {},
 ): Promise<RunHandle> {
   let daemonLog: DaemonLogger | undefined;
   let owner: 'startup' | 'handle' | 'signal' = 'startup';
   try {
-    return await runQwenServeImpl(optsIn, deps, {
+    return await runHopCodeServeImpl(optsIn, deps, {
       initialized: (logger) => {
         daemonLog = logger;
       },
@@ -1721,9 +1721,9 @@ export async function runQwenServe(
   }
 }
 
-async function runQwenServeImpl(
-  optsIn: RunQwenServeOptions,
-  deps: RunQwenServeDeps,
+async function runHopCodeServeImpl(
+  optsIn: RunHopCodeServeOptions,
+  deps: RunHopCodeServeDeps,
   loggerLifecycle: DaemonLoggerLifecycleCallbacks,
 ): Promise<RunHandle> {
   const runStartedAt = performance.now();
@@ -2216,7 +2216,7 @@ async function runQwenServeImpl(
   if (workspaceInputs.length > 1 && deps.bridge) {
     throw new Error(
       'Injected bridge dependencies are only supported with a single workspace; ' +
-        'multiple --workspace values require runQwenServe to construct one bridge per workspace.',
+        'multiple --workspace values require runHopCodeServe to construct one bridge per workspace.',
     );
   }
   // Canonicalize ONCE here so `/capabilities` and the POST /session
@@ -3848,7 +3848,7 @@ async function runQwenServeImpl(
         prevRateRejected = rejectedTotal;
         // ACP child resource: read this tick's cached snapshot synchronously
         // and kick an async refresh for the next tick, keeping the sampler
-        // sync. Optional-chained: an injected bridge (RunQwenServeDeps.bridge)
+        // sync. Optional-chained: an injected bridge (RunHopCodeServeDeps.bridge)
         // built against the older contract may not implement these hooks.
         const child = bridge.getChildResourceSnapshot?.();
         // Only poll the child's resources when someone is watching: the

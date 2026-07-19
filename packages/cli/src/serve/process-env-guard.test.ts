@@ -132,7 +132,7 @@ const allowedProcessEnvAccesses = normalizeAllowances([
     },
   ],
   [
-    'packages/cli/src/serve/run-qwen-serve.ts',
+    'packages/cli/src/serve/run-hopcode-serve.ts',
     {
       reason:
         'The serve entry point owns daemon bootstrap, feature flags, and child-process defaults.',

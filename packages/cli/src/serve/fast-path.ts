@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { RunHandle } from './run-qwen-serve.js';
+import type { RunHandle } from './run-hopcode-serve.js';
 import { MAX_COMPACTED_REPLAY_MAX_BYTES } from '@hoptrendy/acp-bridge/replayWindowLimits';
 import { normalizeServeFastPathArgv } from './fast-path-argv.js';
 import type { ServeFastPathSettings } from './fast-path-settings.js';

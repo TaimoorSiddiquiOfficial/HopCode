@@ -26,6 +26,7 @@ import {
   mcpServerRequiresOAuth,
   MCPOAuthTokenStorage,
   createDebugLogger,
+  matchesAnyServerPattern,
 } from '@hoptrendy/hopcode-core';
 import {
   loadSettings,

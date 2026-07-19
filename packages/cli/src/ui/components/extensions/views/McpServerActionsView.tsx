@@ -19,6 +19,7 @@ import {
   DiscoveredMCPTool,
   MCPOAuthTokenStorage,
   createDebugLogger,
+  matchesAnyServerPattern,
 } from '@hoptrendy/hopcode-core';
 import { loadSettings, SettingScope } from '../../../../config/settings.js';
 import { getErrorMessage } from '../../../../utils/errors.js';

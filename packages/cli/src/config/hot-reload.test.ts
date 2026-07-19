@@ -17,6 +17,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import type { Config, MCPServerConfig } from '@hoptrendy/hopcode-core';
+import { ApprovalMode } from '@hoptrendy/hopcode-core';
 import type { LoadedSettings, Settings } from './settings.js';
 import type {
   SettingsWatcher,

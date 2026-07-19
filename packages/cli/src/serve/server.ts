@@ -383,7 +383,7 @@ export interface ServeAppDeps {
    * Enables resident management of scheduled-task-owned sessions: a periodic
    * keepalive (so their schedulers aren't idle-reaped) and a boot-time
    * rehydration (so they re-arm after a restart). Opt-in — only the real
-   * long-running daemon (`runQwenServe`) sets it. Tests and direct embeds
+   * long-running daemon (`runHopCodeServe`) sets it. Tests and direct embeds
    * leave it off so `createServeApp` neither spawns sessions on boot nor holds
    * a heartbeat timer.
    */
@@ -391,7 +391,7 @@ export interface ServeAppDeps {
   /**
    * Directory of the built Web Shell SPA (`index.html` + `assets/`). When
    * set (and `opts.serveWebShell !== false`), `createServeApp` mounts the
-   * UI at the daemon root before `bearerAuth`. Production `runQwenServe`
+   * UI at the daemon root before `bearerAuth`. Production `runHopCodeServe`
    * resolves this via `resolveWebShellDir()` and injects it here; direct
    * embeds / tests opt in by passing a fixture dir, so the default
    * `createServeApp` (no injection) stays API-only and existing route tests
@@ -512,7 +512,7 @@ export interface ServeAppDeps {
   /**
    * Reverse tool channel (issue #5626, Phase 2). Shared sender registry that
    * bridges the daemon WS (per-connection `ClientMcpRegistrar`) and the ACP
-   * child's `client_mcp/message` ext-method. `runQwenServe` constructs ONE and
+   * child's `client_mcp/message` ext-method. `runHopCodeServe` constructs ONE and
    * passes the SAME instance here AND to its `createAcpSessionBridge` call (as
    * `clientMcpSender: registry.lookup`) so the bridge that answers the child
    * and the WS provider that registers senders agree. When omitted (the
@@ -608,7 +608,7 @@ export function createServeApp(
   // `POST /session` cwd fallback, AND passed into the primary bridge must be
   // the SAME canonical form.
   // `deps.boundWorkspace` is the pre-canonicalized fast-path from
-  // `runQwenServe`; when omitted we canonicalize ourselves.
+  // `runHopCodeServe`; when omitted we canonicalize ourselves.
   const injectedWorkspaceRegistry = deps.workspaceRegistry;
   const boundWorkspace =
     injectedWorkspaceRegistry?.primary.workspaceCwd ??
@@ -694,7 +694,7 @@ export function createServeApp(
     opts.enableSessionShell === true && tokenConfigured;
   // Reverse tool channel (issue #5626, Phase 2). Process-scoped registry that
   // bridges the daemon WS (per-connection `ClientMcpRegistrar`) and the ACP
-  // child's `client_mcp/message` ext-method. Prefer the registry `runQwenServe`
+  // child's `client_mcp/message` ext-method. Prefer the registry `runHopCodeServe`
   // already wired into its injected bridge (`deps.clientMcpSenderRegistry`) so
   // the bridge that answers the child and the WS provider share ONE map.
   // Standalone `createServeApp` (no injected bridge) builds its own and wires
@@ -1494,11 +1494,11 @@ export function createServeApp(
       }
       // Validate against the runtime provider map (not the static
       // tuple) so injected providers are accepted.
-      if (!deviceFlowProviderMap.has(providerIdRaw as DeviceFlowProviderId)) {
+      if (!getSupportedDeviceFlowProviders().includes(providerIdRaw as DeviceFlowProviderId)) {
         res.status(400).json({
           error: `Unsupported device-flow provider: ${providerIdRaw}`,
           code: 'unsupported_provider',
-          supportedProviders: Array.from(deviceFlowProviderMap.keys()),
+          supportedProviders: getSupportedDeviceFlowProviders(),
         });
         return;
       }
@@ -1618,7 +1618,7 @@ export function createServeApp(
         ...(view.expiresAt !== undefined ? { expiresAt: view.expiresAt } : {}),
       })),
       // Derive from runtime provider map (single source of truth).
-      supportedDeviceFlowProviders: Array.from(deviceFlowProviderMap.keys()),
+      supportedDeviceFlowProviders: getSupportedDeviceFlowProviders(),
     });
   });
 
@@ -1857,7 +1857,7 @@ export function createServeApp(
 
     // Park a combined stop fn on `app.locals` (same pattern as `fsFactory` /
     // `boundWorkspace` / `acpHandle` above) so the shutdown sequence in
-    // run-qwen-serve.ts can invoke it without threading it back through the
+    // run-hopcode-serve.ts can invoke it without threading it back through the
     // createServeApp return type. Stopping all is idempotent per keepalive.
     (
       app.locals as { stopScheduledTaskKeepalive?: () => void }

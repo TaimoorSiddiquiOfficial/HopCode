@@ -186,7 +186,7 @@ describe('serve rate limit env parsing', () => {
     const argv = buildParser().parseSync(args);
     void handler(argv as Parameters<typeof handler>[0]);
     await vi.waitFor(() => {
-      expect(mockRunQwenServe).toHaveBeenCalled();
+      expect(mockrunHopCodeServe).toHaveBeenCalled();
     });
   }
 
@@ -230,8 +230,8 @@ describe('serve rate limit env parsing', () => {
     );
   });
 
-  it('passes normalized named channels to runQwenServe', async () => {
-    mockRunQwenServe.mockResolvedValueOnce({
+  it('passes normalized named channels to runHopCodeServe', async () => {
+    mockrunHopCodeServe.mockResolvedValueOnce({
       url: 'http://127.0.0.1:4170/',
       webShellMounted: false,
     });
@@ -240,15 +240,15 @@ describe('serve rate limit env parsing', () => {
       '--no-web --channel telegram --channel telegram --channel feishu',
     );
 
-    expect(mockRunQwenServe).toHaveBeenCalledWith(
+    expect(mockrunHopCodeServe).toHaveBeenCalledWith(
       expect.objectContaining({
         channelSelection: { mode: 'names', names: ['telegram', 'feishu'] },
       }),
     );
   });
 
-  it('passes compacted replay byte cap to runQwenServe', async () => {
-    mockRunQwenServe.mockResolvedValueOnce({
+  it('passes compacted replay byte cap to runHopCodeServe', async () => {
+    mockrunHopCodeServe.mockResolvedValueOnce({
       url: 'http://127.0.0.1:4170/',
       webShellMounted: false,
     });
@@ -257,35 +257,35 @@ describe('serve rate limit env parsing', () => {
       '--no-web --compacted-replay-max-bytes 1048576',
     );
 
-    expect(mockRunQwenServe).toHaveBeenCalledWith(
+    expect(mockrunHopCodeServe).toHaveBeenCalledWith(
       expect.objectContaining({
         compactedReplayMaxBytes: 1024 * 1024,
       }),
     );
   });
 
-  it('passes --max-total-sessions to runQwenServe', async () => {
-    mockRunQwenServe.mockResolvedValueOnce({
+  it('passes --max-total-sessions to runHopCodeServe', async () => {
+    mockrunHopCodeServe.mockResolvedValueOnce({
       url: 'http://127.0.0.1:4170/',
       webShellMounted: false,
     });
 
     await startServeHandlerWithArgs('--no-web --max-total-sessions 42');
 
-    expect(mockRunQwenServe).toHaveBeenCalledWith(
+    expect(mockrunHopCodeServe).toHaveBeenCalledWith(
       expect.objectContaining({ maxTotalSessions: 42 }),
     );
   });
 
   it('passes --channel all as an all-channel selection', async () => {
-    mockRunQwenServe.mockResolvedValueOnce({
+    mockrunHopCodeServe.mockResolvedValueOnce({
       url: 'http://127.0.0.1:4170/',
       webShellMounted: false,
     });
 
     await startServeHandlerWithArgs('--no-web --channel all');
 
-    expect(mockRunQwenServe).toHaveBeenCalledWith(
+    expect(mockrunHopCodeServe).toHaveBeenCalledWith(
       expect.objectContaining({
         channelSelection: { mode: 'all' },
       }),
@@ -306,7 +306,7 @@ describe('serve rate limit env parsing', () => {
     await expect(
       handler(argv as Parameters<typeof handler>[0]),
     ).rejects.toThrow('process.exit(1) called');
-    expect(mockRunQwenServe).not.toHaveBeenCalled();
+    expect(mockrunHopCodeServe).not.toHaveBeenCalled();
   });
 });
 

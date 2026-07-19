@@ -25,7 +25,7 @@ import {
   ChannelWorkerControlError,
   type ChannelWorkerControlState,
 } from './channel-worker-manager.js';
-import { runQwenServe, type RunHandle } from './run-qwen-serve.js';
+import { runHopCodeServe, type RunHandle } from './run-hopcode-serve.js';
 import {
   resolveWebShellDir,
   isDocumentNavigation,
@@ -19156,7 +19156,7 @@ describe('runHopCodeServe', () => {
       { bridge, fsFactory },
     );
     try {
-      handle = await runQwenServe(
+      handle = await runHopCodeServe(
         {
           hostname: '127.0.0.1',
           port: 0,

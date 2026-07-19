@@ -6,6 +6,9 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import express from 'express';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import WebSocket from 'ws';
@@ -45,12 +48,15 @@ import {
   type SetupGithubResult,
 } from '../../services/setup-github.js';
 import {
+  createWorkspaceFileSystemFactory,
   MAX_READ_BYTES,
   type ResolvedPath,
   type WorkspaceFileSystem,
   type WorkspaceFileSystemFactory,
 } from '../fs/index.js';
 import type { DaemonWorkspaceService } from '../workspace-service/types.js';
+import { MAX_TRUST_REASON_LENGTH } from '../validation-limits.js';
+import { WorkspaceRememberTaskLane } from '../workspace-remember.js';
 import { mountAcpHttp } from './index.js';
 
 const stdioMocks = vi.hoisted(() => ({
@@ -5114,7 +5120,11 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
 
   it('dispatches _qwen/workspace/setup-github', async () => {
     await restartServer({
-      fsFactory: makeFileFsFactory({}),
+      fsFactory: createWorkspaceFileSystemFactory({
+        boundWorkspaces: ['/ws'],
+        trusted: true,
+        emit: vi.fn(),
+      }),
       daemonEnv: { HTTPS_PROXY: 'http://runtime-proxy.example:8080' },
     });
     const connId = await initialize();
@@ -5155,7 +5165,13 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
   });
 
   it('rejects _qwen/workspace/setup-github without consent', async () => {
-    await restartServer({ fsFactory: makeFileFsFactory({}) });
+    await restartServer({
+      fsFactory: createWorkspaceFileSystemFactory({
+        boundWorkspaces: ['/ws'],
+        trusted: true,
+        emit: vi.fn(),
+      }),
+    });
     const connId = await initialize();
     const connStream = await openStream(connId);
     const got = takeFrames(connStream, 1);
@@ -5205,7 +5221,13 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
   });
 
   it('includes partial setup-github results in ACP errors', async () => {
-    await restartServer({ fsFactory: makeFileFsFactory({}) });
+    await restartServer({
+      fsFactory: createWorkspaceFileSystemFactory({
+        boundWorkspaces: ['/ws'],
+        trusted: true,
+        emit: vi.fn(),
+      }),
+    });
     const partial: SetupGithubResult = {
       kind: 'github_setup',
       workspaceCwd: '/ws',

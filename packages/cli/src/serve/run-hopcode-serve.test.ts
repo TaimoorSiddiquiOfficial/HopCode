@@ -23,7 +23,7 @@ import {
   type RunHandle,
   validatePolicyConfig,
   waitForRuntimeStartingForShutdown,
-} from './run-qwen-serve.js';
+} from './run-hopcode-serve.js';
 import { isBrowserAutomationMcpAvailable } from './cdp-mcp-command.js';
 import { RUNTIME_STARTUP_CANCELLED_MESSAGE } from './runtime-startup-errors.js';
 import { isLoopbackBind } from './loopback-binds.js';
@@ -189,7 +189,7 @@ describe('workspace skill settings persistence', () => {
       persistDisabledSkills = args[2]?.persistDisabledSkills;
       return originalCreateServeApp(...args);
     });
-    handle = await runQwenServe(
+    handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -580,7 +580,7 @@ describe('runHopCodeServe telemetry validation', () => {
         return bridge;
       });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -671,7 +671,7 @@ describe('runHopCodeServe telemetry validation', () => {
       return originalCreateWorkspaceService(deps);
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -748,7 +748,7 @@ describe('runHopCodeServe telemetry validation', () => {
       add: vi.fn().mockResolvedValue(true),
       removeByIds,
     } as unknown as WorkspaceRegistrationStore;
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -911,7 +911,7 @@ describe('runHopCodeServe telemetry validation', () => {
         throw new Error('workspace service construction failed');
       });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -990,7 +990,7 @@ describe('runHopCodeServe telemetry validation', () => {
       effective: { state: 'trusted' },
     } as ReturnType<typeof trustedFoldersRuntime.getWorkspaceTrustStatus>);
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -1078,7 +1078,7 @@ describe('runHopCodeServe telemetry validation', () => {
         }) as ReturnType<typeof trustedFoldersRuntime.getWorkspaceTrustStatus>,
     );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -1113,7 +1113,7 @@ describe('runHopCodeServe telemetry validation', () => {
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -1147,7 +1147,7 @@ describe('runHopCodeServe telemetry validation', () => {
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -1251,7 +1251,7 @@ describe('runHopCodeServe permissionResponseTimeoutMs validation', () => {
 
     try {
       await expect(
-        runQwenServe(
+        runHopCodeServe(
           {
             port: 0,
             hostname: '127.0.0.1',
@@ -1376,7 +1376,7 @@ describe('runHopCodeServe pre-listen bridge option validation', () => {
     });
 
     await expect(
-      runQwenServe(
+      runHopCodeServe(
         {
           port: 0,
           hostname: '127.0.0.1',
@@ -1506,7 +1506,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       throw new Error('runtime boom');
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -1677,7 +1677,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -1778,7 +1778,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       },
     );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -1900,7 +1900,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     );
 
     const logBaseDir = path.join(tmpDir, 'debug');
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2018,7 +2018,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       },
     );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2132,7 +2132,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       }),
     } as unknown as WorkspaceRegistrationStore;
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2223,7 +2223,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       read: vi.fn().mockRejectedValue(new Error('store unavailable')),
     } as unknown as WorkspaceRegistrationStore;
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2304,7 +2304,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       }),
     } as unknown as WorkspaceRegistrationStore;
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2380,7 +2380,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     );
     vi.spyOn(serverModule, 'createServeApp').mockReturnValue(express());
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2447,7 +2447,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     );
     vi.spyOn(serverModule, 'createServeApp').mockReturnValue(express());
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2513,7 +2513,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     );
     vi.spyOn(serverModule, 'createServeApp').mockReturnValue(express());
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2574,7 +2574,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     );
     vi.spyOn(serverModule, 'createServeApp').mockReturnValue(express());
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2766,7 +2766,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       effective: { state: 'trusted' },
     } as ReturnType<typeof trustedFoldersRuntime.getWorkspaceTrustStatus>);
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2829,7 +2829,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2897,7 +2897,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -2955,7 +2955,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3027,7 +3027,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       return app;
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3116,7 +3116,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       return app;
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3210,7 +3210,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       .mockReturnValue(
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3351,7 +3351,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       return app;
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3469,7 +3469,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       return app;
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3536,7 +3536,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3585,7 +3585,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3635,7 +3635,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3687,7 +3687,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         throw new Error('runtime boom');
       });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3728,7 +3728,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3767,7 +3767,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3817,7 +3817,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3866,7 +3866,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       return runtimeApp;
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -3918,7 +3918,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -4009,7 +4009,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       return runtimeApp;
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -4087,7 +4087,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         throw new Error('runtime boom');
       });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -4257,7 +4257,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
     );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -4640,7 +4640,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       throw new Error('runtime app boom');
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -4753,7 +4753,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       dispose,
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -4915,7 +4915,7 @@ describe('runHopCodeServe Web Shell signals on RunHandle', () => {
   });
 });
 
-describe('runQwenServe channel worker supervisor', () => {
+describe('runHopCodeServe channel worker supervisor', () => {
   let tmpDir: string | undefined;
 
   afterEach(() => {
@@ -5013,7 +5013,7 @@ describe('runQwenServe channel worker supervisor', () => {
       capturedDeps = args[2];
       return originalCreateServeApp(...args);
     });
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5063,7 +5063,7 @@ describe('runQwenServe channel worker supervisor', () => {
       capturedDeps = args[2];
       return originalCreateServeApp(...args);
     });
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5112,7 +5112,7 @@ describe('runQwenServe channel worker supervisor', () => {
     });
     const workerFactory = makeReadyWorkerFactory(worker);
     const pidfile = makePidfileDeps();
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5225,7 +5225,7 @@ describe('runQwenServe channel worker supervisor', () => {
     });
     const workerFactory = makeReadyWorkerFactory(worker);
     const pidfile = makePidfileDeps();
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5291,7 +5291,7 @@ describe('runQwenServe channel worker supervisor', () => {
       channels: ['telegram'],
       requestedChannels: ['telegram'],
     });
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5350,7 +5350,7 @@ describe('runQwenServe channel worker supervisor', () => {
         channels: ['telegram'],
       }),
     );
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5392,7 +5392,7 @@ describe('runQwenServe channel worker supervisor', () => {
       }),
     );
     const pidfile = makePidfileDeps();
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5453,7 +5453,7 @@ describe('runQwenServe channel worker supervisor', () => {
       startedAt: new Date().toISOString(),
       channels: ['telegram'],
     });
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5514,7 +5514,7 @@ describe('runQwenServe channel worker supervisor', () => {
     pidfile.reserveServeServiceInfo.mockImplementation(() => {
       throw eexist;
     });
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5577,7 +5577,7 @@ describe('runQwenServe channel worker supervisor', () => {
       if (acpHandle) acpHandle.attachServer = attachServer;
       return app;
     });
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5619,7 +5619,7 @@ describe('runQwenServe channel worker supervisor', () => {
       pid: 1234,
       channels: ['telegram'],
     });
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5681,7 +5681,7 @@ describe('runQwenServe channel worker supervisor', () => {
       }),
     );
 
-    const outcome = await runQwenServe(
+    const outcome = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5761,7 +5761,7 @@ describe('runQwenServe channel worker supervisor', () => {
       }),
       add: vi.fn().mockResolvedValue(true),
     } as unknown as WorkspaceRegistrationStore;
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -5963,7 +5963,7 @@ describe('runQwenServe channel worker supervisor', () => {
       removeByIds,
     } as unknown as WorkspaceRegistrationStore;
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6264,7 +6264,7 @@ describe('runQwenServe channel worker supervisor', () => {
     });
     const pidfile = makePidfileDeps();
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6329,7 +6329,7 @@ describe('runQwenServe channel worker supervisor', () => {
       .mockImplementation((() => undefined) as never);
     const existingSigtermListeners = new Set(process.rawListeners('SIGTERM'));
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6398,7 +6398,7 @@ describe('runQwenServe channel worker supervisor', () => {
     const existingSigintListeners = new Set(process.rawListeners('SIGINT'));
     const existingSigtermListeners = new Set(process.rawListeners('SIGTERM'));
 
-    await runQwenServe(
+    await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6473,7 +6473,7 @@ describe('runQwenServe channel worker supervisor', () => {
       .mockResolvedValueOnce(undefined);
     const pidfile = makePidfileDeps();
     const logPath = path.join(tmpDir, 'debug', 'daemon', 'daemon.log');
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6562,7 +6562,7 @@ describe('runQwenServe channel worker supervisor', () => {
       .mockResolvedValueOnce(undefined);
     const pidfile = makePidfileDeps();
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6612,7 +6612,7 @@ describe('runQwenServe channel worker supervisor', () => {
       pidfile.readServiceInfo.mockReturnValue(null);
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6652,7 +6652,7 @@ describe('runQwenServe channel worker supervisor', () => {
       channels: ['telegram'],
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6688,7 +6688,7 @@ describe('runQwenServe channel worker supervisor', () => {
       throw new Error('disk full');
     });
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6725,7 +6725,7 @@ describe('runQwenServe channel worker supervisor', () => {
     });
     let onReady: CreateChannelWorkerSupervisorOptions['onReady'];
     const pidfile = makePidfileDeps();
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6781,7 +6781,7 @@ describe('runQwenServe channel worker supervisor', () => {
     let onExit: CreateChannelWorkerSupervisorOptions['onExit'];
 
     try {
-      const handle = await runQwenServe(
+      const handle = await runHopCodeServe(
         {
           port: 0,
           hostname: '127.0.0.1',
@@ -6853,7 +6853,7 @@ describe('runQwenServe channel worker supervisor', () => {
       channels: ['telegram'],
     });
     let workerOptions: CreateChannelWorkerSupervisorOptions | undefined;
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '0.0.0.0',
@@ -6893,7 +6893,7 @@ describe('runQwenServe channel worker supervisor', () => {
       channels: ['telegram'],
     });
     const pidfile = makePidfileDeps();
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -6965,7 +6965,7 @@ describe('runQwenServe channel worker supervisor', () => {
       },
     );
     const pidfile = makePidfileDeps();
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -7042,7 +7042,7 @@ describe('runQwenServe channel worker supervisor', () => {
 
     const pidfile = makePidfileDeps();
     await expect(
-      runQwenServe(
+      runHopCodeServe(
         {
           port: 0,
           hostname: '127.0.0.1',
@@ -7086,7 +7086,7 @@ describe('runQwenServe channel worker supervisor', () => {
     const existingSigtermListeners = new Set(process.rawListeners('SIGTERM'));
     let settled = false;
 
-    const running = runQwenServe(
+    const running = runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -7168,7 +7168,7 @@ describe('runQwenServe channel worker supervisor', () => {
     });
 
     await expect(
-      runQwenServe(
+      runHopCodeServe(
         {
           port: 0,
           hostname: '127.0.0.1',
@@ -7209,7 +7209,7 @@ describe('runQwenServe channel worker supervisor', () => {
       .mockImplementationOnce(() => undefined);
     pidfile.readServiceInfo.mockReturnValueOnce(null).mockReturnValueOnce(null);
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -7248,7 +7248,7 @@ describe('runQwenServe channel worker supervisor', () => {
     const pidfile = makePidfileDeps();
 
     await expect(
-      runQwenServe(
+      runHopCodeServe(
         {
           port: -1,
           hostname: '127.0.0.1',
@@ -7305,7 +7305,7 @@ describe('runQwenServe channel worker supervisor', () => {
       }),
     } as unknown as express.Application);
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 4170,
         hostname: '127.0.0.1',
@@ -7352,7 +7352,7 @@ describe('runQwenServe channel worker supervisor', () => {
     } as unknown as express.Application);
 
     await expect(
-      runQwenServe(
+      runHopCodeServe(
         {
           port: 4170,
           hostname: '127.0.0.1',
@@ -7392,7 +7392,7 @@ describe('runQwenServe channel worker supervisor', () => {
     } as unknown as express.Application);
 
     await expect(
-      runQwenServe(
+      runHopCodeServe(
         {
           port: 4170,
           hostname: '127.0.0.1',
@@ -7431,7 +7431,7 @@ describe('runQwenServe channel worker supervisor', () => {
     } as unknown as express.Application);
 
     await expect(
-      runQwenServe(
+      runHopCodeServe(
         {
           port: 0,
           hostname: '127.0.0.1',
@@ -7463,7 +7463,7 @@ describe('runQwenServe channel worker supervisor', () => {
     const uncaughtExceptionHandler = () => {};
     process.on('uncaughtException', uncaughtExceptionHandler);
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',
@@ -7531,7 +7531,7 @@ describe('runQwenServe channel worker supervisor', () => {
         },
       );
 
-    const handle = await runQwenServe(
+    const handle = await runHopCodeServe(
       {
         port: 0,
         hostname: '127.0.0.1',

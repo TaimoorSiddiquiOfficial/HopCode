@@ -6,7 +6,7 @@
 
 import { useCallback } from 'react';
 import { SettingScope } from '../../config/settings.js';
-import type { AuthType, ApprovalMode } from '@hoptrendy/hopcode-core';
+import type { AuthType, ApprovalMode, ReasoningEffort } from '@hoptrendy/hopcode-core';
 import type { ArenaDialogType } from './useArenaCommand.js';
 
 export interface DialogCloseOptions {

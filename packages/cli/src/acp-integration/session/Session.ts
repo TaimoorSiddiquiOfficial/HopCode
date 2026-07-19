@@ -47,6 +47,7 @@ import {
   detectLoopSentinel,
   detectAutonomousSentinel,
   LoopTickResolver,
+  parsePositiveIntegerEnv,
   convertToFunctionErrorResponse,
   convertToFunctionResponse,
   createDuplicateProviderToolCallResponse,
@@ -5575,16 +5576,16 @@ export class Session implements SessionContext {
       onStopAfterLoopDetected?: () => void,
       shouldSkipUnstarted?: () => boolean,
     ): Promise<RunToolResult[]> => {
-      const maxConcurrency = parsePositiveIntegerEnv(
+      let maxConcurrency = parsePositiveIntegerEnv(
         process.env['HOPCODE_CODE_MAX_TOOL_CONCURRENCY'],
         10,
       );
-      const maxConcurrency = toolLoopState
+      maxConcurrency = toolLoopState
         ? Math.min(
-            configuredMaxConcurrency,
+            maxConcurrency,
             DAEMON_INVALID_TOOL_PARAMS_THRESHOLD,
           )
-        : configuredMaxConcurrency;
+        : maxConcurrency;
       const results: RunToolResult[] = new Array(calls.length);
       const executing = new Set<Promise<void>>();
       const fillLoopSkippedFrom = async (startIndex: number) => {

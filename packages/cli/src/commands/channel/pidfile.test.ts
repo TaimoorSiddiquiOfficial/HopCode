@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { join } from 'node:path';
+import { homedir } from 'node:os';
 
 // vi.hoisted runs before vi.mock hoisting, so fsStore is available in the factory
 const fsStore = vi.hoisted(() => {

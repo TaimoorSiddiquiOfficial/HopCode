@@ -15,6 +15,10 @@ import { SettingScope } from '../../config/settings.js';
 /** Maximum search results shown per query. */
 const MAX_DISPLAY_RESULTS = 20;
 
+function makeError(msg: string): MessageActionReturn {
+  return { type: 'message', messageType: 'error', content: msg };
+}
+
 function makeInfo(content: string): MessageActionReturn {
   return { type: 'message', messageType: 'info', content };
 }

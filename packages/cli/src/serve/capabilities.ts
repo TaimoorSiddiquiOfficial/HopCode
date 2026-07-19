@@ -338,7 +338,7 @@ export const SERVE_CAPABILITY_REGISTRY = {
   // `mcp_register` { server }, `mcp_message` { id, server, payload }
   // (bidirectional, request/response correlated by `id`), `mcp_unregister`
   // { server }. Advertised CONDITIONALLY so clients pre-flight this tag before
-  // attempting to register a client-hosted server. `runQwenServe` enables it
+  // attempting to register a client-hosted server. `runHopCodeServe` enables it
   // only when explicitly requested by option or env.
   client_mcp_over_ws: { since: 'v1' },
   // Plan C "CDP tunnel" (issue #5626): the daemon exposes a `/cdp` WebSocket

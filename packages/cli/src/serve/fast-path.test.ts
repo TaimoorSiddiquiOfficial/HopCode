@@ -45,6 +45,7 @@ import * as runHopCodeServeModule from './run-hopcode-serve.js';
 import type { ServeFastPathSettings } from './fast-path-settings.js';
 import type { Settings } from '../config/settingsSchema.js';
 import { serveCommand } from '../commands/serve.js';
+import { HEADLESS_IZN_NO_SANDBOX_WARNING } from '../utils/headlessSafetyWarnings.js';
 
 let tempWorkspace: string | undefined;
 let tempLaunchCwd: string | undefined;
@@ -461,9 +462,9 @@ describe('CLI entry import boundary', () => {
     );
   });
 
-  it('keeps the runQwenServe static source graph free of ACP runtime modules', () => {
+  it('keeps the runHopCodeServe static source graph free of ACP runtime modules', () => {
     const graph = collectStaticSourceGraph(
-      resolve(cliPackageRoot, 'src/serve/run-qwen-serve.ts'),
+      resolve(cliPackageRoot, 'src/serve/run-hopcode-serve.ts'),
     );
 
     expect(graph.unresolvedLocalImports).toEqual([]);
@@ -1013,25 +1014,25 @@ describe('serve fast path environment bootstrap', () => {
     const originalSuppress = process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
     delete process.env['SANDBOX'];
     delete process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
-    const qwenHome = useTempQwenHome();
+    const hopcodeHome = useTemphopcodeHome();
     writeFileSync(
-      join(qwenHome, 'settings.json'),
+      join(hopcodeHome, 'settings.json'),
       JSON.stringify({ tools: { approvalMode: 'yolo', sandbox: false } }),
     );
     const runtimeReady = Promise.reject(new Error('runtime boom'));
     void runtimeReady.catch(() => undefined);
     const close = vi.fn().mockResolvedValue(undefined);
-    vi.spyOn(runQwenServeModule, 'runQwenServe').mockResolvedValue({
+    vi.spyOn(runHopCodeServeModule, 'runHopCodeServe').mockResolvedValue({
       runtimeReady,
       close,
     } as unknown as Awaited<
-      ReturnType<typeof runQwenServeModule.runQwenServe>
+      ReturnType<typeof runHopCodeServeModule.runHopCodeServe>
     >);
     const stderrWrites: string[] = [];
     vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
       const text = String(chunk);
       stderrWrites.push(text);
-      if (text.includes(HEADLESS_YOLO_NO_SANDBOX_WARNING)) {
+      if (text.includes(HEADLESS_IZN_NO_SANDBOX_WARNING)) {
         throw new Error('stderr closed');
       }
       return true;
@@ -1047,7 +1048,7 @@ describe('serve fast path environment bootstrap', () => {
         tryRunServeFastPath(['serve', '--port', '0', '--no-open', '--no-web']),
       ).rejects.toThrow('process.exit(1)');
 
-      expect(stderrWrites.join('')).toContain(HEADLESS_YOLO_NO_SANDBOX_WARNING);
+      expect(stderrWrites.join('')).toContain(HEADLESS_IZN_NO_SANDBOX_WARNING);
       expect(stderrWrites.join('')).toContain(
         'qwen serve: runtime startup failed after listener was ready: runtime boom',
       );

@@ -18,7 +18,12 @@ import {
   vi,
   type MockInstance,
 } from 'vitest';
-import { Storage } from '@hoptrendy/hopcode-core';
+import {
+  AGENT_CONTEXT_FILENAME,
+  DEFAULT_CONTEXT_FILENAME,
+  setGeminiMdFilename,
+  Storage,
+} from '@hoptrendy/hopcode-core';
 import { createMutationGate } from './auth.js';
 import {
   InvalidClientIdError,

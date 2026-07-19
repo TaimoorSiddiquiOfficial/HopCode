@@ -23,6 +23,7 @@ import {
   type SessionArchiveState,
   type SubagentLevel,
 } from '@hoptrendy/hopcode-core';
+import type { PermissionResponse } from '@hoptrendy/sdk/daemon';
 import { FsError } from '../fs/errors.js';
 import {
   TooManyActiveDeviceFlowsError,
@@ -40,6 +41,7 @@ import {
 import {
   SessionArtifactAuthorizationError,
   SessionArtifactValidationError,
+  type SessionArtifactInput,
 } from '@hoptrendy/acp-bridge/sessionArtifacts';
 import { canonicalizeWorkspace } from '@hoptrendy/acp-bridge/workspacePaths';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
@@ -51,6 +53,8 @@ import {
 import { WorkspaceVoiceError } from '../../services/voice-service.js';
 import type { DeviceFlowRegistry } from '../auth/device-flow.js';
 import { collectWorkspaceMemoryStatus } from '../workspace-memory.js';
+import { MAX_TRUST_REASON_LENGTH } from '../validation-limits.js';
+import { WorkspaceRememberTaskLane } from '../workspace-remember.js';
 import {
   createDaemonSubagentManager,
   toSummary as agentToSummary,
@@ -74,7 +78,7 @@ import type {
   WorkspaceRequestContext,
 } from '../workspace-service/types.js';
 import { WorkspaceSettingsPartialPersistError } from '../workspace-service/types.js';
-import type { AcpConnection } from './connection-registry.js';
+import type { AcpConnection, ConnectionRegistry } from './connection-registry.js';
 import {
   HOPCODE_META_KEY,
   HOPCODE_METHOD_NS,
@@ -325,7 +329,7 @@ function parsePermissionResponse(
 
 function pickSessionArtifactInput(
   params: Record<string, unknown>,
-): AddSessionArtifactInput {
+): SessionArtifactInput {
   const {
     title,
     kind,
@@ -354,7 +358,7 @@ function pickSessionArtifactInput(
     metadata,
     retention,
     clientRetained,
-  } as AddSessionArtifactInput;
+  } as SessionArtifactInput;
 }
 
 /**
@@ -1171,8 +1175,8 @@ export class AcpDispatcher {
           const loadMeta = isObject(loadState._meta)
             ? loadState._meta
             : undefined;
-          const loadQwenMeta = isObject(loadMeta?.[QWEN_META_KEY])
-            ? loadMeta[QWEN_META_KEY]
+          const loadQwenMeta = isObject(loadMeta?.[HOPCODE_META_KEY])
+            ? loadMeta[HOPCODE_META_KEY]
             : undefined;
           const replayStatus =
             method === 'session/load' && restored.partial === true
@@ -1189,7 +1193,7 @@ export class AcpDispatcher {
               ? {
                   _meta: {
                     ...(loadMeta ?? {}),
-                    [QWEN_META_KEY]: {
+                    [HOPCODE_META_KEY]: {
                       ...(loadQwenMeta ?? {}),
                       sessionLoadReplay: replayStatus,
                     },
@@ -1954,7 +1958,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}session/update_organization`: {
+        case `${HOPCODE_METHOD_NS}session/update_organization`: {
           const sessionId = String(params['sessionId'] ?? '');
           if (!sessionId) {
             throw new AcpParamError('`sessionId` is required');
@@ -2016,7 +2020,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/session_groups/list`: {
+        case `${HOPCODE_METHOD_NS}workspace/session_groups/list`: {
           const workspaceCwd = this.parseBoundWorkspaceParam(params);
           const groups =
             await createSessionOrganizationService(workspaceCwd).listGroups();
@@ -2024,7 +2028,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/session_groups/create`: {
+        case `${HOPCODE_METHOD_NS}workspace/session_groups/create`: {
           const workspaceCwd = this.parseBoundWorkspaceParam(params);
           const group = await createSessionOrganizationService(
             workspaceCwd,
@@ -2036,7 +2040,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/session_groups/update`: {
+        case `${HOPCODE_METHOD_NS}workspace/session_groups/update`: {
           const workspaceCwd = this.parseBoundWorkspaceParam(params);
           const groupId = String(params['groupId'] ?? '');
           if (!groupId) {
@@ -2055,7 +2059,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/session_groups/delete`: {
+        case `${HOPCODE_METHOD_NS}workspace/session_groups/delete`: {
           const workspaceCwd = this.parseBoundWorkspaceParam(params);
           const groupId = String(params['groupId'] ?? '');
           if (!groupId) {
@@ -2138,7 +2142,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/trust`: {
+        case `${HOPCODE_METHOD_NS}workspace/trust`: {
           const result = await this.workspace.getWorkspaceTrustStatus(
             this.wsCtx(conn, method),
           );
@@ -2146,7 +2150,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/trust/request`: {
+        case `${HOPCODE_METHOD_NS}workspace/trust/request`: {
           const desiredState = params['desiredState'];
           if (desiredState !== 'trusted' && desiredState !== 'untrusted') {
             if (id !== undefined) {
@@ -2199,7 +2203,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/permissions`: {
+        case `${HOPCODE_METHOD_NS}workspace/permissions`: {
           const result = await this.workspace.getWorkspacePermissionsStatus(
             this.wsCtx(conn, method),
           );
@@ -2207,7 +2211,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/permissions/set`: {
+        case `${HOPCODE_METHOD_NS}workspace/permissions/set`: {
           const scope = params['scope'];
           if (scope !== 'user' && scope !== 'workspace') {
             if (id !== undefined) {
@@ -2282,7 +2286,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/voice`: {
+        case `${HOPCODE_METHOD_NS}workspace/voice`: {
           const result = await this.workspace.getWorkspaceVoiceStatus(
             this.wsCtx(conn, method),
           );
@@ -2290,7 +2294,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/voice/set`: {
+        case `${HOPCODE_METHOD_NS}workspace/voice/set`: {
           const update = parseWorkspaceVoiceUpdateParams(params);
           if ('error' in update) {
             if (id !== undefined) {
@@ -2307,7 +2311,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/setup-github`: {
+        case `${HOPCODE_METHOD_NS}workspace/setup-github`: {
           if (params['consent'] !== true) {
             if (id !== undefined) {
               conn.sendConn(
@@ -2376,7 +2380,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/set_tool_enabled`: {
+        case `${HOPCODE_METHOD_NS}workspace/set_tool_enabled`: {
           const toolName = String(params['toolName'] ?? '');
           if (!toolName || toolName.length > MAX_NAME_LENGTH) {
             if (id !== undefined) {
@@ -2562,7 +2566,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}session/lsp`: {
+        case `${HOPCODE_METHOD_NS}session/lsp`: {
           const sessionId = String(params['sessionId'] ?? '');
           if (!this.requireOwned(conn, sessionId, id)) return;
           const result = await this.bridge.getSessionLspStatus(sessionId);
@@ -2570,7 +2574,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}session/artifacts`: {
+        case `${HOPCODE_METHOD_NS}session/artifacts`: {
           const sessionId = String(params['sessionId'] ?? '');
           if (!this.requireOwned(conn, sessionId, id)) return;
           const result = await this.bridge.getSessionArtifacts(
@@ -2581,7 +2585,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}session/artifacts/add`: {
+        case `${HOPCODE_METHOD_NS}session/artifacts/add`: {
           const sessionId = String(params['sessionId'] ?? '');
           await this.withMutableOwned(conn, sessionId, id, async () => {
             const result = await this.bridge.addSessionArtifact(
@@ -2594,7 +2598,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}session/artifacts/remove`: {
+        case `${HOPCODE_METHOD_NS}session/artifacts/remove`: {
           const sessionId = String(params['sessionId'] ?? '');
           await this.withMutableOwned(conn, sessionId, id, async () => {
             const artifactId = String(params['artifactId'] ?? '');
@@ -2616,7 +2620,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}workspace/memory`: {
+        case `${HOPCODE_METHOD_NS}workspace/memory`: {
           const result = await collectWorkspaceMemoryStatus(
             this.boundWorkspace,
           );
@@ -3308,7 +3312,7 @@ export class AcpDispatcher {
           return;
         }
 
-        case `${QWEN_METHOD_NS}sessions/unarchive`: {
+        case `${HOPCODE_METHOD_NS}sessions/unarchive`: {
           const ids = this.parseSessionIds(params);
           const svc = new SessionService(this.boundWorkspace, {
             onWarning: logSessionArchiveWarning,

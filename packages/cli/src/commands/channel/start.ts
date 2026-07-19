@@ -12,8 +12,13 @@ import {
 } from '@hoptrendy/hopcode-core';
 import { loadSettings } from '../../config/settings.js';
 import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
-import { AcpBridge, SessionRouter } from '@hoptrendy/channel-base';
-import type { ChannelBase } from '@hoptrendy/channel-base';
+import {
+  AcpBridge,
+  ChannelLoopScheduler,
+  ChannelLoopStore,
+  SessionRouter,
+} from '@hoptrendy/channel-base';
+import type { ChannelBase, ChannelBaseOptions, ChannelLoopController } from '@hoptrendy/channel-base';
 import { findCliEntryPath, parseChannelConfig } from './config-utils.js';
 import { resolveProxy } from './proxy.js';
 import { readServiceInfo, removeServiceInfo } from './pidfile.js';

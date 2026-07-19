@@ -41,7 +41,7 @@ describe('serve fast path --open import boundary', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-    vi.doUnmock('./run-qwen-serve.js');
+    vi.doUnmock('./run-hopcode-serve.js');
     vi.doUnmock('../commands/serve.js');
     vi.resetModules();
     if (originalQwenHome === undefined) {
@@ -80,13 +80,13 @@ describe('serve fast path --open import boundary', () => {
     const runtimeReady = new Promise<void>((resolve) => {
       resolveRuntime = resolve;
     });
-    const runQwenServe = vi.fn(async () => ({
+    const runHopCodeServe = vi.fn(async () => ({
       runtimeReady,
       close: vi.fn().mockResolvedValue(undefined),
     }));
     let serveCommandImported = false;
     const openBrowser = vi.fn(async () => undefined);
-    vi.doMock('./run-qwen-serve.js', () => ({ runQwenServe }));
+    vi.doMock('./run-hopcode-serve.js', () => ({ runHopCodeServe }));
     vi.doMock('../commands/serve.js', () => {
       serveCommandImported = true;
       return { maybeOpenWebShellBrowser: openBrowser };
@@ -103,8 +103,8 @@ describe('serve fast path --open import boundary', () => {
       '--no-web',
     ]);
 
-    await vi.waitFor(() => expect(runQwenServe).toHaveBeenCalledTimes(1));
-    expect(runQwenServe).toHaveBeenCalledWith(
+    await vi.waitFor(() => expect(runHopCodeServe).toHaveBeenCalledTimes(1));
+    expect(runHopCodeServe).toHaveBeenCalledWith(
       expect.any(Object),
       expect.objectContaining({ deferRuntimeUntilFirstHealth: false }),
     );
@@ -124,13 +124,13 @@ describe('serve fast path --open import boundary', () => {
       rejectRuntime = reject;
     });
     const close = vi.fn().mockResolvedValue(undefined);
-    const runQwenServe = vi.fn(async () => ({
+    const runHopCodeServe = vi.fn(async () => ({
       runtimeReady,
       close,
     }));
     let serveCommandImported = false;
     const openBrowser = vi.fn(async () => undefined);
-    vi.doMock('./run-qwen-serve.js', () => ({ runQwenServe }));
+    vi.doMock('./run-hopcode-serve.js', () => ({ runHopCodeServe }));
     vi.doMock('../commands/serve.js', () => {
       serveCommandImported = true;
       return { maybeOpenWebShellBrowser: openBrowser };
@@ -150,8 +150,8 @@ describe('serve fast path --open import boundary', () => {
       '--no-web',
     ]);
 
-    await vi.waitFor(() => expect(runQwenServe).toHaveBeenCalledTimes(1));
-    expect(runQwenServe).toHaveBeenCalledWith(
+    await vi.waitFor(() => expect(runHopCodeServe).toHaveBeenCalledTimes(1));
+    expect(runHopCodeServe).toHaveBeenCalledWith(
       expect.any(Object),
       expect.objectContaining({ deferRuntimeUntilFirstHealth: false }),
     );
