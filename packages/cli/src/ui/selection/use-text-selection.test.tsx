@@ -5,7 +5,7 @@
  */
 
 import { cleanup, render } from '@testing-library/react';
-import type { ReadonlyFrame } from 'ink';
+import type { ReadonlyFrame } from './ink-types.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMouseEvents } from '../hooks/useMouseEvents.js';
 import type { MouseEvent } from '../utils/mouse.js';

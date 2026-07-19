@@ -348,7 +348,7 @@ function parseEnvFiles(
       const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
       const isQwenScopedEnvFile =
         isHomeScopedEnvFile ||
-        path.basename(path.dirname(normalizedEnvFilePath)) === QWEN_DIR;
+        path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
 
       files.push({
         parsedEnv,

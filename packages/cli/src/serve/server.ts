@@ -46,15 +46,8 @@ import {
 } from './auth/device-flow.js';
 import { createBridgeFileSystemAdapter } from './bridge-file-system-adapter.js';
 import { createDaemonStatusProvider } from './daemon-status-provider.js';
-import { getDemoHtml } from './demo.js';
 import { isServeDebugMode } from './debug-mode.js';
-import { isLoopbackBind } from './loopback-binds.js';
 import { mountAcpHttp, type AcpHttpHandle } from './acp-http/index.js';
-import {
-  buildDaemonStatusResponse,
-  type DaemonStartupSnapshot,
-  parseDaemonStatusDetail,
-} from './daemon-status.js';
 import {
   ClientMcpSenderRegistry,
   createClientMcpServerProvider,
@@ -71,17 +64,12 @@ import {
 } from './acp-session-bridge.js';
 import {
   CAPABILITIES_SCHEMA_VERSION,
-  type CapabilitiesEnvelope,
   type ServeAuthProviderInstallRequest,
   type ServeAuthProviderInstallResult,
   type ServeChannelSelection,
   type ChannelWebhookConfigSource,
   type ServeOptions,
 } from './types.js';
-import {
-  mountWebShellAssets,
-  mountWebShellSpaFallback,
-} from './web-shell-static.js';
 import {
   mountWorkspaceMemoryRoutes,
   mountWorkspaceQualifiedMemoryRoutes,
@@ -223,6 +211,9 @@ import {
 } from '../commands/channel/config-utils.js';
 import { loadChannelsConfig } from '../commands/channel/runtime.js';
 import { writeStderrLine } from '../utils/stdioHelpers.js';
+import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
+import { SessionArchiveCoordinator } from './server/session-archive.js';
+import { installSelfOriginStripMiddleware } from './server/self-origin.js';
 
 export { resolveBridgeFsFactory } from './server/fs-factory.js';
 export {
@@ -1187,7 +1178,7 @@ export function createServeApp(
     workspace: primaryWorkspace,
     daemonLog,
     startup: deps.startup,
-    qwenCodeVersion: deps.qwenCodeVersion,
+    HopCodeVersion: deps.HopCodeVersion,
     getAcpHandle: () => acpHandleRef.current,
     getRateLimiter: () => rateLimiter,
     getRestSseActive: getActiveSseCount,
@@ -1204,7 +1195,7 @@ export function createServeApp(
   });
 
   registerCapabilitiesRoutes(app, {
-    qwenCodeVersion: deps.qwenCodeVersion,
+    HopCodeVersion: deps.HopCodeVersion,
     mode: opts.mode,
     currentServeFeatures,
     boundWorkspace: primaryBoundWorkspace,
@@ -2181,7 +2172,7 @@ function requireSessionId(
   req: import('express').Request,
   res: import('express').Response,
 ): string | null {
-  const sessionId = req.params['id'];
+  const sessionId = req.params['id'] as string;
   if (!sessionId) {
     res.status(400).json({ error: '`sessionId` route parameter is required' });
     return null;

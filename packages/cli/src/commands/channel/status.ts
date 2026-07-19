@@ -7,7 +7,7 @@ import { readServiceInfo } from './pidfile.js';
 import type { SessionTarget } from '@hoptrendy/channel-base';
 import {
   QWEN_DAEMON_TOKEN_ENV,
-  QWEN_SERVER_TOKEN_ENV,
+  HOPCODE_SERVER_TOKEN_ENV,
 } from '../../serve/channel-worker-env.js';
 import {
   formatChannelStartupFailures,
@@ -57,7 +57,7 @@ export const statusCommand: CommandModule<unknown, StatusArgs> = {
     if (argv['daemon-url']) {
       const token =
         argv.token ??
-        process.env[QWEN_SERVER_TOKEN_ENV] ??
+        process.env[HOPCODE_SERVER_TOKEN_ENV] ??
         process.env[QWEN_DAEMON_TOKEN_ENV];
       try {
         const sdk = (await import('@hoptrendy/sdk/daemon')) as unknown as {

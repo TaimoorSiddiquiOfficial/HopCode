@@ -9,7 +9,7 @@ import {
   QWEN_DAEMON_TOKEN_ENV,
   QWEN_DAEMON_URL_ENV,
   QWEN_DAEMON_WORKSPACE_ENV,
-  QWEN_SERVER_TOKEN_ENV,
+  HOPCODE_SERVER_TOKEN_ENV,
 } from './channel-worker-env.js';
 import { sanitizeLogText } from '@hoptrendy/channel-base';
 import type { ChannelWebhookTask } from '@hoptrendy/channel-base';
@@ -345,7 +345,7 @@ function createWorkerEnv(opts: {
   env[CHANNEL_DAEMON_WORKER_SENTINEL] = randomUUID();
   env[QWEN_DAEMON_URL_ENV] = opts.daemonUrl;
   env[QWEN_DAEMON_WORKSPACE_ENV] = opts.workspace;
-  delete env[QWEN_SERVER_TOKEN_ENV];
+  delete env[HOPCODE_SERVER_TOKEN_ENV];
   delete env[QWEN_DAEMON_TOKEN_ENV];
   if (opts.daemonToken) {
     env[QWEN_DAEMON_TOKEN_ENV] = opts.daemonToken;

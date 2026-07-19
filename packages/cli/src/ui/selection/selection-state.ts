@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ScreenSelection } from 'ink';
+import type { ScreenSelection } from './ink-types.js';
 
 /** A point in composited-frame coordinates: column `x`, grid row `y`. */
 export interface Point {

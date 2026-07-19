@@ -564,8 +564,8 @@ export function registerWorkspaceExtensionRoutes(
           ) {
             return;
           }
-          const operationId = req.params['operationId'];
-          const interactionId = req.params['interactionId'];
+          const operationId = req.params['operationId'] as string;
+          const interactionId = req.params['interactionId'] as string;
           const pending = operationId
             ? pendingExtensionInteractions.get(operationId)
             : undefined;
@@ -962,7 +962,7 @@ export function registerWorkspaceExtensionRoutes(
           ) {
             return;
           }
-          const name = req.params['name'];
+          const name = req.params['name'] as string;
           if (!name) {
             res.status(400).json({ error: 'Missing extension name' });
             return;
@@ -1015,7 +1015,7 @@ export function registerWorkspaceExtensionRoutes(
           ) {
             return;
           }
-          const name = req.params['name'];
+          const name = req.params['name'] as string;
           if (!name) {
             res.status(400).json({ error: 'Missing extension name' });
             return;
@@ -1068,7 +1068,7 @@ export function registerWorkspaceExtensionRoutes(
           ) {
             return;
           }
-          const name = req.params['name'];
+          const name = req.params['name'] as string;
           if (!name) {
             res.status(400).json({ error: 'Missing extension name' });
             return;
@@ -1165,7 +1165,7 @@ export function registerWorkspaceExtensionRoutes(
         ) {
           return;
         }
-        const name = req.params['name'];
+        const name = req.params['name'] as string;
         if (!name) {
           res.status(400).json({ error: 'Missing extension name' });
           return;
@@ -1212,7 +1212,7 @@ export function registerWorkspaceExtensionRoutes(
       .find((extension) => extension.id === extensionId);
 
   const parseExtensionId = (req: Request, res: Response): string | null => {
-    const extensionId = req.params['extensionId'];
+    const extensionId = req.params['extensionId'] as string;
     if (!extensionId || !/^[a-f0-9]{64}$/.test(extensionId)) {
       res.status(400).json({
         error: 'Invalid extension id',

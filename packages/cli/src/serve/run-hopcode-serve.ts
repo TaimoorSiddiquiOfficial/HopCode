@@ -115,7 +115,7 @@ import type {
   ChannelWorkerSnapshot,
   CreateChannelWorkerSupervisorOptions,
 } from './channel-worker-supervisor.js';
-import { QWEN_SERVER_TOKEN_ENV } from './channel-worker-env.js';
+import { HOPCODE_SERVER_TOKEN_ENV } from './channel-worker-env.js';
 import { ChannelWebhookEnqueueError } from './channel-webhook-ipc.js';
 import { channelSelectionNames } from './channel-selection.js';
 import {
@@ -150,7 +150,6 @@ import {
   type DeferredRuntimeRequestTiming,
 } from './server/request-helpers.js';
 
-const HOPCODE_SERVER_TOKEN_ENV = 'HOPCODE_SERVER_TOKEN';
 const HOPCODE_SERVE_PROMPT_DEADLINE_MS_ENV = 'HOPCODE_SERVE_PROMPT_DEADLINE_MS';
 const HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV =
   'HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS';
@@ -1781,8 +1780,8 @@ async function runHopCodeServeImpl(
       HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV,
       process.env[HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV],
     );
-  const clientMcpOverWsEnv = process.env[QWEN_SERVE_CLIENT_MCP_OVER_WS_ENV];
-  const cdpTunnelOverWsEnv = process.env[QWEN_SERVE_CDP_TUNNEL_OVER_WS_ENV];
+  const clientMcpOverWsEnv = process.env[HOPCODE_SERVE_CLIENT_MCP_OVER_WS_ENV];
+  const cdpTunnelOverWsEnv = process.env[HOPCODE_SERVE_CDP_TUNNEL_OVER_WS_ENV];
   const chromeExtensionOriginAllowed = hasChromeExtensionOrigin(
     optsIn.allowOrigins,
   );
@@ -4721,7 +4720,7 @@ async function runHopCodeServeImpl(
         if (opts.clientMcpOverWs === true) {
           writeStderrLine(
             `qwen serve: client-hosted MCP tools are accepted over the WebSocket without auth. ` +
-              `Set ${QWEN_SERVE_CLIENT_MCP_OVER_WS_ENV}=0 to disable.`,
+              `Set ${HOPCODE_SERVE_CLIENT_MCP_OVER_WS_ENV}=0 to disable.`,
           );
         }
       } else if (opts.requireAuth) {
@@ -5113,14 +5112,14 @@ async function runHopCodeServeImpl(
         if (shuttingDown || runtimeStarting || runtimeStartFallbackTimer)
           return;
         daemonLog.info(
-          `deferred runtime: scheduling fallback start in ${FAST_PATH_RUNTIME_START_FALLBACK_MS}ms`,
+          `deferred runtime: scheduling fallback start in ${HOPCODE_FAST_PATH_RUNTIME_START_FALLBACK_MS}ms`,
         );
         runtimeStartFallbackTimer = setTimeout(() => {
           runtimeStartFallbackTimer = undefined;
           if (shuttingDown) return;
           daemonLog.info('deferred runtime: fallback timer fired, starting');
           startRuntime();
-        }, FAST_PATH_RUNTIME_START_FALLBACK_MS);
+        }, HOPCODE_FAST_PATH_RUNTIME_START_FALLBACK_MS);
         runtimeStartFallbackTimer.unref();
       };
       startRuntimeAfterHealth = (): void => {
@@ -5129,14 +5128,14 @@ async function runHopCodeServeImpl(
         }
         clearRuntimeStartFallbackTimer();
         daemonLog.info(
-          `deferred runtime: health served, scheduling start in ${FAST_PATH_RUNTIME_START_AFTER_HEALTH_MS}ms`,
+          `deferred runtime: health served, scheduling start in ${HOPCODE_FAST_PATH_RUNTIME_START_AFTER_HEALTH_MS}ms`,
         );
         runtimeStartAfterHealthTimer = setTimeout(() => {
           runtimeStartAfterHealthTimer = undefined;
           if (shuttingDown) return;
           daemonLog.info('deferred runtime: health timer fired, starting');
           startRuntime();
-        }, FAST_PATH_RUNTIME_START_AFTER_HEALTH_MS);
+        }, HOPCODE_FAST_PATH_RUNTIME_START_AFTER_HEALTH_MS);
         runtimeStartAfterHealthTimer.unref();
       };
 

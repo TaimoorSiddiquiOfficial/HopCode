@@ -1141,7 +1141,7 @@ function makeOptions(input: MakeOptionsInput = {}): BuildDaemonStatusOptions {
     boundWorkspace: BASE_WORKSPACE,
     bridge,
     workspace,
-    qwenCodeVersion: 'test',
+    HopCodeVersion: 'test',
     daemonLog: input.daemonLog,
     ...(input.acpSnapshot
       ? {

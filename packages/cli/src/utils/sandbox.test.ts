@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { EventEmitter } from 'node:events';
 import { pathToFileURL } from 'node:url';
-import { FatalSandboxError, QWEN_DIR } from '@hoptrendy/hopcode-core';
+import { FatalSandboxError, HOPCODE_DIR } from '@hoptrendy/hopcode-core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const spawnMock = vi.hoisted(() => vi.fn());
@@ -79,7 +79,7 @@ describe('resolveSeatbeltProfileFile', () => {
     ).toString();
 
     expect(resolveSeatbeltProfileFile('project-profile', chunkUrl)).toBe(
-      path.join(QWEN_DIR, 'sandbox-macos-project-profile.sb'),
+      path.join(HOPCODE_DIR, 'sandbox-macos-project-profile.sb'),
     );
   });
 

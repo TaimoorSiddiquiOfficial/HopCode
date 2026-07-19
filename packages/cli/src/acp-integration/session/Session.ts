@@ -5215,7 +5215,7 @@ export class Session implements SessionContext {
 
     const requireCachedCredentials =
       selectedAuthType !== previousAuthType &&
-      selectedAuthType === AuthType.QWEN_OAUTH;
+      selectedAuthType === AuthType.HOPCODE_OAUTH;
     const switchOptions =
       resolvedRoute?.baseUrl !== undefined || requireCachedCredentials
         ? {

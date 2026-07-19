@@ -17,14 +17,16 @@
         "../acp-bridge/src/transcript-replay.ts"
       ],
       "@hoptrendy/acp-bridge/*": ["../acp-bridge/src/*"],
-      "@hoptrendy/audio-capture": ["../audio-capture/src/index.ts"],
-      "@hoptrendy/audio-capture/*": ["../audio-capture/src/*"],
-      "@hoptrendy/sdk": ["../sdk-typescript/src/index.ts"],
+      "@hoptrendy/audio-capture": ["../audio-capture/dist/index.d.ts"],
+      "@hoptrendy/audio-capture/*": ["../audio-capture/dist/*"],
+      "@hoptrendy/sdk": ["../sdk-typescript/dist/index.d.ts"],
       "@hoptrendy/sdk/daemon/ui/transcript": [
-        "../sdk-typescript/src/daemon/ui/transcript.ts"
+        "../sdk-typescript/dist/daemon/ui/transcript.d.ts"
       ],
-      "@hoptrendy/sdk/daemon/types": ["../sdk-typescript/src/daemon/types.ts"],
-      "@hoptrendy/sdk/*": ["../sdk-typescript/src/*"]
+      "@hoptrendy/sdk/daemon/types": [
+        "../sdk-typescript/dist/daemon/types.d.ts"
+      ],
+      "@hoptrendy/sdk/*": ["../sdk-typescript/dist/*"]
     }
   },
   "include": [

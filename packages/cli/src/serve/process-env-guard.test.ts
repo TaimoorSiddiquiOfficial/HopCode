@@ -137,11 +137,11 @@ const allowedProcessEnvAccesses = normalizeAllowances([
       reason:
         'The serve entry point owns daemon bootstrap, feature flags, and child-process defaults.',
       accesses: {
-        'computed:QWEN_SERVER_TOKEN_ENV': 1,
-        'computed:QWEN_SERVE_CDP_TUNNEL_OVER_WS_ENV': 1,
-        'computed:QWEN_SERVE_CLIENT_MCP_OVER_WS_ENV': 1,
-        'computed:QWEN_SERVE_PROMPT_DEADLINE_MS_ENV': 1,
-        'computed:QWEN_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV': 1,
+        'computed:HOPCODE_SERVER_TOKEN_ENV': 1,
+        'computed:HOPCODE_SERVE_CDP_TUNNEL_OVER_WS_ENV': 1,
+        'computed:HOPCODE_SERVE_CLIENT_MCP_OVER_WS_ENV': 1,
+        'computed:HOPCODE_SERVE_PROMPT_DEADLINE_MS_ENV': 1,
+        'computed:HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV': 1,
         'computed:RUNTIME_STARTUP_TIMEOUT_ENV': 1,
         'key:QWEN_CODE_IDE_WORKSPACE_PATH': 1,
         'key:QWEN_SERVE_NO_MCP_POOL': 1,

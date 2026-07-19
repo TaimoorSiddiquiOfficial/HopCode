@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { ReadonlyFrame, FrameCell } from 'ink';
+import type { ReadonlyFrame, FrameCell } from './ink-types.js';
 import { SelectionState } from './selection-state.js';
 import { getSelectedText } from './selection-text.js';
 

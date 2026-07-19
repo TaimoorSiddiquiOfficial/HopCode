@@ -5,7 +5,8 @@
  */
 
 import { useCallback, useEffect, useRef } from 'react';
-import { useStdout, type ReadonlyFrame } from 'ink';
+import { useStdout } from 'ink';
+import type { ReadonlyFrame } from './ink-types.js';
 import { createDebugLogger } from '@hoptrendy/hopcode-core';
 import { useMouseEvents } from '../hooks/useMouseEvents.js';
 import type { MouseEvent } from '../utils/mouse.js';

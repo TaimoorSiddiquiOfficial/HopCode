@@ -11,7 +11,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import lockfile from 'proper-lockfile';
 import { MAX_WORKSPACE_PATH_LENGTH } from '@hoptrendy/acp-bridge/workspacePaths';
-import { getGlobalQwenDirLite } from '../config/storage-paths-lite.js';
+import { getGlobalhopcodeDirLite } from '../config/storage-paths-lite.js';
 import { MAX_REGISTERED_WORKSPACES } from './workspace-inputs.js';
 
 const SCHEMA_VERSION = 1;
@@ -67,7 +67,7 @@ export function workspaceRegistrationId(workspace: string): string {
 
 export function getWorkspaceRegistrationStorePath(
   primaryWorkspace: string,
-  qwenHome = getGlobalQwenDirLite(),
+  qwenHome = getGlobalhopcodeDirLite(),
 ): string {
   return path.join(
     qwenHome,

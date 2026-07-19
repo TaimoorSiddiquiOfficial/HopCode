@@ -9,7 +9,7 @@ import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
 import {
   QWEN_DAEMON_TOKEN_ENV,
   QWEN_DAEMON_URL_ENV,
-  QWEN_SERVER_TOKEN_ENV,
+  HOPCODE_SERVER_TOKEN_ENV,
 } from '../../serve/channel-worker-env.js';
 import {
   channelStartupFailureBody,
@@ -75,7 +75,7 @@ export const setCommand: CommandModule<unknown, SetArgs> = {
       })
       .option('token', {
         type: 'string',
-        description: `Bearer token (default: $${QWEN_SERVER_TOKEN_ENV} or $${QWEN_DAEMON_TOKEN_ENV})`,
+        description: `Bearer token (default: $${HOPCODE_SERVER_TOKEN_ENV} or $${QWEN_DAEMON_TOKEN_ENV})`,
       })
       .option('timeout', {
         type: 'number',
@@ -98,7 +98,7 @@ export const setCommand: CommandModule<unknown, SetArgs> = {
       DEFAULT_DAEMON_URL;
     const token =
       argv.token ??
-      process.env[QWEN_SERVER_TOKEN_ENV] ??
+      process.env[HOPCODE_SERVER_TOKEN_ENV] ??
       process.env[QWEN_DAEMON_TOKEN_ENV];
     const selection =
       names[0] === 'all'

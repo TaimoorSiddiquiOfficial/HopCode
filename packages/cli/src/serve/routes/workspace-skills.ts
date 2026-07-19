@@ -193,7 +193,7 @@ export function registerWorkspaceSkillsRoutes(
     deps.mutate({ strict: true }),
     async (req, res) => {
       if (!requireTrustedWorkspaceRuntime(deps.workspaceRuntime, res)) return;
-      const rawSkillName = req.params['name'];
+      const rawSkillName = req.params['name'] as string;
       const scope = parseDeleteScope(req, res);
       if (!rawSkillName || !scope) return;
       let skillName: string;
@@ -293,7 +293,7 @@ export function registerWorkspaceQualifiedSkillsRoutes(
         res,
       );
       if (!runtime || !requireTrustedWorkspaceRuntime(runtime, res)) return;
-      const rawSkillName = req.params['name'];
+      const rawSkillName = req.params['name'] as string;
       const scope = parseDeleteScope(req, res);
       if (!rawSkillName || !scope) return;
       let skillName: string;

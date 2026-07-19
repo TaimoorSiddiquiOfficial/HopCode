@@ -4264,7 +4264,7 @@ describe('Settings Loading and Merging', () => {
         process.env['THREE_SOURCE_ENV_VAR'] = '';
         const geminiEnvPath = path.join(
           RESOLVED_MOCK_WORKSPACE_DIR,
-          QWEN_DIR,
+          HOPCODE_DIR,
           '.env',
         );
         const userSettingsContent: Settings = {

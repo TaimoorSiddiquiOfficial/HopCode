@@ -523,7 +523,7 @@ export function registerSessionRoutes(
     res: Response,
     paramName = 'id',
   ): WorkspaceRuntime | null => {
-    const workspaceParam = req.params[paramName] ?? '';
+    const workspaceParam = (req.params[paramName] ?? '') as string;
     const byId = workspaceRegistry.getByWorkspaceId(workspaceParam);
     if (byId) return byId;
     if (!path.isAbsolute(workspaceParam)) {
@@ -1106,7 +1106,7 @@ export function registerSessionRoutes(
     req: Request,
     res: Response,
   ): string | null => {
-    const workspaceCwd = req.params['id'] ?? '';
+    const workspaceCwd = (req.params['id'] ?? '') as string;
     if (!path.isAbsolute(workspaceCwd)) {
       res
         .status(400)
@@ -1900,7 +1900,7 @@ export function registerSessionRoutes(
     withOwnerMutableSession(
       'DELETE /session/:id/artifacts/:artifactId',
       async (req, res, sessionId, runtime) => {
-        const artifactId = req.params['artifactId'];
+        const artifactId = req.params['artifactId'] as string;
         const clientId = parseClientIdHeader(req, res);
         if (clientId === null) return;
         if (!requireSessionArtifactClientId(clientId, res)) return;
@@ -1939,13 +1939,7 @@ export function registerSessionRoutes(
     withOwnerMutableSession(
       'POST /session/:id/tasks/:taskId/cancel',
       async (req, res, sessionId, runtime) => {
-        const taskId = req.params['taskId'];
-        if (!taskId) {
-          res.status(400).json({
-            error: '`taskId` route parameter is required',
-          });
-          return;
-        }
+        const taskId = req.params['taskId'] as string;
         const body = safeBody(req);
         const kind = body['kind'];
         if (kind !== 'agent' && kind !== 'shell' && kind !== 'monitor') {
@@ -2697,7 +2691,7 @@ export function registerSessionRoutes(
       const body = safeBody(req);
       try {
         const group = await createSessionOrganizationService(key).updateGroup(
-          req.params['groupId'] ?? '',
+          (req.params['groupId'] ?? '') as string,
           {
             ...(Object.prototype.hasOwnProperty.call(body, 'name')
               ? { name: body['name'] as string }
@@ -2728,7 +2722,7 @@ export function registerSessionRoutes(
       if (key === null) return;
       try {
         const deleted = await createSessionOrganizationService(key).deleteGroup(
-          req.params['groupId'] ?? '',
+          (req.params['groupId'] ?? '') as string,
         );
         res.status(200).json({ deleted });
       } catch (err) {
@@ -2791,7 +2785,7 @@ export function registerSessionRoutes(
       try {
         const group = await createSessionOrganizationService(
           runtime.workspaceCwd,
-        ).updateGroup(req.params['groupId'] ?? '', {
+        ).updateGroup((req.params['groupId'] ?? '') as string, {
           ...(Object.prototype.hasOwnProperty.call(body, 'name')
             ? { name: body['name'] as string }
             : {}),
@@ -2820,7 +2814,7 @@ export function registerSessionRoutes(
       try {
         const deleted = await createSessionOrganizationService(
           runtime.workspaceCwd,
-        ).deleteGroup(req.params['groupId'] ?? '');
+        ).deleteGroup((req.params['groupId'] ?? '') as string);
         res.status(200).json({ deleted });
       } catch (err) {
         if (sendSessionOrganizationError(res, err)) return;
@@ -3250,13 +3244,7 @@ export function registerSessionRoutes(
       (req, res, sessionId, runtime) => {
         const clientId = parseClientIdHeader(req, res);
         if (clientId === null) return;
-        const promptId = req.params['promptId'];
-        if (!promptId) {
-          res
-            .status(400)
-            .json({ error: '`promptId` route parameter is required' });
-          return;
-        }
+        const promptId = req.params['promptId'] as string;
         const result = runtime.bridge.removePendingPrompt(
           sessionId,
           promptId,

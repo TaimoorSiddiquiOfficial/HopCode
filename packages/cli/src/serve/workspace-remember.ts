@@ -741,7 +741,7 @@ export function mountWorkspaceMemoryRememberRoutes(
       const requesterClientId = validateOriginatorClientId(deps, req, res);
       if (requesterClientId === null) return;
       const task = deps.lane.get(
-        req.params['taskId'],
+        req.params['taskId'] as string,
         requesterClientId,
         'remember',
       );
@@ -811,7 +811,7 @@ export function mountWorkspaceMemoryRememberRoutes(
       const requesterClientId = validateOriginatorClientId(deps, req, res);
       if (requesterClientId === null) return;
       const task = deps.lane.get(
-        req.params['taskId'],
+        req.params['taskId'] as string,
         requesterClientId,
         'forget',
       );
@@ -860,7 +860,7 @@ export function mountWorkspaceMemoryRememberRoutes(
       const requesterClientId = validateOriginatorClientId(deps, req, res);
       if (requesterClientId === null) return;
       const task = deps.lane.get(
-        req.params['taskId'],
+        req.params['taskId'] as string,
         requesterClientId,
         'dream',
       );

@@ -45,8 +45,8 @@ export function registerChannelWebhookRoutes(
     '/channels/:channelName/webhooks/:source',
     ...(deps.rateLimiter ? [createWebhookRateLimitMiddleware(deps)] : []),
     (req, res, next) => {
-      const channelName = req.params['channelName'];
-      const source = req.params['source'];
+      const channelName = req.params['channelName'] as string;
+      const source = req.params['source'] as string;
       if (!channelName || !source) {
         res.status(404).json({ error: 'Channel webhook route not found' });
         return;

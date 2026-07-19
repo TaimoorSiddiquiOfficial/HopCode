@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { ReadonlyFrame, FrameCell } from 'ink';
+import type { ReadonlyFrame, FrameCell } from './ink-types.js';
 import { wordSpanAt, lineSpanAt } from './selection-span.js';
 
 const cell = (value: string, fullWidth = false): FrameCell => ({

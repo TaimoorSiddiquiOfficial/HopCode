@@ -283,8 +283,8 @@ describe('acpModelUtils', () => {
     });
 
     it('allows a model when both sides have no baseUrl/envKey (e.g. qwen-oauth)', () => {
-      const config = makeConfig({ authType: AuthType.QWEN_OAUTH }, [
-        { id: 'qwen-max', authType: AuthType.QWEN_OAUTH },
+      const config = makeConfig({ authType: AuthType.HOPCODE_OAUTH }, [
+        { id: 'qwen-max', authType: AuthType.HOPCODE_OAUTH },
       ]);
       expect(isInlineModelOverrideAllowed(config, 'qwen-max')).toBe(true);
     });
@@ -328,16 +328,16 @@ describe('acpModelUtils', () => {
     });
 
     it('rejects an unknown model id', () => {
-      const config = makeConfig({ authType: AuthType.QWEN_OAUTH }, [
-        { id: 'qwen-max', authType: AuthType.QWEN_OAUTH },
+      const config = makeConfig({ authType: AuthType.HOPCODE_OAUTH }, [
+        { id: 'qwen-max', authType: AuthType.HOPCODE_OAUTH },
       ]);
       expect(isInlineModelOverrideAllowed(config, 'missing')).toBe(false);
     });
 
     it('does not match fast-only or voice-only models', () => {
-      const config = makeConfig({ authType: AuthType.QWEN_OAUTH }, [
-        { id: 'qwen-fast', authType: AuthType.QWEN_OAUTH, fastOnly: true },
-        { id: 'qwen-voice', authType: AuthType.QWEN_OAUTH, voiceOnly: true },
+      const config = makeConfig({ authType: AuthType.HOPCODE_OAUTH }, [
+        { id: 'qwen-fast', authType: AuthType.HOPCODE_OAUTH, fastOnly: true },
+        { id: 'qwen-voice', authType: AuthType.HOPCODE_OAUTH, voiceOnly: true },
       ]);
       expect(isInlineModelOverrideAllowed(config, 'qwen-fast')).toBe(false);
       expect(isInlineModelOverrideAllowed(config, 'qwen-voice')).toBe(false);

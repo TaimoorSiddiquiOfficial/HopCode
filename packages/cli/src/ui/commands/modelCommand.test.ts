@@ -216,7 +216,7 @@ describe('modelCommand', () => {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
             model: 'qwen-plus',
-            authType: AuthType.QWEN_OAUTH,
+            authType: AuthType.HOPCODE_OAUTH,
           }),
           getAvailableModelsForAuthType: vi
             .fn()
@@ -254,7 +254,7 @@ describe('modelCommand', () => {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
             model: 'qwen-plus',
-            authType: AuthType.QWEN_OAUTH,
+            authType: AuthType.HOPCODE_OAUTH,
           }),
           switchModel,
           getAvailableModelsForAuthType: vi.fn().mockReturnValue([]),
@@ -284,7 +284,7 @@ describe('modelCommand', () => {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
             model: 'qwen-plus',
-            authType: AuthType.QWEN_OAUTH,
+            authType: AuthType.HOPCODE_OAUTH,
           }),
           switchModel,
           getAvailableModelsForAuthType: vi
@@ -408,7 +408,7 @@ describe('modelCommand', () => {
         config: {
           getContentGeneratorConfig: vi.fn().mockReturnValue({
             model: 'qwen-plus',
-            authType: AuthType.QWEN_OAUTH,
+            authType: AuthType.HOPCODE_OAUTH,
           }),
           switchModel,
           getAvailableModelsForAuthType: vi

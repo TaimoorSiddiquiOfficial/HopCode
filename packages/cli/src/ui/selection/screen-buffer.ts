@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  getFrameController,
-  type FrameController,
-  type ReadonlyFrame,
-  type ScreenSelection,
-} from 'ink';
+import { getFrameController } from './ink-stubs.js';
+import type {
+  FrameController,
+  ReadonlyFrame,
+  ScreenSelection,
+} from './ink-types.js';
 
 /** A single addressable cell of the composited screen. */
 export interface ScreenCell {

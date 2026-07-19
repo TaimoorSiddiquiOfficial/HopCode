@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ReadonlyFrame } from 'ink';
+import type { ReadonlyFrame } from './ink-types.js';
 import type { NormalizedSelection } from './selection-state.js';
 
 /** A cell counts as part of a word when it is non-empty and not whitespace. */

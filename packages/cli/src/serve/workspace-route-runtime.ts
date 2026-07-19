@@ -108,7 +108,7 @@ export function resolveWorkspaceRuntimeFromParam(
   res: Response,
   paramName = 'workspace',
 ): WorkspaceRuntime | null {
-  const selector = req.params[paramName] ?? '';
+  const selector = (req.params[paramName] ?? '') as string;
   const byId = registry.getByWorkspaceId(selector);
   if (byId) return byId;
 
@@ -137,7 +137,7 @@ export function resolveManagedWorkspaceRuntimeFromParam(
   res: Response,
   paramName = 'workspace',
 ): WorkspaceRuntime | null {
-  const selector = req.params[paramName] ?? '';
+  const selector = (req.params[paramName] ?? '') as string;
   const byId = registry.getManagedByWorkspaceId(selector);
   if (byId) return byId;
 

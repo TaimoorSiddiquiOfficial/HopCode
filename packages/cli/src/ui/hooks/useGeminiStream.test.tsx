@@ -6217,10 +6217,10 @@ describe('useGeminiStream', () => {
       const allowInlineModel = (modelId = 'inline-model') => {
         mockConfig.getModel = vi.fn(() => 'session-model');
         mockConfig.getContentGeneratorConfig = vi.fn(
-          () => ({ authType: AuthType.QWEN_OAUTH }) as never,
+          () => ({ authType: AuthType.HOPCODE_OAUTH }) as never,
         );
         mockConfig.getAvailableModelsForAuthType = vi.fn(
-          () => [{ id: modelId, authType: AuthType.QWEN_OAUTH }] as never,
+          () => [{ id: modelId, authType: AuthType.HOPCODE_OAUTH }] as never,
         );
       };
 
