@@ -1,7 +1,7 @@
 import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { getGlobalQwenDir, getWorkspaceScopeDirName } from './paths.js';
+import { getGlobalHopCodeDir, getWorkspaceScopeDirName } from './paths.js';
 
 // Alphabet without ambiguous chars: 0/O, 1/I
 const SAFE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -33,7 +33,7 @@ export class PairingStore {
    *   global layout (`<qwen-home>/channels/`).
    */
   constructor(channelName: string, workspaceCwd?: string) {
-    const channelsRoot = path.join(getGlobalQwenDir(), 'channels');
+    const channelsRoot = path.join(getGlobalHopCodeDir(), 'channels');
     this.dir = workspaceCwd
       ? path.join(channelsRoot, getWorkspaceScopeDirName(workspaceCwd))
       : channelsRoot;

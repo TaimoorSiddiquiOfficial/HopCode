@@ -180,7 +180,7 @@ import {
 } from './constants.js';
 import { DEFAULT_HOPCODE_CUSTOM_IGNORE_FILE_NAMES } from '../utils/hopCodeIgnoreParser.js';
 import { DEFAULT_TOOL_RESULTS_TOTAL_CHARS_THRESHOLD } from './clearContextDefaults.js';
-import { DEFAULT_QWEN_EMBEDDING_MODEL } from './models.js';
+import { DEFAULT_HOPCODE_EMBEDDING_MODEL } from './models.js';
 import {
   registerSessionProjectDir,
   unregisterSessionProjectDir,
@@ -626,7 +626,7 @@ function normalizeGitCoAuthor(value: GitCoAuthorParam | undefined): {
   };
 }
 
-export type ExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
+export type ExtensionOriginSource = 'HopCode' | 'Claude' | 'Gemini';
 export type ExtensionNetworkPolicy = 'public';
 
 export interface ExtensionInstallMetadata {
@@ -679,10 +679,7 @@ export type McpServerScope = 'project' | 'workspace' | 'system';
  * - `pending_approval`: a gated server awaiting approval (#4615).
  */
 export type McpServerUnavailableReason =
-  | 'removed'
-  | 'not_allowed'
-  | 'excluded'
-  | 'pending_approval';
+  'removed' | 'not_allowed' | 'excluded' | 'pending_approval';
 
 /**
  * Scopes whose servers are checked-in / shareable and therefore untrusted: they
@@ -1630,8 +1627,7 @@ export class Config {
   private skillManager: SkillManager | null = null;
   private permissionManager: PermissionManager | null = null;
   private modelInvocableCommandsProvider:
-    | (() => ReadonlyArray<{ name: string; description: string }>)
-    | null = null;
+    (() => ReadonlyArray<{ name: string; description: string }>) | null = null;
   private modelInvocableCommandsExecutor:
     | ((
         name: string,
@@ -1666,8 +1662,7 @@ export class Config {
   private readonly excludeTools: string[] | undefined;
   private readonly disabledSlashCommands: readonly string[];
   private readonly disabledSkillNamesProvider:
-    | (() => ReadonlySet<string>)
-    | null;
+    (() => ReadonlySet<string>) | null;
   //   `disabledTools` is set at construction
   // time but can be re-synced by the daemon mutation surface
   // (`setWorkspaceToolEnabled` propagates through ACP) so a subsequent
@@ -1696,8 +1691,7 @@ export class Config {
    */
   private readonly recentlyRemovedMcpServers = new Set<string>();
   private readonly topTierMcpServers:
-    | Record<string, MCPServerConfig>
-    | undefined;
+    Record<string, MCPServerConfig> | undefined;
   private readonly runtimeMcpServers = new Map<string, MCPServerConfig>();
   private readonly lspEnabled: boolean;
   private lspClient?: LspClient;
@@ -1814,8 +1808,7 @@ export class Config {
   private shellExecutionConfig: ShellExecutionConfig;
   private arenaManager: ArenaManager | null = null;
   private arenaManagerChangeCallback:
-    | ((manager: ArenaManager | null) => void)
-    | null = null;
+    ((manager: ArenaManager | null) => void) | null = null;
   private readonly arenaAgentClient: ArenaAgentClient | null;
   private teamManager: TeamManager | null = null;
   private teamManagerChangeCallbacks = new Set<
@@ -2006,9 +1999,9 @@ export class Config {
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
       respectHopcodeIgnore: params.fileFiltering?.respectHopcodeIgnore ?? true,
-      customIgnoreFiles:
-        params.fileFiltering?.customIgnoreFiles ??
-        [...DEFAULT_HOPCODE_CUSTOM_IGNORE_FILE_NAMES],
+      customIgnoreFiles: params.fileFiltering?.customIgnoreFiles ?? [
+        ...DEFAULT_HOPCODE_CUSTOM_IGNORE_FILE_NAMES,
+      ],
       enableRecursiveFileSearch:
         params.fileFiltering?.enableRecursiveFileSearch ?? true,
       enableFuzzySearch: params.fileFiltering?.enableFuzzySearch ?? true,
@@ -2469,8 +2462,7 @@ export class Config {
                   (input['permission_mode'] as PermissionMode) ||
                     PermissionMode.Default,
                   (input['permission_suggestions'] as
-                    | PermissionSuggestion[]
-                    | undefined) || undefined,
+                    PermissionSuggestion[] | undefined) || undefined,
                   signal,
                 );
                 break;
@@ -3616,8 +3608,7 @@ export class Config {
    * the bridge at an unreachable, or non-image-capable, model.
    */
   private resolveVisionModelSelection():
-    | VisionBridgeModelSelection
-    | undefined {
+    VisionBridgeModelSelection | undefined {
     if (!this.visionModel) return undefined;
     const visionModelForLog = formatVisionModelSettingForLog(this.visionModel);
     const parsedSetting = parseVisionModelSetting(this.visionModel);
@@ -4403,8 +4394,7 @@ export class Config {
   }
 
   getMcpTransportPool():
-    | import('../tools/mcp-transport-pool.js').McpTransportPool
-    | undefined {
+    import('../tools/mcp-transport-pool.js').McpTransportPool | undefined {
     return this.mcpTransportPool;
   }
 
@@ -6382,8 +6372,7 @@ export class Config {
    * has been registered (e.g., in SDK mode).
    */
   getModelInvocableCommandsProvider():
-    | (() => ReadonlyArray<{ name: string; description: string }>)
-    | null {
+    (() => ReadonlyArray<{ name: string; description: string }>) | null {
     return this.modelInvocableCommandsProvider;
   }
 
@@ -6517,9 +6506,8 @@ export class Config {
       if (options?.forSubAgent) return;
       const schema = this.jsonSchema;
       await registerLazy(ToolNames.STRUCTURED_OUTPUT, async () => {
-        const { SyntheticOutputTool } = await import(
-          '../tools/syntheticOutput.js'
-        );
+        const { SyntheticOutputTool } =
+          await import('../tools/syntheticOutput.js');
         return new SyntheticOutputTool(schema);
       });
     };
@@ -6554,9 +6542,8 @@ export class Config {
       return new ToolSearchTool(this);
     });
     await registerLazy(ToolNames.READ_MCP_RESOURCE, async () => {
-      const { ReadMcpResourceTool } = await import(
-        '../tools/read-mcp-resource.js'
-      );
+      const { ReadMcpResourceTool } =
+        await import('../tools/read-mcp-resource.js');
       return new ReadMcpResourceTool(this);
     });
     await registerLazy(ToolNames.AGENT, async () => {
@@ -6648,9 +6635,8 @@ export class Config {
       return new TodoWriteTool(this);
     });
     await registerLazy(ToolNames.ASK_USER_QUESTION, async () => {
-      const { AskUserQuestionTool } = await import(
-        '../tools/askUserQuestion.js'
-      );
+      const { AskUserQuestionTool } =
+        await import('../tools/askUserQuestion.js');
       return new AskUserQuestionTool(this);
     });
     if (!this.sdkMode) {
@@ -6721,9 +6707,8 @@ export class Config {
     // daemon-only error otherwise. Registered unconditionally so the message is
     // available rather than the tool silently missing.
     await registerLazy(ToolNames.CREATE_SUB_SESSION, async () => {
-      const { CreateSubSessionTool } = await import(
-        '../tools/create-sub-session.js'
-      );
+      const { CreateSubSessionTool } =
+        await import('../tools/create-sub-session.js');
       return new CreateSubSessionTool(this);
     });
 
@@ -6740,9 +6725,8 @@ export class Config {
         return new TeamDeleteTool(this);
       });
       await registerLazy(ToolNames.TEAM_PLAN_APPROVAL, async () => {
-        const { TeamPlanApprovalTool } = await import(
-          '../tools/team-plan-approval.js'
-        );
+        const { TeamPlanApprovalTool } =
+          await import('../tools/team-plan-approval.js');
         return new TeamPlanApprovalTool(this);
       });
       await registerLazy(ToolNames.TASK_CREATE, async () => {
@@ -6776,9 +6760,8 @@ export class Config {
     // built-in also gates these. Direct registry.registerFactory() would
     // bypass coreTools allowlist + whole-tool deny rules.
     if (this.isComputerUseEnabled()) {
-      const { registerComputerUseTools } = await import(
-        '../tools/computer-use/index.js'
-      );
+      const { registerComputerUseTools } =
+        await import('../tools/computer-use/index.js');
       await registerComputerUseTools(registerLazy, this);
     }
 

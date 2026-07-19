@@ -638,7 +638,7 @@ export class IdeClient {
 
     if (portFromEnv) {
       try {
-        const ideDir = Storage.getGlobalIdeDir();
+        const ideDir = Storage.getGlobalQwenDir();
         const lockFile = path.join(ideDir, `${portFromEnv}.lock`);
         const lockFileContents = await fs.promises.readFile(lockFile, 'utf8');
         const config = JSON.parse(lockFileContents) as IdeConnectionConfig;
@@ -672,7 +672,7 @@ export class IdeClient {
       );
     }
 
-    const ideDir = Storage.getGlobalIdeDir();
+    const ideDir = Storage.getGlobalQwenDir();
     const configs = await this.getAllConnectionConfigs(ideDir);
     for (const config of configs) {
       if (config.workspacePath === undefined) {
@@ -846,7 +846,7 @@ export class IdeClient {
     const cwd = process.cwd();
     const currentPort = this.connectionConfig?.port;
     const configs = await this.getAllConnectionConfigs(
-      Storage.getGlobalIdeDir(),
+      Storage.getGlobalQwenDir(),
     );
     const workspaceMatches: IdeConnectionConfig[] = [];
     const otherConfigs: IdeConnectionConfig[] = [];

@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import * as os from 'node:os';
 import {
   canonicalizeWorkspacePath,
-  getGlobalQwenDir,
+  getGlobalHopCodeDir,
   getWorkspaceScopeDirName,
   resolvePath,
 } from './paths.js';

@@ -518,14 +518,7 @@ export async function isBinaryFile(filePath: string): Promise<boolean> {
 }
 
 export type FileType =
-  | 'text'
-  | 'image'
-  | 'pdf'
-  | 'audio'
-  | 'video'
-  | 'binary'
-  | 'svg'
-  | 'notebook';
+  'text' | 'image' | 'pdf' | 'audio' | 'video' | 'binary' | 'svg' | 'notebook';
 
 /**
  * `application/*` mime types that the `mime/lite` registry actually
@@ -1104,8 +1097,7 @@ export async function processSingleFileContent(
     const fileSizeInMB = stats.size / (1024 * 1024);
     const normalizedPages = pages?.trim();
     let pageRange:
-      | NonNullable<ReturnType<typeof parsePDFPageRange>>
-      | undefined;
+      NonNullable<ReturnType<typeof parsePDFPageRange>> | undefined;
     let pdfPageCount: number | null | undefined;
     if (fileType === 'pdf' && normalizedPages !== undefined) {
       const invalidPagesDisplay = `Invalid PDF pages parameter: ${relativePathForDisplay}`;
@@ -1710,9 +1702,9 @@ export async function processSingleFileContent(
         // return a helpful error (scanned PDF on a text-only model without an
         // available bridge, or poppler entirely missing).
         return {
-          llmContent: `[Cannot extract text from PDF: "${displayName}". ${pdfFailure.error}]`,
+          llmContent: `[Cannot extract text from PDF: "${displayName}". ${pdfResult.error}]`,
           returnDisplay: `Failed to read pdf: ${relativePathForDisplay}`,
-          error: pdfFailure.error,
+          error: pdfResult.error,
           errorType: ToolErrorType.READ_CONTENT_FAILURE,
         };
       }

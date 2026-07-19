@@ -768,7 +768,7 @@ export function logProtocolTagSanitized(
   config: Config,
   event: ProtocolTagSanitizedEvent,
 ): void {
-  QwenLogger.getInstance(config)?.logProtocolTagSanitizedEvent(event);
+  HopCodeLogger.getInstance(config)?.logProtocolTagSanitizedEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {
@@ -823,7 +823,7 @@ export function logContentRetryFailure(
  */
 export function logApiRetry(config: Config, event: ApiRetryEvent): void {
   apiActivityTracker.recordRetry(); // sink 0 — see fan-out above
-  QwenLogger.getInstance(config)?.logApiRetryEvent(event);
+  HopCodeLogger.getInstance(config)?.logApiRetryEvent(event);
   if (!isTelemetrySdkInitialized()) return;
 
   const attributes: LogAttributes = {

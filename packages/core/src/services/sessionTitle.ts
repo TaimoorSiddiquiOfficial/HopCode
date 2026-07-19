@@ -9,6 +9,7 @@ import type { Config } from '../config/config.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import {
   getStartupContextLength,
+  isSystemReminderContent,
   stripSystemReminderBlocks,
 } from '../utils/environmentContext.js';
 import { runSideQuery } from '../utils/sideQuery.js';

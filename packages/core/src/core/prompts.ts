@@ -14,6 +14,10 @@ import { HOPCODE_DIR } from '../config/storage.js';
 import type { GenerateContentConfig } from '@google/genai';
 import { InputFormat } from '../output/types.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
+import {
+  QURAN_GUIDED_AGENT_PROMPT,
+  getQuranGuidedBehavior,
+} from '@hoptrendy/quran-guidance';
 
 const debugLogger = createDebugLogger('PROMPTS');
 
@@ -929,7 +933,7 @@ function getToolCallExamples(model?: string): string {
         return hopCoderToolCallExamples;
       case 'hopvl':
       case 'qwen-vl':
-        return qwenVlToolCallExamples;
+        return hopVlToolCallExamples;
       case 'gemma4':
         return gemma4ToolCallExamples;
       case 'general':
