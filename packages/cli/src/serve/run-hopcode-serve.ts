@@ -182,6 +182,11 @@ function writeDaemonLifecycleBestEffort(write: () => void): void {
   }
 }
 
+const HOPCODE_SERVE_CLIENT_MCP_OVER_WS_ENV = 'HOPCODE_SERVE_CLIENT_MCP_OVER_WS';
+const HOPCODE_SERVE_CDP_TUNNEL_OVER_WS_ENV = 'HOPCODE_SERVE_CDP_TUNNEL_OVER_WS';
+const HOPCODE_FAST_PATH_RUNTIME_START_FALLBACK_MS = 30_000;
+const HOPCODE_FAST_PATH_RUNTIME_START_AFTER_HEALTH_MS = 5_000;
+
 function daemonPipeDirection(
   direction: NdJsonMessageObservation['direction'],
 ): 'inbound' | 'outbound' {
@@ -736,7 +741,7 @@ function buildProviderSetupInputs(
   };
 }
 
-export interface runHopCodeServeDeps {
+export interface RunHopCodeServeDeps {
   /** Bridge instance; tests inject a fake. Defaults to a fresh real one. */
   bridge?: AcpSessionBridge;
   /**
@@ -806,7 +811,7 @@ export interface runHopCodeServeDeps {
   workspaceRegistrationStore?: WorkspaceRegistrationStore;
 }
 
-function shouldPreheatBridge(deps: runHopCodeServeDeps): boolean {
+function shouldPreheatBridge(deps: RunHopCodeServeDeps): boolean {
   if (deps.preheatBridge !== undefined) return deps.preheatBridge;
   return process.env['VITEST_WORKER_ID'] === undefined;
 }
@@ -818,7 +823,7 @@ function loadCoreRuntime(): Promise<CoreRuntime> {
 }
 
 async function resolveDaemonLogBaseDirForRun(input: {
-  deps: runHopCodeServeDeps;
+  deps: RunHopCodeServeDeps;
   bootSettings: ServeFastPathSettings | undefined;
   boundWorkspace: string;
 }): Promise<string> {

@@ -10,7 +10,7 @@ import { normalizeServeFastPathArgv } from './fast-path-argv.js';
 import type { ServeFastPathSettings } from './fast-path-settings.js';
 import { RUNTIME_STARTUP_CANCELLED_MESSAGE } from './runtime-startup-errors.js';
 import type { ServeOptions } from './types.js';
-import { getHeadlessYoloSafetyWarning } from '../utils/headlessSafetyWarnings.js';
+import { getHeadlessIznSafetyWarning } from '../utils/headlessSafetyWarnings.js';
 
 type McpBudgetMode = NonNullable<ServeOptions['mcpBudgetMode']>;
 

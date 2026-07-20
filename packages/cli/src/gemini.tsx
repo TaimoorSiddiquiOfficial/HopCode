@@ -81,7 +81,7 @@ import { getStartupWarnings } from './utils/startupWarnings.js';
 import { getUserStartupWarnings } from './utils/userStartupWarnings.js';
 import { initializeWarningHandler } from './utils/warningHandler.js';
 import { writeStderrLine } from './utils/stdioHelpers.js';
-import { getHeadlessYoloSafetyWarning } from './utils/headlessSafetyWarnings.js';
+import { getHeadlessIznSafetyWarning } from './utils/headlessSafetyWarnings.js';
 import { initializeLlmOutputLanguage } from './utils/languageUtils.js';
 import {
   CUSTOM_SANDBOX_IMAGE_ENV_VAR,

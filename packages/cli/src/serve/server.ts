@@ -213,6 +213,15 @@ import { writeStderrLine } from '../utils/stdioHelpers.js';
 import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
 import { SessionArchiveCoordinator } from './server/session-archive.js';
 import { installSelfOriginStripMiddleware } from './server/self-origin.js';
+import { setupDeviceFlowRegistry } from './server/device-flow-registry.js';
+import { createServeFeatures } from './server/serve-features.js';
+import { createVoiceWsConnectionHandler } from './voice/voice-ws.js';
+import {
+  createWorkspaceProvidersStatusProvider,
+} from './workspace-providers-status.js';
+import {
+  createWorkspaceSkillsStatusProvider,
+} from './workspace-skills-status.js';
 
 export { resolveBridgeFsFactory } from './server/fs-factory.js';
 export {
@@ -1112,14 +1121,13 @@ export function createServeApp(
     app.use(rateLimiter.middleware);
   }
 
-  if (!exposeHealthPreAuth) {
+  if (!healthDemoRoutes.exposeHealthPreAuth) {
     // Non-loopback OR loopback with `--require-auth`: register
     // `/health` and `/demo` AFTER `bearerAuth` so probes must carry
     // the token. Otherwise unauthenticated callers can ping any
     // reachable address:port to confirm a daemon exists (and `/demo`
     // leaks the full API surface).
-    app.get('/health', healthHandler);
-    app.get('/demo', demoHandler);
+    healthDemoRoutes.register(app);
   }
 
   installJsonBodyParser(app);

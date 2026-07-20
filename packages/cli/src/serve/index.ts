@@ -8,7 +8,7 @@ export { createServeApp, type ServeAppDeps } from './server.js';
 export {
   runHopCodeServe,
   type RunHandle,
-  type runHopCodeServeDeps,
+  type RunHopCodeServeDeps,
 } from './run-hopcode-serve.js';
 export {
   CAPABILITIES_SCHEMA_VERSION,

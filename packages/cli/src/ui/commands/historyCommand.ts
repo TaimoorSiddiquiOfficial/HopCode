@@ -9,6 +9,7 @@ import {
   CommandKind,
   type MessageActionReturn,
 } from './types.js';
+import { t } from '../../i18n/index.js';
 
 /** Maximum search results shown per query. */
 const MAX_DISPLAY_RESULTS = 20;
