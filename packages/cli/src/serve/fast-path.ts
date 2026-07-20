@@ -10,7 +10,6 @@ import { normalizeServeFastPathArgv } from './fast-path-argv.js';
 import type { ServeFastPathSettings } from './fast-path-settings.js';
 import { RUNTIME_STARTUP_CANCELLED_MESSAGE } from './runtime-startup-errors.js';
 import type { ServeOptions } from './types.js';
-import { getHeadlessIznSafetyWarning } from '../utils/headlessSafetyWarnings.js';
 
 type McpBudgetMode = NonNullable<ServeOptions['mcpBudgetMode']>;
 
@@ -432,9 +431,9 @@ async function maybeOpenWebShellBrowser(
   await openBrowser(handle, true);
 }
 
-function emitHeadlessYoloWarning(
+async function emitHeadlessYoloWarning(
   settings: ServeFastPathSettings | undefined,
-): void {
+): Promise<void> {
   if (!settings) return;
   try {
     const { HEADLESS_IZN_NO_SANDBOX_WARNING } = await import(
@@ -531,7 +530,7 @@ export async function tryRunServeFastPath(
       deferRuntimeUntilFirstHealth: !parsed.open,
     });
     try {
-      emitHeadlessYoloWarning(settings);
+      await emitHeadlessYoloWarning(settings);
     } catch {
       // Keep the warning best-effort, matching the yargs serve handler.
     }

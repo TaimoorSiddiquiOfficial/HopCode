@@ -635,10 +635,12 @@ describe('interactive.tsx main function kitty protocol', () => {
       maxWallTime: undefined,
       maxToolCalls: undefined,
       maxSessionTurns: undefined,
+      maxSubagentDepth: undefined,
       experimentalLsp: undefined,
       channel: undefined,
       chatRecording: undefined,
       sessionId: undefined,
+      fallbackModel: undefined,
     });
 
     await main();

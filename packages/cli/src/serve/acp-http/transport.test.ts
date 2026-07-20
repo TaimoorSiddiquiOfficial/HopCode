@@ -1056,7 +1056,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
     expect(result.agentCapabilities._meta.hopcode.methods).toContain(
       '_hopcode/session/shell',
     );
-    expect(result.agentCapabilities._meta.qwen.methods).not.toContain(
+    expect(result.agentCapabilities._meta.hopcode.methods).not.toContain(
       '_qwen/session/rewind',
     );
   });

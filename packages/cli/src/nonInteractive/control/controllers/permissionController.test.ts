@@ -94,7 +94,7 @@ describe('PermissionController', () => {
   it('fails closed without an interactive SDK even in yolo mode', async () => {
     const context = createContext();
     vi.mocked(context.config.getInputFormat).mockReturnValue('text');
-    context.permissionMode = 'yolo';
+    context.permissionMode = 'izn';
     const controller = new PermissionController(
       context,
       createRegistry(),

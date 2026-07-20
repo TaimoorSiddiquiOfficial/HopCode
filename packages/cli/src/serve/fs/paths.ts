@@ -21,7 +21,7 @@ import {
   canonicalizeWorkspaces,
   MAX_WORKSPACE_PATH_LENGTH,
 } from '@hoptrendy/acp-bridge/workspacePaths';
-export { canonicalizeWorkspace, MAX_WORKSPACE_PATH_LENGTH };
+export { canonicalizeWorkspace, canonicalizeWorkspaces, MAX_WORKSPACE_PATH_LENGTH };
 
 /**
  * Branded absolute path that has passed the workspace boundary check.

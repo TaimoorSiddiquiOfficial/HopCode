@@ -1027,7 +1027,7 @@ export type ServeExtensionInstallType =
   | 'npm'
   | 'archive-url';
 
-export type ServeExtensionOriginSource = 'QwenCode' | 'Claude' | 'Gemini';
+export type ServeExtensionOriginSource = 'HopCode' | 'Claude' | 'Gemini';
 
 export interface ServeExtensionCapabilities {
   mcpServerCount: number;

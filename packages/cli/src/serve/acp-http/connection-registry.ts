@@ -27,8 +27,6 @@ const MAX_BUFFERED_FRAMES = 256;
  * drop the oldest id-less reply and log loudly (its caller may hang, but an
  * unbounded daemon heap is worse). 4× the soft cap.
  */
-const HARD_BUFFERED_FRAMES_CAP = MAX_BUFFERED_FRAMES * 4;
-
 /** Default cap on concurrent live connections (mirrors a bounded resource). */
 const DEFAULT_MAX_CONNECTIONS = 64;
 

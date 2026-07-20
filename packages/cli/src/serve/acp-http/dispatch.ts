@@ -16,7 +16,6 @@ import {
   type SessionGroupPresetColor,
   BuiltinAgentRegistry,
   IMAGE_CAPABILITY,
-  RUNTIME_MCP_IF_ABSENT_CONFIG_FLAG,
   SubagentError,
   WorkspaceMemoryFileTooLargeError,
   WorkspaceMemoryWriteTimeoutError,
@@ -39,6 +38,7 @@ import {
   InvalidPermissionOptionError,
   PermissionForbiddenError,
   PermissionPolicyNotImplementedError,
+  SessionArchivingError,
   SessionShellClientRequiredError,
   SessionShellDisabledError,
   WorkspaceMismatchError,
@@ -79,9 +79,11 @@ import {
 import type {
   DaemonWorkspaceService,
   WorkspaceRequestContext,
-  WorkspacePermissionRulesSessionRequiredError,
 } from '../workspace-service/types.js';
-import { WorkspaceSettingsPartialPersistError } from '../workspace-service/types.js';
+import {
+  WorkspacePermissionRulesSessionRequiredError,
+  WorkspaceSettingsPartialPersistError,
+} from '../workspace-service/types.js';
 import type {
   AcpConnection,
   ConnectionRegistry,
@@ -619,7 +621,7 @@ export class AcpDispatcher {
     private readonly boundWorkspace: string,
     private readonly env: Readonly<NodeJS.ProcessEnv>,
     private readonly workspace: DaemonWorkspaceService,
-    private readonly workspaceRememberLane: WorkspaceRememberTaskLane,
+    _workspaceRememberLane: WorkspaceRememberTaskLane,
     private readonly fsFactory?: WorkspaceFileSystemFactory,
     private readonly deviceFlowRegistry?: DeviceFlowRegistry,
     private readonly sessionShellCommandEnabled: boolean = false,
@@ -3329,10 +3331,12 @@ export class AcpDispatcher {
             );
           }
           this.replyConn(conn, id, {
-            archived: result.archived,
-            alreadyArchived: result.alreadyArchived,
-            notFound: result.notFound,
-            errors: this.serializeSessionErrors(result.errors),
+            removed: removeResult.removed,
+            notFound: removeResult.notFound,
+            errors: this.serializeSessionErrors([
+              ...closeErrors,
+              ...removeResult.errors,
+            ]),
           } as unknown);
           return;
         }

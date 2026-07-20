@@ -15,7 +15,7 @@ import {
 } from '../config/settings.js';
 import { promisify } from 'node:util';
 import type { Config, SandboxConfig } from '@hoptrendy/hopcode-core';
-import { FatalSandboxError, Storage, isSubpath } from '@hoptrendy/hopcode-core';
+import { FatalSandboxError, Storage, isSubpath, resolveBundleDir } from '@hoptrendy/hopcode-core';
 import { randomBytes } from 'node:crypto';
 import { writeStderrLine } from './stdioHelpers.js';
 import { parseSandboxImageName } from './sandboxImageName.js';
@@ -642,11 +642,11 @@ export async function start_sandbox(
     args.push('--env', `HOPCODE_TEST_VAR=${process.env['HOPCODE_TEST_VAR']}`);
   }
   args.push(...getSandboxPassthroughEnvArgs());
-  if (process.env['QWEN_CODE_MCP_APPROVALS_PATH']) {
+  if (process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']) {
     args.push(
       '--env',
       `HOPCODE_CODE_MCP_APPROVALS_PATH=${getContainerPath(
-        process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'],
+        process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']!,
       )}`,
     );
   }

@@ -11,6 +11,22 @@ import type { AgentSideConnection } from '@agentclientprotocol/sdk';
 import { promises as fs } from 'node:fs';
 import { realpath as fsRealpath } from 'node:fs/promises';
 import os from 'node:os';
+
+const { mockDebugLogger } = vi.hoisted(() => ({
+  mockDebugLogger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+
+vi.mock('@hoptrendy/hopcode-core', () => ({
+  createDebugLogger: () => mockDebugLogger,
+  getErrorMessage: (e: unknown) =>
+    e instanceof Error ? e.message : String(e),
+  isSubpath: (parent: string, child: string) => child.startsWith(parent),
+}));
 import path from 'node:path';
 
 const RESOURCE_NOT_FOUND_CODE = -32002;

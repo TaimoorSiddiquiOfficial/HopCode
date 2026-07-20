@@ -1321,6 +1321,7 @@ describe('gemini.tsx main function kitty protocol', () => {
         authError: null,
         themeError: null,
         shouldOpenAuthDialog: false,
+        contextMdFileCount: 0,
         geminiMdFileCount: 0,
       });
     vi.mocked(loadCliConfig).mockResolvedValue({
@@ -1367,7 +1368,7 @@ describe('gemini.tsx main function kitty protocol', () => {
       systemPrompt: undefined,
       appendSystemPrompt: undefined,
       query: undefined,
-      yolo: undefined,
+      IZN: undefined,
       bare: undefined,
       approvalMode: undefined,
       telemetry: undefined,
@@ -1446,6 +1447,7 @@ describe('gemini.tsx main function kitty protocol', () => {
         authError: null,
         themeError: null,
         shouldOpenAuthDialog: false,
+        contextMdFileCount: 0,
         geminiMdFileCount: 0,
       });
     vi.mocked(loadCliConfig).mockResolvedValue({
@@ -1492,7 +1494,7 @@ describe('gemini.tsx main function kitty protocol', () => {
       systemPrompt: undefined,
       appendSystemPrompt: undefined,
       query: undefined,
-      yolo: undefined,
+      IZN: undefined,
       bare: undefined,
       approvalMode: undefined,
       telemetry: undefined,
@@ -1569,6 +1571,7 @@ describe('gemini.tsx main function kitty protocol', () => {
         authError: null,
         themeError: null,
         shouldOpenAuthDialog: false,
+        contextMdFileCount: 0,
         geminiMdFileCount: 0,
       });
     vi.mocked(loadCliConfig).mockResolvedValue({
@@ -1616,7 +1619,7 @@ describe('gemini.tsx main function kitty protocol', () => {
       systemPrompt: undefined,
       appendSystemPrompt: undefined,
       query: undefined,
-      yolo: undefined,
+      IZN: undefined,
       bare: undefined,
       approvalMode: undefined,
       telemetry: undefined,
@@ -1690,6 +1693,7 @@ describe('gemini.tsx main function kitty protocol', () => {
         authError: null,
         themeError: null,
         shouldOpenAuthDialog: false,
+        contextMdFileCount: 0,
         geminiMdFileCount: 0,
       });
     vi.mocked(loadCliConfig).mockResolvedValue({
@@ -1775,6 +1779,7 @@ describe('gemini.tsx main function kitty protocol', () => {
       channel: undefined,
       chatRecording: undefined,
       sessionId: undefined,
+      fallbackModel: undefined,
       tavilyApiKey: undefined,
       googleApiKey: undefined,
       googleSearchEngineId: undefined,
@@ -2337,6 +2342,7 @@ describe('startInteractiveUI', () => {
       authError: null,
       themeError: null,
       shouldOpenAuthDialog: false,
+      contextMdFileCount: 0,
       geminiMdFileCount: 0,
     };
 
@@ -2378,6 +2384,7 @@ describe('startInteractiveUI', () => {
         authError: null,
         themeError: null,
         shouldOpenAuthDialog: false,
+        contextMdFileCount: 0,
         geminiMdFileCount: 0,
       },
     );
@@ -2426,6 +2433,7 @@ describe('startInteractiveUI', () => {
           authError: null,
           themeError: null,
           shouldOpenAuthDialog: false,
+          contextMdFileCount: 0,
           geminiMdFileCount: 0,
         },
       );
@@ -2461,6 +2469,7 @@ describe('startInteractiveUI', () => {
           authError: null,
           themeError: null,
           shouldOpenAuthDialog: false,
+          contextMdFileCount: 0,
           geminiMdFileCount: 0,
         },
       );

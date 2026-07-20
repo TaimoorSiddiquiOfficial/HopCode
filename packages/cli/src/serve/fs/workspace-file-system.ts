@@ -281,29 +281,24 @@ export interface CreateWorkspaceFileSystemFactoryDeps {
 export function createWorkspaceFileSystemFactory(
   deps: CreateWorkspaceFileSystemFactoryDeps,
 ): WorkspaceFileSystemFactory {
-  const boundWorkspace = canonicalizeWorkspace(deps.boundWorkspace);
-  const ignore =
-    deps.ignore ??
-    loadIgnoreRules({
-      projectRoot: boundWorkspace,
-      useGitignore: true,
-      useHopcodeignore: true,
-      ignoreDirs: [],
-    });
-  // Freeze the `Ignore` instance so it cannot be mutated after
-  // the factory builds it. The `Ignore` class exposes a public
-  // `add(patterns): this` method that mutates state in-place;
-  // every `forRequest()` returns a `WorkspaceFileSystemImpl`
-  // sharing this same instance, so a future "ignore this
-  // pattern for this session" feature calling `.add()` would
-  // silently corrupt all concurrent requests. `Object.freeze`
-  // turns the mutation into a `TypeError` instead of a silent
-  // cross-request leak — surfacing the architectural mistake
-  // before it ships. Read paths (`getFileFilter` /
-  // `getDirectoryFilter`) are unaffected. Operators wanting
-  // per-session ignore rules should pass a different `Ignore`
-  // instance via `deps.ignore` to a separate factory.
-  Object.freeze(ignore);
+  const boundWorkspaces = canonicalizeWorkspaces(deps.boundWorkspaces);
+  if (boundWorkspaces.length === 0) {
+    throw new Error('WorkspaceFileSystem requires at least one workspace root');
+  }
+  assertNoNestedWorkspaces(boundWorkspaces);
+  const primaryWorkspace = boundWorkspaces[0]!;
+  const workspaces = boundWorkspaces.map((workspace) => {
+    const ignore =
+      deps.ignore ??
+      loadIgnoreRules({
+        projectRoot: workspace,
+        useGitignore: true,
+        useHopcodeignore: true,
+        ignoreDirs: [],
+      });
+    Object.freeze(ignore);
+    return { path: workspace, ignore };
+  });
   const audit: AuditPublisher = createAuditPublisher({
     emit: deps.emit,
     boundWorkspace: primaryWorkspace,

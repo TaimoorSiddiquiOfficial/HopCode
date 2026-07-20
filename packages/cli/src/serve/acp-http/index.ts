@@ -11,6 +11,7 @@ import type { Application, Request, Response } from 'express';
 import { WebSocketServer, type WebSocket } from 'ws';
 import type { HttpAcpBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
+import { RUNTIME_MCP_IF_ABSENT_CONFIG_FLAG } from '@hoptrendy/hopcode-core';
 import type { DaemonWorkspaceService } from '../workspace-service/types.js';
 import type { WorkspaceFileSystemFactory } from '../fs/index.js';
 import { resolveAcpHttpEnabled } from '../acp-http-enabled.js';

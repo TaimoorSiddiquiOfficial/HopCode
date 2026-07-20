@@ -218,7 +218,7 @@ describe('useReactToolScheduler in IZN Mode', () => {
     });
     mockToolRegistry.getTool.mockReturnValue(streamingTool);
 
-    const { result } = renderSchedulerInYoloMode();
+    const { result } = renderSchedulerInIznMode();
     const schedule = result.current[1];
 
     act(() => {
