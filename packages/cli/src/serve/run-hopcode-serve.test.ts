@@ -8,7 +8,6 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { createServer } from 'node:http';
-import * as https from 'node:https';
 import type { AddressInfo } from 'node:net';
 import { describe, it, expect, vi, afterEach, afterAll } from 'vitest';
 import express from 'express';

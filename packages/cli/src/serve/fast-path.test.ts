@@ -17,7 +17,8 @@ import {
   writeFileSync,
 } from 'node:fs';
 import * as os from 'node:os';
-import { join } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
+import * as ts from 'typescript';
 import { HOPCODE_DIR, Storage } from '@hoptrendy/hopcode-core';
 
 import {
@@ -97,7 +98,9 @@ function importDeclarationHasRuntimeValue(node: ts.ImportDeclaration): boolean {
   if (!bindings) return false;
   if (ts.isNamespaceImport(bindings)) return true;
   if (bindings.elements.length === 0) return true;
-  return bindings.elements.some((element) => !element.isTypeOnly);
+  return bindings.elements.some(
+    (element: ts.ImportSpecifier) => !element.isTypeOnly,
+  );
 }
 
 function exportDeclarationHasRuntimeValue(node: ts.ExportDeclaration): boolean {
@@ -106,7 +109,9 @@ function exportDeclarationHasRuntimeValue(node: ts.ExportDeclaration): boolean {
   if (!clause) return true;
   if (ts.isNamespaceExport(clause)) return true;
   if (clause.elements.length === 0) return true;
-  return clause.elements.some((element) => !element.isTypeOnly);
+  return clause.elements.some(
+    (element: ts.ExportSpecifier) => !element.isTypeOnly,
+  );
 }
 
 function resolveLocalSourceImport(

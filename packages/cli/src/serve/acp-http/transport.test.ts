@@ -6,7 +6,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import express from 'express';
-import * as fs from 'node:fs';
+import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import type { Server } from 'node:http';
@@ -49,15 +49,25 @@ import {
 } from '../../services/setup-github.js';
 import {
   createWorkspaceFileSystemFactory,
-  MAX_READ_BYTES,
   type ResolvedPath,
   type WorkspaceFileSystem,
   type WorkspaceFileSystemFactory,
 } from '../fs/index.js';
-import type { DaemonWorkspaceService } from '../workspace-service/types.js';
-import { MAX_TRUST_REASON_LENGTH } from '../validation-limits.js';
-import { WorkspaceRememberTaskLane } from '../workspace-remember.js';
-import { mountAcpHttp } from './index.js';
+import {
+  type DaemonWorkspaceService,
+  WorkspacePermissionRulesSessionRequiredError,
+  WorkspaceSettingsPartialPersistError,
+} from '../workspace-service/types.js';
+import {
+  MAX_TRUST_REASON_LENGTH,
+  MAX_VOICE_MODEL_LENGTH,
+} from '../validation-limits.js';
+import {
+  WorkspaceRememberTaskLane,
+  mountWorkspaceMemoryRememberRoutes,
+} from '../workspace-remember.js';
+import { CdpTunnelRegistry } from '../cdp-tunnel/cdp-tunnel-registry.js';
+import { mountAcpHttp, type AcpHttpHandle } from './index.js';
 
 const stdioMocks = vi.hoisted(() => ({
   writeStderrLine: vi.fn(),
@@ -804,8 +814,13 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
     mountWorkspaceMemoryRememberRoutes(app, {
       bridge: bridge as unknown as HttpAcpBridge,
       lane: workspaceRememberLane,
-      mutate: () => (_req, _res, next) => next(),
-      parseClientId: (req, res) => {
+      mutate: () =>
+        (
+          _req: any,
+          _res: any,
+          next: any,
+        ): void => next(),
+      parseClientId: (req: any, res: any) => {
         const raw = req.get('x-qwen-client-id');
         if (raw === undefined || raw === '') return undefined;
         if (!bridge.knownClientIdSet.has(raw)) {
@@ -818,7 +833,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         }
         return raw;
       },
-      safeBody: (req) => {
+      safeBody: (req: any) => {
         const raw = req.body;
         if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
           return Object.create(null) as Record<string, unknown>;
@@ -956,6 +971,11 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       }
       await fs.rm(runtimeDir, { recursive: true, force: true });
     }
+  }
+
+  async function writeJson(file: string, value: unknown): Promise<void> {
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, JSON.stringify(value, null, 2), 'utf8');
   }
 
   async function writeStoredSession(

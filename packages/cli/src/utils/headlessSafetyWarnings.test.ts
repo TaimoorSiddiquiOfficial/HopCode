@@ -11,11 +11,14 @@ import {
   getHeadlessIznSafetyWarning,
 } from './headlessSafetyWarnings.js';
 
-function makeConfig(approvalMode: ApprovalMode, sandbox: unknown) {
+function makeConfig(
+  approvalMode: ApprovalMode,
+  sandbox: unknown,
+): Pick<Config, 'getApprovalMode' | 'getSandbox'> {
   return {
     getApprovalMode: () => approvalMode,
     getSandbox: () => sandbox,
-  };
+  } as Pick<Config, 'getApprovalMode' | 'getSandbox'>;
 }
 
 describe('getHeadlessIznSafetyWarning', () => {
