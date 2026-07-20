@@ -39,7 +39,6 @@ import {
   UnsupportedDeviceFlowProviderError,
   UpstreamDeviceFlowError,
   type DeviceFlowProvider,
-  type DeviceFlowEventSink,
   type DeviceFlowProviderId,
   type DeviceFlowPublicView,
 } from './auth/device-flow.js';
@@ -55,14 +54,9 @@ import { CdpTunnelRegistry } from './cdp-tunnel/cdp-tunnel-registry.js';
 import {
   canonicalizeWorkspace,
   createAcpSessionBridge,
-  PromptQueueFullError,
-  SessionNotFoundError,
-  SessionShellClientRequiredError,
-  SessionShellDisabledError,
   type AcpSessionBridge,
 } from './acp-session-bridge.js';
 import {
-  CAPABILITIES_SCHEMA_VERSION,
   type ServeAuthProviderInstallRequest,
   type ServeAuthProviderInstallResult,
   type ServeChannelSelection,
@@ -83,7 +77,6 @@ import {
 } from './workspace-agents.js';
 import { registerDaemonStatusRoutes } from './routes/daemon-status.js';
 import { createHealthDemoRoutes } from './routes/health-demo.js';
-import { registerWorkspaceAuthRoutes } from './routes/workspace-auth.js';
 import { registerWorkspaceExtensionRoutes } from './routes/workspace-extensions.js';
 import type { WorkspaceFileSystemFactory } from './fs/index.js';
 import {
