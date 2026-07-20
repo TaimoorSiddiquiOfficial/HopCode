@@ -28,8 +28,6 @@ import type {
 import {
   formatVisionBridgeNoticeDisplay,
   isVisionBridgeNoticeDisplay,
-  ToolNames,
-  ToolNamesMigration,
 } from '@hoptrendy/hopcode-core';
 import { ToolConfirmationMessage } from './ToolConfirmationMessage.js';
 import { PlanSummaryDisplay } from '../PlanSummaryDisplay.js';

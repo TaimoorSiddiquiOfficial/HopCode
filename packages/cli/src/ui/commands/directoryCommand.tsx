@@ -13,6 +13,7 @@ import { CommandKind } from './types.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
+  expandHomeDir,
   loadServerHierarchicalMemory,
   ConditionalRulesRegistry,
 } from '@hoptrendy/hopcode-core';

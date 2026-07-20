@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import path from 'node:path';
 import express from 'express';
 import type { Application } from 'express';
 import type { DaemonStatusProvider } from '@hoptrendy/acp-bridge';

@@ -21,7 +21,7 @@ import {
 import type { ChannelBase, ChannelBaseOptions, ChannelLoopController } from '@hoptrendy/channel-base';
 import { findCliEntryPath, parseChannelConfig } from './config-utils.js';
 import { resolveProxy } from './proxy.js';
-import { readServiceInfo, removeServiceInfo } from './pidfile.js';
+import { readServiceInfo, removeServiceInfo, writeServiceInfo } from './pidfile.js';
 import {
   createChannel,
   channelLoopPath,
@@ -42,14 +42,6 @@ export { resolveProxy } from './proxy.js';
 const MAX_CRASH_RESTARTS = 3;
 const CRASH_WINDOW_MS = 5 * 60 * 1000; // 5-minute window for counting crashes
 const RESTART_DELAY_MS = 3000;
-
-function isFileExistsError(err: unknown): boolean {
-  return (
-    typeof err === 'object' &&
-    err !== null &&
-    (err as NodeJS.ErrnoException).code === 'EEXIST'
-  );
-}
 
 function channelMemoryOptions(
   getBridge: () => AcpBridge,
@@ -221,9 +213,15 @@ async function startSingle(
     bridge.stop();
     process.exit(1);
   }
-  writeServiceInfoOrExit([name], () =>
-    cleanupStartedChannels([channel], bridge, router),
-  );
+  try {
+    writeServiceInfo([name]);
+  } catch (err) {
+    writeStderrLine(
+      `[Channel] Another channel service started concurrently. Error: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    cleanupStartedChannels([channel], bridge, router);
+    process.exit(1);
+  }
   scheduler?.start();
   writeStdoutLine(`[Channel] "${name}" is running. Press Ctrl+C to stop.`);
 
@@ -403,10 +401,15 @@ async function startAll(
         nextFireTime,
       })
     : undefined;
-  writeServiceInfoOrExit(
-    parsed.map((p) => p.name),
-    () => cleanupStartedChannels(channels.values(), bridge, router),
-  );
+  try {
+    writeServiceInfo(parsed.map((p) => p.name));
+  } catch (err) {
+    writeStderrLine(
+      `[Channel] Another channel service started concurrently. Error: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    cleanupStartedChannels(channels.values(), bridge, router);
+    process.exit(1);
+  }
   scheduler?.start();
   writeStdoutLine(
     `[Channel] Running ${connectedCount} channel(s). Press Ctrl+C to stop.`,

@@ -9,13 +9,14 @@ import {
   APPROVAL_MODES,
   type ApprovalMode,
   BTW_MAX_INPUT_LENGTH,
-  createDebugLogger,
   GROUP_COLOR_OPTIONS,
   SessionService,
   SessionOrganizationError,
   type SessionGroupColor,
   type SessionGroupPresetColor,
   BuiltinAgentRegistry,
+  IMAGE_CAPABILITY,
+  RUNTIME_MCP_IF_ABSENT_CONFIG_FLAG,
   SubagentError,
   WorkspaceMemoryFileTooLargeError,
   WorkspaceMemoryWriteTimeoutError,
@@ -34,6 +35,10 @@ import type { HttpAcpBridge } from '@hoptrendy/acp-bridge/bridgeTypes';
 import { parseSessionSource } from '@hoptrendy/acp-bridge';
 import type { BridgeEvent } from '@hoptrendy/acp-bridge/eventBus';
 import {
+  CancelSentinelCollisionError,
+  InvalidPermissionOptionError,
+  PermissionForbiddenError,
+  PermissionPolicyNotImplementedError,
   SessionShellClientRequiredError,
   SessionShellDisabledError,
   WorkspaceMismatchError,
@@ -66,9 +71,7 @@ import {
 } from '../server.js';
 import { createSessionOrganizationService } from '../session-organization-helpers.js';
 import {
-  archiveDaemonSessions,
   assertSessionLoadable,
-  deleteDaemonSessions,
   logSessionArchiveWarning,
   SessionArchiveCoordinator,
   unarchiveDaemonSessions,
@@ -76,9 +79,14 @@ import {
 import type {
   DaemonWorkspaceService,
   WorkspaceRequestContext,
+  WorkspacePermissionRulesSessionRequiredError,
 } from '../workspace-service/types.js';
 import { WorkspaceSettingsPartialPersistError } from '../workspace-service/types.js';
-import type { AcpConnection, ConnectionRegistry } from './connection-registry.js';
+import type {
+  AcpConnection,
+  ConnectionRegistry,
+  PendingClientRequestRef,
+} from './connection-registry.js';
 import {
   HOPCODE_META_KEY,
   HOPCODE_METHOD_NS,
@@ -97,6 +105,23 @@ import {
   type JsonRpcRequest,
   type JsonRpcResponse,
 } from './json-rpc.js';
+import { INVALID_PERMISSION_OUTCOME_ERROR } from '../server/request-helpers.js';
+import {
+  isPermissionRuleType,
+  normalizePermissionRules,
+  PermissionRulesValidationError,
+  readPermissionRuleSet,
+} from '../../config/permission-settings.js';
+import { loadSettings } from '../../config/settings.js';
+import { parseWorkspaceVoiceUpdateParams } from '../routes/workspace-voice.js';
+import {
+  resolveSetupGithubProxy,
+  createSetupGithubFileOps,
+  setupGithubEventData,
+  sanitizeSetupGithubMessage,
+  sanitizeSetupGithubResult,
+} from '../routes/workspace-setup-github.js';
+import { setupGithub, SetupGithubError } from '../../services/setup-github.js';
 
 function errMsg(err: unknown): string {
   return err instanceof Error ? err.message : String(err);

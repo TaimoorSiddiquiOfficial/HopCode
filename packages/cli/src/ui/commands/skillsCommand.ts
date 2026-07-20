@@ -13,6 +13,7 @@ import {
 import { MessageType } from '../types.js';
 import { t } from '../../i18n/index.js';
 import { normalizeSkillPriority } from '@hoptrendy/hopcode-core';
+import { levelLabel } from '../utils/skill-level-label.js';
 
 export const skillsCommand: SlashCommand = {
   name: 'skills',

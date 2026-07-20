@@ -172,6 +172,8 @@ export async function handleApiKeyAuth(
       appendSystemPrompt: undefined,
       bare: undefined,
       disabledSlashCommands: undefined,
+      fallbackModel: undefined,
+      maxSubagentDepth: undefined,
     };
 
     const config = await loadCliConfig(

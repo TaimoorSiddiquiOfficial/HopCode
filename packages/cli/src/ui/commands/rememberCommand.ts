@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  getAutoMemoryRoot,
-  getUserAutoMemoryRoot,
-} from '@hoptrendy/hopcode-core';
+import { buildManagedRememberPrompt } from '@hoptrendy/hopcode-core';
 import { t } from '../../i18n/index.js';
 import type {
   CommandContext,

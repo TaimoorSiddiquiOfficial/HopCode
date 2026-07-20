@@ -69,7 +69,7 @@ export const MAX_TOOL_NAME_LENGTH = 256;
 export const MAX_SKILL_NAME_LENGTH = 256;
 export const MAX_SERVER_NAME_LENGTH = 256;
 export const CLIENT_ID_RE = /^[A-Za-z0-9._:-]+$/;
-const INVALID_PERMISSION_OUTCOME_ERROR =
+export const INVALID_PERMISSION_OUTCOME_ERROR =
   '`outcome` must be `{ outcome: "cancelled" }` or `{ outcome: "selected", optionId: string }`';
 
 export interface DeferredRuntimeRequestTiming {
