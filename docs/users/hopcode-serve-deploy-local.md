@@ -64,7 +64,7 @@ Type=simple
 # Replace with your project; %h expands to $HOME under user units.
 WorkingDirectory=%h/project-a
 # Run `which qwen` to find the absolute path. systemd does NOT read $PATH.
-ExecStart=/PATH/TO/qwen serve --hostname 127.0.0.1 --port 4170 --workspace %h/project-a --workspace %h/project-b
+ExecStart=/PATH/TO/hopcode serve --hostname 127.0.0.1 --port 4170 --workspace %h/project-a --workspace %h/project-b
 # Read the bearer token from a chmod 600 file rather than inlining it
 # in the unit. `Environment=` would expose the token in the unit file
 # (typically 644 = world-readable). EnvironmentFile keeps the token in
@@ -185,7 +185,7 @@ After editing the plist (e.g., rotating the token) you must `unload` then `load`
 Assumes `HOPCODE_SERVER_TOKEN` is already exported in your shell (see the setup section above):
 
 ```bash
-tmux new -d -s qwen-serve "qwen serve --hostname 127.0.0.1 --workspace /absolute/path/project-a --workspace /absolute/path/project-b"
+tmux new -d -s qwen-serve "hopcode serve --hostname 127.0.0.1 --workspace /absolute/path/project-a --workspace /absolute/path/project-b"
 tmux attach -t qwen-serve   # see live logs; Ctrl-b d to detach
 tmux kill-session -t qwen-serve
 ```
@@ -197,7 +197,7 @@ tmux kill-session -t qwen-serve
 Assumes `HOPCODE_SERVER_TOKEN` is already exported in your shell:
 
 ```bash
-nohup qwen serve --hostname 127.0.0.1 \
+nohup hopcode serve --hostname 127.0.0.1 \
   --workspace /absolute/path/project-a \
   --workspace /absolute/path/project-b \
   > qwen-serve.log 2>&1 &

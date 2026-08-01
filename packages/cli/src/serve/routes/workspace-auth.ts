@@ -45,7 +45,7 @@ interface RegisterWorkspaceAuthRoutesDeps {
  * match (anonymous-start -> anonymous-reattach is the legitimate case).
  *
  * **Threat model:** this is BEST-EFFORT ATTRIBUTION, not authentication.
- * `X-Qwen-Client-Id` is a syntactic header, not bound to a server-
+ * `X-HopCode-Client-Id` is a syntactic header, not bound to a server-
  * validated identity — the bearer token IS the auth boundary. This gate
  * prevents accidental cross-client reads in well-behaved multi-SDK setups.
  */

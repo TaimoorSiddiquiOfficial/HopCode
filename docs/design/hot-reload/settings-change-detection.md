@@ -21,7 +21,7 @@ The `writeWithBackupSync` write flow is `write(.tmp) → rename(target, .orig) �
 
 ### Lazy Directory Handling: Never Create `.hopcode/` at Startup
 
-> **Startup filesystem side effect (intentionally avoided).** The watcher must **never** create `<project>/.hopcode/` (or `~/.hopcode/`) just to be able to watch it. An earlier version called `mkdirSync({ recursive: true })` for any missing settings directory, which meant a normal non-bare startup silently created `<project>/.hopcode/` even in projects that never had Qwen settings — polluting the workspace and git status. Directory creation is owned solely by settings _persistence_ (`saveSettings()` does its own `mkdirSync` when the user actually writes settings).
+> **Startup filesystem side effect (intentionally avoided).** The watcher must **never** create `<project>/.hopcode/` (or `~/.hopcode/`) just to be able to watch it. An earlier version called `mkdirSync({ recursive: true })` for any missing settings directory, which meant a normal non-bare startup silently created `<project>/.hopcode/` even in projects that never had hopcode settings — polluting the workspace and git status. Directory creation is owned solely by settings _persistence_ (`saveSettings()` does its own `mkdirSync` when the user actually writes settings).
 
 To still detect a `settings.json` added later in the session without creating the directory and without recursing the project tree, the watcher uses a two-stage, per-scope strategy keyed on **directory** existence:
 

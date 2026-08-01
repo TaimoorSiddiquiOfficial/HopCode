@@ -1,4 +1,4 @@
-﻿# Declarative Agent Definitions — Port from Claude Code 2.1.168
+# Declarative Agent Definitions — Port from Claude Code 2.1.168
 
 Internal design document for porting Claude Code's declarative agent (markdown +
 YAML frontmatter) schema to hopcode, addressing issue [#4821][i4821] and
@@ -20,12 +20,12 @@ and hooks actually fire when a subagent runs.
 
 | Field             | Status                  | Notes                                                                                                                                                               |
 | ----------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `permissionMode`  | **shipped (#4842)**     | bridges to existing qwen `approvalMode` at parse time                                                                                                               |
+| `permissionMode`  | **shipped (#4842)**     | bridges to existing hopcode `approvalMode` at parse time                                                                                                               |
 | `maxTurns`        | **shipped (#4842)**     | wired into existing `runConfig.max_turns` runtime path                                                                                                              |
 | `color` allowlist | **shipped (#4842)**     | tightens existing field to CC's `_Y` set + `auto` legacy sentinel handling                                                                                          |
 | `mcpServers`      | **shipped (follow-up)** | nested YAML round-trip safe via eemeli/`yaml` stringify; runtime override merges session + agent servers via subagent Config wrapper + forced tool-registry rebuild |
 | `hooks`           | **shipped (follow-up)** | ephemeral HookRegistry entries registered at subagent spawn, removed via `onStop`; v1 fires globally (no agent-scope filter)                                        |
-| `effort`          | deferred                | no model-layer `effort` parameter exists yet in qwen providers                                                                                                      |
+| `effort`          | deferred                | no model-layer `effort` parameter exists yet in hopcode providers                                                                                                      |
 | `memory`          | deferred                | qwen's auto-memory has no `user`/`project`/`local` scope distinction yet                                                                                            |
 | `isolation`       | deferred                | workflow PR #4732 owns the runtime; per-agent default lands when that lands                                                                                         |
 | `initialPrompt`   | deferred                | requires `--agent` CLI flag (no main-session-agent infra in qwen)                                                                                                   |
@@ -382,7 +382,7 @@ verbatim so users can drop in Claude Code agent files unchanged.
 | `memory`                   | `memory` (new)                                     | enum `user/project/local`; loads from `.hopcode/agent-memory/<name>/` etc.                                   | runtime in P4                                                                                            |
 | `background`               | `background`                                       | accept bool or string `"true"/"false"`; only truthy → true                                                   | already supported; loosen parse rules                                                                    |
 | `isolation`                | `isolation` (new)                                  | enum **only** `["worktree"]`                                                                                 | runtime owned by workflow PR (#4732 P3+); registry just carries the field                                |
-| `color` (undocumented #16) | `color`                                            | enum `_Y = ["red","blue","green","yellow","purple","orange","pink","cyan"]`; values outside silently dropped | already in qwen `SubagentConfig`; tighten validation to match Claude Code allowlist                      |
+| `color` (undocumented #16) | `color`                                            | enum `_Y = ["red","blue","green","yellow","purple","orange","pink","cyan"]`; values outside silently dropped | already in hopcode `SubagentConfig`; tighten validation to match Claude Code allowlist                      |
 
 ### TDD test plan
 
@@ -452,7 +452,7 @@ this PR lands.
 | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1  | Schema drift between Claude Code minor releases (2.1.168 → 2.1.x)                                                                                                                                   | Pin the enum constants module to "verified against 2.1.168" with a doc comment; rerun the strings-grep against new releases as part of `feature-reverse` skill |
 | R2  | `runConfig.max_turns` → top-level `maxTurns` is a breaking schema change for existing `.hopcode/agents/*.md` files                                                                                  | Keep nested form as deprecated alias with one-cycle deprecation; emit warn on parse, document in CHANGELOG                                                     |
-| R3  | `permissionMode` ↔ `approvalMode` round-trip lossy (Claude has 6 modes, qwen has 4-ish)                                                                                                            | Map both directions explicitly per D7; emit telemetry on dual-set; do NOT silently rewrite on save                                                             |
+| R3  | `permissionMode` ↔ `approvalMode` round-trip lossy (Claude has 6 modes, hopcode has 4-ish)                                                                                                            | Map both directions explicitly per D7; emit telemetry on dual-set; do NOT silently rewrite on save                                                             |
 | R4  | New fields (`hooks`, `mcpServers`, `skills`, `memory`) carried in registry but no runtime in v1 → users may set them and silently get no effect                                                     | Document v1 scope clearly; emit a one-time info log per agent when a "carried but not yet runtime" field is non-empty                                          |
 | R5  | Adversarial-verify flagged that `EXCLUDED_TOOLS_FOR_SUBAGENTS` does NOT include `WORKFLOW` on `main` — could mean the workflow port is not yet merged or that the recursive-fanout guard is missing | Confirm with the workflow PR author (LaZzyMan = self) that the guard lands with PR #4732, not in this port                                                     |
 | R6  | The outer-tree-beats-inner-tree projectSettings behaviour (Q5) is a footgun if mirrored                                                                                                             | hopcode chooses **innermost-wins** explicitly; tested via R5 fixture                                                                                           |

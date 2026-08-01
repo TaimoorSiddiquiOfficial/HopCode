@@ -873,7 +873,7 @@ describe('workspace voice routes', () => {
       .post('/workspace/voice/transcribe')
       .set('Host', hostHeader)
       .set('Authorization', 'Bearer secret')
-      .set('X-Qwen-Client-Id', 'detached-client')
+      .set('X-HopCode-Client-Id', 'detached-client')
       .set('Content-Type', 'application/octet-stream')
       .send(Buffer.from([9]));
 

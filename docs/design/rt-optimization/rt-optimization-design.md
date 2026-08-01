@@ -1,4 +1,4 @@
-﻿# HopCode Agent Loop RT 优化技术方案
+# HopCode Agent Loop RT 优化技术方案
 
 ## 1. 背景与问题定义
 
@@ -125,9 +125,9 @@ export interface ToolResult {
 - 复核 `repairOrphanedToolUseTurnsInHistory`（session-load 时调用）是否容忍此形态
 - 复核 auto-compaction 在缺少 assistant 文本时的行为
 - PR #4176 刚关闭过 tool_use↔tool_result 不变量，落地前需补单测覆盖"skip 后下一轮 user message"的 alternation
-- Qwen / OpenAI 风格 API 容忍；Anthropic 严格 alternation —— 后续若支持 Anthropic 直连需要兜底（向 history 注入空 assistant text）
+- hopcode / OpenAI 风格 API 容忍；Anthropic 严格 alternation —— 后续若支持 Anthropic 直连需要兜底（向 history 注入空 assistant text）
 
-> **统一修复点**：此处和 §3.3（D3 中途打断 Summarizing）破坏的是**同一个历史不变量**。修复方案二选一（注入空 assistant / 接受 Qwen 容忍），两个方向必须使用相同选择。
+> **统一修复点**：此处和 §3.3（D3 中途打断 Summarizing）破坏的是**同一个历史不变量**。修复方案二选一（注入空 assistant / 接受 hopcode 容忍），两个方向必须使用相同选择。
 
 #### 信号生态（Phase 2 工作）
 
@@ -485,7 +485,7 @@ batch 全员 `postExecution.resultIsTerminal === true`。
                                           ↑ 无 assistant turn
 ```
 
-**这与 §3.1 跳过 LLM 轮破坏的是同一个不变量**，必须使用与 D1 相同的修复策略（注入空 assistant / 接受 Qwen 容忍）。
+**这与 §3.1 跳过 LLM 轮破坏的是同一个不变量**，必须使用与 D1 相同的修复策略（注入空 assistant / 接受 hopcode 容忍）。
 
 - 复用 D1 的不变量单测覆盖
 - session-load 重放（含 `repairOrphanedToolUseTurnsInHistory`）必须覆盖此形态
@@ -778,7 +778,7 @@ HopCode 是本地 CLI，**没有运行时下发能力**——传统"5% / 25% / 1
 5. **`tryCompress` 触发可能反向恶化**：fast 模型 context 小，compression 自身耗 LLM 调用——`wouldTriggerCompression` gate 是必备防御
 6. **展示解耦改变交互模型**：新模式需要用户适应；用户行为决定实际感知收益
 7. **网络延迟不可控**：本方案减少调用次数，非优化单次调用
-8. **Anthropic 直连未覆盖**：当前 alternation 容忍度依赖 Qwen / OpenAI 风格 API
+8. **Anthropic 直连未覆盖**：当前 alternation 容忍度依赖 hopcode / OpenAI 风格 API
 9. **主 chat 上 fastModel-streaming 是首次落地**：无生产先例，需独立验证实验
 10. **本地 CLI 无运行时下发**：发布策略只能阶段性 release 推进，不支持快速灰度调节
 11. **D2 仅作用于交互路径**：Subagent / Cron / Notification 不享收益，刻意如此

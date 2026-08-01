@@ -4141,7 +4141,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-2')
+        .set('X-HopCode-Client-Id', 'client-2')
         .send({ source: 'owner/repo', consent: true });
 
       expect(res.status).toBe(400);
@@ -4190,7 +4190,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/installed-ext', consent: true });
 
         expect(res.status).toBe(202);
@@ -4244,7 +4244,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({
             source: 'https://example.com/installed-ext',
             ref: 'v1.2.3',
@@ -4286,7 +4286,7 @@ describe('createServeApp', () => {
           )
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ value: 123 });
         expect(invalidSetting.status).toBe(400);
 
@@ -4311,7 +4311,7 @@ describe('createServeApp', () => {
           )
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ value: 'super-secret' });
         expect(answer.status).toBe(200);
         expect(answer.body).toEqual({ accepted: true });
@@ -4423,7 +4423,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/marketplace', consent: true });
 
         let interactionId = '';
@@ -4462,7 +4462,7 @@ describe('createServeApp', () => {
           )
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ pluginName: 'missing-plugin' });
         expect(invalid.status).toBe(400);
 
@@ -4485,7 +4485,7 @@ describe('createServeApp', () => {
           )
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ pluginName: 'example-plugin' });
         expect(answer.status).toBe(200);
         await vi.waitFor(() => {
@@ -4952,7 +4952,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/first-ext', consent: true });
         expect(first.status).toBe(202);
 
@@ -4972,7 +4972,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/second-ext', consent: true });
         expect(second.status).toBe(202);
 
@@ -4992,7 +4992,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/third-ext', consent: true });
         expect(third.status).toBe(202);
 
@@ -5086,7 +5086,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/first-ext', consent: true });
         await vi.waitFor(() => expect(firstStarted).toBe(true));
 
@@ -5094,7 +5094,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/second-ext', consent: true });
         await vi.waitFor(() => expect(commits).toEqual(['second-ext']));
 
@@ -5134,7 +5134,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/warning-ext', consent: true });
 
         await vi.waitFor(async () => {
@@ -5180,7 +5180,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source: 'https://example.com/warning-ext', consent: true });
 
         await vi.waitFor(async () => {
@@ -5222,7 +5222,7 @@ describe('createServeApp', () => {
             .post('/workspace/extensions/install')
             .set('Host', `127.0.0.1:${tokenOpts.port}`)
             .set('Authorization', 'Bearer secret')
-            .set('X-Qwen-Client-Id', 'client-1')
+            .set('X-HopCode-Client-Id', 'client-1')
             .send({
               source: `https://example.com/installed-ext-${i}`,
               consent: true,
@@ -5399,7 +5399,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({
             source: 'https://example.com/private-ext',
             consent: true,
@@ -5484,7 +5484,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({
             source: 'https://example.com/installed-ext',
             consent: true,
@@ -5556,7 +5556,7 @@ describe('createServeApp', () => {
             .post('/workspace/extensions/install')
             .set('Host', `127.0.0.1:${tokenOpts.port}`)
             .set('Authorization', 'Bearer secret')
-            .set('X-Qwen-Client-Id', 'client-1')
+            .set('X-HopCode-Client-Id', 'client-1')
             .send({
               source: 'https://example.com/installed-ext',
               consent: true,
@@ -5571,13 +5571,13 @@ describe('createServeApp', () => {
             .post('/workspace/extensions/check-updates')
             .set('Host', `127.0.0.1:${tokenOpts.port}`)
             .set('Authorization', 'Bearer secret')
-            .set('X-Qwen-Client-Id', 'client-1')
+            .set('X-HopCode-Client-Id', 'client-1')
             .send({}),
           request(app)
             .post('/workspace/extensions/refresh')
             .set('Host', `127.0.0.1:${tokenOpts.port}`)
             .set('Authorization', 'Bearer secret')
-            .set('X-Qwen-Client-Id', 'client-1')
+            .set('X-HopCode-Client-Id', 'client-1')
             .send({}),
         ]);
         const releaseTimer = setTimeout(() => releaseInstall?.(), 100);
@@ -5625,7 +5625,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ source: 'owner/repo' });
 
       expect(res.status).toBe(400);
@@ -5647,7 +5647,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ source: 'owner/repo', ref: '', consent: true });
 
       expect(res.status).toBe(400);
@@ -5667,7 +5667,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ source: 'owner/repo', ref: 123, consent: true });
 
       expect(res.status).toBe(400);
@@ -5690,7 +5690,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ source: localExtensionDir, consent: true });
 
       expect(res.status).toBe(400);
@@ -5716,7 +5716,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source, consent: true });
 
         expect(res.status).toBe(400);
@@ -5740,7 +5740,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           source: 'http://169.254.169.254/latest/meta-data',
           consent: true,
@@ -5769,7 +5769,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({
             source,
             consent: true,
@@ -5801,7 +5801,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source, consent: true });
 
         expect(res.status).toBe(400);
@@ -5827,7 +5827,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ source, consent: true });
 
         expect(res.status).toBe(400);
@@ -5848,7 +5848,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           source: 'https://example.com/repo',
           ref: '--upload-pack=/bin/sh',
@@ -5872,7 +5872,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           source: 'https://user:pass@example.com/repo',
           consent: true,
@@ -5895,7 +5895,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ source: '@scope/ext', ref: 'v1', consent: true });
 
       expect(res.status).toBe(400);
@@ -5918,7 +5918,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           source: 'https://example.com/repo',
           registry: 'https://registry.example.com',
@@ -5945,7 +5945,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           source: '@scope/ext',
           registry: 'http://registry.example.com',
@@ -5969,7 +5969,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           source: '@scope/ext',
           registry: 'not a url',
@@ -5993,7 +5993,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           source: '@scope/ext',
           registry: 'https://169.254.169.254',
@@ -6017,7 +6017,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/install')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           source: '@scope/ext',
           registry: 'https://user:pass@registry.example.com',
@@ -6096,7 +6096,7 @@ describe('createServeApp', () => {
             .post('/workspace/extensions/install')
             .set('Host', `127.0.0.1:${tokenOpts.port}`)
             .set('Authorization', 'Bearer secret')
-            .set('X-Qwen-Client-Id', 'client-1')
+            .set('X-HopCode-Client-Id', 'client-1')
             .send({
               source: `https://example.com/${name}`,
               consent: true,
@@ -6110,7 +6110,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/check-updates')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({})
           .then((response) => response);
         await new Promise((resolve) => setTimeout(resolve, 20));
@@ -6152,7 +6152,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/test-ext/enable')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ scope: 'team' });
 
       expect(res.status).toBe(400);
@@ -6176,7 +6176,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/TEST-EXT/enable')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ scope: 'workspace' });
         expect(enable.status).toBe(202);
 
@@ -6184,7 +6184,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/TEST-EXT/disable')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ scope: 'user' });
         expect(disable.status).toBe(202);
 
@@ -6321,7 +6321,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/install')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({
             source: 'https://example.com/installed-ext',
             consent: true,
@@ -6336,7 +6336,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/refresh')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({})
           .then((response) => response);
         const res = await refresh;
@@ -6381,7 +6381,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/test-ext/enable')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ scope: 'workspace' });
         expect(enable.status).toBe(202);
         await vi.waitFor(() => {
@@ -6394,7 +6394,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/refresh')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({});
         const requestStarted = new Promise<void>((resolve) => {
           refreshRequest.on('request', () => resolve());
@@ -6432,7 +6432,7 @@ describe('createServeApp', () => {
         .post('/workspace/extensions/test-ext/update')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-2')
+        .set('X-HopCode-Client-Id', 'client-2')
         .send({});
 
       expect(res.status).toBe(400);
@@ -6520,7 +6520,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/test-ext/update')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({});
         expect(update.status).toBe(202);
 
@@ -6553,7 +6553,7 @@ describe('createServeApp', () => {
           )
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({ value: 'updated-secret' });
         expect(answer.status).toBe(200);
 
@@ -6596,7 +6596,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/missing-ext/update')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({});
 
         expect(res.status).toBe(202);
@@ -6632,7 +6632,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/test-ext/update')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({});
 
         expect(res.status).toBe(202);
@@ -6669,7 +6669,7 @@ describe('createServeApp', () => {
           .post('/workspace/extensions/test-ext/update')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({});
 
         expect(res.status).toBe(202);
@@ -6730,7 +6730,7 @@ describe('createServeApp', () => {
           .delete('/workspace/extensions/TEST-EXT')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1');
+          .set('X-HopCode-Client-Id', 'client-1');
 
         expect(res.status).toBe(202);
         await vi.waitFor(() => {
@@ -6769,7 +6769,7 @@ describe('createServeApp', () => {
           .delete('/workspace/extensions/https%3A%2F%2Fexample.com%2Ftest-ext')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1');
+          .set('X-HopCode-Client-Id', 'client-1');
 
         expect(res.status).toBe(202);
         await vi.waitFor(() => {
@@ -6815,7 +6815,7 @@ describe('createServeApp', () => {
           .delete('/workspace/extensions/plain-name')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1');
+          .set('X-HopCode-Client-Id', 'client-1');
 
         expect(res.status).toBe(202);
         await vi.waitFor(() => {
@@ -6855,7 +6855,7 @@ describe('createServeApp', () => {
           .delete('/workspace/extensions/https%3A%2F%2Fexample.com%2Fmissing')
           .set('Host', `127.0.0.1:${tokenOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('X-Qwen-Client-Id', 'client-1');
+          .set('X-HopCode-Client-Id', 'client-1');
 
         expect(res.status).toBe(202);
         await vi.waitFor(() => {
@@ -7397,7 +7397,7 @@ describe('createServeApp', () => {
       expect(bridge.continueSessionCalls).toEqual(['s-1']);
     });
 
-    it('forwards X-Qwen-Client-Id to continueSession', async () => {
+    it('forwards X-HopCode-Client-Id to continueSession', async () => {
       const bridge = fakeBridge({
         continueSessionImpl: async () => ({
           accepted: true,
@@ -7415,7 +7415,7 @@ describe('createServeApp', () => {
         .post('/session/s-1/continue')
         .set('Host', `127.0.0.1:${tokenOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-xyz');
+        .set('X-HopCode-Client-Id', 'client-xyz');
 
       expect(res.status).toBe(200);
       // The originator + a generated promptId must reach the bridge so the
@@ -7640,7 +7640,7 @@ describe('createServeApp', () => {
         .get('/session/s-1/pending-prompts')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'rogue');
+        .set('X-HopCode-Client-Id', 'rogue');
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('invalid_client_id');
     });
@@ -7701,7 +7701,7 @@ describe('createServeApp', () => {
         .delete('/session/s-1/pending-prompts/p-1')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'rogue');
+        .set('X-HopCode-Client-Id', 'rogue');
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('invalid_client_id');
     });
@@ -8813,7 +8813,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/prompt')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-stale')
+        .set('X-HopCode-Client-Id', 'client-stale')
         .send({ prompt: [{ type: 'text', text: 'hi' }] });
 
       expect(res.status).toBe(400);
@@ -11210,7 +11210,7 @@ describe('createServeApp', () => {
 
       const res = await auth(
         request(app).get('/session/session-A/artifacts'),
-      ).set('X-Qwen-Client-Id', 'client-1');
+      ).set('X-HopCode-Client-Id', 'client-1');
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
@@ -11249,7 +11249,7 @@ describe('createServeApp', () => {
       const app = createServeApp(tokenOpts, undefined, { bridge });
 
       const res = await auth(request(app).get('/session/ghost/artifacts')).set(
-        'X-Qwen-Client-Id',
+        'X-HopCode-Client-Id',
         'client-1',
       );
 
@@ -11292,7 +11292,7 @@ describe('createServeApp', () => {
       const app = createServeApp(tokenOpts, undefined, { bridge });
 
       const res = await auth(request(app).post('/session/session-A/artifacts'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({
           title: 'Lineage',
           url: 'https://example.com/lineage',
@@ -11337,7 +11337,7 @@ describe('createServeApp', () => {
       const app = createServeApp(tokenOpts, undefined, { bridge });
 
       const res = await auth(request(app).post('/session/session-A/artifacts'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ title: 'Bad link', url: 'javascript:alert(1)' });
 
       expect(res.status).toBe(400);
@@ -11383,7 +11383,7 @@ describe('createServeApp', () => {
 
       const res = await auth(
         request(app).delete('/session/session-A/artifacts/missing'),
-      ).set('X-Qwen-Client-Id', 'client-1');
+      ).set('X-HopCode-Client-Id', 'client-1');
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
@@ -11406,7 +11406,7 @@ describe('createServeApp', () => {
 
       const res = await auth(
         request(app).delete('/session/session-A/artifacts/artifact-1'),
-      ).set('X-Qwen-Client-Id', 'client-1');
+      ).set('X-HopCode-Client-Id', 'client-1');
 
       expect(res.status).toBe(200);
       expect(bridge.removeSessionArtifactCalls).toEqual([
@@ -11433,7 +11433,7 @@ describe('createServeApp', () => {
 
       const res = await auth(
         request(app).delete('/session/session-A/artifacts/artifact-1'),
-      ).set('X-Qwen-Client-Id', 'client-b');
+      ).set('X-HopCode-Client-Id', 'client-b');
 
       expect(res.status).toBe(403);
       expect(res.body).toEqual({
@@ -11624,7 +11624,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/generate')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .set('Accept', 'text/event-stream')
         .send({ prompt: 'Translate hello' });
 
@@ -11758,7 +11758,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/btw')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ question: '  what now?  ' });
 
       expect(res.status).toBe(200);
@@ -11802,7 +11802,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/btw')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'bad client id')
+        .set('X-HopCode-Client-Id', 'bad client id')
         .send({ question: 'what now?' });
 
       expect(res.status).toBe(400);
@@ -12144,7 +12144,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/session/session-A/fork')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ directive: 'review the current code' });
 
       expect(res.status).toBe(202);
@@ -12661,7 +12661,7 @@ describe('createServeApp', () => {
         );
 
         const res = await auth(request(app).post('/workspace/reload'))
-          .set('X-Qwen-Client-Id', 'client-1')
+          .set('X-HopCode-Client-Id', 'client-1')
           .send({});
         expect(res.status).toBe(200);
         expect(reload).toHaveBeenCalledWith(
@@ -13473,7 +13473,7 @@ describe('createServeApp', () => {
       const res = await request(app)
         .post('/workspace/trust/request')
         .set('Host', `127.0.0.1:${baseOpts.port}`)
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ desiredState: 'untrusted' });
 
       expect(res.status).toBe(401);
@@ -13499,7 +13499,7 @@ describe('createServeApp', () => {
       });
 
       const res = await auth(request(app).post('/workspace/trust/request'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ desiredState: 'untrusted', reason: 'remote user request' });
 
       expect(res.status).toBe(202);
@@ -13543,7 +13543,7 @@ describe('createServeApp', () => {
       });
 
       const res = await auth(request(app).post('/workspace/trust/request'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ desiredState: 'trusted' });
 
       expect(res.status).toBe(409);
@@ -13564,13 +13564,13 @@ describe('createServeApp', () => {
       });
 
       const invalid = await auth(request(app).post('/workspace/trust/request'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ desiredState: 'maybe' });
       expect(invalid.status).toBe(400);
       expect(invalid.body.code).toBe('invalid_desired_state');
 
       const overlong = await auth(request(app).post('/workspace/trust/request'))
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .send({ desiredState: 'trusted', reason: 'x'.repeat(1025) });
       expect(overlong.status).toBe(400);
       expect(overlong.body.code).toBe('invalid_reason');
@@ -13833,7 +13833,7 @@ describe('createServeApp', () => {
       });
     });
 
-    it('400 fresh add requires X-Qwen-Client-Id', async () => {
+    it('400 fresh add requires X-HopCode-Client-Id', async () => {
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(request(app).post('/workspace/mcp/servers')).send({
@@ -14049,7 +14049,7 @@ describe('createServeApp', () => {
       });
     });
 
-    it('400 remove requires X-Qwen-Client-Id', async () => {
+    it('400 remove requires X-HopCode-Client-Id', async () => {
       const bridge = fakeBridge();
       const app = createServeApp(tokenOpts, undefined, { bridge });
       const res = await auth(
@@ -14440,7 +14440,7 @@ describe('createServeApp', () => {
       const res = await auth(
         request(app).post('/workspace/skills/review/enable'),
       )
-        .set('X-Qwen-Client-Id', 'forged-client')
+        .set('X-HopCode-Client-Id', 'forged-client')
         .send({ enabled: false });
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('invalid_client_id');
@@ -18086,7 +18086,7 @@ describe('createServeApp', () => {
         const secondWebhook = await request(rateLimited)
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('X-Qwen-Client-Id', 'rotated-client')
+          .set('X-HopCode-Client-Id', 'rotated-client')
           .set('x-qwen-webhook-secret', 'secret-value')
           .send({
             eventType: 'ci_failed',

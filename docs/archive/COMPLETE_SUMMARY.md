@@ -134,14 +134,14 @@ Display:     'Inter', SemiBold (600)
 | ----------------- | ------------- | ----------------- | ------ |
 | **Project Name**  | HopCode       | HopCode           | ✅     |
 | **NPM Scope**     | @hoptrendy/\* | @hoptrendy/\*     | ✅     |
-| **CLI Command**   | qwen          | hopcode           | ✅     |
+| **CLI Command**   | hopcode          | hopcode           | ✅     |
 | **Config Dir**    | .hopcode/     | .hopcode/         | ✅     |
 | **Env Vars**      | QWEN*CODE*\*  | HOPCODE\_\*       | ✅     |
 | **CSS Classes**   | .hopcode-\*   | .hopcode-\*       | ✅     |
 | **CSS Variables** | --app-qwen-\* | --app-hopcode-\*  | ✅     |
 | **VS Code Ext**   | hopcode-\*    | hopcode-\*        | ✅     |
 | **Zed Ext**       | hopcode       | hopcode           | ✅     |
-| **Copyright**     | 2025 Qwen     | 2026 HopCode Team | ✅     |
+| **Copyright**     | 2025 hopcode     | 2026 HopCode Team | ✅     |
 
 ### Verified Changes
 

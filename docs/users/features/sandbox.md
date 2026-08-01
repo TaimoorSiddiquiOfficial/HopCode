@@ -111,7 +111,7 @@ hopcode -p "run the test suite"
 
 `settings.env.QWEN_SANDBOX_IMAGE` also works as a generic env injection mechanism, but `tools.sandboxImage` is the preferred persistent setting.
 
-Custom images are user-managed. Rebuild them with an up-to-date Qwen Code installation to receive the safe update handoff; older images may still use their original in-process updater.
+Custom images are user-managed. Rebuild them with an up-to-date HopCode installation to receive the safe update handoff; older images may still use their original in-process updater.
 
 ### macOS Seatbelt profiles
 
@@ -132,7 +132,7 @@ Built-in profiles (set via `SEATBELT_PROFILE` env var):
 
 To use a custom Seatbelt profile:
 
-1. Create a file named `.qwen/sandbox-macos-<profile_name>.sb` in your project.
+1. Create a file named `.hopcode/sandbox-macos-<profile_name>.sb` in your project.
 2. Set `SEATBELT_PROFILE=<profile_name>`.
 
 ### Custom Sandbox Flags

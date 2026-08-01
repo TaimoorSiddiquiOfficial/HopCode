@@ -199,7 +199,7 @@ registry. Clients **must** gate UI off `features`, not off `mode` (per design
 
 `session_scope_override` is the negotiation handle for the per-request `sessionScope` field on `POST /session` (see below). Older daemons silently ignore the field, so SDK clients should pre-flight `caps.features` for this tag before sending it.
 
-`persistent_workspace_registration` advertises durable registration for workspaces added at runtime. `POST /workspaces` accepts `{ "cwd": "/absolute/path", "persist": true }`; success includes `persisted: true`. Registrations are scoped to the daemon's canonical primary workspace under the user's Qwen home and are restored on the next daemon start. Omitting `persist` preserves process-local registration. `GET /workspace-registrations` lists the stored desired set, and `DELETE /workspace-registrations/:id` forgets an entry for the next restart without hot-removing an active runtime.
+`persistent_workspace_registration` advertises durable registration for workspaces added at runtime. `POST /workspaces` accepts `{ "cwd": "/absolute/path", "persist": true }`; success includes `persisted: true`. Registrations are scoped to the daemon's canonical primary workspace under the user's hopcode home and are restored on the next daemon start. Omitting `persist` preserves process-local registration. `GET /workspace-registrations` lists the stored desired set, and `DELETE /workspace-registrations/:id` forgets an entry for the next restart without hot-removing an active runtime.
 
 `workspace_runtime_removal` advertises synchronous hot removal through `DELETE /workspaces/:workspace`. Capability workspace entries add optional `removable`; only rows with `removable: true` may be removed. Removal also forgets every persistent registration alias for the runtime, but never deletes files, settings, transcripts, or archives.
 
@@ -608,7 +608,7 @@ not the channel-adapter worker. Daemon-managed channels use
 and then exits, `/daemon/status` keeps the daemon online and reports warning
 issue code `channel_worker_exited`.
 
-Daemon-managed channel worker startup remains fail-fast: if `qwen serve
+Daemon-managed channel worker startup remains fail-fast: if `hopcode serve
 --channel ...` cannot start a worker that reaches ready, serve startup fails.
 After a worker has reached ready, unexpected exits are restarted by the serve
 supervisor within a bounded policy: up to 3 restart attempts in a 5 minute
@@ -723,7 +723,7 @@ trusted `workspaceCwd` of the attempted worker. These fields describe the
 failed transaction, while `state` describes the current state after rollback;
 a later GET does not retain the failed attempt. A partially connected worker
 instead returns success and exposes its failures in the worker snapshot. Boot-
-time all-failure still aborts `qwen serve` before a queryable daemon exists.
+time all-failure still aborts `hopcode serve` before a queryable daemon exists.
 
 `qwen channel status` without `--daemon-url` continues to read pidfile metadata;
 with `--daemon-url` it reads `GET /workspace/channel`. During a restart
@@ -1063,7 +1063,7 @@ Recommended poll cadence: aligned with whatever already polls `/workspace/mcp`; 
       "level": "project",
       "modelInvocable": true,
       "userInvocable": false,
-      "installedPath": "/home/alice/project/.qwen/skills/review/SKILL.md",
+      "installedPath": "/home/alice/project/.hopcode/skills/review/SKILL.md",
       "argumentHint": "[path]"
     }
   ]
@@ -2499,7 +2499,7 @@ The SSE-level `id:` / `event:` lines duplicate `envelope.id` / `envelope.type` f
 
 Reconnect semantics:
 
-- Send `Last-Event-ID: <n>` to replay events with `id > n` from the per-session ring (default depth **8000**, tunable via `qwen serve --event-ring-size <n>`).
+- Send `Last-Event-ID: <n>` to replay events with `id > n` from the per-session ring (default depth **8000**, tunable via `hopcode serve --event-ring-size <n>`).
 - **Gap detection:** if `<n>` predates the oldest event still in the ring, the daemon emits an id-less `state_resync_required` frame before replaying the surviving suffix. The SDK latches `awaitingResync`; clients should call `POST /session/:id/load` and rebuild from the current bounded replay snapshot window. That snapshot may itself start with `history_truncated` when older in-memory replay entries were dropped; this marker is informational and must not start another resync loop.
 - IDs are monotonic per session, starting at 1
 - Synthetic frames (`client_evicted`, `slow_client_warning`, `stream_error`) intentionally omit `id` so they don't burn a sequence slot for other subscribers

@@ -306,7 +306,7 @@ hopcode migrate
 # 1. Backup ~/.hopcode/ → ~/.hopcode.backup/
 # 2. Copy ~/.hopcode/ → ~/.hopcode/
 # 3. Update settings.json with new paths
-# 4. Create alias: qwen → hopcode (optional)
+# 4. Create alias: hopcode → hopcode (optional)
 # 5. Provide rollback instructions
 ```
 

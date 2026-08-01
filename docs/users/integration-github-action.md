@@ -112,7 +112,7 @@ This type of action can be used to invoke a general-purpose, conversational HopC
 
 <!-- BEGIN_AUTOGEN_INPUTS -->
 
-- <a name="__input_HOPCODE_API_KEY"></a><a href="#user-content-__input_HOPCODE_API_KEY"><code>hopcode_api_key</code></a>: \*(Optional)\_ The API key for the Qwen API.
+- <a name="__input_HOPCODE_API_KEY"></a><a href="#user-content-__input_HOPCODE_API_KEY"><code>hopcode_api_key</code></a>: \*(Optional)\_ The API key for the hopcode API.
 
 - <a name="__input_hopcode_cli_version"></a><a href="#user-content-__input_hopcode_cli_version"><code>hopcode_cli_version</code></a>: \*(Optional, default: `latest`)\_ The version of the HopCode CLI to install. Can be "latest", "preview", "nightly", a specific version number, or a git branch, tag, or commit. For more information, see [HopCode CLI releases](https://github.com/TaimoorSiddiquiOfficial/HopCode/blob/main/docs/releases.md).
 
@@ -175,7 +175,7 @@ You can set the following secrets in your repository:
 
 | Name              | Description                                   | Required | When Required                              |
 | ----------------- | --------------------------------------------- | -------- | ------------------------------------------ |
-| `HOPCODE_API_KEY` | Your Qwen API key from DashScope.             | Yes      | Required for all workflows that call Qwen. |
+| `HOPCODE_API_KEY` | Your hopcode API key from DashScope.             | Yes      | Required for all workflows that call Qwen. |
 | `APP_PRIVATE_KEY` | Private key for your GitHub App (PEM format). | No       | Using a custom GitHub App.                 |
 
 To add a secret:
@@ -199,7 +199,7 @@ You can authenticate with GitHub in two ways:
 2. **Custom GitHub App (Recommended):** For the most secure and flexible
    authentication, we recommend creating a custom GitHub App.
 
-For detailed setup instructions for both Qwen and GitHub authentication, go to the
+For detailed setup instructions for both hopcode and GitHub authentication, go to the
 [**Authentication documentation**](./configuration/auth).
 
 ## Extensions

@@ -7728,7 +7728,7 @@ describe('createAcpSessionBridge', () => {
     it('applies modelServiceId via unstable_setSessionModel after newSession', async () => {
       const { bridge, setModelCalls } = setup({
         setModelResult: {
-          _meta: { qwenModelSwitch: { modelId: 'qwen3-coder-canonical' } },
+          _meta: { hopcodeModelSwitch: { modelId: 'qwen3-coder-canonical' } },
         },
       });
       const session = await bridge.spawnOrAttach({
@@ -9312,7 +9312,7 @@ describe('createAcpSessionBridge', () => {
 
     it('publishes a model_switched event on success', async () => {
       const { bridge, session } = await setup({
-        _meta: { qwenModelSwitch: { modelId: 'qwen3-coder' } },
+        _meta: { hopcodeModelSwitch: { modelId: 'qwen3-coder' } },
       });
       const abort = new AbortController();
       const iter = bridge.subscribeEvents(session.sessionId, {

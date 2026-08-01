@@ -236,7 +236,7 @@ describe('POST /workspace/setup-github', () => {
       .post('/workspace/setup-github')
       .set('Host', loopbackHost())
       .set('Authorization', 'Bearer secret')
-      .set('X-Qwen-Client-Id', 'client-1')
+      .set('X-HopCode-Client-Id', 'client-1')
       .send({ consent: true });
 
     expect(res.status).toBe(200);

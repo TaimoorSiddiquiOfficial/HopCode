@@ -1,6 +1,6 @@
 # call_llm
 
-`call_llm` asks the configured Qwen backend for a focused completion from inside a session tool flow.
+`call_llm` asks the configured hopcode backend for a focused completion from inside a session tool flow.
 
 ## Parameters
 
@@ -8,7 +8,7 @@
 |------|------|-------------|
 | `prompt` | string | Instructions for the model |
 | `attachments` | array | Optional files on disk |
-| `model` | string | Optional Qwen model ID or short name |
+| `model` | string | Optional hopcode model ID or short name |
 | `systemPrompt` | string | Optional system prompt |
 | `maxTokens` | number | Maximum output tokens |
 | `temperature` | number | Sampling temperature |

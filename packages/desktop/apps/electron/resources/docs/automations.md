@@ -116,7 +116,7 @@ Send a prompt to HopCode (creates a new session for scheduled prompts).
 - Use `@mentions` to reference sources or skills
 - Environment variables are expanded (e.g., `$CRAFT_LABEL`)
 
-**LLM Connection & Model:** Optionally specify the Qwen connection and model to use for the created session. If omitted, the workspace default connection and model are used.
+**LLM Connection & Model:** Optionally specify the hopcode connection and model to use for the created session. If omitted, the workspace default connection and model are used.
 
 ```json
 {

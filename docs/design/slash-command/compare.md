@@ -1,4 +1,4 @@
-﻿# HopCode Command 模块重构方案
+# HopCode Command 模块重构方案
 
 ## 1. 目标定义
 
@@ -63,7 +63,7 @@ HopCode 现有 command 系统的问题，不是完全没有能力，而是：
 3. 模式一致性对齐
 4. 内部实现简洁
 
-### 3.2 保留 Qwen 的统一 outcome 模型
+### 3.2 保留 hopcode 的统一 outcome 模型
 
 不建议机械复制 Claude 的执行实现。
 

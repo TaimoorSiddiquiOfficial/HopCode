@@ -1,4 +1,4 @@
-# Qwen Cua Driver
+# hopcode Cua Driver
 
 Cross-platform background computer-use driver for AI agents. Speaks MCP over stdio; drives native apps without stealing focus.
 
@@ -64,7 +64,7 @@ qwen-cua-driver list-tools
 
 ## MCP Configuration
 
-### Qwen Code
+### HopCode
 
 ```bash
 qwen mcp add --transport stdio cua-driver -- qwen-cua-driver mcp
@@ -76,7 +76,7 @@ With relative-coordinate normalization (recommended for Qwen-VL models):
 qwen mcp add-json --scope user cua-computer-use '{"command":"qwen-cua-driver","args":["mcp"],"env":{"CUA_DRIVER_RS_COORDINATE_SPACE":"1"}}'
 ```
 
-Or add to `.qwen/settings.json`:
+Or add to `.hopcode/settings.json`:
 
 ```json
 {

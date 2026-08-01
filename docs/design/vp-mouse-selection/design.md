@@ -218,7 +218,7 @@ PR 2 (follow-up) — cross-screen selection and semantic copy fidelity, as descr
 - **Unit** — coordinate mapping (wide chars, scroll offset, frame anchor); `selection-text.ts` visual extraction; mouse arbitration.
 - **Snapshot** — `getSelectedText` (visual) over markdown, a diff, a table, and tool output, asserting extracted text matches the _visible_ text.
 - **Patch guard** — asserts the exposed frame's shape/dimensions so an Ink upgrade breaks loudly.
-- **E2E** — interactive tmux harness: drag-select across wrapped visual lines and multiple items, confirm clipboard/OSC 52 payload. Follows the `.qwen/e2e-tests/` workflow.
+- **E2E** — interactive tmux harness: drag-select across wrapped visual lines and multiple items, confirm clipboard/OSC 52 payload. Follows the `.hopcode/e2e-tests/` workflow.
 
 ## Rollout
 

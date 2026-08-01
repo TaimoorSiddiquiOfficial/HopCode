@@ -29,7 +29,7 @@ The assembly order is part of the daemon contract and must stay visually auditab
 
 `server/serve-features.ts` owns the language-code list, voice transcription capability cache, and advertised feature envelope input construction. Its cache invalidation function is still called by workspace settings reload/change paths.
 
-`server/device-flow-registry.ts` owns default Qwen OAuth provider registration, event sink wiring, audit stderr breadcrumbs, and `app.locals` registry installation.
+`server/device-flow-registry.ts` owns default hopcode OAuth provider registration, event sink wiring, audit stderr breadcrumbs, and `app.locals` registry installation.
 
 `routes/capabilities.ts` owns `GET /capabilities`.
 

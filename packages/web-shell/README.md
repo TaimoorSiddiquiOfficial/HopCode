@@ -239,7 +239,7 @@ renderer 不会自己读取 URL 或本地路径。
 提供对应 skill，并且只在确认当前 Web Shell 宿主已经注册 renderer 时启用。
 `@hoptrendy/web-shell` 不内置或自动加载这个 skill；可从
 `packages/web-shell/docs/examples/qwencode-viz/SKILL.md` 复制模板到宿主的
-`.qwen/skills/qwencode-viz/SKILL.md`，或通过宿主自己的 skill 注入机制提供等价
+`.hopcode/skills/qwencode-viz/SKILL.md`，或通过宿主自己的 skill 注入机制提供等价
 说明。
 
 `echarts-fulldata` 的 block body 可以是旧版纯 JSON ECharts option，也可以是
@@ -275,7 +275,7 @@ normalize 成原生 ECharts option，并注入 `option.dataset`，再渲染图�
 | ---------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `/help`          | 本地实现            | 打开帮助弹窗，支持键盘浏览命令和快捷键。                                                                                |
 | `/theme`         | 本地实现            | 打开主题选择弹窗；支持 `/theme light`、`/theme dark`。                                                                  |
-| `/settings`      | 本地实现            | 打开设置面板，管理工作区与用户级（`~/.qwen/settings.json`）配置；两个作用域均可编辑并写回对应的 settings.json。         |
+| `/settings`      | 本地实现            | 打开设置面板，管理工作区与用户级（`~/.hopcode/settings.json`）配置；两个作用域均可编辑并写回对应的 settings.json。         |
 | `/language`      | 本地实现 + ACP 透传 | `/language ui <lang>` 会切换 web-shell UI 语言并同步给 daemon；其他语言能力由 daemon 执行。包含 `ui`、`output` 子命令。 |
 | `/model`         | 本地实现 + 部分透传 | 无参数打开模型弹窗；普通参数直接切换模型；`/model --fast <model>` 透传给 daemon。                                       |
 | `/plan`          | 本地实现            | 切换到 `plan` approval mode，并可继续发送后续 prompt。                                                                  |

@@ -66,7 +66,7 @@ Chunks containing only `role` metadata or only `usageMetadata` (final usage-summ
 
 **Why not "first stream event of any kind" (claude-code's choice)**: claude-code measures TTFT at `message_start`, an Anthropic-specific metadata event that fires 50–300ms before any actual content. Their internal `headlessProfiler.ts` already separates `time_to_first_response_ms` for the "user saw something" semantic, acknowledging the distinction. hopcode spans multiple providers (Anthropic, OpenAI, Gemini, Qwen) — picking the metadata-event semantic means TTFT for Anthropic is fundamentally different from TTFT for OpenAI (which has no analogous metadata-only first event). The user-visible-content semantic is uniform across all 4 providers and matches "time-to-first-token" literally.
 
-**Why include `thought` / reasoning**: from the operator's perspective, reasoning chunks are still "the model produced output." Excluding them would understate TTFT for reasoning-heavy models (o1, Qwen thinking variants). Future split into `ttft_to_reasoning_ms` vs `ttft_to_answer_ms` is possible; not Phase 4.
+**Why include `thought` / reasoning**: from the operator's perspective, reasoning chunks are still "the model produced output." Excluding them would understate TTFT for reasoning-heavy models (o1, hopcode thinking variants). Future split into `ttft_to_reasoning_ms` vs `ttft_to_answer_ms` is possible; not Phase 4.
 
 **Why include tool-call-only chunks**: agent tool-decision LLM calls (one `tool_use`, no text) are common in hopcode's workflow. Excluding them means TTFT is undefined for these requests. The `functionCall` Part is meaningful output.
 

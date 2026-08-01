@@ -4,7 +4,7 @@
 
 `WorkspaceMcpBudget` (`packages/core/src/tools/mcp-workspace-budget.ts`) is the workspace-scoped MCP client budget controller from F2 (#4175 commit 6). It owns the same state machine `McpClientManager` carries inline (slot reservation, 75% hysteresis warning, refused-batch coalescing across a `discoverAllMcpTools*` pass), but lives **once per workspace** inside `McpTransportPool` instead of once per session inside each ACP child's manager. The pool delegates `acquire` and `release` calls here so the cap applies to the **workspace**, not each session.
 
-The legacy `McpClientManager` budget machinery stays for standalone qwen and SDK MCP servers (which bypass the pool per commit 4 fix). Pool mode → `WorkspaceMcpBudget` enforces; standalone / SDK MCP → manager's inline machinery enforces. No double counting because pool-mode discovery never calls the manager's `tryReserveSlot`.
+The legacy `McpClientManager` budget machinery stays for standalone hopcode and SDK MCP servers (which bypass the pool per commit 4 fix). Pool mode → `WorkspaceMcpBudget` enforces; standalone / SDK MCP → manager's inline machinery enforces. No double counting because pool-mode discovery never calls the manager's `tryReserveSlot`.
 
 ## Responsibilities
 

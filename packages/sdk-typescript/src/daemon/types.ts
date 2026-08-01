@@ -422,7 +422,7 @@ export interface DaemonStatusReport {
       processStartedAt: string;
       listenerReadyAt?: string;
       processToListenMs?: number;
-      runQwenServeToListenMs?: number;
+      runHopCodeServeToListenMs?: number;
       preheat: { status: string; durationMs?: number; error?: string };
     };
     qwenCodeVersion?: string;

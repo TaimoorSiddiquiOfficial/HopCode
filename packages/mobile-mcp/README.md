@@ -12,7 +12,7 @@ Based on [mobile-next/mobile-mcp](https://github.com/mobile-next/mobile-mcp) v0.
 
 ### 1. Opt-in 0-1000 relative coordinate mode
 
-Mirrors the [cua-driver relative coordinate shim](../cua-driver/docs/relative-coordinates-design.md) for mobile. When enabled, all coordinate inputs/outputs are normalized to a 0-1000 scale, matching the Qwen VL model's `computer_use` / `mobile_use` coordinate convention.
+Mirrors the [cua-driver relative coordinate shim](../cua-driver/docs/relative-coordinates-design.md) for mobile. When enabled, all coordinate inputs/outputs are normalized to a 0-1000 scale, matching the hopcode VL model's `computer_use` / `mobile_use` coordinate convention.
 
 **Environment variables:**
 

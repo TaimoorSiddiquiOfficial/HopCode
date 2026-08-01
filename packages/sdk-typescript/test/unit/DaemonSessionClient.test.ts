@@ -527,7 +527,7 @@ describe('DaemonSessionClient', () => {
       mutationResult,
     );
 
-    expect(calls.map((call) => call.headers['x-qwen-client-id'])).toEqual([
+    expect(calls.map((call) => call.headers['X-HopCode-Client-Id'])).toEqual([
       'client-1',
       'client-1',
       'client-1',
@@ -593,7 +593,7 @@ describe('DaemonSessionClient', () => {
 
     expect(events).toHaveLength(1);
     expect(calls[0]?.url).toBe('http://daemon/session/s-1/generate');
-    expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+    expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
   });
 
   it('forwards pending prompt list requests with encoded session id and clientId', async () => {
@@ -634,7 +634,7 @@ describe('DaemonSessionClient', () => {
       'http://daemon/session/session%20with%2Fslash/pending-prompts',
     );
     expect(calls[0]?.method).toBe('GET');
-    expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+    expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
   });
 
   it('forwards pending prompt removals with encoded ids and clientId', async () => {
@@ -659,7 +659,7 @@ describe('DaemonSessionClient', () => {
       'http://daemon/session/session%20with%2Fslash/pending-prompts/prompt%20with%2Fslash',
     );
     expect(calls[0]?.method).toBe('DELETE');
-    expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+    expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
   });
 
   it('maps pending prompt HTTP failures through DaemonClient errors', async () => {
@@ -1612,12 +1612,12 @@ describe('DaemonSessionClient clientId self-heal', () => {
     const promptRequests = calls.filter((c) =>
       c.url.endsWith('/session/s-1/prompt'),
     );
-    expect(promptRequests[0]?.headers['x-qwen-client-id']).toBe('client-1');
-    expect(promptRequests[1]?.headers['x-qwen-client-id']).toBe('client-2');
+    expect(promptRequests[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
+    expect(promptRequests[1]?.headers['X-HopCode-Client-Id']).toBe('client-2');
     expect(session.clientId).toBe('client-2');
     // resume re-registers without sending the stale clientId.
     const resumeReq = calls.find((c) => c.url.endsWith('/session/s-1/resume'));
-    expect(resumeReq?.headers['x-qwen-client-id']).toBeUndefined();
+    expect(resumeReq?.headers['X-HopCode-Client-Id']).toBeUndefined();
     expect(resumeReq?.body).toBe(JSON.stringify({ cwd: '/work/a' }));
   });
 
@@ -1682,7 +1682,7 @@ describe('DaemonSessionClient clientId self-heal', () => {
     const promptRequests = calls.filter((c) =>
       c.url.endsWith('/session/s-1/prompt'),
     );
-    expect(promptRequests[1]?.headers['x-qwen-client-id']).toBe('client-2');
+    expect(promptRequests[1]?.headers['X-HopCode-Client-Id']).toBe('client-2');
 
     eventsController?.close();
     eventsAbort.abort();

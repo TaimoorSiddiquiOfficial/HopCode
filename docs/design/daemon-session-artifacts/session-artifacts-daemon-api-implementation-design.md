@@ -687,7 +687,7 @@ artifacts: [
 
 保留现有 `llmContent`、`returnDisplay`、`resultFilePaths`，保证兼容。
 
-`ArtifactTool` 当前 local publisher 可能把内容写入 qwen home 下的托管目录，并返回 `file://` 或远端 URL。Daemon artifact API 不应把 qwen home 本机绝对路径作为 `workspacePath` 暴露；应使用：
+`ArtifactTool` 当前 local publisher 可能把内容写入 hopcode home 下的托管目录，并返回 `file://` 或远端 URL。Daemon artifact API 不应把 hopcode home 本机绝对路径作为 `workspacePath` 暴露；应使用：
 
 - `storage: 'published'`
 - `url`: 已发布的可打开 URL，也是 published artifact 的 primary locator
@@ -995,7 +995,7 @@ V1 的 store 是 live bridge session 内存索引：
   - 扩展 `ToolResult.artifacts?`。
 - `packages/core/src/tools/artifact/artifact-tool.ts`
   - 成功 publish 后填充 `artifacts`。
-  - 使用 `storage: 'published'`，不把 qwen home 本机路径作为 `workspacePath` 暴露。
+  - 使用 `storage: 'published'`，不把 hopcode home 本机路径作为 `workspacePath` 暴露。
 
 Phase A 先接入 `ToolResult.artifacts` 和 `ArtifactTool`；`record_artifact` 在 Phase D 接入，但仍属于同一个 V1 完整能力。
 
@@ -1314,7 +1314,7 @@ V1 提供 hook artifacts 后，extension 可在 `qwen-extension.json` 或 `hooks
 
 - `ToolResult.artifacts` 类型编译。
 - `ArtifactTool` 成功返回 `storage: 'published'` 的 html artifact。
-- `ArtifactTool` 不把 qwen home 本机绝对路径作为 `workspacePath` 暴露。
+- `ArtifactTool` 不把 hopcode home 本机绝对路径作为 `workspacePath` 暴露。
 - `ToolArtifact.kind` / `storage` 默认推断规则有单测覆盖。
 
 命令：

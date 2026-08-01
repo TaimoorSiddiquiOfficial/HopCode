@@ -1,4 +1,4 @@
-﻿# Automation and Triage Processes
+# Automation and Triage Processes
 
 This document provides a detailed overview of the automated processes we use to manage and triage issues and pull requests. Our goal is to provide prompt feedback and ensure that contributions are reviewed and integrated efficiently. Understanding this automation will help you as a contributor know what to expect and how to best interact with our repository bots.
 
@@ -19,7 +19,7 @@ This is the first bot you will interact with when you create an issue. Its job i
 - **Workflow File**: `.github/workflows/hopcode-automated-issue-triage.yml`
 - **When it runs**: Immediately after an issue is created or reopened.
 - **What it does**:
-  - It uses a Qwen model to analyze the issue's title and body against a detailed set of guidelines.
+  - It uses a hopcode model to analyze the issue's title and body against a detailed set of guidelines.
   - **Applies one `area/*` label**: Categorizes the issue into a functional area of the project (e.g., `area/ux`, `area/models`, `area/platform`).
   - **Applies one `kind/*` label**: Identifies the type of issue (e.g., `kind/bug`, `kind/enhancement`, `kind/question`).
   - **Applies one `priority/*` label**: Assigns a priority from P0 (critical) to P3 (low) based on the described impact.

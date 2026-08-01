@@ -34,7 +34,7 @@ the store.
 The layout is:
 
 ```text
-~/.qwen/
+~/.hopcode/
 ├── extensions/
 └── extension-store/
     ├── lock

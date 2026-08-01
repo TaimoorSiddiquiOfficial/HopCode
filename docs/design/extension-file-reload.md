@@ -43,7 +43,7 @@ rebuilt from one coherent snapshot.
 - `SettingsWatcher` and existing MCP/LSP watchers do not cover installed
   extension package content. Extension-specific files need their own watcher.
 - Linked extensions can live outside the user extension directory, so watching
-  only `~/.qwen/extensions` misses active development workflows.
+  only `~/.hopcode/extensions` misses active development workflows.
 
 ## Goals
 
@@ -181,7 +181,7 @@ watchFs(roots, {
 });
 ```
 
-`followSymlinks: false` keeps an extension from causing Qwen to watch arbitrary
+`followSymlinks: false` keeps an extension from causing hopcode to watch arbitrary
 external paths through symlinks. The ignore filter skips `node_modules`, `.git`,
 common editor backup files, swap files, temporary files, and `.DS_Store`.
 

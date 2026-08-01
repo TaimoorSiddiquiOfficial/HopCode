@@ -34,7 +34,7 @@
 - ✅ Fixed `hopcodeClient` → `qwenClient` (in qwenContentGenerator.ts)
 - ✅ Fixed `hopcodeIgnoreFilter` → `hopcodeignoreFilter` (in fileDiscoveryService.ts)
 - ✅ Fixed `hopcodeDir` → `hopcodeDir` (in logger.ts)
-- These refer to actual Qwen API services and file structures
+- These refer to actual hopcode API services and file structures
 
 **Key Principle Applied:**
 

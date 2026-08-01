@@ -42,7 +42,7 @@ Each time the job fires, HopCode runs `/review-pr 1234` as if you had typed it.
 
 ### Autonomous mode
 
-Running `/loop` with **no prompt** starts an autonomous loop instead of repeating a fixed prompt. Qwen Code acts as a steward of the work already established in the conversation — it keeps your work moving while you're away:
+Running `/loop` with **no prompt** starts an autonomous loop instead of repeating a fixed prompt. HopCode acts as a steward of the work already established in the conversation — it keeps your work moving while you're away:
 
 ```text
 /loop

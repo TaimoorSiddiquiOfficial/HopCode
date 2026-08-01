@@ -149,7 +149,7 @@ export function registerSseEventsRoutes(
 
     if (daemonLog) {
       const sseOpenedAt = Date.now();
-      const sseClientId = req.headers['x-qwen-client-id'] as string | undefined;
+      const sseClientId = req.headers['X-HopCode-Client-Id'] as string | undefined;
       daemonLog.info('SSE stream opened', { sessionId, clientId: sseClientId });
       res.on('close', () => {
         try {

@@ -79,7 +79,7 @@ Use this procedure before every `hopcode extensions link` or re-link attempt.
    `hopcode extensions link`. Do not run the command while expecting to pause at
    the prompt.
 5. If the user approves and the extension has no `settings`, run
-   `printf 'y\n' | qwen extensions link "$extension_path"`.
+   `printf 'y\n' | hopcode extensions link "$extension_path"`.
 6. If `settings` are present, do not pipe approval; resolve `extension_path` to
    an absolute path and ask the user to run
    `hopcode extensions link "<absolute-extension-path>"` in an interactive terminal

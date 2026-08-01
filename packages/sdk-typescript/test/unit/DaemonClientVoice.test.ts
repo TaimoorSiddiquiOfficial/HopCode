@@ -95,7 +95,7 @@ describe('DaemonClient voice helpers', () => {
     expect(calls[0]?.url).toBe('http://daemon/workspace/voice');
     expect(calls[0]?.method).toBe('POST');
     expect(calls[0]?.headers['content-type']).toBe('application/json');
-    expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+    expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
     expect(JSON.parse(String(calls[0]?.body))).toEqual({
       enabled: true,
       mode: 'tap',
@@ -127,7 +127,7 @@ describe('DaemonClient voice helpers', () => {
     );
     expect(calls[0]?.method).toBe('POST');
     expect(calls[0]?.headers['content-type']).toBe('audio/wav');
-    expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+    expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
     expect(calls[0]?.body).toBe(audio);
   });
 
@@ -172,9 +172,9 @@ describe('DaemonClient voice helpers', () => {
       'http://daemon/workspaces/%2Fwork%20with%20space/voice',
       'http://daemon/workspaces/%2Fwork%20with%20space/voice/transcribe?voiceModel=qwen3+asr',
     ]);
-    expect(calls[1]?.headers['x-qwen-client-id']).toBe('client-2');
+    expect(calls[1]?.headers['X-HopCode-Client-Id']).toBe('client-2');
     expect(calls[2]?.headers['content-type']).toBe('audio/wav');
-    expect(calls[2]?.headers['x-qwen-client-id']).toBe('client-3');
+    expect(calls[2]?.headers['X-HopCode-Client-Id']).toBe('client-3');
   });
 
   it('applies a custom timeout to qualified Voice transcription', async () => {

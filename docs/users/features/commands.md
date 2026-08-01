@@ -100,7 +100,7 @@ Commands for managing AI tools and models.
 | `/remember`       | Save a durable memory                                                                 | `/remember Prefer terse responses`                                                                        |
 | `/forget`         | Remove matching entries from auto-memory                                              | `/forget <query>`                                                                                         |
 | `/dream`          | Manually run auto-memory consolidation                                                | `/dream`                                                                                                  |
-| `/hooks`          | Manage Qwen Code hooks                                                                | `/hooks`, `/hooks list`                                                                                   |
+| `/hooks`          | Manage HopCode hooks                                                                | `/hooks`, `/hooks list`                                                                                   |
 | `/reload-plugins` | Reload extension changes (commands, skills, agents, hooks, MCP/LSP servers) from disk | `/reload-plugins`                                                                                         |
 | `/permissions`    | Manage permission rules                                                               | `/permissions`                                                                                            |
 | `/agents`         | Manage subagents                                                                      | `/agents manage`, `/agents create`                                                                        |
@@ -113,7 +113,7 @@ Commands for managing AI tools and models.
 
 > [!warning]
 >
-> Only install extensions (`/extensions install`) from sources you trust. Extensions can bundle MCP servers, skills, and commands that run with the same permissions as Qwen Code itself — they can access your files, API keys, and conversation data. `/extensions install` does not prompt for confirmation.
+> Only install extensions (`/extensions install`) from sources you trust. Extensions can bundle MCP servers, skills, and commands that run with the same permissions as HopCode itself — they can access your files, API keys, and conversation data. `/extensions install` does not prompt for confirmation.
 
 > [!warning]
 >
@@ -132,7 +132,7 @@ These commands invoke bundled skills that provide specialized workflows.
 | `/review`    | Multi-agent code review (12 parallel agents at high effort) | `/review`, `/review 123`, `/review 123 --comment`, `/review --effort low` |
 | `/loop`      | Run a prompt on a recurring schedule                        | `/loop 5m check the build`                                                |
 | `/simplify`  | Review recent changes and apply safe cleanup edits directly | `/simplify`, `/simplify focus on duplication`                             |
-| `/qc-helper` | Answer questions about Qwen Code usage and configuration    | `/qc-helper how do I configure MCP?`                                      |
+| `/qc-helper` | Answer questions about HopCode usage and configuration    | `/qc-helper how do I configure MCP?`                                      |
 
 See [Code Review](./code-review.md) for full `/review` documentation.
 
@@ -330,13 +330,13 @@ Commands for obtaining information and performing system settings.
 | → `memory`       | Show current process memory diagnostics                                                                                        | `/doctor memory [--json] [--sample] [--snapshot]`                                   |
 | → `cpu-profile`  | Record a CPU profile for Chrome DevTools analysis                                                                              | `/doctor cpu-profile [--duration <seconds>]`                                        |
 | → `rollback`     | Roll back the standalone CLI binary to the previous version (standalone installs only; for conversation history use `/rewind`) | `/doctor rollback`                                                                  |
-| `/docs`          | Open full Qwen Code documentation in browser                                                                                   | `/docs`                                                                             |
+| `/docs`          | Open full HopCode documentation in browser                                                                                   | `/docs`                                                                             |
 | `/ide`           | Manage IDE integration                                                                                                         | `/ide status`, `/ide install`, `/ide enable`, `/ide disable`                        |
 | `/insight`       | Generate programming insights from chat history                                                                                | `/insight`                                                                          |
 | `/setup-github`  | Set up GitHub Actions                                                                                                          | `/setup-github`                                                                     |
-| `/bug`           | Submit issue about Qwen Code                                                                                                   | `/bug Button click unresponsive`                                                    |
+| `/bug`           | Submit issue about HopCode                                                                                                   | `/bug Button click unresponsive`                                                    |
 | `/copy`          | Copy to clipboard: reply (Nth-last), code (by lang), LaTeX, or Mermaid                                                         | `/copy`, `/copy 2`, `/copy python`, `/copy latex`, `/copy mermaid`                  |
-| `/quit`          | Exit Qwen Code immediately                                                                                                     | `/quit` or `/exit`                                                                  |
+| `/quit`          | Exit HopCode immediately                                                                                                     | `/quit` or `/exit`                                                                  |
 
 > [!warning]
 >
@@ -344,7 +344,7 @@ Commands for obtaining information and performing system settings.
 
 > [!note]
 >
-> `/config` reads and writes individual settings by dot-path key (e.g. `general.vimMode`), complementing the interactive `/settings` editor. Running `/config` with no argument (or `--help`) lists every settable key with its type and current value. `/config <key>` prints the current value — except for boolean keys, where it toggles the value. `/config <key>=<value>` sets the value. Changes are written to user settings (`~/.qwen/settings.json`). Only `boolean`, `string`, `number`, and `enum` settings can be changed this way — `array` and `object` settings must be edited in `settings.json` directly. Sensitive values (API keys, tokens, base URLs) are masked in output, and setting `tools.approvalMode` to `yolo` is blocked.
+> `/config` reads and writes individual settings by dot-path key (e.g. `general.vimMode`), complementing the interactive `/settings` editor. Running `/config` with no argument (or `--help`) lists every settable key with its type and current value. `/config <key>` prints the current value — except for boolean keys, where it toggles the value. `/config <key>=<value>` sets the value. Changes are written to user settings (`~/.hopcode/settings.json`). Only `boolean`, `string`, `number`, and `enum` settings can be changed this way — `array` and `object` settings must be edited in `settings.json` directly. Sensitive values (API keys, tokens, base URLs) are masked in output, and setting `tools.approvalMode` to `yolo` is blocked.
 
 ### 1.10 Common Shortcuts
 

@@ -821,7 +821,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
           next: any,
         ): void => next(),
       parseClientId: (req: any, res: any) => {
-        const raw = req.get('x-qwen-client-id');
+        const raw = req.get('X-HopCode-Client-Id');
         if (raw === undefined || raw === '') return undefined;
         if (!bridge.knownClientIdSet.has(raw)) {
           res.status(400).json({

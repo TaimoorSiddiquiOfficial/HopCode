@@ -68,11 +68,11 @@ OpenCode uses **Vercel AI SDK** (`ai` package v5.0.124) with these providers:
 └────────┬────────┘
          │
 ┌────────▼────────┐
-│  Qwen Generator │
+│  hopcode Generator │
 └────────┬────────┘
          │
 ┌────────▼────────┐
-│  Qwen API       │
+│  hopcode API       │
 └─────────────────┘
 ```
 

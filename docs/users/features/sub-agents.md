@@ -14,7 +14,7 @@ Subagents are independent AI assistants that:
 
 ## Fork Subagent
 
-In addition to named subagents, Qwen Code supports **forking** — selected explicitly with `subagent_type: "fork"` (available in interactive sessions). A fork inherits the parent's full conversation context and runs detached in the background. Omitting `subagent_type` does **not** fork; it launches the general-purpose subagent. Top-level named subagents run in the background by default and deliver their results through completion notifications. Set `run_in_background: false` when the current turn must wait for the result inline.
+In addition to named subagents, HopCode supports **forking** — selected explicitly with `subagent_type: "fork"` (available in interactive sessions). A fork inherits the parent's full conversation context and runs detached in the background. Omitting `subagent_type` does **not** fork; it launches the general-purpose subagent. Top-level named subagents run in the background by default and deliver their results through completion notifications. Set `run_in_background: false` when the current turn must wait for the result inline.
 
 ### How Fork Differs from Named Subagents
 
@@ -196,7 +196,7 @@ model ID.
 
 The built-in Explore agent inherits the main session model by default. To
 select a different model for only that built-in agent, configure
-`agents.builtin.exploreModel` in `settings.json` and restart Qwen Code:
+`agents.builtin.exploreModel` in `settings.json` and restart HopCode:
 
 Earlier versions used `fastModel` for Explore by default. To preserve that
 behavior, set `agents.builtin.exploreModel` to `fast`.
@@ -212,7 +212,7 @@ behavior, set `agents.builtin.exploreModel` to `fast`.
 ```
 
 This setting accepts the same selectors described above. It is applied only
-when Qwen Code resolves the built-in Explore definition; a session, project,
+when HopCode resolves the built-in Explore definition; a session, project,
 user, or extension agent named Explore keeps its own `model` setting.
 
 #### Permission Mode
@@ -308,7 +308,7 @@ at parse time rather than rejected — the same lenient posture CC uses.
 | ---------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `permissionMode` | enum string      | `acceptEdits`, `auto`, `bypassPermissions`, `default`, `dontAsk`, `plan`. Mapped to `approvalMode` at parse time; when both are set, the explicit `approvalMode` wins.                                                                                                           |
 | `maxTurns`       | positive integer | Caps the agent's turn budget. Wired into `runConfig.max_turns` at runtime; when both are set, the top-level field wins. The legacy nested value is pruned from the on-disk file on save to avoid two sources of truth.                                                           |
-| `color`          | enum string      | Display color. Allowlist: `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, `cyan` (mirrors CC's `_Y`). The legacy qwen sentinel `auto` is preserved for backward compatibility. Other values are silently dropped on parse.                                         |
+| `color`          | enum string      | Display color. Allowlist: `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, `cyan` (mirrors CC's `_Y`). The legacy hopcode sentinel `auto` is preserved for backward compatibility. Other values are silently dropped on parse.                                         |
 | `mcpServers`     | record of specs  | Per-agent MCP server overrides. Merged with the session-level MCP server set when the agent spawns; on key collision the agent's spec wins (matching CC's `scope: 'agent'` semantics). Malformed entries are dropped per-key with a warning rather than failing the whole agent. |
 | `hooks`          | record of arrays | Per-agent hooks. Keys are CC hook event names (`PreToolUse`, `PostToolUse`, `UserPromptSubmit`, …); values are arrays of `{ matcher?, hooks: [...] }` definitions in the same shape as `settings.json`'s `hooks` field. Registered while the agent runs, removed when it stops.  |
 

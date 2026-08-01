@@ -44,7 +44,7 @@ ensures an unforeseen tool stall becomes a tool-level error instead of
 ### Isolate the fork's daemon endpoint
 
 Use a Qwen-specific default Unix socket and PID directory. An old upstream
-daemon may continue running on the upstream default, but the Qwen proxy will no
+daemon may continue running on the upstream default, but the hopcode proxy will no
 longer silently reuse it and execute a different implementation/version than
 the binary the user launched. Explicit `--socket` overrides remain unchanged.
 

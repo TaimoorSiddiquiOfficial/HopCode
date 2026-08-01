@@ -473,7 +473,7 @@ export interface BridgeClientRequestContext {
  * Returned from `recordHeartbeat`. `lastSeenAt` is the server-side
  * `Date.now()` epoch (ms) the bridge stored for this session/client
  * pair. `clientId` is echoed only when the caller provided a trusted
- * one through `X-Qwen-Client-Id`; anonymous heartbeats omit it but
+ * one through `X-HopCode-Client-Id`; anonymous heartbeats omit it but
  * still bump the per-session timestamp.
  */
 export interface BridgeHeartbeatResult {
@@ -902,7 +902,7 @@ export interface AcpSessionBridge {
 
   /**
    * Union of every live session's `clientIds`. Used by workspace-level
-   * mutation routes to validate the optional `X-Qwen-Client-Id` header.
+   * mutation routes to validate the optional `X-HopCode-Client-Id` header.
    * Returns a snapshot — callers must not mutate.
    */
   knownClientIds(): ReadonlySet<string>;
@@ -1357,7 +1357,7 @@ export interface AcpSessionBridge {
   /** Queued prompts across all sessions — accepted but not yet dispatched,
    *  excluding the one running per session — i.e. the queue-depth gauge for the
    *  Daemon Status charts (distinct from `activePromptCount`). Optional: a
-   *  bridge injected via `RunQwenServeDeps.bridge` may predate these Daemon
+   *  bridge injected via `runHopCodeServeDeps.bridge` may predate these Daemon
    *  Status hooks, so the sampler treats them as absent (→ 0 / skipped). */
   readonly pendingPromptTotal?: number;
 
@@ -1392,7 +1392,7 @@ export interface AcpSessionBridge {
 
   /**
    * Active permission mediation policy. Reflects
-   * the value `runQwenServe` resolved from
+   * the value `runHopCodeServe` resolved from
    * `settings.policy.permissionStrategy` (or the
    * `'first-responder'` default). Surfaced through the
    * `/capabilities` envelope's `policy.permission` field so SDK

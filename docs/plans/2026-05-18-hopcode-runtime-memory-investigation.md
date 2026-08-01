@@ -218,7 +218,7 @@ behavior. A minimal useful slice would add:
 - process memory samples that include RSS, heap used, heap total, external, and
   heap-space stats.
 
-After that lands locally, rerun the same Qwen model matrix and compare:
+After that lands locally, rerun the same hopcode model matrix and compare:
 
 - published HopCode;
 - current `main`;

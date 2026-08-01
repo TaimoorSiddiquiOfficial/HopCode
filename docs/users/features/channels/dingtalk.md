@@ -67,7 +67,7 @@ Or define them in the `env` section of `settings.json`:
 
 `useConnectionManager` defaults to `true`. The connection manager monitors the Stream WebSocket and replaces the DingTalk SDK client when the connection stops responding. You should normally leave it enabled.
 
-Set `"useConnectionManager": false` to disable Qwen Code's connection manager and fall back to the SDK's keepalive and automatic reconnect behavior.
+Set `"useConnectionManager": false` to disable HopCode's connection manager and fall back to the SDK's keepalive and automatic reconnect behavior.
 
 ## Running
 
@@ -83,7 +83,7 @@ Open DingTalk and send a message to the bot. You should see a 👀 emoji reactio
 
 ## Daemon Webhook Delivery
 
-When the channel runs under `qwen serve`, authenticated external Webhook events can trigger unattended agent tasks and deliver the final Markdown response to either a DingTalk user or group. Use the existing Webhook target fields; no separate channel type is required:
+When the channel runs under `hopcode serve`, authenticated external Webhook events can trigger unattended agent tasks and deliver the final Markdown response to either a DingTalk user or group. Use the existing Webhook target fields; no separate channel type is required:
 
 ```json
 {

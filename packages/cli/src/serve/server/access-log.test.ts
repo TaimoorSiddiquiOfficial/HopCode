@@ -118,9 +118,9 @@ describe('installAccessLogMiddleware', () => {
     const { response } = h.begin({
       path: `/session/${sessionId}/${routeSuffix}`,
       rawHeaders: [
-        'X-Qwen-Client-Id',
+        'X-HopCode-Client-Id',
         firstClientId,
-        'x-qwen-client-id',
+        'X-HopCode-Client-Id',
         'second-client',
       ],
     });

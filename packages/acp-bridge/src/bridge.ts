@@ -199,7 +199,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function getCanonicalModelId(response: unknown, fallback: string): string {
   if (!isRecord(response) || !isRecord(response['_meta'])) return fallback;
-  const modelSwitch = response['_meta']['qwenModelSwitch'];
+  const modelSwitch = response['_meta']['hopcodeModelSwitch'];
   if (!isRecord(modelSwitch)) return fallback;
   const modelId = modelSwitch['modelId'];
   return typeof modelId === 'string' ? modelId : fallback;
@@ -538,7 +538,7 @@ interface SessionEntry {
   pendingInteractions: Map<string, BridgePendingInteraction>;
   /**
    * Daemon-issued client ids currently known for this live session. HTTP
-   * clients may echo one through `X-Qwen-Client-Id`; the bridge only treats
+   * clients may echo one through `X-HopCode-Client-Id`; the bridge only treats
    * it as trusted originator metadata if it appears in this set.
    */
   clientIds: Map<string, number>;
@@ -621,7 +621,7 @@ interface SessionEntry {
   sessionLastSeenAt?: number;
   /**
    * Per-`clientId` last heartbeat (Date.now() epoch ms). Only populated
-   * when the heartbeat carried a trusted `X-Qwen-Client-Id`. Entries are
+   * when the heartbeat carried a trusted `X-HopCode-Client-Id`. Entries are
    * dropped together with the parent session — revocation policy will
    * own per-client eviction.
    */
@@ -629,7 +629,7 @@ interface SessionEntry {
 }
 
 function isServeDebugLoggingEnabled(): boolean {
-  const value = process.env['QWEN_SERVE_DEBUG'];
+  const value = process.env['HOPCODE_SERVE_DEBUG'];
   if (!value) return false;
   return !['0', 'false', 'off', 'no'].includes(value.trim().toLowerCase());
 }
@@ -840,7 +840,7 @@ function pickUserInputEchoMeta(meta: unknown): Record<string, unknown> {
  * `suppressOwnUserEcho: true` skip the echo for the originator (the
  * envelope-level `originatorClientId` matches their own clientId).
  *
- * Anonymous-prompt caveat: a stable `X-Qwen-Client-Id` is a PRECONDITION
+ * Anonymous-prompt caveat: a stable `X-HopCode-Client-Id` is a PRECONDITION
  * for that dedup. A prompt with no clientId (curl smoke / pre-registration
  * script) produces an envelope without `originatorClientId`, so
  * `suppressOwnUserEcho` has nothing to match and the originating connection
@@ -1292,7 +1292,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
   // `channelFactory` at spawn time receive this as the 2nd arg, so
   // the default factory can merge into the child env without
   // consulting any global state that another concurrent
-  // `runQwenServe()` handle might have mutated. Frozen to make
+  // `runHopCodeServe()` handle might have mutated. Frozen to make
   // accidental mutation throw rather than silently corrupt later
   // spawns.
   const childEnvOverrides: Readonly<Record<string, string | undefined>> =
@@ -1346,7 +1346,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
   }
   // The bound path is the canonical form `spawnOrAttach` compares
   // incoming `workspaceCwd` against. The caller MUST pass an already-
-  // canonical value (via `canonicalizeWorkspace`). `runQwenServe`
+  // canonical value (via `canonicalizeWorkspace`). `runHopCodeServe`
   // does this at boot and threads the same value into both
   // `createHttpAcpBridge` and `createServeApp`; direct embeds / tests
   // must call `canonicalizeWorkspace` first. No redundant
@@ -1725,7 +1725,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
   // dispatched on an existing connection AFTER the shutdown snapshot
   // taken in `shutdown()` fails fast instead of creating a child the
   // shutdown path has no more visibility into. Without this, the
-  // server.listen → bridge.shutdown ordering in `runQwenServe` leaves
+  // server.listen → bridge.shutdown ordering in `runHopCodeServe` leaves
   // a window between (a) shutdown snapshotting `byId` for kills and
   // (b) `server.close` rejecting new connections, during which a
   // late-arriving `POST /session` slips a fresh child past cleanup.
@@ -2063,7 +2063,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
         //
         // Suppressed during `shuttingDown` because the operator
         // already saw "received SIGINT, draining..." from
-        // `runQwenServe`'s signal handler. The standalone
+        // `runHopCodeServe`'s signal handler. The standalone
         // killSession case (last session leaves, channel torn down
         // but daemon stays up) still logs — there's no upstream
         // context line in that flow, and the message confirms the
@@ -2655,7 +2655,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
       throw new Error(
         'setSessionApprovalMode called with `persist: true` but no ' +
           '`persistApprovalMode` callback wired in BridgeOptions. ' +
-          'runQwenServe wires the production callback; direct embeds ' +
+          'runHopCodeServe wires the production callback; direct embeds ' +
           'and tests must opt in or omit `persist`.',
       );
     }
@@ -4450,7 +4450,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
 
     async spawnOrAttach(req) {
       if (shuttingDown) {
-        // `runQwenServe.close()` calls `bridge.shutdown()` BEFORE
+        // `runHopCodeServe.close()` calls `bridge.shutdown()` BEFORE
         // `server.close()`. During that window, established HTTP
         // connections can still hit `POST /session`. Refuse here so
         // late-arrivers don't spawn children the shutdown path won't
@@ -5802,7 +5802,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
       // are downgraded to the debug channel when `shuttingDown` is
       // true. `EventBus.publish` is documented never to throw, so
       // anything landing here in normal ops is unexpected — silencing
-      // via QWEN_SERVE_DEBUG would let a regression succeed at the
+      // via HOPCODE_SERVE_DEBUG would let a regression succeed at the
       // route layer while SSE subscribers stop seeing events.
       //
       // PR #4255 fold-in 9: track per-session success/fail. A
@@ -5865,7 +5865,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
       // Snapshot the union of every live session's stamped client ids.
       // Returned as a fresh Set so callers can mutate-safely (the live
       // per-session maps stay private). Workspace-level mutation routes
-      // use this to validate `X-Qwen-Client-Id` without owning a
+      // use this to validate `X-HopCode-Client-Id` without owning a
       // session id.
       const out = new Set<string>();
       for (const entry of byId.values()) {
@@ -7648,7 +7648,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
       });
       void (async () => {
         // Set BEFORE the snapshot so any racing `spawnOrAttach` triggered
-        // by an in-flight HTTP connection after `runQwenServe.close()`
+        // by an in-flight HTTP connection after `runHopCodeServe.close()`
         // entered the bridge.shutdown() phase fails fast instead of
         // spawning a child this teardown won't see.
         shuttingDown = true;

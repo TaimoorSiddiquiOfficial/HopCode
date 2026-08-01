@@ -116,7 +116,7 @@ qwen-code 当前把 **Ctrl+O 绑定为 `TOGGLE_COMPACT_MODE`**：一个**全局�
 
 ### 3.4 实现效果截图（VHS 自动化捕获）
 
-下列两张为本分支构建（`node dist/cli.js --yolo`）在固定虚拟终端（1400×900 / FontSize 14）下、对同一会话先后捕获的 before/after，经 `qwen-code-mac-autotest` skill 录制（`session.tape` 可复现）。会话提示为：列文件 → 读 `README.md` → grep `export` → 一句话总结，触发 list/read/grep 三个**可折叠**工具。
+下列两张为本分支构建（`node dist/cli.js --izn`）在固定虚拟终端（1400×900 / FontSize 14）下、对同一会话先后捕获的 before/after，经 `qwen-code-mac-autotest` skill 录制（`session.tape` 可复现）。会话提示为：列文件 → 读 `README.md` → grep `export` → 一句话总结，触发 list/read/grep 三个**可折叠**工具。
 
 **主视图（默认基线，§3.1）**——三个 read/search/list 工具折叠为单行分区摘要 `✔ Searched 1 pattern, read 1 file, listed 1 directory`，思考块折叠为 `Thought for Ns (option+t to expand)`：
 
@@ -518,7 +518,7 @@ claude code 的机制是"**存储层保留完整、显示层按 `verbose` 截断
 - 可复用滚动屏底座：`components/shared/ScrollableList.tsx`、`VirtualizedList.tsx`（`MainContent` 默认对其用恒定 `estimatedItemHeight=3`，transcript 须调大/自适应）；覆盖层 `DialogManager.tsx`、`layouts/DefaultAppLayout.tsx`；Esc 统一关闭 `hooks/useDialogClose.ts`
 - **可复用 alt-screen 组件（qwen 自身）**：`packages/cli/src/ui/components/AlternateScreen.tsx`（PR #5627）——`useEffect` 写 `ENTER_ALT_SCREEN+CLEAR+HIDE_CURSOR`、卸载/`process.on('exit')` 写 `SHOW_CURSOR+EXIT_ALT_SCREEN`，用 `useTerminalOutput()`/`useTerminalSize()`，带 `disabled?: boolean`（注释："Skip escape writes when the root Ink renderer already owns the alt screen (VP mode)"）
 - **VP 模式 alt-screen 常驻**：`gemini.tsx:367`（`const useVP = settings.merged.ui?.useTerminalBuffer ?? false;`）、`:379`（`alternateScreen: useVP`）
-- **ink 版本（澄清）**：qwen-code 用上游官方 `ink ^7.0.3`；gemini-cli 用 fork `npm:@jrichman/ink@6.6.9`（v6）——**不同包不同大版本**，alt-screen 能力基于 qwen 自己的 ink v7 + 复用上述组件
+- **ink 版本（澄清）**：qwen-code 用上游官方 `ink ^7.0.3`；gemini-cli 用 fork `npm:@jrichman/ink@6.6.9`（v6）——**不同包不同大版本**，alt-screen 能力基于 hopcode 自己的 ink v7 + 复用上述组件
 - **main per-block 思考机制（与本方案共存）**：`ThoughtExpandedContext`（Alt+T `TOGGLE_THINKING_EXPANDED`）、`ThinkingViewer`/`ThinkingViewerContext`、`thoughtExpanded`/`thinkingFullText` props、`buildThinkingFullTextMap`、`ClickableThinkMessage`（详见 §4.7）
 - **阻塞确认/对话框（全部需自动关闭 transcript）**：`DialogManager.tsx` 渲染 `shellConfirmationRequest`(ShellConfirmationDialog)、`loopDetectionConfirmationRequest`(LoopDetectionConfirmation)、`confirmationRequest`(ConsentPrompt)、`confirmUpdateExtensionRequests`(ConsentPrompt)、`providerUpdateRequest`(ProviderUpdatePrompt) 等（§4.6 #1）
 - **web-shell 独立 compact**：`packages/web-shell/client/App.tsx`（读 `'ui.compactMode'`、独立 `CompactModeContext`）——`WEB_SHELL_SETTINGS` 须保留该键透传（§6 / §7 #5）

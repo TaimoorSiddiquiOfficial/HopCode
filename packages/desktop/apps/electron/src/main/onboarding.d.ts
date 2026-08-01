@@ -1,4 +1,0 @@
-import type { RpcServer } from '@craft-agent/server-core/transport';
-import type { HandlerDeps } from './handlers/handler-deps';
-export declare const HANDLED_CHANNELS: readonly [any, any, any, any];
-export declare function registerOnboardingHandlers(server: RpcServer, deps: HandlerDeps): void;

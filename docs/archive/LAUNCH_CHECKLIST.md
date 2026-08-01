@@ -188,7 +188,7 @@ Multi-AI support coming soon!
 
 An AI-powered coding assistant with:
 ✅ Terminal-based workflow
-✅ Qwen series optimization
+✅ hopcode series optimization
 ✅ VS Code + Zed support  
 ✅ Multi-AI coming soon
 

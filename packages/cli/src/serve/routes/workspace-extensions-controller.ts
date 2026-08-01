@@ -297,7 +297,7 @@ export function createExtensionsController(
     if (clientId === null) return false;
     if (clientId === undefined && opts.requireClientId !== false) {
       res.status(400).json({
-        error: 'Missing X-Qwen-Client-Id header',
+        error: 'Missing X-HopCode-Client-Id header',
         code: 'missing_client_id',
       });
       return false;

@@ -18,7 +18,7 @@ and platform-specific progress surfaces such as Feishu cards. The missing P0
 product layer is a stable way to say "this channel has its own resident agent
 identity" and "this prompt turn has a lifecycle adapters can observe."
 
-Issue #6103 tracks this focused slice. It builds on the broader qwen tag roadmap
+Issue #6103 tracks this focused slice. It builds on the broader hopcode tag roadmap
 in #5887, but keeps this PR small enough to review and ship independently.
 
 ## Scope

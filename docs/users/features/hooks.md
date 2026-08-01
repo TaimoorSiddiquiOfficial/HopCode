@@ -1,4 +1,4 @@
-﻿# HopCode Hooks
+# HopCode Hooks
 
 ## Overview
 
@@ -592,11 +592,11 @@ The `permissionDecision` value controls whether the tool runs:
 - **`displayed_text` is provisional until `is_final`.** It reflects what has streamed so far; treat intermediate payloads as display state, not as authoritative final content.
 - **A tool-using turn produces multiple messages.** Each model call gets its own `message_id` with its own `is_final: true` firing: the text before a tool call is one message, the continuation after the tool result is another. Model calls that produce no displayed text (tool-call-only) fire nothing.
 
-**Note**: Fires in the terminal UI, headless (`-p`), and ACP (IDE/editor/`qwen serve`) sessions, with the same payload contract on every surface.
+**Note**: Fires in the terminal UI, headless (`-p`), and ACP (IDE/editor/`hopcode serve`) sessions, with the same payload contract on every surface.
 
 #### Stop
 
-**Purpose**: Executed before Qwen concludes its response to provide final feedback or summaries.
+**Purpose**: Executed before hopcode concludes its response to provide final feedback or summaries.
 
 **Event-specific fields**:
 

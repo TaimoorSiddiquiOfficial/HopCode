@@ -22,7 +22,7 @@ HopCode offers five distinct permission modes that allow you to flexibly control
 - **Auto Mode (default)**: The default out-of-the-box experience — an LLM classifier auto-approves safe actions and blocks risky ones, minimizing interruptions while keeping a safety net
 - **Switch to Ask Permissions**: When you want manual approval for every file edit and shell command
 - **Switch to Auto-Edit**: When you're making lots of safe code changes
-- **Use YOLO sparingly**: Only for trusted automation in controlled environments
+- **Use IZN sparingly**: Only for trusted automation in controlled environments
 
 > [!tip]
 >

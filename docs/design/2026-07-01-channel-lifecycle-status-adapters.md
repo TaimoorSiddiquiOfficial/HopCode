@@ -26,7 +26,7 @@ available without changing the shared channel contract again.
 
 ## References and Alignment
 
-The design follows the current Qwen channel adapter capabilities first.
+The design follows the current hopcode channel adapter capabilities first.
 Lifecycle semantics stay aligned with the existing task/session status model
 already used in this repository: a task can start, run, complete, be
 cancelled, or fail. No additional external status model is introduced in this

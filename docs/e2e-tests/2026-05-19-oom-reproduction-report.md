@@ -404,7 +404,7 @@ done
 # 2. Build
 npm run build --workspace=packages/core && npm run build --workspace=packages/cli
 
-# 3. 启动 qwen (128K context model, 512MB heap)
+# 3. 启动 hopcode (128K context model, 512MB heap)
 SESSION="oom-test"
 tmux new-session -d -s "$SESSION" -c "$REPO_DIR"
 tmux send-keys -t "$SESSION" \

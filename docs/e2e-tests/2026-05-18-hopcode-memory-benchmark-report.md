@@ -99,9 +99,9 @@ problem area.
 
 | Signal                                                                                       | What it suggests                                                                           | What it does not prove                                                                                  |
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| Qwen remains near `1 GiB` in small PR and code-navigation cases                              | A high non-interactive task-time runtime cost is likely involved                           | It does not identify whether the footprint is V8 heap, native memory, module loading, or retained state |
+| hopcode remains near `1 GiB` in small PR and code-navigation cases                              | A high non-interactive task-time runtime cost is likely involved                           | It does not identify whether the footprint is V8 heap, native memory, module loading, or retained state |
 | Diff size from 100 KiB to 5 MiB does not scale linearly with RSS                             | Raw diff bytes alone are probably not the primary driver                                   | Large outputs can still amplify memory in real PR review flows                                          |
-| Qwen uses more tokens than Claude in every matrix cell                                       | Qwen likely constructs or retains larger prompt/context/tool-result state for similar work | Token count is not the same as process memory and may be an effect rather than the cause                |
+| hopcode uses more tokens than Claude in every matrix cell                                       | hopcode likely constructs or retains larger prompt/context/tool-result state for similar work | Token count is not the same as process memory and may be an effect rather than the cause                |
 | Tool call counts are similar, and Claude sometimes uses more turns/tool calls with lower RSS | A longer tool-call chain is unlikely to be the main explanation by itself                  | Tool output size and retention still need to be measured                                                |
 | Earlier large PR runs showed saved-output recovery and subagent amplification                | Tool-output truncation and saved-output paths are likely heavy-workload amplifiers         | They do not explain the entire small-task execution footprint                                           |
 
@@ -146,7 +146,7 @@ All 20 runs exited `0` with no timeout.
 
 ## Matrix Results
 
-| Case             | Model          | Qwen tree peak | Claude tree peak | Qwen / Claude |
+| Case             | Model          | hopcode tree peak | Claude tree peak | hopcode / Claude |
 | ---------------- | -------------- | -------------: | ---------------: | ------------: |
 | small PR `#4268` | `pai/glm-5`    |     1032.7 MiB |        357.8 MiB |         2.89x |
 | small PR `#4268` | `qwen3.6-plus` |      852.2 MiB |        365.5 MiB |         2.33x |
@@ -161,7 +161,7 @@ All 20 runs exited `0` with no timeout.
 
 Average process-tree RSS peak by case:
 
-| Case             | Avg Qwen tree peak | Avg Claude tree peak |
+| Case             | Avg hopcode tree peak | Avg Claude tree peak |
 | ---------------- | -----------------: | -------------------: |
 | small PR `#4268` |          942.5 MiB |            361.6 MiB |
 | code navigation  |          995.0 MiB |            354.3 MiB |
@@ -178,13 +178,13 @@ Selected examples:
 
 | Case            | Model          | CLI    | Duration | Turns | Total tokens | Tool calls |
 | --------------- | -------------- | ------ | -------: | ----: | -----------: | ---------: |
-| small PR        | `pai/glm-5`    | Qwen   |    25.2s |     2 |       32,567 |          3 |
+| small PR        | `pai/glm-5`    | hopcode   |    25.2s |     2 |       32,567 |          3 |
 | small PR        | `pai/glm-5`    | Claude |    21.1s |     4 |        7,899 |          3 |
-| code navigation | `qwen3.6-plus` | Qwen   |    25.2s |     2 |       38,151 |          3 |
+| code navigation | `qwen3.6-plus` | hopcode   |    25.2s |     2 |       38,151 |          3 |
 | code navigation | `qwen3.6-plus` | Claude |    46.9s |     6 |       25,861 |          5 |
-| diff 100 KiB    | `qwen3.6-plus` | Qwen   |    16.5s |     3 |       57,185 |          2 |
+| diff 100 KiB    | `qwen3.6-plus` | hopcode   |    16.5s |     3 |       57,185 |          2 |
 | diff 100 KiB    | `qwen3.6-plus` | Claude |    17.2s |     3 |        6,377 |          2 |
-| diff 5 MiB      | `pai/glm-5`    | Qwen   |    23.2s |     2 |       38,574 |          2 |
+| diff 5 MiB      | `pai/glm-5`    | hopcode   |    23.2s |     2 |       38,574 |          2 |
 | diff 5 MiB      | `pai/glm-5`    | Claude |     9.8s |     3 |        5,285 |          2 |
 
 This token gap does not prove that token volume is the memory root cause, but it
@@ -205,7 +205,7 @@ What the data supports today:
 What this suggests:
 
 - The token delta is unlikely to come only from a longer tool-call chain.
-- Qwen may be carrying larger static prompt/context state, larger tool schemas,
+- hopcode may be carrying larger static prompt/context state, larger tool schemas,
   larger serialized tool results, or more retained conversation/session content.
 - Large-output flows may add another layer through truncation, saved-output
   recovery, or subagent paths.
@@ -243,7 +243,7 @@ gap.
 The current evidence supports these hypotheses, in priority order:
 
 1. HopCode has a higher non-interactive task-time process footprint than
-   Claude Code. The Qwen child Node worker was typically the largest process in
+   Claude Code. The hopcode child Node worker was typically the largest process in
    local sampling, often around `0.7-0.8 GiB`.
 2. Model choice is not the main explanation. Both `pai/glm-5` and
    `qwen3.6-plus` showed the same broad Qwen-vs-Claude gap.

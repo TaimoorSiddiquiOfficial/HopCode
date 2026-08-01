@@ -22,7 +22,7 @@ Root cause: the main-agent request path `await`s the recall result before sendin
 Fire recall on UserQuery and never await it. Consume the result at two opportunistic points — whichever fires first:
 
 1. **UserQuery consume point** — synchronous `settledAt !== null` check just before `turn.run()`. Zero-wait: if already settled, use it; if not, skip.
-2. **ToolResult inject point** — same check on every ToolResult turn. Injects memory as a `system-reminder` **appended after** the functionResponse parts in `requestToSend`, giving the model memory context before its next response. (Append, not prepend: the Qwen API requires the functionResponse to immediately follow the model's functionCall — see the existing `hasPendingToolCall` IDE-context skip for the same constraint.)
+2. **ToolResult inject point** — same check on every ToolResult turn. Injects memory as a `system-reminder` **appended after** the functionResponse parts in `requestToSend`, giving the model memory context before its next response. (Append, not prepend: the hopcode API requires the functionResponse to immediately follow the model's functionCall — see the existing `hasPendingToolCall` IDE-context skip for the same constraint.)
 
 This matches the pattern used by Claude Code upstream (`startRelevantMemoryPrefetch` / `settledAt` polling in `query.ts`).
 

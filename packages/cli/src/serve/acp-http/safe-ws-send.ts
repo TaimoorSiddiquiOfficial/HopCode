@@ -17,7 +17,7 @@ import { isServeDebugMode } from '../debug-mode.js';
  * `WsStream`'s instance-level `OPEN` check so a late send is a silent no-op.
  *
  * `context` labels the dropped frame's surface (e.g. `CDP`, `client-MCP`) so a
- * tunnel that's been quietly cut shows up in the logs under `QWEN_SERVE_DEBUG`
+ * tunnel that's been quietly cut shows up in the logs under `HOPCODE_SERVE_DEBUG`
  * instead of disappearing without a trace.
  */
 export function safeWsSend(

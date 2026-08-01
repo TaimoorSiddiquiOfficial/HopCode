@@ -41,7 +41,7 @@ const allowedProcessEnvAccesses = normalizeAllowances([
     'packages/acp-bridge/src/bridge.ts',
     {
       reason: 'The ACP bridge debug switch is process-scoped.',
-      accesses: { 'key:QWEN_SERVE_DEBUG': 1 },
+      accesses: { 'key:HOPCODE_SERVE_DEBUG': 1 },
     },
   ],
   [
@@ -90,7 +90,7 @@ const allowedProcessEnvAccesses = normalizeAllowances([
     'packages/cli/src/serve/debug-mode.ts',
     {
       reason: 'Serve debug logging is process-scoped.',
-      accesses: { 'key:QWEN_SERVE_DEBUG': 1 },
+      accesses: { 'key:HOPCODE_SERVE_DEBUG': 1 },
     },
   ],
   [

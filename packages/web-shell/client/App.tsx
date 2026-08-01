@@ -811,7 +811,7 @@ function getModelSwitchSummary(result: unknown): ModelSwitchSummary | null {
   if (!isRecord(result)) return null;
   const meta = result._meta;
   if (!isRecord(meta)) return null;
-  const summary = meta.qwenModelSwitch;
+  const summary = meta.hopcodeModelSwitch;
   if (!isRecord(summary)) return null;
   const authType = summary.authType;
   const modelId = summary.modelId;

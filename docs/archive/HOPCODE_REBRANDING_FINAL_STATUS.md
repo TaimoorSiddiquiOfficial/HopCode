@@ -29,7 +29,7 @@
 **Visual Assets:**
 
 - ✅ Zed extension icon updated (`hopcode.svg`)
-- ✅ Old Qwen logo deleted (`hopcode.svg` removed)
+- ✅ Old hopcode logo deleted (`hopcode.svg` removed)
 - ✅ WebUI favicon updated (`favicon.svg`)
 - ✅ Installation scripts auto-renamed by script
 
@@ -48,7 +48,7 @@
 | ----------------- | ---------------------- | --------------------------- | ------ |
 | **Project Name**  | HopCode                | HopCode                     | ✅     |
 | **NPM Scope**     | @hoptrendy/\*          | @hoptrendy/\*               | ✅     |
-| **CLI Command**   | qwen                   | hopcode                     | ✅     |
+| **CLI Command**   | hopcode                   | hopcode                     | ✅     |
 | **Config Dir**    | .hopcode/              | .hopcode/                   | ✅     |
 | **Env Vars**      | QWEN*CODE*\*           | HOPCODE\_\*                 | ✅     |
 | **CSS Classes**   | .hopcode-\*            | .hopcode-\*                 | ✅     |

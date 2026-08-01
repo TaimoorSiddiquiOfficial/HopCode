@@ -1,6 +1,6 @@
-﻿# Channels
+# Channels
 
-Channels let you interact with a Qwen Code agent from messaging platforms like Telegram, WeChat, QQ, DingTalk, WeCom, or Feishu, instead of the terminal. You send messages from your phone or desktop chat app, and the agent responds just like it would in the CLI.
+Channels let you interact with a HopCode agent from messaging platforms like Telegram, WeChat, QQ, DingTalk, WeCom, or Feishu, instead of the terminal. You send messages from your phone or desktop chat app, and the agent responds just like it would in the CLI.
 
 ## How It Works
 
@@ -16,7 +16,7 @@ All channels share one agent process with isolated sessions per user. Each chann
 ## Quick Start
 
 1. Set up a bot on your messaging platform (see channel-specific guides: [Telegram](./telegram), [WeChat](./weixin), [QQ Bot](./qqbot), [DingTalk](./dingtalk), [WeCom](./wecom), [Feishu](./feishu))
-2. Add the channel configuration to `~/.qwen/settings.json`
+2. Add the channel configuration to `~/.hopcode/settings.json`
 3. Run `qwen channel start` to start all channels, or `qwen channel start <name>` for a single channel
 
 Want to connect a platform that isn't built in? See [Plugins](./plugins) to add a custom adapter as an extension.
@@ -173,7 +173,7 @@ When `senderPolicy` is set to `"pairing"`, unknown senders go through an approva
 hopcode channel pairing approve my-channel VEQDDWXJ
 ```
 
-Once approved, the user's ID is saved to the channel's workspace-scoped allowlist (`~/.qwen/channels/<workspace-scope>/<name>-allowlist.json`) and all future messages go through normally. Pairing state is scoped per workspace, so two workspaces using the same channel name keep separate approvals.
+Once approved, the user's ID is saved to the channel's workspace-scoped allowlist (`~/.hopcode/channels/<workspace-scope>/<name>-allowlist.json`) and all future messages go through normally. Pairing state is scoped per workspace, so two workspaces using the same channel name keep separate approvals.
 
 ### Pairing CLI Commands
 
@@ -193,7 +193,7 @@ Run these from the channel's workspace directory (or pass `--cwd <dir>`) — pai
 - Codes expire after 1 hour
 - Maximum 3 pending requests per channel at a time — additional requests are ignored until one expires or is approved
 - Users listed in `allowedUsers` in `settings.json` always skip pairing
-- Approved users are stored per workspace in `~/.qwen/channels/<workspace-scope>/<name>-allowlist.json` — treat this file as sensitive
+- Approved users are stored per workspace in `~/.hopcode/channels/<workspace-scope>/<name>-allowlist.json` — treat this file as sensitive
 
 ## Group Chats
 
@@ -228,7 +228,7 @@ Configure per-group with the `groups` setting:
 
 ### Group History Backfill
 
-By default, Qwen ignores unmentioned group messages and does not store them as session turns. To let the next `@mention` include recent group context, set `groupHistoryLimit` to a positive number.
+By default, hopcode ignores unmentioned group messages and does not store them as session turns. To let the next `@mention` include recent group context, set `groupHistoryLimit` to a positive number.
 
 ```json
 {
@@ -255,7 +255,7 @@ By default, Qwen ignores unmentioned group messages and does not store them as s
 - Group-level `groupHistoryLimit` overrides the channel-level value.
 - Only messages from authorized senders are persisted.
 - Messages rejected by `groupPolicy` or group allowlist are not persisted.
-- Pending group history is stored as local JSONL under `~/.qwen/channels/<channel-name>-group-history.jsonl` or `$QWEN_HOME/channels/<channel-name>-group-history.jsonl`.
+- Pending group history is stored as local JSONL under `~/.hopcode/channels/<channel-name>-group-history.jsonl` or `$QWEN_HOME/channels/<channel-name>-group-history.jsonl`.
 - Cached messages are injected as untrusted context on the next real trigger and are not written as standalone session turns.
 
 ### How group messages are evaluated
@@ -419,17 +419,17 @@ The bot runs in the foreground. Press `Ctrl+C` to stop, or use `hopcode channel 
 
 ### Experimental Daemon-Managed Mode
 
-You can also run configured channels under `qwen serve`:
+You can also run configured channels under `hopcode serve`:
 
 ```bash
 # Start one channel under the daemon lifecycle
-qwen serve --channel my-channel
+hopcode serve --channel my-channel
 
 # Start all configured channels
-qwen serve --channel all
+hopcode serve --channel all
 
 # Or enable channels later on a token-protected daemon
-QWEN_SERVER_TOKEN=secret qwen serve
+QWEN_SERVER_TOKEN=secret hopcode serve
 qwen channel set my-channel --token secret
 
 # Query or stop the daemon-managed selection
@@ -437,15 +437,15 @@ qwen channel status --daemon-url http://127.0.0.1:4170 --token secret
 qwen channel stop --daemon-url http://127.0.0.1:4170 --token secret
 ```
 
-This mode starts workspace-grouped channel worker processes owned by `qwen serve`. Workers connect back to the daemon through the SDK and use the same channel adapters. They are separate from the daemon process, so a channel adapter crash does not crash the daemon. A daemon started without `--channel` does not load channel adapters or reserve the channel-service PID lease until the first `qwen channel set`.
+This mode starts workspace-grouped channel worker processes owned by `hopcode serve`. Workers connect back to the daemon through the SDK and use the same channel adapters. They are separate from the daemon process, so a channel adapter crash does not crash the daemon. A daemon started without `--channel` does not load channel adapters or reserve the channel-service PID lease until the first `qwen channel set`.
 
-`qwen serve --channel` is not the same service as `qwen channel start`. Standalone `qwen channel start` still uses the ACP-backed channel service and can run channel configs with different `cwd` values. Daemon-managed channels require every selected channel's `cwd` to resolve to a workspace registered by the daemon. In multi-workspace mode, a selection replacement keeps workers for workspaces whose ordered channel list did not change; `all` remains primary-workspace-only.
+`hopcode serve --channel` is not the same service as `qwen channel start`. Standalone `qwen channel start` still uses the ACP-backed channel service and can run channel configs with different `cwd` values. Daemon-managed channels require every selected channel's `cwd` to resolve to a workspace registered by the daemon. In multi-workspace mode, a selection replacement keeps workers for workspaces whose ordered channel list did not change; `all` remains primary-workspace-only.
 
 Without `--daemon-url`, `qwen channel status` and `qwen channel stop` retain standalone pidfile behavior. Their `--daemon-url` variants query or stop the daemon manager. Runtime selections are not written to settings and do not survive daemon restart. If a ready worker exits unexpectedly, the daemon continues running and reports a channel-worker warning in `/daemon/status`.
 
 ## Webhook-triggered tasks
 
-Daemon-managed channels can also accept authenticated webhook events. Qwen receives the event as context, summarizes and decides what matters, and then delivers the final response to the configured chat target. This is not a raw notification relay.
+Daemon-managed channels can also accept authenticated webhook events. hopcode receives the event as context, summarizes and decides what matters, and then delivers the final response to the configured chat target. This is not a raw notification relay.
 Webhook tasks require `approvalMode: "yolo"` because they run without interactive approval. That setting applies to the whole channel, not only webhook turns, so use a dedicated webhook channel or tightly restrict normal chat senders for that channel.
 
 Example channel config:
@@ -530,10 +530,10 @@ The response returns complete platform IDs and labels. Group labels use names al
 
 These nested users are observed participants, not authoritative group membership. Only messages that pass direct/group, mention, sender, and pairing gates are recorded. Repeated observations refresh labels and timestamps; passive observation cannot detect a leave or deletion until the relationship becomes stale. Message content is never stored. The bounded registry lives under `$QWEN_HOME/channels/daemon/<workspaceHash>/observed-contacts.json`, outside the workspace checkout and partitioned per workspace. Its 500-observation limit is shared by all channels and conversations in that workspace, and observations older than 365 days are removed on the next accepted write. If the registry becomes malformed or uses an unsupported version, delete that file to reset it; accepted traffic recreates it. Webhook configuration and delivery are unchanged.
 
-Start `qwen serve` with the channel worker enabled:
+Start `hopcode serve` with the channel worker enabled:
 
 ```bash
-QWEN_SERVER_TOKEN="$QWEN_SERVER_TOKEN" qwen serve --require-auth --channel dingtalk-main
+QWEN_SERVER_TOKEN="$QWEN_SERVER_TOKEN" hopcode serve --require-auth --channel dingtalk-main
 ```
 
 Example request:
@@ -554,7 +554,7 @@ curl -X POST "http://127.0.0.1:4170/channels/dingtalk-main/webhooks/github-ci" \
   }'
 ```
 
-Webhook routes authenticate with the webhook secret header, even when `qwen serve` is running with bearer auth enabled. Do not share the daemon bearer token with webhook providers. Webhook config and `secretEnv` values are loaded when the daemon starts; restart `qwen serve` after changing webhook sources or rotating secrets. A `202 {"accepted": true}` response means the channel worker accepted ownership of the task, not that the final response has already been delivered to chat. Check daemon and channel worker logs, plus `/daemon/status`, when troubleshooting delivery failures.
+Webhook routes authenticate with the webhook secret header, even when `hopcode serve` is running with bearer auth enabled. Do not share the daemon bearer token with webhook providers. Webhook config and `secretEnv` values are loaded when the daemon starts; restart `hopcode serve` after changing webhook sources or rotating secrets. A `202 {"accepted": true}` response means the channel worker accepted ownership of the task, not that the final response has already been delivered to chat. Check daemon and channel worker logs, plus `/daemon/status`, when troubleshooting delivery failures.
 
 ### Multi-Channel Mode
 

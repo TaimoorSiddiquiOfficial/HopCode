@@ -2,7 +2,7 @@
 
 ## Goal
 
-Workspaces added from the Web Shell survive a `qwen serve` process restart
+Workspaces added from the Web Shell survive a `hopcode serve` process restart
 when the daemon is relaunched with the same primary workspace and `QWEN_HOME`.
 
 ## State ownership

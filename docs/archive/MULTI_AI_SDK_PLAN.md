@@ -18,7 +18,7 @@ Transform HopCode into a **universal AI coding assistant** that supports multipl
 
 - ✅ HopCode rebranding complete
 - ✅ Core build successful
-- ✅ Currently optimized for Qwen series models
+- ✅ Currently optimized for hopcode series models
 - ✅ Strong foundation for expansion
 
 ### Goal
@@ -46,11 +46,11 @@ Add support for **10+ AI providers** and **50+ models** while maintaining:
 └────────┬────────┘
          │
 ┌────────▼────────┐
-│  Qwen Generator │
+│  hopcode Generator │
 └────────┬────────┘
          │
 ┌────────▼────────┐
-│  Qwen API       │
+│  hopcode API       │
 │  (Alibaba)      │
 └─────────────────┘
 ```

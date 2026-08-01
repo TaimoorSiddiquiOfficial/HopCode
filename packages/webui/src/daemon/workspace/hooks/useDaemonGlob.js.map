@@ -1,1 +1,0 @@
-{"version":3,"file":"useDaemonGlob.js","sourceRoot":"","sources":["useDaemonGlob.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAEH,OAAO,EAAE,yBAAyB,EAAE,MAAM,+BAA+B,CAAC;AAE1E,MAAM,UAAU,aAAa;IAC3B,MAAM,gBAAgB,GAAG,yBAAyB,EAAE,CAAC;IACrD,OAAO;QACL,aAAa,EAAE,gBAAgB,CAAC,aAAa;KAC9C,CAAC;AACJ,CAAC"}

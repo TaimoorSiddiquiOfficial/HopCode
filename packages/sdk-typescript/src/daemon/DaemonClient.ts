@@ -303,7 +303,7 @@ const DEFAULT_MAX_PENDING_PROMPTS_PER_SESSION = 5;
 // Server deadline + headroom so the client never races the daemon's own budget.
 const MCP_RESTART_DEFAULT_TIMEOUT_MS =
   MCP_RESTART_SERVER_DEADLINE_MS + MCP_RESTART_CLIENT_HEADROOM_MS;
-const CLIENT_ID_HEADER = 'X-Qwen-Client-Id';
+const CLIENT_ID_HEADER = 'X-HopCode-Client-Id';
 const urlEncode = encodeURIComponent;
 
 function transcriptPageSuffix(

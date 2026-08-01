@@ -2,7 +2,7 @@
 
 ## Problem
 
-`exit_plan_mode` previously mixed approval and execution. Its confirmation callback changed `ApprovalMode` before hooks and execution completed, and AUTO/YOLO sessions could bypass the user through an LLM Plan Approval Gate. Permission-manager allow rules, permission hooks, and sibling auto-approval could also satisfy an `ask` decision without an actual host/user response. This made a model-originated tool call capable of attempting to leave Plan mode without a user decision and created misleading mode notifications when later execution failed.
+`exit_plan_mode` previously mixed approval and execution. Its confirmation callback changed `ApprovalMode` before hooks and execution completed, and AUTO/IZN sessions could bypass the user through an LLM Plan Approval Gate. Permission-manager allow rules, permission hooks, and sibling auto-approval could also satisfy an `ask` decision without an actual host/user response. This made a model-originated tool call capable of attempting to leave Plan mode without a user decision and created misleading mode notifications when later execution failed.
 
 ## Design
 

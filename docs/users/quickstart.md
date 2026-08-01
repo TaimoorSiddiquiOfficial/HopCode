@@ -79,7 +79,7 @@ The first-run menu lets you connect a model provider. Choose one of:
 
 > [!note]
 >
-> When you first authenticate HopCode with your Qwen account, a workspace called ".hopcode" is automatically created for you. This workspace provides centralized cost tracking and management for all HopCode usage in your organization.
+> When you first authenticate HopCode with your hopcode account, a workspace called ".hopcode" is automatically created for you. This workspace provides centralized cost tracking and management for all HopCode usage in your organization.
 
 > [!tip]
 >

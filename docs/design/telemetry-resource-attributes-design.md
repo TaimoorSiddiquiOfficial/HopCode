@@ -700,7 +700,7 @@ export OTEL_RESOURCE_ATTRIBUTES="debug_run=true"
 
 ```bash
 # 一次性 debug run
-HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true qwen "投资分析"
+HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true hopcode "投资分析"
 ```
 
 完事即关闭，不要持久化到 settings。

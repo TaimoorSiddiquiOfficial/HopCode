@@ -168,7 +168,7 @@
 # HopCode: The Butterfly Effect of Intelligent Code
 
 Today we're excited to announce HopCode, the rebranded open-source AI
-coding assistant optimized for Qwen series models.
+coding assistant optimized for hopcode series models.
 
 ## What is HopCode?
 
@@ -235,7 +235,7 @@ Multi-AI support coming soon with OpenAI, Anthropic, Google & more!
 
 An AI-powered coding assistant with:
 ✅ Terminal-based workflow
-✅ Qwen series optimization  
+✅ hopcode series optimization  
 ✅ VS Code + Zed support
 ✅ Multi-AI coming soon
 

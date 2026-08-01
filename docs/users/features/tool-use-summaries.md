@@ -1,6 +1,6 @@
 # Tool-Use Summaries
 
-Qwen Code can generate a short, git-commit-subject-style label after each tool batch completes, summarizing what the batch accomplished. The label appears inline: for a completed tool group in the main view it replaces the generic `Tool × N` header; when the group is force-expanded (in the `Ctrl+O` full-detail transcript, or for error / user-initiated batches) it appears as a dim `● <label>` line below the group.
+HopCode can generate a short, git-commit-subject-style label after each tool batch completes, summarizing what the batch accomplished. The label appears inline: for a completed tool group in the main view it replaces the generic `Tool × N` header; when the group is force-expanded (in the `Ctrl+O` full-detail transcript, or for error / user-initiated batches) it appears as a dim `● <label>` line below the group.
 
 This is a UX aid for parallel tool calls: when the model fans out into several `Read` + `Grep` + `Bash` calls at once, the summary tells you the intent at a glance instead of forcing you to scan the tool list.
 

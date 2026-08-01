@@ -1384,7 +1384,7 @@ describe('Session', () => {
       );
       expect(response).toMatchObject({
         _meta: {
-          qwenModelSwitch: {
+          hopcodeModelSwitch: {
             modelId: 'shared-model',
             baseUrl: 'https://two.example/v1',
           },
@@ -1437,7 +1437,7 @@ describe('Session', () => {
       );
       expect(response).toMatchObject({
         _meta: {
-          qwenModelSwitch: {
+          hopcodeModelSwitch: {
             modelId: 'shared-model',
           },
         },

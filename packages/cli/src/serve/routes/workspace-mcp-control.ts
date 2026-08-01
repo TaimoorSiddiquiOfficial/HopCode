@@ -208,7 +208,7 @@ export function registerWorkspaceMcpControlRoutes(
       if (!clientId) {
         res.status(400).json({
           error:
-            '`X-Qwen-Client-Id` header is required for runtime MCP mutation',
+            '`X-HopCode-Client-Id` header is required for runtime MCP mutation',
           code: 'missing_client_id',
         });
         return;
@@ -239,7 +239,7 @@ export function registerWorkspaceMcpControlRoutes(
       if (!clientId) {
         res.status(400).json({
           error:
-            '`X-Qwen-Client-Id` header is required for runtime MCP mutation',
+            '`X-HopCode-Client-Id` header is required for runtime MCP mutation',
           code: 'missing_client_id',
         });
         return;
@@ -473,7 +473,7 @@ export function registerWorkspaceQualifiedMcpControlRoutes(
       if (!clientId) {
         res.status(400).json({
           error:
-            '`X-Qwen-Client-Id` header is required for runtime MCP mutation',
+            '`X-HopCode-Client-Id` header is required for runtime MCP mutation',
           code: 'missing_client_id',
         });
         return;
@@ -513,7 +513,7 @@ export function registerWorkspaceQualifiedMcpControlRoutes(
       if (!clientId) {
         res.status(400).json({
           error:
-            '`X-Qwen-Client-Id` header is required for runtime MCP mutation',
+            '`X-HopCode-Client-Id` header is required for runtime MCP mutation',
           code: 'missing_client_id',
         });
         return;

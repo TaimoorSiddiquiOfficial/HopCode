@@ -102,7 +102,7 @@
 
 ### Option 1: Quick Launch (1-2 Days)
 
-**Focus:** Get HopCode working with Qwen only
+**Focus:** Get HopCode working with hopcode only
 
 **Steps:**
 
@@ -368,7 +368,7 @@ npm run build -- --skipLibCheck
 **Next Action:**
 Choose launch strategy:
 
-- **A)** Launch with Qwen now (1-2 days)
+- **A)** Launch with hopcode now (1-2 days)
 - **B)** Launch with 5 providers (1 week)
 - **C)** Launch with all 20+ (2-3 weeks)
 

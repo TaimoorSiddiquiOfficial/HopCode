@@ -269,7 +269,7 @@ chmod +x scripts/installation/*.sh
 **Solution:** Check for missed references:
 
 ```bash
-# Search for remaining Qwen references
+# Search for remaining hopcode references
 grep -r "hopcode" packages/ --include="*.json"
 grep -r "@hopcode" packages/ --include="*.ts"
 ```

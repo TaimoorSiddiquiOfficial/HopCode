@@ -149,7 +149,7 @@ function auth(pending: request.Test): request.Test {
   return pending
     .set('Host', host())
     .set('Authorization', 'Bearer secret')
-    .set('X-Qwen-Client-Id', 'client-1');
+    .set('X-HopCode-Client-Id', 'client-1');
 }
 
 function mockExtensionManager(
@@ -923,7 +923,7 @@ describe('extension management v2 REST', () => {
       pending
         .set('Host', host())
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'secondary-client');
+        .set('X-HopCode-Client-Id', 'secondary-client');
     try {
       const wrongRuntime = await request(h.app)
         .put(
@@ -931,7 +931,7 @@ describe('extension management v2 REST', () => {
         )
         .set('Host', host())
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'primary-client')
+        .set('X-HopCode-Client-Id', 'primary-client')
         .send({ state: 'enabled' });
       expect(wrongRuntime.status).toBe(400);
       expect(wrongRuntime.body).toMatchObject({ code: 'invalid_client_id' });
@@ -1360,7 +1360,7 @@ describe('extension management v2 REST', () => {
         .delete(`/extensions/${extensionId}`)
         .set('Host', host())
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'invalid client id');
+        .set('X-HopCode-Client-Id', 'invalid client id');
 
       expect(response.status).toBe(400);
       expect(response.body).toMatchObject({ code: 'invalid_client_id' });

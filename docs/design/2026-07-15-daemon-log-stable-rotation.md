@@ -2,7 +2,7 @@
 
 - **Status:** Implemented
 - **Date:** 2026-07-15
-- **Scope:** `qwen serve` file logging, lifecycle ownership, access-log admission, daemon status, and the TypeScript SDK status mirror
+- **Scope:** `hopcode serve` file logging, lifecycle ownership, access-log admission, daemon status, and the TypeScript SDK status mirror
 
 ## Decision
 

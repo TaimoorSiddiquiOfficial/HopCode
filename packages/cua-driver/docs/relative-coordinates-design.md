@@ -12,18 +12,18 @@
 
 ## 0. 一个必须先澄清的发现（项目前提）
 
-Phase-1 对用户提供的 qwen 出错轨迹
+Phase-1 对用户提供的 hopcode 出错轨迹
 `trajectory-check/resolution/20260623_..._qwen3.7-plus.json` 做了逐调用复盘，
 结论与"qwen 用归一化"的工作假设 **方向相反**：
 
 - 该轨迹里 qwen3.7-plus 唯一一次落地的像素点击 `click{x:390,y:10}` 被 driver
   正确映射到屏幕 `(1144,345)`，误差 ≤1px —— **它当时用的是窗口截图像素，不是 0–1000**。
-- qwen 全程几乎只用 `element_index`（UIA）寻址；少数像素调用都是小数值边缘目标，
+- hopcode 全程几乎只用 `element_index`（UIA）寻址；少数像素调用都是小数值边缘目标，
   与"满量程 0–1000 中心点 ~500"不符。
 - 该轨迹真正的失败原因是 Ruler 窗口 **枚举不到**（`No windows found for pid`），
   与坐标系无关。
 - 关键原因：qwen 实际看到的工具 schema 明确写 `"window-local screenshot pixels"`，
-  qwen 遵从了该描述。
+  hopcode 遵从了该描述。
 
 **含义**：本改造的价值依然成立（提供一个归一化模式开关，让按 0–1000 训练的
 客户端能正确驱动 driver），但 **"qwen 在 cua-driver + computer_use 场景下到底输出
@@ -52,7 +52,7 @@ Phase-1 对用户提供的 qwen 出错轨迹
 - 解法：core 新建 `SIZE_CACHE: HashMap<(pid,window_id),(w,h)>`。
   `get_window_state` 返回时从 `structuredContent.screenshot_width/height` ingest，
   坐标工具入参时读出。
-- 基准就是 **downscale（cap 1568）之后的最终截图尺寸**，正是 qwen 看到的图
+- 基准就是 **downscale（cap 1568）之后的最终截图尺寸**，正是 hopcode 看到的图
   （`get_window_state.rs:286-287` 三平台同名 emit）→ 直接 ×/÷1000，无需再过 resize ratio。
 
 ### 1.3 开关
@@ -100,7 +100,7 @@ pixel 模式逐字节不变。非降采样窗口 `ratio==None`，无副作用。
 
 **两种基准**（`input_coord_fields` 的第三元 `screen_basis`）：
 - **window basis**（click/drag/zoom 等）：按 per-(pid,window_id) 缓存的截图尺寸换算，
-  与 qwen 看到的窗口截图 0–1000 网格对齐。
+  与 hopcode 看到的窗口截图 0–1000 网格对齐。
 - **screen basis**（仅 move_cursor）：overlay 光标走屏幕全局逻辑点，无 window 截图基准，
   改按 `SCREEN_SIZE` 缓存（由 `get_screen_size` 的 `structuredContent.width/height` ingest）
   换算。缓存未热时 **透传原值**（降级为字面像素）——move_cursor 是只读 attention overlay，
@@ -130,10 +130,10 @@ pixel 模式逐字节不变。非降采样窗口 `ratio==None`，无副作用。
 
 | 字段 | 处理 | 理由 |
 |---|---|---|
-| `screenshot_width/height` | 改成 `1000/1000`（可选保留 `*_px`） | qwen 视整图为 0–1000 网格 |
+| `screenshot_width/height` | 改成 `1000/1000`（可选保留 `*_px`） | hopcode 视整图为 0–1000 网格 |
 | `elements[].frame{x,y,w,h}` | **首版保持像素**，文档标注为 screen px | frame 是 **screen-global** 坐标（`ax/tree.rs:325 element_screen_rect`、win UIA `BoundingRectangle`、linux `GetExtents(Screen)`），要映射回截图空间需 window_origin + Retina scale，**core 拿不到**；三平台 points/px 语义还不一致。强行转换会引入错误。 |
 | `get_cursor_position` x,y | 保持像素 | screen 坐标，无 window 上下文，工具不收 window_id |
-| `list_windows`/`launch_app` 的 window `bounds` | 保持像素 | screen 绝对坐标，不是 qwen 用来点击的坐标 |
+| `list_windows`/`launch_app` 的 window `bounds` | 保持像素 | screen 绝对坐标，不是 hopcode 用来点击的坐标 |
 
 > 首版只归一化 **输入点击坐标**（qwen 的主路径）。输出 frame 的准确归一化是
 > 后续增强项，需要 platform 侧额外 emit window_origin + scale（破坏"只改 core"），
@@ -186,16 +186,16 @@ MCP `instructions`（`protocol.rs:191` "Prefer element_index … over pixel coor
 注意 `:67`/`:2039` 预存红（断言 serverInfo `"cua-driver-rs"`，实际 `"cua-driver"`），
 与本任务无关，勿误判。
 
-### 8.3 真机（替换 qwen 的 binary）
+### 8.3 真机（替换 hopcode 的 binary）
 1. 编译：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer cargo build -p cua-driver --bin cua-driver`
    （**必须 DEVELOPER_DIR=完整 Xcode**，否则 Swift 链接失败）。
-2. 覆盖 qwen 实际 spawn 的 binary（不改 installed.json 版本号，借壳 0.5.2 路径）：
+2. 覆盖 hopcode 实际 spawn 的 binary（不改 installed.json 版本号，借壳 0.5.2 路径）：
    `~/.hopcode/computer-use/cua-driver-rs-0.5.2/cua-driver-rs-0.5.2-darwin-arm64/CuaDriver.app/Contents/MacOS/cua-driver`
    覆盖后 `codesign --force --deep --sign -`。
 3. **验证 A（纯 driver，确认换算）**：stdio 手发 normalized 坐标 + click 的
    `screenshot_path`/`debug_image_out` 画红十字，四角 (0,0)/(1000,0)/(0,1000)/(1000,1000)
    看是否压边 → 定 DIV=1000 vs 999。
-4. **验证 B（真模型，确认 qwen 坐标空间 = §0 的根本问题）**：跑 qwen CLI，
+4. **验证 B（真模型，确认 hopcode 坐标空间 = §0 的根本问题）**：跑 hopcode CLI，
    抓一次真实 click 的原始坐标值 —— 是 0–1000 量级还是 0–1568 像素量级。
    这 settle 整个项目前提。
 
@@ -205,7 +205,7 @@ MCP `instructions`（`protocol.rs:191` "Prefer element_index … over pixel coor
 
 | # | 风险 | 缓解 |
 |---|---|---|
-| R0 | qwen 实际坐标空间未经真机确认（轨迹反证，§0） | §8.3 验证 B，先实测再定默认值 |
+| R0 | hopcode 实际坐标空间未经真机确认（轨迹反证，§0） | §8.3 验证 B，先实测再定默认值 |
 | R1 | 除数 1000 vs 999、是否 round | §8.3 验证 A 四角实测；DIV 可配 |
 | R2 | replay 双重换算（`recording_tools.rs:391` 再过 invoke） | record 存 denormalize 后像素值 + bypass 标记 |
 | R3 | 输出 frame 是 screen 坐标，无法在 core 准确归一化 | 首版降级保持像素（§5） |
@@ -226,7 +226,7 @@ MCP `instructions`（`protocol.rs:191` "Prefer element_index … over pixel coor
     - [x] function description：`rewrite_coord_desc`；in-process(`tools_list`) + **daemon(`serve.rs` ×2，兼容 `input_schema` 字段名)** 全覆盖
   - [x] `main.rs` `seed_coordinate_space_from_env()`（两个 main 入口）
   - [x] 全量编译 + 双模式 stdio smoke + **daemon-proxy smoke**（description 改写已验证）
-- [ ] Phase-3 真机验证（A 换算四角画十字 + B qwen 坐标空间实测）
+- [ ] Phase-3 真机验证（A 换算四角画十字 + B hopcode 坐标空间实测）
 - [ ] subtree split 抽出独立仓库（待用户提供 GitHub 仓库）
 - [ ] mac app 证书签名（待用户提供）
 

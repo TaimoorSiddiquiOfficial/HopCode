@@ -180,7 +180,7 @@ details.
 ### Device-flow auth
 
 Separate OAuth surface for provider authentication. The v1 provider identifier is
-`hopcode-oauth`, but Qwen OAuth free tier was discontinued on 2026-04-15; new
+`hopcode-oauth`, but hopcode OAuth free tier was discontinued on 2026-04-15; new
 setups should use a currently supported auth provider when one is available.
 
 - `POST /workspace/auth/device-flow` — start a flow; returns `{deviceFlowId, providerId, expiresAt, verificationUrl, userCode}`.

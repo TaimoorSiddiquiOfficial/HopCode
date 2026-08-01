@@ -819,7 +819,7 @@ maskApiKey(apiKey: string): string
 ### Settings
 
 - The API key is written to `settings.json.env[generatedEnvKey]`.
-- `generatedEnvKey` is derived from selected protocol and `baseUrl` using the Qwen private namespace.
+- `generatedEnvKey` is derived from selected protocol and `baseUrl` using the hopcode private namespace.
 - `modelProviders[selectedProtocol]` receives one entry per normalized model ID.
 - Each custom model entry uses `id === name`.
 - `security.auth.selectedType` is set to the selected protocol.

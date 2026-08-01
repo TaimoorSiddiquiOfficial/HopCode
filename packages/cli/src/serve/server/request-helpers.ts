@@ -63,7 +63,7 @@ const PROTOTYPE_POLLUTION_KEYS: ReadonlySet<string> = new Set([
   'prototype',
 ]);
 
-export const CLIENT_ID_HEADER = 'x-qwen-client-id';
+export const CLIENT_ID_HEADER = 'X-HopCode-Client-Id';
 export const MAX_CLIENT_ID_LENGTH = 128;
 export const MAX_TOOL_NAME_LENGTH = 256;
 export const MAX_SKILL_NAME_LENGTH = 256;
@@ -171,7 +171,7 @@ export function parseClientIdHeader(
   if (raw.length > MAX_CLIENT_ID_LENGTH || !CLIENT_ID_RE.test(raw)) {
     res.status(400).json({
       error:
-        '`X-Qwen-Client-Id` must be a non-empty token of 128 characters or fewer',
+        '`X-HopCode-Client-Id` must be a non-empty token of 128 characters or fewer',
       code: 'invalid_client_id',
     });
     return null;
@@ -247,7 +247,7 @@ export function validateMcpRuntimeServerName(
 }
 
 /**
- * Workspace-level mutation routes validate the parsed `X-Qwen-Client-Id`
+ * Workspace-level mutation routes validate the parsed `X-HopCode-Client-Id`
  * against the supplied bridge set so the `originatorClientId` stamped
  * onto fan-out events is grounded in a known identity. Returns the
  * validated client id (or `undefined` when no header was supplied),

@@ -1,8 +1,0 @@
-import type { RpcServer } from '@craft-agent/server-core/transport';
-import type { HandlerDeps } from './handler-deps';
-export declare const CORE_HANDLED_CHANNELS: readonly [any, any, any, any, any, any, any, any, any, any, any, any, any, any];
-export declare const GUI_HANDLED_CHANNELS: readonly [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any];
-export declare const HANDLED_CHANNELS: readonly [any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any, any];
-export declare function registerSystemCoreHandlers(server: RpcServer, deps: HandlerDeps): void;
-export declare function registerSystemGuiHandlers(server: RpcServer, deps: HandlerDeps): void;
-export declare function registerSystemHandlers(server: RpcServer, deps: HandlerDeps): void;

@@ -793,7 +793,7 @@ describe('workspace-qualified core REST', () => {
           `/workspaces/${encodeURIComponent(h.secondaryId)}/mcp/docs/enable`,
         )
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .set('Host', host())
         .send({});
       expect(enable.status).toBe(200);
@@ -806,7 +806,7 @@ describe('workspace-qualified core REST', () => {
       const add = await request(h.app)
         .post(`/workspaces/${encodeURIComponent(h.secondaryId)}/mcp/servers`)
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .set('Host', host())
         .send({ name: 'runtime', config: { command: 'node' } });
       expect(add.status).toBe(200);
@@ -817,7 +817,7 @@ describe('workspace-qualified core REST', () => {
           `/workspaces/${encodeURIComponent(h.secondaryId)}/mcp/servers/runtime`,
         )
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .set('Host', host());
       expect(remove.status).toBe(200);
       expect(remove.body.removed).toBe(true);
@@ -897,7 +897,7 @@ describe('workspace-qualified core REST', () => {
           `/workspaces/${encodeURIComponent(h.secondaryId)}/skills/review/enable`,
         )
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'client-1')
+        .set('X-HopCode-Client-Id', 'client-1')
         .set('Host', host())
         .send({ enabled: false });
       expect(res.status).toBe(200);
@@ -928,7 +928,7 @@ describe('workspace-qualified core REST', () => {
           `/workspaces/${encodeURIComponent(h.secondaryId)}/skills/review/enable`,
         )
         .set('Authorization', 'Bearer secret')
-        .set('X-Qwen-Client-Id', 'forged-client')
+        .set('X-HopCode-Client-Id', 'forged-client')
         .set('Host', host())
         .send({ enabled: false });
       expect(invalidClient.status).toBe(400);

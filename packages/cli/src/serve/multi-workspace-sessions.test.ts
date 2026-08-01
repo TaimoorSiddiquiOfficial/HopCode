@@ -973,7 +973,7 @@ describe('multi-workspace session dispatch', () => {
     await request(app)
       .post('/session/secondary-session/prompt')
       .set('Host', host())
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .send({ prompt: [{ type: 'text', text: 'hello' }] })
       .expect(202);
     expect(primaryBridge.promptCalls).toEqual([]);
@@ -1028,7 +1028,7 @@ describe('multi-workspace session dispatch', () => {
     const rewind = await auth(
       request(app).post('/session/secondary-session/rewind'),
     )
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .send({ promptId: 'secondary-prompt', rewindFiles: true });
     expect(rewind.status).toBe(200);
     expect(rewind.body.filesChanged).toEqual(['tracked.txt']);
@@ -1036,7 +1036,7 @@ describe('multi-workspace session dispatch', () => {
     const shell = await auth(
       request(app).post('/session/secondary-session/shell'),
     )
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .send({ command: ' pwd ' });
     expect(shell.status).toBe(200);
     expect(shell.body.output).toBe(SECONDARY_CWD);
@@ -1170,7 +1170,7 @@ describe('multi-workspace session dispatch', () => {
     const shell = await auth(
       request(app).post('/session/secondary-session/shell'),
     )
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .send({ command: 'pwd' });
     expect(shell.status).toBe(403);
     expect(shell.body.code).toBe('untrusted_workspace');
@@ -1210,7 +1210,7 @@ describe('multi-workspace session dispatch', () => {
       .post('/session/secondary-session/shell')
       .set('Host', host())
       .set('Authorization', 'Bearer secret')
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .send({ command: 'sleep 10' });
     const response = pending.then(
       () => undefined,
@@ -1258,7 +1258,7 @@ describe('multi-workspace session dispatch', () => {
       .post('/session/secondary-session/shell')
       .set('Host', host())
       .set('Authorization', 'Bearer secret')
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .send({ command: '   ' });
     expect(emptyCommand.status).toBe(400);
 
@@ -1287,7 +1287,7 @@ describe('multi-workspace session dispatch', () => {
       .post('/session/primary-session/shell')
       .set('Host', host())
       .set('Authorization', 'Bearer secret')
-      .set('X-Qwen-Client-Id', 'client-1')
+      .set('X-HopCode-Client-Id', 'client-1')
       .send({ command: 'pwd' })
       .expect(200);
 
@@ -1331,7 +1331,7 @@ describe('multi-workspace session dispatch', () => {
       .send({ promptId: 'primary-prompt', rewindFiles: false })
       .expect(200);
     await auth(request(app).post('/session/primary-session/shell'))
-      .set('X-Qwen-Client-Id', 'client-1')
+      .set('X-HopCode-Client-Id', 'client-1')
       .send({ command: 'pwd' })
       .expect(200);
 
@@ -1406,7 +1406,7 @@ describe('multi-workspace session dispatch', () => {
     await request(app)
       .post('/session/secondary-session/permission/perm-1')
       .set('Host', host())
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .send({ outcome: { outcome: 'cancelled' } })
       .expect(200);
     expect(primaryBridge.permissionCalls).toEqual([]);
@@ -1420,7 +1420,7 @@ describe('multi-workspace session dispatch', () => {
     const pending = await request(app)
       .get('/session/secondary-session/pending-prompts')
       .set('Host', host())
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .expect(200);
     expect(pending.body.pendingPrompts).toEqual([
       expect.objectContaining({ promptId: 'prompt-1' }),
@@ -1429,7 +1429,7 @@ describe('multi-workspace session dispatch', () => {
     await request(app)
       .delete('/session/secondary-session/pending-prompts/prompt-1')
       .set('Host', host())
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .expect(200);
     expect(primaryBridge.pendingPromptCalls).toEqual([]);
     expect(primaryBridge.removePendingPromptCalls).toEqual([]);
@@ -1441,7 +1441,7 @@ describe('multi-workspace session dispatch', () => {
     await request(app)
       .delete('/session/secondary-session')
       .set('Host', host())
-      .set('X-Qwen-Client-Id', 'client-2')
+      .set('X-HopCode-Client-Id', 'client-2')
       .expect(204);
     expect(primaryBridge.closeCalls).toEqual([]);
     expect(secondaryBridge.closeCalls).toEqual(['secondary-session']);
@@ -1631,7 +1631,7 @@ describe('multi-workspace session dispatch', () => {
     const res = await request(app)
       .post('/session/secondary-session/model')
       .set('Host', host())
-      .set('X-Qwen-Client-Id', 'client-1')
+      .set('X-HopCode-Client-Id', 'client-1')
       .send({ modelId: 'qwen3-coder' });
 
     expect(res.status).toBe(200);
@@ -1703,7 +1703,7 @@ describe('multi-workspace session dispatch', () => {
       .patch('/session/secondary-session/metadata')
       .set('Host', host())
       .set('Authorization', TEST_AUTHORIZATION)
-      .set('X-Qwen-Client-Id', 'secondary-client')
+      .set('X-HopCode-Client-Id', 'secondary-client')
       .send({ displayName: 'renamed' });
     expect(metadataRes.status).toBe(200);
     expect(metadataRes.body).toEqual({
@@ -1715,7 +1715,7 @@ describe('multi-workspace session dispatch', () => {
       .post('/session/secondary-session/recap')
       .set('Host', host())
       .set('Authorization', TEST_AUTHORIZATION)
-      .set('X-Qwen-Client-Id', 'secondary-client')
+      .set('X-HopCode-Client-Id', 'secondary-client')
       .send({});
     expect(recapRes.status).toBe(200);
     expect(recapRes.body).toEqual({
@@ -1727,7 +1727,7 @@ describe('multi-workspace session dispatch', () => {
       .post('/session/secondary-session/btw')
       .set('Host', host())
       .set('Authorization', TEST_AUTHORIZATION)
-      .set('X-Qwen-Client-Id', 'secondary-client')
+      .set('X-HopCode-Client-Id', 'secondary-client')
       .send({ question: '  why?  ' });
     expect(btwRes.status).toBe(200);
     expect(btwRes.body).toEqual({
@@ -1739,7 +1739,7 @@ describe('multi-workspace session dispatch', () => {
       .post('/session/secondary-session/mid-turn-message')
       .set('Host', host())
       .set('Authorization', TEST_AUTHORIZATION)
-      .set('X-Qwen-Client-Id', 'secondary-client')
+      .set('X-HopCode-Client-Id', 'secondary-client')
       .send({ message: '  remember this  ' });
     expect(midTurnRes.status).toBe(200);
     expect(midTurnRes.body).toEqual({ accepted: true });
@@ -1823,12 +1823,12 @@ describe('multi-workspace session dispatch', () => {
     const firstContinue = await auth(
       request(app).post('/session/secondary-session/continue'),
     )
-      .set('X-Qwen-Client-Id', 'secondary-client')
+      .set('X-HopCode-Client-Id', 'secondary-client')
       .send({});
     const secondContinue = await auth(
       request(app).post('/session/secondary-session/continue'),
     )
-      .set('X-Qwen-Client-Id', 'secondary-client')
+      .set('X-HopCode-Client-Id', 'secondary-client')
       .send({});
     expect(firstContinue.status).toBe(200);
     expect(secondContinue.status).toBe(200);
@@ -1841,7 +1841,7 @@ describe('multi-workspace session dispatch', () => {
     const language = await auth(
       request(app).post('/session/secondary-session/language'),
     )
-      .set('X-Qwen-Client-Id', 'secondary-client')
+      .set('X-HopCode-Client-Id', 'secondary-client')
       .send({ language: 'zh', syncOutputLanguage: true });
     expect(language.status).toBe(200);
     expect(language.body).toEqual({
@@ -1853,7 +1853,7 @@ describe('multi-workspace session dispatch', () => {
     const addArtifact = await auth(
       request(app).post('/session/secondary-session/artifacts'),
     )
-      .set('X-Qwen-Client-Id', 'secondary-client')
+      .set('X-HopCode-Client-Id', 'secondary-client')
       .send({
         title: 'Secondary artifact',
         url: 'https://example.com/secondary',
@@ -1869,7 +1869,7 @@ describe('multi-workspace session dispatch', () => {
       request(app).delete(
         '/session/secondary-session/artifacts/artifact-secondary',
       ),
-    ).set('X-Qwen-Client-Id', 'secondary-client');
+    ).set('X-HopCode-Client-Id', 'secondary-client');
     expect(removeArtifact.status).toBe(200);
     expect(removeArtifact.body).toMatchObject({
       v: 1,
@@ -1928,12 +1928,12 @@ describe('multi-workspace session dispatch', () => {
       request(app)
         .post('/session/secondary-session/artifacts')
         .set('Host', host())
-        .set('X-Qwen-Client-Id', 'secondary-client')
+        .set('X-HopCode-Client-Id', 'secondary-client')
         .send({ title: 'blocked', url: 'https://example.com/blocked' }),
       request(app)
         .delete('/session/secondary-session/artifacts/artifact-secondary')
         .set('Host', host())
-        .set('X-Qwen-Client-Id', 'secondary-client'),
+        .set('X-HopCode-Client-Id', 'secondary-client'),
     ]);
     expect(responses.map((response) => response.status)).toEqual([
       401, 401, 401,
@@ -1971,13 +1971,13 @@ describe('multi-workspace session dispatch', () => {
         language: 'zh',
       }),
       auth(request(app).post('/session/secondary-session/artifacts'))
-        .set('X-Qwen-Client-Id', 'secondary-client')
+        .set('X-HopCode-Client-Id', 'secondary-client')
         .send({ title: 'blocked', url: 'https://example.com/blocked' }),
       auth(
         request(app).delete(
           '/session/secondary-session/artifacts/artifact-secondary',
         ),
-      ).set('X-Qwen-Client-Id', 'secondary-client'),
+      ).set('X-HopCode-Client-Id', 'secondary-client'),
     ]);
 
     expect(responses.map((response) => response.status)).toEqual([
@@ -2004,11 +2004,11 @@ describe('multi-workspace session dispatch', () => {
         language: 'zh',
       }),
       auth(request(missing.app).post('/session/missing/artifacts'))
-        .set('X-Qwen-Client-Id', 'secondary-client')
+        .set('X-HopCode-Client-Id', 'secondary-client')
         .send({ title: 'missing', url: 'https://example.com/missing' }),
       auth(
         request(missing.app).delete('/session/missing/artifacts/artifact-1'),
-      ).set('X-Qwen-Client-Id', 'secondary-client'),
+      ).set('X-HopCode-Client-Id', 'secondary-client'),
     ]);
     expect(missingResponses.map((response) => response.status)).toEqual([
       404, 404, 404, 404,
@@ -2058,13 +2058,13 @@ describe('multi-workspace session dispatch', () => {
 
     const responses = await Promise.all([
       auth(request(app).post('/session/primary-session/continue'))
-        .set('X-Qwen-Client-Id', 'primary-client')
+        .set('X-HopCode-Client-Id', 'primary-client')
         .send({}),
       auth(request(app).post('/session/primary-session/language'))
-        .set('X-Qwen-Client-Id', 'primary-client')
+        .set('X-HopCode-Client-Id', 'primary-client')
         .send({ language: 'en', syncOutputLanguage: true }),
       auth(request(app).post('/session/primary-session/artifacts'))
-        .set('X-Qwen-Client-Id', 'primary-client')
+        .set('X-HopCode-Client-Id', 'primary-client')
         .send({
           title: 'Primary artifact',
           url: 'https://example.com/primary',
@@ -2073,7 +2073,7 @@ describe('multi-workspace session dispatch', () => {
         request(app).delete(
           '/session/primary-session/artifacts/artifact-primary',
         ),
-      ).set('X-Qwen-Client-Id', 'primary-client'),
+      ).set('X-HopCode-Client-Id', 'primary-client'),
     ]);
     expect(responses.map((response) => response.status)).toEqual([
       200, 200, 200, 200,

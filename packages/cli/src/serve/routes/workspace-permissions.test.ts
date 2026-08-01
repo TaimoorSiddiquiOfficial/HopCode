@@ -92,7 +92,7 @@ async function makeHarness(opts?: {
     safeBody,
     workspace: workspaceService,
     parseAndValidateClientId: (req: Request, res: Response) => {
-      const clientId = req.get('X-Qwen-Client-Id');
+      const clientId = req.get('X-HopCode-Client-Id');
       if (clientId === 'unknown-client') {
         res.status(400).json({
           error: 'Unknown client id',
@@ -223,7 +223,7 @@ describe('workspace permissions routes', () => {
 
     const res = await request(h.app)
       .post('/workspace/permissions')
-      .set('X-Qwen-Client-Id', 'client-1')
+      .set('X-HopCode-Client-Id', 'client-1')
       .send({
         scope: 'user',
         ruleType: 'allow',
@@ -320,7 +320,7 @@ describe('workspace permissions routes', () => {
 
     const res = await request(h.app)
       .post('/workspace/permissions')
-      .set('X-Qwen-Client-Id', 'client-1')
+      .set('X-HopCode-Client-Id', 'client-1')
       .send({
         scope: 'user',
         ruleType: 'allow',

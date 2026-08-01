@@ -219,7 +219,7 @@ For bugfix PRs, the Issue Fidelity agent fetches issue evidence directly instead
 
 If the issue evidence shows an upstream service or provider returned malformed data outside the client contract, client-side parser or sanitizer changes are not treated as a valid root-cause fix unless a maintainer explicitly requested a defensive workaround. A test that replays malformed upstream output proves only that the workaround handles that shape; it does not prove the workaround is architecturally appropriate.
 
-Example `.qwen/review-rules.md`:
+Example `.hopcode/review-rules.md`:
 
 ```markdown
 # Review Rules
@@ -258,7 +258,7 @@ If you switch models (via `/model`) and re-review the same PR, `/review` detects
 # → "Previous review used qwen3-coder. Running full review with gpt-4o for a second opinion."
 ```
 
-Cache is stored in `.qwen/review-cache/` and tracks both the commit SHA and model ID. Make sure this directory is in your `.gitignore` (a broader rule like `.qwen/*` also works). If the cached commit was rebased away, it falls back to a full review. Only high-effort reviews consult or write the cache — a `--effort low|medium` quick pass never counts as "already reviewed".
+Cache is stored in `.hopcode/review-cache/` and tracks both the commit SHA and model ID. Make sure this directory is in your `.gitignore` (a broader rule like `.hopcode/*` also works). If the cached commit was rebased away, it falls back to a full review. Only high-effort reviews consult or write the cache — a `--effort low|medium` quick pass never counts as "already reviewed".
 
 ## Review Reports
 

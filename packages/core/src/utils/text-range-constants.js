@@ -1,8 +1,0 @@
-/**
- * @license
- * Copyright 2026 HopCode Team
- * SPDX-License-Identifier: Apache-2.0
- */
-export const TEXT_RANGE_FAST_PATH_MAX_SIZE = 10 * 1024 * 1024;
-export const DEFAULT_RANGE_READ_BYTES = 25_000;
-//# sourceMappingURL=text-range-constants.js.map

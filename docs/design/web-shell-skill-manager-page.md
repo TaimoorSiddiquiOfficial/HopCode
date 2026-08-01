@@ -48,7 +48,7 @@ Skill level before deletion.
 
 ## Filesystem and validation
 
-- Workspace Skills are confined to `<workspace>/.qwen/skills/<slug>`.
+- Workspace Skills are confined to `<workspace>/.hopcode/skills/<slug>`.
 - Global Skills are confined to `<QWEN_HOME>/skills/<slug>`.
 - Deletion also accepts discovered project/user Skills in compatible
   `.agents/skills` provider directories.

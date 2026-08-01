@@ -7,10 +7,10 @@ A minimal end-to-end example: start a `hopcode serve` daemon in another terminal
 In one terminal:
 
 ```bash
-qwen serve --port 4170 \
+hopcode serve --port 4170 \
   --workspace /path/to/project-a \
   --workspace /path/to/project-b
-# → qwen serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/project-a)
+# → hopcode serve listening on http://127.0.0.1:4170 (mode=http-bridge, workspace=/path/to/project-a)
 ```
 
 Each `--workspace` value must be an absolute directory. The first startup workspace is primary and remains the compatibility default for requests that omit `cwd`; `/capabilities.workspaces[]` is the catalog clients should use when selecting any runtime explicitly.
@@ -183,7 +183,7 @@ case 'permission_request': {
 
 ## Shared-session collaboration
 
-Two clients pointed at the **same daemon workspace** end up on the same session when they use the default `sessionScope: 'single'`. For a single-workspace daemon launched as `qwen serve --workspace /work/repo` (or `cd /work/repo && qwen serve`), both clients connect to that primary workspace:
+Two clients pointed at the **same daemon workspace** end up on the same session when they use the default `sessionScope: 'single'`. For a single-workspace daemon launched as `hopcode serve --workspace /work/repo` (or `cd /work/repo && hopcode serve`), both clients connect to that primary workspace:
 
 ```ts
 // Daemon was launched as `hopcode serve --workspace /work/repo` so

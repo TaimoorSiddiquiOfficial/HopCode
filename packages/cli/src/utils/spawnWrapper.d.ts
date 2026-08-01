@@ -1,7 +1,0 @@
-/**
- * @license
- * Copyright 2025 HopCode Team
- * SPDX-License-Identifier: Apache-2.0
- */
-import { spawn } from 'node:child_process';
-export declare const spawnWrapper: typeof spawn;

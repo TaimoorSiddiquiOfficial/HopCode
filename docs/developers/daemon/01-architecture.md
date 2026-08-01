@@ -2,7 +2,7 @@
 
 ## Overview
 
-A `qwen serve` process hosts one Express HTTP server and one primary workspace by default. With `multi_workspace_sessions` enabled it may also host additional workspace runtimes for the live session closed loop; each registered workspace owns its own `@hoptrendy/acp-bridge` / `qwen --acp` child pair. Multiple clients (CLI TUI, IDE companion, IM channel bots, web BFFs, custom scripts) connect over HTTP + SSE and either share one ACP session (`sessionScope: 'single'`, default) or split sessions by conversation thread (`sessionScope: 'thread'`).
+A `hopcode serve` process hosts one Express HTTP server and one primary workspace by default. With `multi_workspace_sessions` enabled it may also host additional workspace runtimes for the live session closed loop; each registered workspace owns its own `@hoptrendy/acp-bridge` / `qwen --acp` child pair. Multiple clients (CLI TUI, IDE companion, IM channel bots, web BFFs, custom scripts) connect over HTTP + SSE and either share one ACP session (`sessionScope: 'single'`, default) or split sessions by conversation thread (`sessionScope: 'thread'`).
 
 Inside the ACP child, MCP servers are shared workspace-wide through `McpTransportPool` (F2): a single (server-name + config-fingerprint) tuple maps to one MCP transport, regardless of how many sessions discover it. The bridge's `MultiClientPermissionMediator` (F3) coordinates permission votes across all connected clients under one of four policies.
 
@@ -20,7 +20,7 @@ flowchart LR
         SDK["Any SDK consumer<br/>(packages/sdk-typescript/src/daemon)"]
     end
 
-    subgraph daemon["qwen serve process (primary workspace plus optional session runtimes)"]
+    subgraph daemon["hopcode serve process (primary workspace plus optional session runtimes)"]
         EXP["Express app<br/>(packages/cli/src/serve/server.ts)"]
         BR["AcpBridge<br/>(packages/acp-bridge/src/bridge.ts)"]
         MED["MultiClientPermissionMediator<br/>(F3)"]

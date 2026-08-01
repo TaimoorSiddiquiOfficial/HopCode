@@ -44,7 +44,7 @@ Three tiers (verified at commit `0c0430939`):
 
 ```
 ┌──────────────┐  bespoke REST + SSE (HTTP/1.1)   ┌────────────┐  ACP JSON-RPC   ┌──────────────┐
-│ web / SDK    │ ───────────────────────────────► │  qwen      │  (stdio NDJSON) │ hopcode --acp   │
+│ web / SDK    │ ───────────────────────────────► │  hopcode      │  (stdio NDJSON) │ hopcode --acp   │
 │ client       │ ◄─── GET /session/:id/events ──── │  serve     │ ◄─────────────► │ child (Agent)│
 │ (ACP client) │       (text/event-stream)        │  (daemon)  │  ndJsonStream   │              │
 └──────────────┘                                   └────────────┘                 └──────────────┘
@@ -167,7 +167,7 @@ client  ────────────────────────
 | `connection-registry.ts` | `Acp-Connection-Id` → `AcpConnection` (connection SSE writer, `Map<sessionId, SessionStream>`, pending agent→client requests by JSON-RPC id, monotonic id allocator). TTL + DELETE cleanup. |
 | `json-rpc.ts`            | JSON-RPC 2.0 parse/validate/serialize helpers; error codes (`-32600` etc.); `_hopcode/` namespace guard.                                                                                       |
 | `dispatch.ts`            | Maps inbound JSON-RPC methods → `HttpAcpBridge` calls. Maps `BridgeEvent`s → outbound JSON-RPC frames. The translation table (§4).                                                          |
-| `sse-stream.ts`          | Long-lived SSE writer (reuses the backpressure/heartbeat pattern from `server.ts`). Distinct from REST `/events` (different framing: full JSON-RPC objects, not qwen event envelopes).      |
+| `sse-stream.ts`          | Long-lived SSE writer (reuses the backpressure/heartbeat pattern from `server.ts`). Distinct from REST `/events` (different framing: full JSON-RPC objects, not hopcode event envelopes).      |
 
 No change to `bridge.ts` / `eventBus.ts` (additive consumer only).
 

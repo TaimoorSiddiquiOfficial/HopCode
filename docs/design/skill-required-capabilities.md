@@ -1,4 +1,4 @@
-﻿# Skill Required Capabilities Design
+# Skill Required Capabilities Design
 
 Status: design note; this PR proceeds with Option B and leaves
 `required-capabilities` as a future proposal.
@@ -239,7 +239,7 @@ renderer, supplies the skill itself.
 
 Possible distribution models:
 
-- The Web Shell host installs `.qwen/skills/qwencode-viz/SKILL.md`.
+- The Web Shell host installs `.hopcode/skills/qwencode-viz/SKILL.md`.
 - The Web Shell package ships an optional non-auto-loaded skill template that a
   host can copy or install when chart rendering is enabled.
 - The Web Shell integration ships an extension skill package.
@@ -300,7 +300,7 @@ packages/web-shell/docs/examples/qwencode-viz/SKILL.md
 to the workspace or user skill directory, for example:
 
 ```text
-.qwen/skills/qwencode-viz/SKILL.md
+.hopcode/skills/qwencode-viz/SKILL.md
 ```
 
 An integration with its own skill distribution layer can instead load the same
@@ -319,16 +319,16 @@ second.
 
 A daemon-backed host can treat the workspace file API as one artifact backend.
 For example, the host can persist chart artifacts under a controlled workspace
-directory such as `.qwen/artifacts/`, expose model-facing references like
+directory such as `.hopcode/artifacts/`, expose model-facing references like
 `artifact://chart-data/orders.csv`, and resolve them through daemon
-`GET /file?path=.qwen/artifacts/chart-data/orders.csv`. This keeps
+`GET /file?path=.hopcode/artifacts/chart-data/orders.csv`. This keeps
 `artifact://` as the public chart contract while allowing the first
 implementation to reuse daemon workspace files.
 
 The resolver must still enforce the artifact root before calling the daemon:
 
 ```tsx
-const ARTIFACT_ROOT = '.qwen/artifacts/';
+const ARTIFACT_ROOT = '.hopcode/artifacts/';
 const MAX_CHART_DATA_BYTES = 256 * 1024;
 
 async function resolveDataRef(
@@ -369,7 +369,7 @@ async function resolveDataRef(
 ```
 
 This example intentionally maps only normalized `artifact://` paths under
-`.qwen/artifacts/`. If a host later moves artifacts to object storage or a
+`.hopcode/artifacts/`. If a host later moves artifacts to object storage or a
 session-scoped artifact service, only `resolveDataRef` needs to change; the
 model-facing `echarts-fulldata` block can keep using the same ref shape.
 

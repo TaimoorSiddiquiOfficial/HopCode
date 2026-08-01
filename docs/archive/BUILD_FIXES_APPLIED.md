@@ -107,7 +107,7 @@ The authentication type `HOPCODE_OAUTH` refers to the actual Alibaba Cloud HopCo
 - `packages/core/src/utils/retry.ts` (1 error)
 
 **Solution:**
-These should remain as `AuthType.HOPCODE_OAUTH` because they refer to the actual Alibaba Qwen authentication service. The rebranding script incorrectly changed these.
+These should remain as `AuthType.HOPCODE_OAUTH` because they refer to the actual Alibaba hopcode authentication service. The rebranding script incorrectly changed these.
 
 **To Fix:**
 Run a find-and-replace in the core package:
@@ -128,10 +128,10 @@ AuthType.hopcode_OAUTH → AuthType.HOPCODE_OAUTH
 - `packages/core/src/services/fileDiscoveryService.ts`
 
 **Solution:**
-These internal service names that refer to actual Qwen API clients should remain unchanged:
+These internal service names that refer to actual hopcode API clients should remain unchanged:
 
-- `qwenClient` → Keep as is (refers to Qwen API client)
-- `hopcodeignoreFilter` → Keep as is (refers to Qwen ignore file format)
+- `qwenClient` → Keep as is (refers to hopcode API client)
+- `hopcodeignoreFilter` → Keep as is (refers to hopcode ignore file format)
 
 ---
 
@@ -151,7 +151,7 @@ These internal service names that refer to actual Qwen API clients should remain
 
 ### ❌ SHOULD NOT Be Changed (Technical/API-facing)
 
-- **API service names** (HopCode OAuth, Qwen API, etc.)
+- **API service names** (HopCode OAuth, hopcode API, etc.)
 - **Model names** (qwen3.5-plus, qwen3.6-plus, etc.)
 - **Internal client library names** (qwenClient, etc.)
 - **File format names** (.hopcodeignore files)

@@ -34,7 +34,7 @@ Your goal here is to understand the scope of changes so you can dispatch agents 
 
 **Do not parse the arguments yourself — run the parser. And do not retype them — they are already in a file.** The flag grammar (`--comment`, `--effort <level>`, `--effort=<level>`) and the target disambiguation are deterministic, and three separate parsing bugs shipped while they lived here as prose. The tested implementation is a subcommand, and it reads the argument string **on stdin from a file — never as a positional shell argument, and never inline in shell syntax**: a raw string that begins with a flag (`/review --effort low`) is eaten by the CLI's own argument parsing before the subcommand runs (`Unknown argument: effort low`); one containing a quote or `$(...)` is mangled by the shell; and a heredoc is not safe either — the delimiter is recognized inside the content, so a raw string carrying that exact line would terminate the heredoc early and hand the rest to the shell as commands. A file crosses the boundary with zero shell parsing of the content.
 
-**The CLI has already written that file for you.** When `/review` is invoked with arguments, they are saved verbatim to a session-private file before this prompt reaches you, and the `<skill-args>` note at the end of your instructions gives you its **exact path** — it is under `.qwen/tmp/s-<session>/`, so do not guess the name, read the path the note states. Read from that file. Do **not** `write_file` the arguments yourself: that is a transcription, and a transcription is a recall. Dogfooding `/review 6771`, a run wrote `--effort high` into the argument file — not the user's argument, but an **example** lifted out of the paragraph above. The parser then did its job perfectly on the wrong input: it resolved a _local_ review, found the working tree clean, and reported "no changes to review". A request to review a pull request became a no-op, and nothing raised an error.
+**The CLI has already written that file for you.** When `/review` is invoked with arguments, they are saved verbatim to a session-private file before this prompt reaches you, and the `<skill-args>` note at the end of your instructions gives you its **exact path** — it is under `.hopcode/tmp/s-<session>/`, so do not guess the name, read the path the note states. Read from that file. Do **not** `write_file` the arguments yourself: that is a transcription, and a transcription is a recall. Dogfooding `/review 6771`, a run wrote `--effort high` into the argument file — not the user's argument, but an **example** lifted out of the paragraph above. The parser then did its job perfectly on the wrong input: it resolved a _local_ review, found the working tree clean, and reported "no changes to review". A request to review a pull request became a no-op, and nothing raised an error.
 
 If the args file is genuinely absent (an older CLI, or a write that failed), fall back to `write_file`-ing the raw argument string **verbatim and unmodified** — copying **the user's argument**, not an example from these instructions — and say in your output that you did, so a wrong target is at least attributable. For a no-argument `/review`, no file is written and none is needed; run the parser with an empty stdin.
 
@@ -45,9 +45,9 @@ Then run:
 ```bash
 # The CLI wrote this file; you did not, and must not.
 "${QWEN_CODE_CLI:-qwen}" review parse-args --stdin < <the path in the <skill-args-file> note> \
-  | tee .qwen/tmp/qwen-review-parse-args.json
+  | tee .hopcode/tmp/qwen-review-parse-args.json
 # No arguments at all (`/review` bare) — no args file exists:
-#   : | "${QWEN_CODE_CLI:-qwen}" review parse-args --stdin | tee .qwen/tmp/qwen-review-parse-args.json
+#   : | "${QWEN_CODE_CLI:-qwen}" review parse-args --stdin | tee .hopcode/tmp/qwen-review-parse-args.json
 ```
 
 (Step 9 removes these files with the other temp files.)
@@ -77,7 +77,7 @@ The parser already classified the target, so there is nothing to disambiguate by
 
 For a `pr-url` whose `host` is not `github.com` (GitHub Enterprise), **pass `--host <host>` to every review subcommand that talks to GitHub — `fetch-pr`, `pr-context`, and `presubmit`** — which routes all of their `gh` calls via GH_HOST in code; a forgotten host cannot silently retarget them at github.com. The `gh` commands you run directly are still yours to route: prefix Agent 0's `gh pr view`/`gh issue view`, Step 6's residual body fetch, and the Step 7 submission with `GH_HOST=<host> ` (e.g. `GH_HOST=github.example.com gh api ...`). `gh` defaults to `github.com`, so a dropped host makes a call read from and post to the wrong site's `owner/repo`.
 
-3. If **no remote matches**, use **lightweight mode**: run `gh pr diff <url>` to get the diff directly. Skip Step 2 (no local rules) and Step 8 (no local reports or cache). In Step 9, skip worktree removal (none was created) but still clean up temp files (`.qwen/tmp/qwen-review-{target}-*`). Also run `"${QWEN_CODE_CLI:-qwen}" review pr-context <number> <owner>/<repo> --out .qwen/tmp/qwen-review-pr-<number>-context.md` — it is pure GitHub API and works cross-repo. Agent 0 and Step 6's open-Critical re-check depend on it: a `Refs #123`-style target issue is only discoverable from the PR body, and open Critical threads only from the context file, so skipping it lets a wrong-root fix sail through blocker-free. If `pr-context` fails here (auth, network), warn and continue with the diff alone — but skip Agent 0 (it has nothing to work from) and treat every open-Critical re-check verdict as "cannot tell", which forbids an Approve. Carry this forward as the **context-unavailable** state: Step 7's invariant caps **every** `C=0` outcome of such a run at `COMMENT` with a diff-only body (both the would-be APPROVE and the Suggestion-only "no blockers" sentence), so a run that could not see the PR's existing discussion can post findings but never certify the absence of blockers. In Step 7, use the owner/repo from the URL. Inform the user: "Cross-repo review: running in lightweight mode (no build/test)."
+3. If **no remote matches**, use **lightweight mode**: run `gh pr diff <url>` to get the diff directly. Skip Step 2 (no local rules) and Step 8 (no local reports or cache). In Step 9, skip worktree removal (none was created) but still clean up temp files (`.hopcode/tmp/qwen-review-{target}-*`). Also run `"${QWEN_CODE_CLI:-qwen}" review pr-context <number> <owner>/<repo> --out .hopcode/tmp/qwen-review-pr-<number>-context.md` — it is pure GitHub API and works cross-repo. Agent 0 and Step 6's open-Critical re-check depend on it: a `Refs #123`-style target issue is only discoverable from the PR body, and open Critical threads only from the context file, so skipping it lets a wrong-root fix sail through blocker-free. If `pr-context` fails here (auth, network), warn and continue with the diff alone — but skip Agent 0 (it has nothing to work from) and treat every open-Critical re-check verdict as "cannot tell", which forbids an Approve. Carry this forward as the **context-unavailable** state: Step 7's invariant caps **every** `C=0` outcome of such a run at `COMMENT` with a diff-only body (both the would-be APPROVE and the Suggestion-only "no blockers" sentence), so a run that could not see the PR's existing discussion can post findings but never certify the absence of blockers. In Step 7, use the owner/repo from the URL. Inform the user: "Cross-repo review: running in lightweight mode (no build/test)."
 
 Based on the parsed `target.type`:
 
@@ -105,11 +105,11 @@ Based on the parsed `target.type`:
 
     Guessing the owner/repo here is not a recoverable mistake — dogfooding this skill against its own PR, the model inferred the fork from the branch's push target, `fetch-pr` answered "Could not resolve to a PullRequest", and the review stopped before reading a line of code. If `gh repo view` and the remote scan disagree, or no remote matches, say so and stop rather than picking one.
 
-    Read `.qwen/tmp/qwen-review-pr-<n>-fetch.json` for: `worktreePath`, `baseRefName`, `headRefName`, `fetchedSha` (use as the **HEAD commit SHA** for Step 7), `isCrossRepository`, `diffStat` (files / additions / deletions). If the command fails (auth, network, PR not found), inform the user and stop.
+    Read `.hopcode/tmp/qwen-review-pr-<n>-fetch.json` for: `worktreePath`, `baseRefName`, `headRefName`, `fetchedSha` (use as the **HEAD commit SHA** for Step 7), `isCrossRepository`, `diffStat` (files / additions / deletions). If the command fails (auth, network, PR not found), inform the user and stop.
 
     Worktree isolation: all subsequent steps (agents, build/test) operate inside `worktreePath`, not the user's working tree. Cache and reports (Step 8) are written to the **main project directory**, not the worktree.
 
-  - **Incremental review check** (high effort only — a low/medium quick pass neither consults nor updates the cache): if `.qwen/review-cache/pr-<n>.json` exists, read `lastCommitSha` and `lastModelId`. Compare to `fetchedSha` from the fetch report and the current model ID (`{{model}}`):
+  - **Incremental review check** (high effort only — a low/medium quick pass neither consults nor updates the cache): if `.hopcode/review-cache/pr-<n>.json` exists, read `lastCommitSha` and `lastModelId`. Compare to `fetchedSha` from the fetch report and the current model ID (`{{model}}`):
     - If SHAs differ → continue with the worktree just created. Compute the incremental diff (`git diff <lastCommitSha>..HEAD` inside the worktree) and use as the review scope; if the cached commit was rebased away, fall back to the full diff and log a warning.
     - If SHAs match **and** model matches **and** `--comment` was NOT specified → inform the user "No new changes since last review", run `"${QWEN_CODE_CLI:-qwen}" review cleanup pr-<n>` to remove the worktree just created, and stop.
     - If SHAs match **and** model matches **but** `--comment` WAS specified → run the full review anyway. Inform the user: "No new code changes. Running review to post inline comments."
@@ -119,7 +119,7 @@ Based on the parsed `target.type`:
 
     ```bash
     "${QWEN_CODE_CLI:-qwen}" review pr-context <pr_number> <owner>/<repo> \
-      --out .qwen/tmp/qwen-review-pr-<pr_number>-context.md
+      --out .hopcode/tmp/qwen-review-pr-<pr_number>-context.md
     ```
 
     The subcommand fetches `gh pr view` metadata + inline / issue comments and writes a single Markdown file with the PR title, description, base/head, diff stats, an **"Open inline comments"** section, a **"Blockers to re-check"** section, full-text **"Review summaries"**, and an **"Already discussed"** section for settled non-blocking threads. Each replied-to thread renders the **complete reply chain** (root comment + chronological replies), so review agents can see whether a "Fixed in `<commit>`"-style reply has closed the topic — agents must NOT re-report a concern whose latest reply addresses it. (That no-re-report rule is about _reporting_; Step 6's open-Critical re-check draws on **every** comment-bearing section — a blocker does not leave the verdict gate just because someone replied to it.)
@@ -142,7 +142,7 @@ Based on the parsed `target.type`:
   - **Do not install dependencies here.** The install belongs to Agent 7, and `hopcode review build-test` runs it — nothing before Agent 7 needs `node_modules`: the diff-reading agents read the diff and grep the worktree's _sources_. Run from here it is a **blocking prefix** to the whole fan-out — measured at ~161 seconds on a cold worktree of this repo, because `npm ci` triggers this project's `prepare` hook, which builds and bundles every workspace; run from inside `build-test` (which sets `QWEN_SKIP_PREPARE=1`) the install skips that wasted full build and overlaps the other agents, still reading. At low/medium effort nothing builds or tests at all, so there is no install on any path.
 
 - **`file`** (e.g., `src/foo.ts`):
-  - Run `"${QWEN_CODE_CLI:-qwen}" review capture-local --file <file> --target <filename> --out .qwen/tmp/qwen-review-<filename>-plan.json` to get its changes (`--out` is required — see the capture block below for the full form). An **untracked** target file is captured whole (every line reads as added), which is the right frame for a file that does not exist upstream yet. The path is taken relative to **your** working directory and must be inside the repo.
+  - Run `"${QWEN_CODE_CLI:-qwen}" review capture-local --file <file> --target <filename> --out .hopcode/tmp/qwen-review-<filename>-plan.json` to get its changes (`--out` is required — see the capture block below for the full form). An **untracked** target file is captured whole (every line reads as added), which is the right frame for a file that does not exist upstream yet. The path is taken relative to **your** working directory and must be inside the repo.
   - If the plan is empty (the file is tracked and unmodified), read the file and review its current state — see the no-diff branch below
 
 ### Diff capture and the review topology
@@ -169,13 +169,13 @@ A chunk is read with `read_file(file_path=diffPathAbsolute, offset=startLine - 1
 For **local-diff and file-path reviews**, capture and plan in one command:
 
 ```bash
-"${QWEN_CODE_CLI:-qwen}" review capture-local --out .qwen/tmp/qwen-review-local-plan.json
+"${QWEN_CODE_CLI:-qwen}" review capture-local --out .hopcode/tmp/qwen-review-local-plan.json
 # for a file-path review:
 "${QWEN_CODE_CLI:-qwen}" review capture-local --file <file> --target <filename> \
-  --out .qwen/tmp/qwen-review-<filename>-plan.json
+  --out .hopcode/tmp/qwen-review-<filename>-plan.json
 ```
 
-It writes the diff to `.qwen/tmp/qwen-review-<target>-diff.txt` and emits the same report `fetch-pr` does (`diffPathAbsolute`, `chunks[]`, `files[]`, the topology counts), plus two fields of its own:
+It writes the diff to `.hopcode/tmp/qwen-review-<target>-diff.txt` and emits the same report `fetch-pr` does (`diffPathAbsolute`, `chunks[]`, `files[]`, the topology counts), plus two fields of its own:
 
 - **`untrackedFiles`** — brand-new files, whose contents no `git diff` would have shown. **Name them in the review's summary.** A local review now reads files the user never staged, and the most common untracked-but-unignored file in the wild is a credentials file (`.env`, a key dump). Nothing is filtered — a hardcoded skip-list would reintroduce exactly the silent-skipping this command exists to end — so the user is told instead, and can re-run with `--no-untracked` or fix their `.gitignore`.
 - **`skippedFiles`** — untracked files that were **not** reviewed, each with a reason: too large, an embedded git repository, a symlink to a directory, a total-budget or file-count cap. **List these under "Not reviewed" in Step 6.** A capture that quietly dropped a file is the bug this command exists to fix; dropping one for a subtler reason would be the same bug wearing a hat.
@@ -190,11 +190,11 @@ Do **not** hand-type a `git diff` here. Two reasons, and the second is why this 
 For **cross-repo lightweight reviews**, do the same with the diff GitHub hands you. Redirecting to a file is what keeps the 30 000-char shell cap out of it:
 
 ```bash
-mkdir -p .qwen/tmp
-gh pr diff <pr_number> --repo <owner>/<repo> > .qwen/tmp/qwen-review-pr-<n>-diff.txt
-"${QWEN_CODE_CLI:-qwen}" review plan-diff .qwen/tmp/qwen-review-pr-<n>-diff.txt \
+mkdir -p .hopcode/tmp
+gh pr diff <pr_number> --repo <owner>/<repo> > .hopcode/tmp/qwen-review-pr-<n>-diff.txt
+"${QWEN_CODE_CLI:-qwen}" review plan-diff .hopcode/tmp/qwen-review-pr-<n>-diff.txt \
   --pr <pr_number> --repo <owner>/<repo> \
-  --out .qwen/tmp/qwen-review-pr-<n>-plan.json
+  --out .hopcode/tmp/qwen-review-pr-<n>-plan.json
 ```
 
 **Pass `--pr`/`--repo` only when the `pr-context` fetch above succeeded** — they put the PR identity into the plan, which makes the roster REQUIRE Agent 0 (`check-coverage` will name it if it never runs, exactly as in worktree mode). If `pr-context` failed, omit them: the run is in the context-unavailable state, Agent 0 has nothing to work from, and a roster demanding an agent nobody can brief would wedge the review.
@@ -222,7 +222,7 @@ Run `hopcode review load-rules` to read project-specific rules. **For PR reviews
 
 ```bash
 "${QWEN_CODE_CLI:-qwen}" review load-rules <resolved_base_ref> \
-  --out .qwen/tmp/qwen-review-<target>-rules.md
+  --out .hopcode/tmp/qwen-review-<target>-rules.md
 ```
 
 `<resolved_base_ref>` is the base ref to load from: prefer `<base>` if it exists locally, otherwise `<remote>/<base>` (run `git fetch <remote> <base>` first if not yet fetched). For local-uncommitted or file-path reviews use `HEAD`.
@@ -255,7 +255,7 @@ Launch **12 agents** for same-repo **PR** reviews (Agent 1 has three procedural 
 ```bash
 "${QWEN_CODE_CLI:-qwen}" review agent-prompt --plan <the plan report from Step 1> --roster \
   [--rules <the rules file from Step 2, if the project has any>] \
-  > .qwen/tmp/qwen-review-{target}-roster.txt
+  > .hopcode/tmp/qwen-review-{target}-roster.txt
 ```
 
 **Redirected to a file, then `read_file` it, paging until `isTruncated` is false** — the same rule as every other large output in this skill: shell output truncates at 30 000 characters, and a large plan's roster exceeds that, which would silently swallow the middle blocks. The output is self-checking: blocks are numbered `agent k of N` and the file ends with an `end of roster` line — if any `k` is missing or the end line is absent, rebuild just those blocks with `--chunk <id>` / `--role <r>` (every prompt is also recorded on disk regardless).
@@ -277,7 +277,7 @@ Eleven agents all reading the same diff (every 3A agent except Build & Test walk
 ```bash
 "${QWEN_CODE_CLI:-qwen}" review agent-prompt --plan <the plan report from Step 1> --roster \
   [--rules <the rules file from Step 2, if the project has any>] \
-  > .qwen/tmp/qwen-review-{target}-roster.txt
+  > .hopcode/tmp/qwen-review-{target}-roster.txt
 ```
 
 Redirect and `read_file` it paged, exactly as in Step 3A — a 3B roster is the large case, and shell output truncates at 30 000 characters. Check every `agent k of N` block is present (the file ends with an `end of roster` line); rebuild any missing one with `--chunk <id>` / `--role <r>`. One labelled block per agent; each goes to its agent **verbatim**. (To rebuild a single chunk agent's prompt for a relaunch: `--chunk <id>` in place of `--roster`.) **Pass `--rules` whenever Step 2 found any** — this command builds the whole prompt, so there is no later step in which you would staple them on, and a review that silently enforces no project rule is one of the things this skill exists to prevent.
@@ -341,7 +341,7 @@ Three ranges exist in the report and they are not interchangeable, which is why 
 ```bash
 "${QWEN_CODE_CLI:-qwen}" review check-coverage \
   --plan <the plan report from Step 1> \
-  --out .qwen/tmp/qwen-review-{target}-coverage.json
+  --out .hopcode/tmp/qwen-review-{target}-coverage.json
 ```
 
 **This step runs on both topologies.** It used to live inside Step 3B and be reachable only from there, and it modelled coverage as "an agent whose prompt says `chunk N of M` made a tool call" — which no Step 3A agent's prompt ever says. Run against a real 3A review whose twelve agents each opened the diff, walked both chunks and filed findings, it reported `0/2 chunk(s) reviewed … Nobody read those lines` in the same breath as `16 agent(s) ran; 16 did work`. `compose-review` runs the same computation on the way to the verdict, so that review was capped away from Approve and the body it would have posted to the pull request said nobody had read it. Both sentences cannot be true. Coverage is now the intersection of two things the harness wrote down: the lines each agent was **pointed at** (its launch prompt) and the fact that it **opened the diff** (a successful tool call naming the diff file).
@@ -382,7 +382,7 @@ A check you perform silently is a check you skip, and this one has been skipped:
 
 **Every agent MUST return inline: set `subagent_type: "general-purpose"` and `run_in_background: false` on every `agent` call.** Do NOT fork them — never set `subagent_type: "fork"`. A fork runs fire-and-forget and its findings never come back to you, so the review would stall in Step 4 with nothing to aggregate. You need every agent's findings returned to you inline.
 
-**For same-repo PR reviews (worktree mode), every `agent` call MUST also set `working_dir: "<worktreePath>"`** — the `worktreePath` from the Step 1 fetch report (a repo-relative path like `.qwen/tmp/review-pr-<n>`; pass it through as-is). This sets each agent's working directory to the PR worktree, so its `git diff`, `grep_search`, file reads, and Agent 7's build/test **resolve against the PR's code, not the user's main checkout**. It is a deterministic, harness-level cwd pin — it does NOT depend on the agent remembering to `cd`, and it is what makes reviewing multiple PRs concurrently safe. (It pins the working directory; it is not a hard filesystem sandbox — an absolute path could still reach elsewhere — but normal review operations stay inside the worktree.) This rule applies to **every** agent the review workflow launches — not just the Step 3 dimension agents, but also the Step 4 verification agent and the Step 5 reverse-audit agents (both restated below). Do NOT set `working_dir` for **local-diff, file-path, or cross-repo lightweight** reviews — those have no worktree, so the agents run in the main project directory.
+**For same-repo PR reviews (worktree mode), every `agent` call MUST also set `working_dir: "<worktreePath>"`** — the `worktreePath` from the Step 1 fetch report (a repo-relative path like `.hopcode/tmp/review-pr-<n>`; pass it through as-is). This sets each agent's working directory to the PR worktree, so its `git diff`, `grep_search`, file reads, and Agent 7's build/test **resolve against the PR's code, not the user's main checkout**. It is a deterministic, harness-level cwd pin — it does NOT depend on the agent remembering to `cd`, and it is what makes reviewing multiple PRs concurrently safe. (It pins the working directory; it is not a hard filesystem sandbox — an absolute path could still reach elsewhere — but normal review operations stay inside the worktree.) This rule applies to **every** agent the review workflow launches — not just the Step 3 dimension agents, but also the Step 4 verification agent and the Step 5 reverse-audit agents (both restated below). Do NOT set `working_dir` for **local-diff, file-path, or cross-repo lightweight** reviews — those have no worktree, so the agents run in the main project directory.
 
 **You no longer compose these prompts. `hopcode review agent-prompt` does** — one `--roster` call builds every one of them, and each block it prints goes to its agent unedited. It already contains everything the list below used to ask you to remember: `diffPathAbsolute` and the exact `read_file` ranges for that role (its own `offset`/`limit` for a chunk agent; every chunk for a whole-diff or 3A agent; the post-change file plus `addedRanges[]` and its own `diffRange` for an invariant agent), the agent's focus areas, the severity definitions verbatim, the finding format, and the project rules. **Never give an agent a `git diff` command** — see "Diff capture and the review topology" in Step 1 for why. In worktree-mode PR reviews the agent's `working_dir` is the PR worktree, so `grep_search` and source-file reads resolve against the PR's code automatically — the agent must NOT `cd` into the worktree or prefix absolute paths for those.
 
@@ -539,7 +539,7 @@ Write **the cumulative list of every confirmed finding so far** (Steps 3-4 plus 
   --findings <the cumulative findings file> \
   --round <k> \
   [--rules <the rules file from Step 2>] \
-  > .qwen/tmp/qwen-review-{target}-ra-round<k>.txt
+  > .hopcode/tmp/qwen-review-{target}-ra-round<k>.txt
 ```
 
 Redirect and `read_file` it paged, exactly as with `--roster`: one labelled block per chunk, numbered `auditor k of N`, closed by an `end of round` line — launch one agent per block, verbatim. **Never sample the builder's output** (`| head`, `| tail`, a truncated read): the text IS the deliverable, and a real run that sampled each build with `| head -5` never possessed the prompts, hand-reconstructed all ten launches, and had every one flagged rewritten — a full repair round spent recovering from a shortcut that saved nothing. To rebuild a single auditor after a gap: `--chunk <id>` in place of `--all-chunks`, keeping the same `--findings`, `--rules` and `--round` — a rebuild that drops one of them is keyed as a different launch and matches no requirement.
@@ -609,7 +609,7 @@ If there are none of these, omit this section.
 
 ### Before an Approve or a zero-Critical verdict: re-check the open Criticals
 
-A `C=0` outcome — Approve, or a Comment with no Critical — is a claim that nothing blocks the merge. It is not the default you fall back to when your own agents surfaced nothing. **If Step 1 set the context-unavailable state** (`pr-context` failed — lightweight or same-repo), there is no context file to read: skip the walk below, record every existing Critical as `cannot tell` by construction, and carry that into the verdict — which the Step 7 invariant already caps at `COMMENT`. Otherwise, take **each live blocker already on the PR — from every comment-bearing section of the context file: "Open inline comments", "Blockers to re-check", "Review summaries", and "Already discussed" (both its inline threads and its issue-level comments)** — and check it against the code as it stands at the reviewed commit. Select **semantically, not by the literal marker**: a `**[Critical]**` prefix qualifies, but so does any body that asserts a blocking defect in other words — a "Critical findings could not be anchored" preamble, an explicit must-fix claim (legacy body-only blockers were emitted markerless, and one such review is exactly what a marker filter once discarded). When unsure whether a body asserts a blocker, re-check it — the cost is one ruling; the alternative is certifying a merge past it. ("Already discussed" stays in scope even though `pr-context` now promotes blocker-bearing bodies out of it: `carriesBlockerSignal` is a **fail-safe floor, not a ceiling** — it recognises the phrasings we have seen, not every phrasing that exists, and a blocker worded around all of them still settles there. That section's "do NOT re-report" header governs duplicate-_reporting_ by the finder agents; it does not exempt a body from this re-check. Read it with the same eyes you bring to the promoted section.) Review-level bodies matter because an unmappable or 422-relocated blocker lives **only** there — and the context file now carries them **in full**: `pr-context` renders every meaningful review body whole under "Review summaries" (no more 240-character snippets), and pulls every blocker-bearing body — replied inline thread or issue comment, marker or no marker — into the "Blockers to re-check" section, rendered in full, because a reply alone never settles a blocker. So the re-check usually needs no separate fetch: read those sections under the file's untrusted-data preamble, paging with `offset`/`limit` until `isTruncated` is false. Review summaries and blocker bodies are rendered in full; the Open and Already-discussed sections use one-line snippets, and **every snippet the renderer cut carries its own `_(truncated — fetch …)_` note naming the exact, already-filled-in command for the rest** — a candidate blocker whose snippet was cut is ruled on only after running that fetch; ruling on the visible prefix alone is the fail-closed violation. Run any such fetch **redirected to a file, never into the terminal** (shell output truncates at 30 000 chars, which would re-truncate the very body being completed): append `--jq .body > .qwen/tmp/qwen-review-{target}-body-<id>.md` to the command the note names, then `read_file` that file, paging until `isTruncated` is false, before ruling. **Fail closed either way:** a body you could not read whole — the capped tail unfetched, or the single-object fetch failing (auth, rate limit, network) — is `cannot tell`, not "no Critical in it": it goes to compose-review's `cannotTellCriticals` input, which serializes it and caps the event at `COMMENT`; a blocker you could not read is never approved past. A reply alone does not retire a blocker — "I disagree" or "wontfix" is a reply, which is exactly why `pr-context` quarantines blocker-bearing threads in their own section instead of letting them settle into "Already discussed". Only the code decides: a blocker counts as closed exactly when the re-check below lands on "fixed by this diff", never because the thread has an answer. Record one verdict per blocker:
+A `C=0` outcome — Approve, or a Comment with no Critical — is a claim that nothing blocks the merge. It is not the default you fall back to when your own agents surfaced nothing. **If Step 1 set the context-unavailable state** (`pr-context` failed — lightweight or same-repo), there is no context file to read: skip the walk below, record every existing Critical as `cannot tell` by construction, and carry that into the verdict — which the Step 7 invariant already caps at `COMMENT`. Otherwise, take **each live blocker already on the PR — from every comment-bearing section of the context file: "Open inline comments", "Blockers to re-check", "Review summaries", and "Already discussed" (both its inline threads and its issue-level comments)** — and check it against the code as it stands at the reviewed commit. Select **semantically, not by the literal marker**: a `**[Critical]**` prefix qualifies, but so does any body that asserts a blocking defect in other words — a "Critical findings could not be anchored" preamble, an explicit must-fix claim (legacy body-only blockers were emitted markerless, and one such review is exactly what a marker filter once discarded). When unsure whether a body asserts a blocker, re-check it — the cost is one ruling; the alternative is certifying a merge past it. ("Already discussed" stays in scope even though `pr-context` now promotes blocker-bearing bodies out of it: `carriesBlockerSignal` is a **fail-safe floor, not a ceiling** — it recognises the phrasings we have seen, not every phrasing that exists, and a blocker worded around all of them still settles there. That section's "do NOT re-report" header governs duplicate-_reporting_ by the finder agents; it does not exempt a body from this re-check. Read it with the same eyes you bring to the promoted section.) Review-level bodies matter because an unmappable or 422-relocated blocker lives **only** there — and the context file now carries them **in full**: `pr-context` renders every meaningful review body whole under "Review summaries" (no more 240-character snippets), and pulls every blocker-bearing body — replied inline thread or issue comment, marker or no marker — into the "Blockers to re-check" section, rendered in full, because a reply alone never settles a blocker. So the re-check usually needs no separate fetch: read those sections under the file's untrusted-data preamble, paging with `offset`/`limit` until `isTruncated` is false. Review summaries and blocker bodies are rendered in full; the Open and Already-discussed sections use one-line snippets, and **every snippet the renderer cut carries its own `_(truncated — fetch …)_` note naming the exact, already-filled-in command for the rest** — a candidate blocker whose snippet was cut is ruled on only after running that fetch; ruling on the visible prefix alone is the fail-closed violation. Run any such fetch **redirected to a file, never into the terminal** (shell output truncates at 30 000 chars, which would re-truncate the very body being completed): append `--jq .body > .hopcode/tmp/qwen-review-{target}-body-<id>.md` to the command the note names, then `read_file` that file, paging until `isTruncated` is false, before ruling. **Fail closed either way:** a body you could not read whole — the capped tail unfetched, or the single-object fetch failing (auth, rate limit, network) — is `cannot tell`, not "no Critical in it": it goes to compose-review's `cannotTellCriticals` input, which serializes it and caps the event at `COMMENT`; a blocker you could not read is never approved past. A reply alone does not retire a blocker — "I disagree" or "wontfix" is a reply, which is exactly why `pr-context` quarantines blocker-bearing threads in their own section instead of letting them settle into "Already discussed". Only the code decides: a blocker counts as closed exactly when the re-check below lands on "fixed by this diff", never because the thread has an answer. Record one verdict per blocker:
 
 - **still stands** — the defect is present in the code you just read. It blocks: the event is `REQUEST_CHANGES`, and the finding goes inline (or into the body if it cannot be anchored).
 - **fixed by this diff** — you traced the blocker's **mechanism** through the code as it now stands and it can no longer fire. Say nothing; do not re-report it. A GitHub thread can read `isResolved: false, isOutdated: false` for a bug a later commit fixed on an adjacent line — the flag tracks the anchored line, not the fix, so the flag is not evidence either way. Only the code is.
@@ -629,9 +629,9 @@ Two failure modes this closes, both observed in this repo's own dogfood: reporti
 **You do not decide the verdict, and you do not write it. Ask for it:**
 
 ```bash
-"${QWEN_CODE_CLI:-qwen}" review compose-review --input .qwen/tmp/qwen-review-{target}-compose.json \
-  --comments .qwen/tmp/qwen-review-{target}-comments.json \
-  --out .qwen/tmp/qwen-review-{target}-composed.json
+"${QWEN_CODE_CLI:-qwen}" review compose-review --input .hopcode/tmp/qwen-review-{target}-compose.json \
+  --comments .hopcode/tmp/qwen-review-{target}-comments.json \
+  --out .hopcode/tmp/qwen-review-{target}-composed.json
 ```
 
 It prints a `Verdict:` line to stderr. **That line is the verdict — print it, and nothing else.** It writes nothing, posts nothing, and needs no authorisation, so run it on every high-effort review, whether or not you are going to post. The state file is the same one Step 7 uses (see there for every field): your findings and the states you established — the body Criticals, the discarded suggestions, the `cannot tell` blockers, the unreviewed dimensions, the `planPath`, the presubmit flags, the model id. It does **not** take the coverage or the inline counts, and it **refuses** a state JSON carrying `criticalsInline`/`suggestionsInline`. It derives coverage from the harness's transcripts, and it **counts** the inline findings from `--comments`: write the drafted inline comments to that file first — the same `[{path, line, body, …}]` array the Step 7 payload will carry, each body opening with its `**[Critical]**`/`**[Suggestion]**` marker; a review with nothing anchored inline passes a file containing `[]`. Dogfooded, a report-only run — where no later step recounts — moved its one Critical from `bodyCriticals` to an inline comment, and the verdict line read Approve over a blocker the same report listed; counted from the draft, that finding cannot fall out of the computation. **If the comment set changes after composing** — an anchor fails to resolve, a finding relocates to the body, a comment is dropped — update the comments file (and the state), and run `compose-review` again: the verdict must be computed from the set you actually post, and Step 7's `submit` recounts from the payload to hold you to it.
@@ -669,7 +669,7 @@ If the user responds with "post comments" (or similar intent like "yes post them
 ```bash
 "${QWEN_CODE_CLI:-qwen}" review submit \
   --pr <pr_number> --repo <owner>/<repo> \
-  --review .qwen/tmp/qwen-review-{target}-review.json \
+  --review .hopcode/tmp/qwen-review-{target}-review.json \
   [--user-authorized] [--host <host>]
 ```
 
@@ -693,15 +693,15 @@ Also skip this step (independently of the gate above) if the review target is no
 **Resolve every anchor before you submit — do not post the line numbers the agents reported.** GitHub rejects the whole review with a 422 if any comment's `(path, line)` falls outside every hunk of that file, and it does so all-or-nothing: one miscounted anchor takes every Critical in the review down with it. The line is therefore computed from the diff, not carried over from an agent. Write every Critical and Suggestion headed for the `comments` array — using each finding's **Anchor** snippet — and run the resolver:
 
 ```bash
-# write_file .qwen/tmp/qwen-review-{target}-anchors.json
+# write_file .hopcode/tmp/qwen-review-{target}-anchors.json
 # [{"id": "f1", "path": "src/pay.ts",
 #   "anchor": "  if (amt < 0) return;\n  charge(amt);", "line": 42}]
 # `line` is OPTIONAL — omit it when the finder gave no number; it only breaks ties.
 
 "${QWEN_CODE_CLI:-qwen}" review resolve-anchors \
   --diff <diffPathAbsolute> \
-  --input .qwen/tmp/qwen-review-{target}-anchors.json \
-  --out .qwen/tmp/qwen-review-{target}-anchors-resolved.json
+  --input .hopcode/tmp/qwen-review-{target}-anchors.json \
+  --out .hopcode/tmp/qwen-review-{target}-anchors-resolved.json
 ```
 
 `line` is the agent's claim; the resolver uses it **only** to break a tie when the snippet genuinely repeats. Read the report:
@@ -778,7 +778,7 @@ Read `.hopcode/tmp/hopcode-review-{target}-presubmit.json`. Schema:
 
 - **Self-PR**: GitHub rejects both `APPROVE` and `REQUEST_CHANGES` on your own PR (HTTP 422); `COMMENT` is the only accepted event. Critical and Suggestion findings still appear as inline `comments` regardless, so substantive feedback is preserved.
 - **CI failure / pending**: the LLM review reads code statically and cannot see runtime test failures. Approving on red CI is misleading; pending CI means the verdict is premature.
-- **Overlap with existing comments**: posting on the same `(path, line)` as an existing Qwen comment produces visual duplicates, so overlapping findings are dropped rather than re-posted. Stale-commit and replied-to comments are skipped silently — they're false-positive overlap from line-based matching.
+- **Overlap with existing comments**: posting on the same `(path, line)` as an existing hopcode comment produces visual duplicates, so overlapping findings are dropped rather than re-posted. Stale-commit and replied-to comments are skipped silently — they're false-positive overlap from line-based matching.
 
 ⚠️ **Severity routing — high-confidence Critical AND Suggestion findings both go inline, pinned to the exact code line.** They are distinguished by the `**[Critical]**` / `**[Suggestion]**` prefix in the comment body, not by where they are posted.
 
@@ -788,7 +788,7 @@ Rationale: an inline comment is the only place GitHub renders a ` ```suggestion 
 
 ⚠️ **Suggestion text must never appear in the review `body`.** `.github/workflows/qwen-autofix.yml` keeps Suggestions out of the autofix loop by filtering the inline-comment channel on the `**[Suggestion]**` prefix. It does not filter review bodies, so a Suggestion smuggled into `body` would be handed to the autofix bot as actionable work.
 
-**Build the review JSON** with `write_file` to create `.qwen/tmp/qwen-review-{target}-review.json`. It carries three things and **no verdict** — `submit` computes the event and body itself, from the `state` you hand it and the comments you attach, and **refuses a payload that carries `event` or `body`** (a run that skipped the computation and typed its own Approve is exactly what that refusal stops). Every high-confidence Critical or Suggestion finding that maps to a diff line is an entry in `comments`:
+**Build the review JSON** with `write_file` to create `.hopcode/tmp/qwen-review-{target}-review.json`. It carries three things and **no verdict** — `submit` computes the event and body itself, from the `state` you hand it and the comments you attach, and **refuses a payload that carries `event` or `body`** (a run that skipped the computation and typed its own Approve is exactly what that refusal stops). Every high-confidence Critical or Suggestion finding that maps to a diff line is an entry in `comments`:
 
 ````jsonc
 {
@@ -797,12 +797,12 @@ Rationale: an inline comment is the only place GitHub renders a ` ```suggestion 
     {
       "path": "src/file.ts",
       "line": 42,
-      "body": "**[Critical]** issue description — Failure scenario: <trigger> → <wrong outcome>\n\n```suggestion\nfix code\n```\n\n_— YOUR_MODEL_ID via Qwen Code /review_",
+      "body": "**[Critical]** issue description — Failure scenario: <trigger> → <wrong outcome>\n\n```suggestion\nfix code\n```\n\n_— YOUR_MODEL_ID via HopCode /review_",
     },
     {
       "path": "src/other.ts",
       "line": 88,
-      "body": "**[Suggestion]** recommended improvement — Concrete cost: <what is duplicated/wasted/fragile>\n\n```suggestion\nimproved code\n```\n\n_— YOUR_MODEL_ID via Qwen Code /review_",
+      "body": "**[Suggestion]** recommended improvement — Concrete cost: <what is duplicated/wasted/fragile>\n\n```suggestion\nimproved code\n```\n\n_— YOUR_MODEL_ID via HopCode /review_",
     },
   ],
   "state": {
@@ -841,7 +841,7 @@ The verdict is a computed fact and this is the second place it must not be re-de
 
   When `startLine === line`, emit only `"line"` — a single-line comment needs no side (it defaults to `RIGHT`, which is what every comment here is). Do **not** send `start_line` on its own: the multi-line form that omits `start_side` is the one shape of this feature that fails, and it fails by discarding every inline blocker in the review.
 
-- Comment body format: `**[Critical]** issue description — Failure scenario: <trigger> → <wrong outcome>\n\n```suggestion\nfix\n```\n\n_— YOUR_MODEL_ID via Qwen Code /review_` — use the `**[Suggestion]**` prefix for Suggestion-level findings so the author can tell blockers from recommendations at a glance. The `description` MUST carry the finding's concrete failure scenario (the trigger and the wrong outcome, or the concrete cost) — a posted comment that says only what to change, without why it fails, has lost the evidence the finder was required to produce. The prefix must be the **first thing in the body** and the footer must be present: `.github/workflows/qwen-autofix.yml` keys off both to keep Suggestion findings out of the autofix loop. Changing either string silently makes the autofix bot start applying non-blocking suggestions.
+- Comment body format: `**[Critical]** issue description — Failure scenario: <trigger> → <wrong outcome>\n\n```suggestion\nfix\n```\n\n_— YOUR_MODEL_ID via HopCode /review_` — use the `**[Suggestion]**` prefix for Suggestion-level findings so the author can tell blockers from recommendations at a glance. The `description` MUST carry the finding's concrete failure scenario (the trigger and the wrong outcome, or the concrete cost) — a posted comment that says only what to change, without why it fails, has lost the evidence the finder was required to produce. The prefix must be the **first thing in the body** and the footer must be present: `.github/workflows/qwen-autofix.yml` keys off both to keep Suggestion findings out of the autofix loop. Changing either string silently makes the autofix bot start applying non-blocking suggestions.
 - The model name is declared at the top of this prompt. You MUST include it in every footer. Do NOT omit the model name.
 - Use ` ```suggestion ` for one-click fixes; regular code blocks if fix spans multiple locations.
 - Only ONE comment per unique issue.
@@ -851,7 +851,7 @@ Then submit it — through `submit`, which checks the authorisation and the payl
 ```bash
 "${QWEN_CODE_CLI:-qwen}" review submit \
   --pr {pr_number} --repo {owner}/{repo} \
-  --review .qwen/tmp/qwen-review-{target}-review.json \
+  --review .hopcode/tmp/qwen-review-{target}-review.json \
   [--host <host>]     # required for GitHub Enterprise; omit on github.com
 ```
 
@@ -886,7 +886,7 @@ Report content should include:
 - All findings with verification status
 - Verdict (high effort only — a quick pass claims none)
 
-**The report's verdict is not yours to type.** `compose-review` printed the exact `Verdict:` line in Step 6 and persisted the same line as `verdictLine` inside `.qwen/tmp/qwen-review-{target}-composed.json` — copy either, verbatim. Do not reconstruct it from `event` + `cappedBy`: a presubmit downgrade also depends on fields that pair does not carry, and a rebuilt line can differ from the computed one. (And not `$(jq …)`: a `jq` binary is not guaranteed on the host, and a substitution that fails leaves the archived verdict blank or literal — worse than absent, because it looks written.)
+**The report's verdict is not yours to type.** `compose-review` printed the exact `Verdict:` line in Step 6 and persisted the same line as `verdictLine` inside `.hopcode/tmp/qwen-review-{target}-composed.json` — copy either, verbatim. Do not reconstruct it from `event` + `cappedBy`: a presubmit downgrade also depends on fields that pair does not carry, and a rebuilt line can differ from the computed one. (And not `$(jq …)`: a `jq` binary is not guaranteed on the host, and a substitution that fails leaves the archived verdict blank or literal — worse than absent, because it looks written.)
 
 A run that had read `Verdict: Comment — an Approve was NOT available` wrote `**Verdict:** Approve` into its saved report minutes later. The terminal is prose and the archive is forever; this line is the one place the archive can be made to tell the truth for free. If the composed event is not the one you expected, fix the run — not the report.
 
@@ -919,7 +919,7 @@ Run the bundled cleanup subcommand:
 "${QWEN_CODE_CLI:-qwen}" review cleanup <target>
 ```
 
-`<target>` is the same suffix used throughout (`pr-<n>`, `local`, or filename). The command removes the worktree at `.qwen/tmp/review-pr-<n>` (PR targets only), deletes the local branch ref `qwen-review/pr-<n>`, and clears any `.qwen/tmp/qwen-review-<target>-*` side files (review JSON, PR context, presubmit / findings reports). It is idempotent — missing files are silent OK. Also remove `.qwen/tmp/qwen-review-parse-args.json` and the session args directory `.qwen/tmp/s-<session>/` (the path from the `<skill-args>` note) — both are written before the target suffix is known, so the pattern above misses them. (Leave the args file in place if you had to fall back to writing it yourself and the run failed: it is the only record of what the review was actually asked to do.)
+`<target>` is the same suffix used throughout (`pr-<n>`, `local`, or filename). The command removes the worktree at `.hopcode/tmp/review-pr-<n>` (PR targets only), deletes the local branch ref `qwen-review/pr-<n>`, and clears any `.hopcode/tmp/qwen-review-<target>-*` side files (review JSON, PR context, presubmit / findings reports). It is idempotent — missing files are silent OK. Also remove `.hopcode/tmp/qwen-review-parse-args.json` and the session args directory `.hopcode/tmp/s-<session>/` (the path from the `<skill-args>` note) — both are written before the target suffix is known, so the pattern above misses them. (Leave the args file in place if you had to fall back to writing it yourself and the run failed: it is the only record of what the review was actually asked to do.)
 
 **If Step 8 flagged the worktree for preservation** (autofix commit/push failure), skip Step 11 entirely. The user needs the worktree intact to recover the autofix commit. Inform the user the worktree is preserved at `.hopcode/tmp/review-pr-<n>` and they should run `hopcode review cleanup pr-<n>` manually after recovering the commit.
 

@@ -16,7 +16,7 @@ status: 'implemented'
 > `max` only; Opus 4.5 and unversioned ids clamp to `high`), and the
 > `model-with-reasoning` status line (live-updating on `/effort`), the
 > DashScope tier→bool mapping (a set effort turns on `enable_thinking` for qwen
-> hybrid models; the single column to extend when qwen ships a real
+> hybrid models; the single column to extend when hopcode ships a real
 > `reasoning_effort` field), and the interactive `EffortDialog` — bare `/effort`
 > opens a tier picker in interactive mode (and lists tiers non-interactively),
 > wired through `use-effort-command`, the UI contexts, `DialogManager`, and
@@ -132,7 +132,7 @@ Each provider declares a supported subset; the translator clamps a requested
 tier **down** the ladder to the nearest supported tier. Mapping (canonical →
 wire value), with `↓` marking a clamp:
 
-| Tier   | OpenAI `reasoning_effort` | DeepSeek `reasoning_effort` | GLM-5.2+ `reasoning_effort` | Anthropic `output_config.effort` | Gemini 3 `thinking_level` | Qwen DashScope       |
+| Tier   | OpenAI `reasoning_effort` | DeepSeek `reasoning_effort` | GLM-5.2+ `reasoning_effort` | Anthropic `output_config.effort` | Gemini 3 `thinking_level` | hopcode DashScope       |
 | ------ | ------------------------- | --------------------------- | --------------------------- | -------------------------------- | ------------------------- | -------------------- |
 | low    | low                       | high¹                       | low                         | low                              | low                       | enable_thinking:true |
 | medium | medium                    | high¹                       | medium                      | medium                           | medium                    | true                 |
@@ -192,7 +192,7 @@ Known shapes:
 
 Implication: pure passthrough only "just works" for providers that accept the
 nested shape. **PR1 must add GLM/z.ai flattening** (mirror `deepseek.ts`) and,
-when qwen adds an effort field, extend the DashScope adapter to emit whatever
+when hopcode adds an effort field, extend the DashScope adapter to emit whatever
 shape qwen's API documents (flat `reasoning_effort` most likely). A new provider
 is auto-supported only if it accepts the nested canonical shape; otherwise it
 needs a one-hook reshape.

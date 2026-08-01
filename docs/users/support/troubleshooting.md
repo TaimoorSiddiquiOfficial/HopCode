@@ -1,4 +1,4 @@
-﻿# Troubleshooting
+# Troubleshooting
 
 This guide provides solutions to common issues and debugging tips, including topics on:
 
@@ -21,7 +21,7 @@ This guide provides solutions to common issues and debugging tips, including top
     - Example: `export NODE_EXTRA_CA_CERTS=/path/to/your/corporate-ca.crt`
 
 - **Error: `Connection error. (cause: fetch failed)` against a self-signed endpoint**
-  - **Cause:** You are pointing Qwen Code at a self-hosted server (for example a local model behind `https://`) whose TLS certificate is self-signed, so Node.js rejects it.
+  - **Cause:** You are pointing HopCode at a self-hosted server (for example a local model behind `https://`) whose TLS certificate is self-signed, so Node.js rejects it.
   - **Solution:** Prefer trusting the certificate via `NODE_EXTRA_CA_CERTS` (above). If that is not practical in a trusted lab/private network, skip verification with the `--insecure` flag (or `QWEN_TLS_INSECURE=1`):
     - Example: `qwen --insecure --openaiBaseUrl https://192.168.1.10:8080 ...`
     - **Warning:** Disabling verification removes protection against man-in-the-middle attacks. Only use it for endpoints you fully trust.
@@ -55,8 +55,8 @@ This guide provides solutions to common issues and debugging tips, including top
 - **Q: Why don't I see cached token counts in my stats output?**
   - A: Cached token information is only displayed when cached tokens are being used. This feature is available for API key users (e.g., Alibaba Cloud Model Studio API key or Google Cloud Vertex AI). You can still view your total token usage using the `/stats` command.
 
-- **Q: A customization (extension, hook, skill, MCP server, or subagent) seems to be breaking Qwen Code. How do I isolate it?**
-  - A: Start Qwen Code with the `--safe-mode` flag to disable all customizations — context files, hooks, extensions, skills, MCP servers, custom subagents (only built-in subagents load), permission rules, settings-sourced approval mode overrides, memory features, and sandbox settings — for the session. Note: the CLI flags `--yolo` and `--approval-mode` still take effect in safe mode. If the problem disappears in safe mode, re-enable your customizations one at a time to find the culprit.
+- **Q: A customization (extension, hook, skill, MCP server, or subagent) seems to be breaking HopCode. How do I isolate it?**
+  - A: Start HopCode with the `--safe-mode` flag to disable all customizations — context files, hooks, extensions, skills, MCP servers, custom subagents (only built-in subagents load), permission rules, settings-sourced approval mode overrides, memory features, and sandbox settings — for the session. Note: the CLI flags `--izn` and `--approval-mode` still take effect in safe mode. If the problem disappears in safe mode, re-enable your customizations one at a time to find the culprit.
     - Example: `qwen --safe-mode`
     - Alternative: set the environment variable `QWEN_CODE_SAFE_MODE=true` if the CLI cannot accept flags.
 

@@ -66,7 +66,7 @@ export type {
  * workspace-scoped routes that have no session context.
  */
 export interface WorkspaceRequestContext {
-  /** Daemon-stamped client identity (from X-Qwen-Client-Id header). */
+  /** Daemon-stamped client identity (from X-HopCode-Client-Id header). */
   originatorClientId?: string;
   /** ACP session id for cross-correlating audit + session events. */
   sessionId?: string;

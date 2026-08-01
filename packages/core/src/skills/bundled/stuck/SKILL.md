@@ -84,7 +84,7 @@ Otherwise (no arg, or symptom-only arg), run the general path below:
    ps -xo pid=,pcpu=,rss=,etime=,state=,comm=,command= -u "$(id -u)" -ww | grep -E '((^|/)hopcode[^ /]*/[^ ]*\.(js|ts|mjs|cjs)( |$)|/qwen( |$))' | grep -v grep
    ```
 
-   `-u "$(id -u)"` restricts the scan to the current user — on shared hosts this avoids exposing other users' Qwen process paths/arguments into the chat. `-ww` disables column truncation so long "hopcode" paths aren't cut off. The `comm` column will be `node` or `bun`, not `hopcode`; filter to rows where the `command` column contains a hopcode PATH (e.g., `hopcode/dist/cli.js`, or a bin symlink ending in `/qwen`). Cross-reference with the PIDs from step 1.
+   `-u "$(id -u)"` restricts the scan to the current user — on shared hosts this avoids exposing other users' hopcode process paths/arguments into the chat. `-ww` disables column truncation so long "hopcode" paths aren't cut off. The `comm` column will be `node` or `bun`, not `hopcode`; filter to rows where the `command` column contains a hopcode PATH (e.g., `hopcode/dist/cli.js`, or a bin symlink ending in `/qwen`). Cross-reference with the PIDs from step 1.
 
    Note: `ps` reports `rss` in **kilobytes** on both macOS and Linux. To report in MB, divide by 1024; to report in GB, divide by 1048576. The 4GB threshold is `4194304` KB — compare the raw `rss` value against that, or compare the GB value against 4. Do not divide once and then compare against 4; that would flag every process >4MB as "very high RSS".
 

@@ -53,14 +53,14 @@ reproducible with the normal config even on the local diagnostics bundle. It is
 therefore not primarily explained by the local branch including PR `#4186`.
 
 At the normal-config peak, the local process-tree sample was dominated by
-multiple Node/MCP processes rather than the Qwen root process alone:
+multiple Node/MCP processes rather than the hopcode root process alone:
 
 | Role  | Command shape             | RSS at tree peak |
 | ----- | ------------------------- | ---------------: |
 | child | Node process              |        252.9 MiB |
 | child | Chrome DevTools MCP       |        219.7 MiB |
 | child | Node process              |        219.2 MiB |
-| root  | Qwen Node process         |        215.1 MiB |
+| root  | hopcode Node process         |        215.1 MiB |
 | child | Chrome DevTools MCP setup |        175.2 MiB |
 
 PR `#4186` is present in the local diagnostics branch, but it is a V8 heap
@@ -140,7 +140,7 @@ Interpretation:
    because the prompt did not produce tool calls, so `PreToolUse` /
    `PostToolUse` hooks were not executed.
 3. The root process stays around 0.21-0.25 GiB across all rows. The large
-   difference is again process-tree composition, not root Qwen RSS.
+   difference is again process-tree composition, not root hopcode RSS.
 
 Two attempted code-navigation follow-ups with `qwen3.6-plus` and `pai/glm-5`
 also reproduced the same MCP-vs-no-MCP memory split, but neither model produced
@@ -291,7 +291,7 @@ The new diagnostics make the earlier hypothesis more precise:
 
 - The installed-CLI user-visible 1 GiB peak is now reproducible with the normal
   config on the local diagnostics bundle. The stripped run should be used for
-  internal Qwen runtime attribution; the normal-config run should be used for
+  internal hopcode runtime attribution; the normal-config run should be used for
   user-visible process-tree attribution.
 - The largest observed difference between stripped and normal config is
   process-tree shape: normal config starts additional MCP/Node child processes.
@@ -307,7 +307,7 @@ The new diagnostics make the earlier hypothesis more precise:
 - Per-MCP isolation points to `chrome-devtools` as the dominant MCP contributor:
   it is enough by itself to reproduce the high RSS band, and removing it returns
   the run near the no-MCP baseline.
-- Within the local Qwen runtime, the most suspicious areas are no longer "raw
+- Within the local hopcode runtime, the most suspicious areas are no longer "raw
   diff bytes sent to the model". The model-facing request body is bounded.
 - The stronger suspects are static per-request context cost, repeated request
   rounds, tool schema size, and local retention/capture of large tool outputs
@@ -324,7 +324,7 @@ but they do narrow what is and is not driving RSS in these local runs:
 | Signal                       | Current evidence                                                                                                            | RSS implication                                                                                                                           |
 | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | Root RSS vs process-tree RSS | Root and tree peaks are usually within about 2-10 MiB; DeepSeek large PR is the widest gap at about 23.6 MiB                | No persistent child process explains the RSS in this local bundle run; the main Node process dominates                                    |
-| Normal config process tree   | Minimal-prompt normal-config runs reach about 1.1 GiB tree RSS while root RSS stays about 213-250 MiB                       | User-visible 1 GiB peaks can be dominated by MCP/Node child processes rather than Qwen root RSS alone                                     |
+| Normal config process tree   | Minimal-prompt normal-config runs reach about 1.1 GiB tree RSS while root RSS stays about 213-250 MiB                       | User-visible 1 GiB peaks can be dominated by MCP/Node child processes rather than hopcode root RSS alone                                     |
 | `--bare` comparison          | `qwen3.6-plus` normal runs peak around 1.02-1.05 GiB tree RSS; bare runs peak around 0.45-0.53 GiB                          | Loading normal config adds about 0.50-0.59 GiB process-tree RSS in this environment                                                       |
 | Temporary MCP isolation      | Clearing MCP servers drops startup/config tree RSS from 865-1,017 MiB to 443-549 MiB                                        | MCP startup and MCP child processes explain about 0.42-0.47 GiB of process-tree RSS in the controlled config check                        |
 | Per-MCP isolation            | `chrome-devtools` alone reaches about 1.0 GiB in repeated samples; without it the run stays around 461 MiB                  | `chrome-devtools` is the dominant MCP process-tree RSS contributor in this environment                                                    |
@@ -338,10 +338,10 @@ but they do narrow what is and is not driving RSS in these local runs:
 Working attribution: in the stripped local bundle benchmark, the RSS floor looks
 mostly like task-time runtime/module/native footprint, with large tool output
 adding incremental pressure. In the normal-config run, the user-visible 1 GiB
-tree peak is mostly process-tree composition: Qwen root plus MCP/Node child
-processes. The next targeted measurement should split Qwen root diagnostics
+tree peak is mostly process-tree composition: hopcode root plus MCP/Node child
+processes. The next targeted measurement should split hopcode root diagnostics
 from configured MCP server diagnostics, then add startup/module/external-memory
-checkpoints inside the Qwen root process.
+checkpoints inside the hopcode root process.
 
 ## Progress Snapshot
 
@@ -351,12 +351,12 @@ Current confirmed signals:
    installed CLI and the local diagnostics bundle when the normal config is
    loaded. It is not primarily explained by the diagnostics branch or PR `#4186`.
 2. In this environment, that 1 GiB peak is mostly process-tree composition:
-   Qwen root process plus relaunch child process plus MCP child processes.
+   hopcode root process plus relaunch child process plus MCP child processes.
 3. `chrome-devtools` is the dominant configured MCP contributor in the current
    config. It is enough by itself to reproduce the high process-tree RSS band,
    even when the prompt does not explicitly use that MCP.
 4. The no-MCP normal relaunch shape still sits around 0.45 GiB process-tree RSS.
-   A single Qwen runtime process without the relaunch parent is closer to
+   A single hopcode runtime process without the relaunch parent is closer to
    0.22-0.24 GiB in the startup attribution check. This means the 0.45 GiB
    baseline is not a single-process root RSS number.
 5. In stripped non-interactive task runs, model choice changes turns, token
@@ -464,7 +464,7 @@ Validation criteria:
 1. Repeat at least the key long-task cases twice. Startup RSS has visible
    variance, so single-run conclusions should be avoided.
 2. Report root RSS and process-tree RSS separately. User-facing memory pressure
-   can come from child processes, while V8 OOM comes from the Qwen root heap.
+   can come from child processes, while V8 OOM comes from the hopcode root heap.
 3. Treat a flat RSS line as important evidence. If tokens and tool calls grow
    but heap/RSS stays flat, the issue is likely elsewhere.
 4. When RSS or heap grows, correlate the growth with a specific signal:
@@ -491,7 +491,7 @@ Setup:
 - Interactive TUI mode with dual JSON event output and remote JSONL input.
 - Static PR review only. The prompt disallowed dependency install, build, test,
   Playwright, Docker, and other long external build commands.
-- External RSS samplers recorded both process-tree RSS and the Qwen Node root
+- External RSS samplers recorded both process-tree RSS and the hopcode Node root
   RSS every 5 seconds.
 
 Outcome:
@@ -513,7 +513,7 @@ Outcome:
 | Max root input tokens         |      85,655 |
 | Max subagent input tokens     |     215,207 |
 | `/usr/bin/time -l` max RSS    | 1,072.4 MiB |
-| Sampled Qwen root RSS peak    | 1,028.2 MiB |
+| Sampled hopcode root RSS peak    | 1,028.2 MiB |
 | Sampled process-tree RSS peak | 1,038.1 MiB |
 
 The process exited with:
@@ -526,14 +526,14 @@ This is a **thread exhaustion** error, not a V8 heap OOM. The failure mechanism
 is distinct: the OS refused to create a new thread, likely due to per-process
 resource limits (`RLIMIT_NPROC`) or memory fragmentation preventing stack
 allocation. It is still relevant because it occurred in a disabled-MCP,
-no-build/test, interactive long-session review where the Qwen Node process
+no-build/test, interactive long-session review where the hopcode Node process
 itself crossed about 1 GiB RSS.
 The failure happened during the final summary phase, after the controller had
 already completed six review turns.
 
-Turn timeline and sampled Qwen root RSS:
+Turn timeline and sampled hopcode root RSS:
 
-| Window        | Turn state           | Qwen root RSS max | Qwen root RSS at window end |
+| Window        | Turn state           | hopcode root RSS max | hopcode root RSS at window end |
 | ------------- | -------------------- | ----------------: | --------------------------: |
 | 0.0-9.0 min   | turn 1 completed     |         701.2 MiB |                   255.3 MiB |
 | 9.0-15.1 min  | turn 2 completed     |         503.2 MiB |                   494.4 MiB |
@@ -572,7 +572,7 @@ dominant signal in this reproduction.
 Interpretation:
 
 1. This run separates long-session growth from MCP startup/config memory. MCP
-   was disabled and there were no MCP tool calls, yet the Qwen root process
+   was disabled and there were no MCP tool calls, yet the hopcode root process
    still reached about 1 GiB RSS.
 2. The late memory peak aligns with subagent-heavy review turns and final
    summary/merge-back, not with external build/test child processes.

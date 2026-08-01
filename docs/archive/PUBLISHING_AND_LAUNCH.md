@@ -294,7 +294,7 @@ Formerly known as "HopCode," HopCode represents a new chapter in
 AI-assisted development, featuring:
 
 - Enhanced terminal interface
-- Support for Qwen series models
+- Support for hopcode series models
 - VS Code and Zed editor integration
 - Open-source SDK for extensibility
 - Cross-platform compatibility
@@ -348,7 +348,7 @@ npm install -g @hoptrendy/hopcode
 🚀 Exciting News! We're launching HopCode!
 
 After successful development as "HopCode," we're rebranding to
-HopCode - an AI-powered coding assistant optimized for Qwen series
+HopCode - an AI-powered coding assistant optimized for hopcode series
 models.
 
 ✨ What's new:
