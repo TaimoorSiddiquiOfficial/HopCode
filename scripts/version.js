@@ -1,0 +1,131 @@
+/**
+ * @license
+ * Copyright 2025 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { execSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+// A script to handle versioning and ensure all related changes are in a single, atomic commit.
+
+function run(command) {
+  console.log(`> ${command}`);
+  execSync(command, { stdio: 'inherit' });
+}
+
+function readJson(filePath) {
+  return JSON.parse(readFileSync(filePath, 'utf-8'));
+}
+
+function writeJson(filePath, data) {
+  writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n');
+}
+
+// 1. Get the version from the command line arguments.
+const versionType = process.argv[2];
+if (!versionType) {
+  console.error('Error: No version specified.');
+  console.error(
+    'Usage: npm run version <version> (e.g., 1.2.3 or patch|minor|major|prerelease)',
+  );
+  process.exit(1);
+}
+
+// 2. Bump the version in the root package.json file.
+run(`npm version ${versionType} --no-git-tag-version --allow-same-version`);
+
+// 3. Read the new root version so all workspaces can be aligned exactly.
+const rootPackageJsonPath = resolve(process.cwd(), 'package.json');
+const newVersion = readJson(rootPackageJsonPath).version;
+
+// 4. Get all workspaces and bump them to the release version.
+// Exclude third-party packages that may appear in npm ls --workspaces output
+// but are not owned by this repo (e.g., patched/vendored packages).
+const workspacesToExclude = ['ansi-sequence-parser'];
+let lsOutput;
+try {
+  lsOutput = JSON.parse(
+    execSync('npm ls --workspaces --json --depth=0').toString(),
+  );
+} catch (e) {
+  // `npm ls` can exit with a non-zero status code if there are issues
+  // with dependencies, but it will still produce the JSON output we need.
+  // We'll try to parse the stdout from the error object.
+  if (e.stdout) {
+    console.warn(
+      'Warning: `npm ls` exited with a non-zero status code. Attempting to proceed with the output.',
+    );
+    try {
+      lsOutput = JSON.parse(e.stdout.toString());
+    } catch (parseError) {
+      console.error(
+        'Error: Failed to parse JSON from `npm ls` output even after `npm ls` failed.',
+      );
+      console.error('npm ls stderr:', e.stderr.toString());
+      console.error('Parse error:', parseError);
+      process.exit(1);
+    }
+  } else {
+    console.error('Error: `npm ls` failed with no output.');
+    console.error(e.stderr?.toString() || e);
+    process.exit(1);
+  }
+}
+const allWorkspaces = Object.keys(lsOutput.dependencies || {});
+const workspacesToVersion = allWorkspaces.filter(
+  (wsName) => !workspacesToExclude.includes(wsName),
+);
+
+for (const workspaceName of workspacesToVersion) {
+  run(
+    `npm version ${newVersion} --workspace ${workspaceName} --no-git-tag-version --allow-same-version`,
+  );
+}
+
+// 5. Update the sandboxImageUri in the root package.json
+const rootPackageJson = readJson(rootPackageJsonPath);
+if (rootPackageJson.config?.sandboxImageUri) {
+  rootPackageJson.config.sandboxImageUri =
+    rootPackageJson.config.sandboxImageUri.replace(/:.*$/, `:${newVersion}`);
+  console.log(`Updated sandboxImageUri in root to use version ${newVersion}`);
+  writeJson(rootPackageJsonPath, rootPackageJson);
+}
+
+// 6. Update the sandboxImageUri in the cli package.json
+const cliPackageJsonPath = resolve(process.cwd(), 'packages/cli/package.json');
+const cliPackageJson = readJson(cliPackageJsonPath);
+if (cliPackageJson.config?.sandboxImageUri) {
+  cliPackageJson.config.sandboxImageUri =
+    cliPackageJson.config.sandboxImageUri.replace(/:.*$/, `:${newVersion}`);
+  console.log(
+    `Updated sandboxImageUri in cli package to use version ${newVersion}`,
+  );
+  writeJson(cliPackageJsonPath, cliPackageJson);
+}
+
+// 7. Run `npm install` to update package-lock.json.
+// --ignore-scripts prevents the root `prepare` lifecycle from triggering a
+// redundant full build that fails with TS5055 when dist/ already exists from
+// the initial `npm ci` install.
+run(
+  'npm install --workspace packages/cli --workspace packages/core --workspace packages/channels/base --workspace packages/channels/plugin-example --package-lock-only --ignore-scripts',
+);
+const exportHtmlPackageJsonPath = resolve(
+  process.cwd(),
+  'packages/web-templates/src/export-html/package.json',
+);
+const exportHtmlPackageJson = readJson(exportHtmlPackageJsonPath);
+if (exportHtmlPackageJson.dependencies?.['@hoptrendy/webui']) {
+  exportHtmlPackageJson.dependencies['@hoptrendy/webui'] = `^${newVersion}`;
+  writeJson(exportHtmlPackageJsonPath, exportHtmlPackageJson);
+}
+
+// 8. Run `npm install` to update package-lock.json.
+run('npm install --package-lock-only');
+
+// 9. Verify version consistency across all packages.
+run('node scripts/verify-release-consistency.js');
+
+console.log(`Successfully bumped versions to v${newVersion}.`);
