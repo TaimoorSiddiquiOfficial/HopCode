@@ -1,3 +1,4 @@
+import { HopCodeLogger } from '../telemetry/hopcode-logger/hopcode-logger.js';
 /**
  * @license
  * Copyright 2025 Google LLC

@@ -1,3 +1,4 @@
+import { HopCodeLogger } from './hopcode-logger/hopcode-logger.js';
 /**
  * @license
  * Copyright 2025 HopCode Team

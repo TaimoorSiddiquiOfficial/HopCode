@@ -51,6 +51,7 @@ import { ShellTool } from '../tools/shell.js';
 import { canUseRipgrep } from '../utils/ripgrepUtils.js';
 import { getSessionProjectDir } from '../utils/sessionIdContext.js';
 import { logRipgrepFallback } from '../telemetry/loggers.js';
+import { HopCodeLogger } from '../telemetry/index.js';
 import { RipgrepFallbackEvent } from '../telemetry/types.js';
 import { ToolRegistry } from '../tools/tool-registry.js';
 import { ToolNames } from '../tools/tool-names.js';
