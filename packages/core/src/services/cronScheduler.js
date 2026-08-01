@@ -146,7 +146,7 @@ export class CronScheduler {
     timer = null;
     onFire = null;
     // Guard a consumer installs when it cannot execute certain durable jobs. A
-    // headless run can't expand a `.qwen/loop.md` sentinel, so it marks such
+    // headless run can't expand a `.hopcode/loop.md` sentinel, so it marks such
     // durable jobs skippable here: they are then neither fired NOR have their
     // persisted fired-state advanced (lastFiredAt stamp / one-shot removal),
     // leaving the tick for the owning interactive session instead of silently

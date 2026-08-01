@@ -166,9 +166,9 @@ describe('workspace skill settings persistence', () => {
     previousQwenHome = process.env['HOPCODE_HOME'];
     process.env['HOPCODE_HOME'] = qwenHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
-    fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
+    fs.mkdirSync(path.join(workspace, '.hopcode'), { recursive: true });
     fs.writeFileSync(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.hopcode', 'settings.json'),
       JSON.stringify({
         skills: { disabled: ['orphan', ' ReViEw ', 'review'] },
       }),
@@ -223,7 +223,7 @@ describe('workspace skill settings persistence', () => {
     ).resolves.toMatchObject({ changed: true });
 
     const saved = JSON.parse(
-      fs.readFileSync(path.join(workspace, '.qwen', 'settings.json'), 'utf8'),
+      fs.readFileSync(path.join(workspace, '.hopcode', 'settings.json'), 'utf8'),
     ) as { skills: { disabled: string[] } };
     expect(saved.skills.disabled).toEqual(['orphan', 'alpha', 'beta']);
     await expect(
@@ -689,9 +689,9 @@ describe('runHopCodeServe telemetry validation', () => {
       ).json()) as { features: string[] };
       expect(before.features).not.toContain('workspace_voice_transcription');
 
-      fs.mkdirSync(path.join(workspace, '.qwen'));
+      fs.mkdirSync(path.join(workspace, '.hopcode'));
       fs.writeFileSync(
-        path.join(workspace, '.qwen', 'settings.json'),
+        path.join(workspace, '.hopcode', 'settings.json'),
         JSON.stringify({
           modelProviders: {
             openai: [
@@ -5097,9 +5097,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-control-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.hopcode'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.hopcode', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const worker = makeWorker({
@@ -5210,9 +5210,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-race-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.hopcode'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.hopcode', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const worker = makeWorker({
@@ -5270,9 +5270,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-fifo-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.hopcode'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.hopcode', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     let capturedDeps:
@@ -5433,9 +5433,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-conflict-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.hopcode'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.hopcode', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const workerFactory = vi.fn(() =>
@@ -5495,9 +5495,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-runtime-race-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.hopcode'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.hopcode', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const workerFactory = vi.fn(() =>
@@ -5607,9 +5607,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-worker-reload-')),
     );
-    fs.mkdirSync(path.join(tmpDir, '.qwen'));
+    fs.mkdirSync(path.join(tmpDir, '.hopcode'));
     fs.writeFileSync(
-      path.join(tmpDir, '.qwen', 'settings.json'),
+      path.join(tmpDir, '.hopcode', 'settings.json'),
       JSON.stringify({ channels: { telegram: { type: 'telegram' } } }),
     );
     const worker = makeWorker({
@@ -5847,9 +5847,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
         },
       },
     };
-    fs.mkdirSync(path.join(secondary, '.qwen'));
+    fs.mkdirSync(path.join(secondary, '.hopcode'));
     fs.writeFileSync(
-      path.join(secondary, '.qwen', 'settings.json'),
+      path.join(secondary, '.hopcode', 'settings.json'),
       JSON.stringify({ channels: { feishu: secondaryChannelConfig } }),
     );
     vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({

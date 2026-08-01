@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 /** A cell counts as part of a word when it is non-empty and not whitespace. */

@@ -51,7 +51,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || 'qwen-code-dev-bot' }}"
+  AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || 'hopcode-dev-bot' }}"
   BEHIND_SYNC_THRESHOLD: '25'
   SCAN_LIVENESS_MINUTES: '60'
   MAX_SYNCS_PER_TICK: '3'
@@ -61,7 +61,7 @@ env:
 jobs:
   shepherd:
     if: |-
-      ${{ github.repository == 'QwenLM/qwen-code' && vars.FLEET_SHEPHERD_DISABLED != 'true' }}
+      ${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' && vars.FLEET_SHEPHERD_DISABLED != 'true' }}
     runs-on: 'ubuntu-latest'
     timeout-minutes: 15
     steps:

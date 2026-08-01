@@ -17706,7 +17706,7 @@ describe('createServeApp', () => {
           [primary, 'primary-channel'],
           [secondary, 'secondary-channel'],
         ]) {
-          const qwenDir = path.join(workspace, '.qwen');
+          const qwenDir = path.join(workspace, '.hopcode');
           await fsp.mkdir(qwenDir);
           await fsp.writeFile(
             path.join(qwenDir, 'settings.json'),
@@ -17817,9 +17817,9 @@ describe('createServeApp', () => {
       );
       try {
         process.env['HOPCODE_HOME'] = tempHome;
-        await fsp.mkdir(path.join(workspace, '.qwen'));
+        await fsp.mkdir(path.join(workspace, '.hopcode'));
         await fsp.writeFile(
-          path.join(workspace, '.qwen', 'settings.json'),
+          path.join(workspace, '.hopcode', 'settings.json'),
           JSON.stringify({
             channels: {
               old: {
@@ -18326,7 +18326,7 @@ describe('runHopCodeServe', () => {
       path.join(os.tmpdir(), 'qwen-serve-runtime-'),
     );
     // Keep real scheduled task state out of startup/shutdown tests; otherwise a
-    // developer's ~/.qwen/scheduled_tasks.json could rehydrate sessions here.
+    // developer's ~/.hopcode/scheduled_tasks.json could rehydrate sessions here.
     Storage.setRuntimeBaseDir(runtimeDir);
   });
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -754,7 +754,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
   it('routes a WS upgrade + initialize to a trusted secondary workspace', async () => {
     const result = await initializeWs('/workspaces/secondary-id/acp');
     expect(result.result?.protocolVersion).toBeGreaterThanOrEqual(1);
-    expect(result.result?.agentCapabilities?._meta?.qwen?.workspaceCwd).toBe(
+    expect(result.result?.agentCapabilities?._meta?.hopcode?.workspaceCwd).toBe(
       '/ws-b',
     );
   });
@@ -763,7 +763,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
     const result = await initializeWs(
       `/workspaces/${encodeURIComponent('/ws-b')}/acp`,
     );
-    expect(result.result?.agentCapabilities?._meta?.qwen?.workspaceCwd).toBe(
+    expect(result.result?.agentCapabilities?._meta?.hopcode?.workspaceCwd).toBe(
       '/ws-b',
     );
   });

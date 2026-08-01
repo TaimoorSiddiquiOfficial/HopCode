@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 import { type TimeRange, type UsageSummaryRecord } from './usageHistoryService.js';
@@ -78,7 +78,7 @@ export interface LoadUsageDashboardOptions {
 export declare function buildUsageDashboard(records: UsageSummaryRecord[], options?: LoadUsageDashboardOptions): UsageDashboard;
 /**
  * Read-only snapshot of local token usage for the daemon usage-dashboard API.
- * Loads the global cross-project history (`~/.qwen`) via
+ * Loads the global cross-project history (`~/.hopcode`) via
  * {@link loadUsageHistoryWithLive} — the persisted `usage_record.jsonl` unioned
  * with a replay of recent transcripts — so the totals include daemon / Web Shell
  * and in-progress sessions that the persisted file never captures. The load can

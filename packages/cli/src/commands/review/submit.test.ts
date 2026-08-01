@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -129,7 +129,7 @@ describe('the posting gate', () => {
     // a caller-supplied path is honoured only when there is no session (tests),
     // and ignored otherwise.
     const forged = file('forged.txt', '6771 --comment'); // says yes
-    const realArgs = join('.qwen', 'tmp', 'qwen-skill-args-sess1-review.txt');
+    const realArgs = join('.hopcode', 'tmp', 'qwen-skill-args-sess1-review.txt');
     const prev = process.env['HOPCODE_CODE_SESSION_ID'];
     process.env['HOPCODE_CODE_SESSION_ID'] = 'sess1';
     try {

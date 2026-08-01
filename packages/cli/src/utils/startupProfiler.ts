@@ -9,7 +9,7 @@
  *
  * Activated by setting HOPCODE_CODE_PROFILE_STARTUP=1. When enabled, collects
  * high-resolution timestamps at key phases of CLI startup and writes a JSON
- * report to ~/.qwen/startup-perf/ on finalization.
+ * report to ~/.hopcode/startup-perf/ on finalization.
  *
  * Usage (already wired in index.ts / gemini.tsx):
  *   initStartupProfiler()        — call once at process start to record T0
@@ -336,7 +336,7 @@ export function finalizeStartupProfile(sessionId?: string): void {
   }
 
   try {
-    const dir = path.join(os.homedir(), '.qwen', 'startup-perf');
+    const dir = path.join(os.homedir(), '.hopcode', 'startup-perf');
     fs.mkdirSync(dir, { recursive: true });
 
     const prefix = report.outerProcess ? 'outer-' : '';

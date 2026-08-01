@@ -44,7 +44,7 @@ let port = 0;
 let base = '';
 let client;
 function writePersistedTranscript(sessionId, records, state = 'active') {
-    const qwenHome = path.join(homeDir, '.qwen');
+    const qwenHome = path.join(homeDir, '.hopcode');
     const projectDir = Storage.runWithRuntimeBaseDir(qwenHome, REPO_ROOT, () => new Storage(REPO_ROOT).getProjectDir());
     const chatsDir = path.join(projectDir, 'chats', ...(state === 'archived' ? ['archive'] : []));
     mkdirSync(chatsDir, { recursive: true });
@@ -424,7 +424,7 @@ describe('qwen serve — transcript paging route', () => {
         // `chats/` dir. Remove them so later suites (e.g. PATCH metadata's
         // listWorkspaceSessions readback) start from a clean session list: extra
         // persisted sessions widen a pre-existing listing race and flake them.
-        const qwenHome = path.join(homeDir, '.qwen');
+        const qwenHome = path.join(homeDir, '.hopcode');
         const projectDir = Storage.runWithRuntimeBaseDir(qwenHome, REPO_ROOT, () => new Storage(REPO_ROOT).getProjectDir());
         rmSync(path.join(projectDir, 'chats'), { recursive: true, force: true });
     });

@@ -159,7 +159,7 @@ async function resolveExternalWorktreeDir(config, workingDir) {
     // rebinds the child's WorkspaceContext wholesale, so a model-supplied path
     // must not silently move the file tools' boundary outside the repository.
     // (`isolation: 'worktree'` has this property implicitly — it always
-    // provisions under `<projectRoot>/.qwen/worktrees/`.) Compare canonical
+    // provisions under `<projectRoot>/.hopcode/worktrees/`.) Compare canonical
     // paths so a symlink cannot straddle the boundary.
     const realRepoRoot = await fs.realpath(repoRoot).catch(() => repoRoot);
     const realResolved = await fs

@@ -104,7 +104,7 @@ beforeAll(async () => {
         return { content: 'fake response complete' };
     });
     homeDir = mkdtempSync(path.join(tmpdir(), 'qwen-serve-streaming-home-'));
-    const qwenHome = path.join(homeDir, '.qwen');
+    const qwenHome = path.join(homeDir, '.hopcode');
     mkdirSync(qwenHome, { recursive: true });
     writeFileSync(path.join(qwenHome, 'settings.json'), JSON.stringify({
         experimental: { todoStopGuard: true },

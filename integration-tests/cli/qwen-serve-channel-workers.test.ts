@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -254,7 +254,7 @@ describe('qwen serve multi-workspace channel workers', () => {
     });
     const trustedFoldersPath = path.join(qwenHome, 'trustedFolders.json');
     writeJson(trustedFoldersPath, { [workspace]: 'TRUST_FOLDER' });
-    writeJson(path.join(workspace, '.qwen', 'settings.json'), {
+    writeJson(path.join(workspace, '.hopcode', 'settings.json'), {
       channels: {
         runtime: {
           type: 'plugin-example',
@@ -393,7 +393,7 @@ describe('qwen serve multi-workspace channel workers', () => {
     });
     const trustedFoldersPath = path.join(qwenHome, 'trustedFolders.json');
     writeJson(trustedFoldersPath, { [workspace]: 'TRUST_FOLDER' });
-    writeJson(path.join(workspace, '.qwen', 'settings.json'), {
+    writeJson(path.join(workspace, '.hopcode', 'settings.json'), {
       channels: {
         reachable: {
           type: 'plugin-example',
@@ -528,7 +528,7 @@ describe('qwen serve multi-workspace channel workers', () => {
     });
     const trustedFoldersPath = path.join(qwenHome, 'trustedFolders.json');
     writeJson(trustedFoldersPath, { [workspace]: 'TRUST_FOLDER' });
-    writeJson(path.join(workspace, '.qwen', 'settings.json'), {
+    writeJson(path.join(workspace, '.hopcode', 'settings.json'), {
       channels: {
         unreachable: {
           type: 'plugin-example',
@@ -645,7 +645,7 @@ describe('qwen serve multi-workspace channel workers', () => {
       [primaryWorkspace]: 'TRUST_FOLDER',
       [secondaryWorkspace]: 'TRUST_FOLDER',
     });
-    writeJson(path.join(primaryWorkspace, '.qwen', 'settings.json'), {
+    writeJson(path.join(primaryWorkspace, '.hopcode', 'settings.json'), {
       channels: {
         primary: {
           type: 'plugin-example',
@@ -656,7 +656,7 @@ describe('qwen serve multi-workspace channel workers', () => {
         },
       },
     });
-    writeJson(path.join(secondaryWorkspace, '.qwen', 'settings.json'), {
+    writeJson(path.join(secondaryWorkspace, '.hopcode', 'settings.json'), {
       channels: {
         secondary: {
           type: 'plugin-example',

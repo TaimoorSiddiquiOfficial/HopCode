@@ -86,7 +86,7 @@ export function ImpressiveWorkflows({ qualitative, primarySuccess, outcomes, }) 
                     gap: '24px',
                     marginTop: '24px',
                     marginBottom: '24px',
-                }, children: [primarySuccess && Object.keys(primarySuccess).length > 0 && (_jsx(HorizontalBarChart, { data: primarySuccess, title: "What Helped Most (Qwen's Capabilities)", color: "#3b82f6", allowedKeys: [
+                }, children: [primarySuccess && Object.keys(primarySuccess).length > 0 && (_jsx(HorizontalBarChart, { data: primarySuccess, title: "What Helped Most (HopCode's Capabilities)", color: "#3b82f6", allowedKeys: [
                             'fast_accurate_search',
                             'correct_code_edits',
                             'good_explanations',
@@ -224,7 +224,7 @@ function HopCodeMdAdditionsSection({ additions, }) {
         });
     };
     const checkedCount = checkedState.filter(Boolean).length;
-    return (_jsxs("div", { className: "qwen-md-section", children: [_jsx("h3", { children: "Suggested HOPCODE.md Additions" }), _jsx("p", { className: "text-xs text-slate-500 mb-3", children: "Just copy this into HopCode to add it to your HOPCODE.md." }), _jsx("div", { className: "qwen-md-actions", style: { marginBottom: '12px' }, children: _jsx("button", { className: `copy-all-btn ${copiedAll ? 'copied' : ''}`, onClick: handleCopyAll, disabled: checkedCount === 0, children: copiedAll ? 'Copied All!' : `Copy All Checked (${checkedCount})` }) }), additions.map((item, idx) => (_jsxs("div", { className: "qwen-md-item", children: [_jsx("input", { type: "checkbox", checked: checkedState[idx], onChange: () => handleCheckboxChange(idx), className: "cmd-checkbox" }), _jsxs("div", { style: { flex: 1 }, children: [_jsx("code", { className: "cmd-code", children: item.addition }), _jsx("div", { className: "cmd-why", children: _jsx(MarkdownText, { children: item.why }) })] }), _jsx(CopyButton, { text: item.addition })] }, idx)))] }));
+    return (_jsxs("div", { className: "hopcode-md-section", children: [_jsx("h3", { children: "Suggested HOPCODE.md Additions" }), _jsx("p", { className: "text-xs text-slate-500 mb-3", children: "Just copy this into HopCode to add it to your HOPCODE.md." }), _jsx("div", { className: "hopcode-md-actions", style: { marginBottom: '12px' }, children: _jsx("button", { className: `copy-all-btn ${copiedAll ? 'copied' : ''}`, onClick: handleCopyAll, disabled: checkedCount === 0, children: copiedAll ? 'Copied All!' : `Copy All Checked (${checkedCount})` }) }), additions.map((item, idx) => (_jsxs("div", { className: "hopcode-md-item", children: [_jsx("input", { type: "checkbox", checked: checkedState[idx], onChange: () => handleCheckboxChange(idx), className: "cmd-checkbox" }), _jsxs("div", { style: { flex: 1 }, children: [_jsx("code", { className: "cmd-code", children: item.addition }), _jsx("div", { className: "cmd-why", children: _jsx(MarkdownText, { children: item.why }) })] }), _jsx(CopyButton, { text: item.addition })] }, idx)))] }));
 }
 export function Improvements({ qualitative, }) {
     const { improvements } = qualitative;

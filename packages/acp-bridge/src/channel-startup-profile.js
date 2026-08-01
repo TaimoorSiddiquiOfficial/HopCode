@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 import { CHANNEL_STARTUP_PROFILE_META_KEY, CHANNEL_STARTUP_PROFILE_VERSION, } from './bridgeTypes.js';

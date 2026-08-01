@@ -43,7 +43,7 @@ defaults:
 jobs:
   ab:
     name: 'Serve A/B (ubuntu-latest, Node 22.x)'
-    if: "${{ github.repository == 'QwenLM/qwen-code' }}"
+    if: "${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' }}"
     runs-on: 'ubuntu-latest'
     timeout-minutes: 30
     steps:

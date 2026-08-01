@@ -37,7 +37,7 @@ jobs:
   publish:
     name: 'Publish web-shell visuals to the PR'
     if: >-
-      github.repository == 'QwenLM/qwen-code' &&
+      github.repository == 'TaimoorSiddiquiOfficial/HopCode' &&
       github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
     runs-on: 'ubuntu-latest'
@@ -201,8 +201,8 @@ jobs:
             cp "${STAGE}"/* "${WORK}/imgs/"
             cd "${WORK}"
             git init -q
-            git config user.name 'qwen-code-bot'
-            git config user.email 'qwen-code-bot@users.noreply.github.com'
+            git config user.name 'hopcode-bot'
+            git config user.email 'hopcode-bot@users.noreply.github.com'
             git checkout -q --orphan snapshot
             git add imgs
             git commit -q -m "web-shell visuals: PR #${PR} (run ${RUN_ID})"

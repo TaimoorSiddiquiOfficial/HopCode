@@ -630,7 +630,7 @@ describe('AgentTool', () => {
       expect(
         agentTool.validateToolParams({
           ...validParams,
-          working_dir: '.qwen/tmp/review-pr-1',
+          working_dir: '.hopcode/tmp/review-pr-1',
         }),
       ).toBeNull();
     });
@@ -657,7 +657,7 @@ describe('AgentTool', () => {
       expect(
         agentTool.validateToolParams({
           ...validParams,
-          working_dir: '.qwen/tmp/review-pr-1',
+          working_dir: '.hopcode/tmp/review-pr-1',
           isolation: 'worktree',
         }),
       ).toMatch(/mutually exclusive/i);
@@ -669,7 +669,7 @@ describe('AgentTool', () => {
       expect(
         agentTool.validateToolParams({
           ...noTypeParams,
-          working_dir: '.qwen/tmp/review-pr-1',
+          working_dir: '.hopcode/tmp/review-pr-1',
         }),
       ).toMatch(/subagent_type/i);
     });
@@ -679,7 +679,7 @@ describe('AgentTool', () => {
         agentTool.validateToolParams({
           ...validParams,
           subagent_type: 'fork',
-          working_dir: '.qwen/tmp/review-pr-1',
+          working_dir: '.hopcode/tmp/review-pr-1',
         }),
       ).toMatch(/fork/i);
     });
@@ -688,7 +688,7 @@ describe('AgentTool', () => {
       expect(
         agentTool.validateToolParams({
           ...validParams,
-          working_dir: '.qwen/tmp/review-pr-1',
+          working_dir: '.hopcode/tmp/review-pr-1',
           run_in_background: true,
         }),
       ).toMatch(/run_in_background|incompatible/i);
@@ -922,7 +922,7 @@ describe('AgentTool', () => {
         prompt: 'Review the diff',
         subagent_type: 'file-search',
         name: 'reviewer',
-        working_dir: '.qwen/tmp/review-pr-1',
+        working_dir: '.hopcode/tmp/review-pr-1',
       });
 
       const result = await invocation.execute(new AbortController().signal);
@@ -1305,7 +1305,7 @@ describe('AgentTool', () => {
         description: 'Review',
         prompt: 'Review the diff',
         subagent_type: 'file-search',
-        working_dir: '.qwen/tmp/review-pr-1',
+        working_dir: '.hopcode/tmp/review-pr-1',
       });
       const result = await invocation.execute();
 
@@ -1518,8 +1518,8 @@ describe('AgentTool', () => {
         });
 
         // A real, registered worktree the caller owns — mirrors the PR
-        // worktree `/review`'s fetch-pr provisions at `.qwen/tmp/review-pr-<n>`.
-        const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+        // worktree `/review`'s fetch-pr provisions at `.hopcode/tmp/review-pr-<n>`.
+        const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
         fs.mkdirSync(path.dirname(wt), { recursive: true });
         execFileSync(
           'git',
@@ -1597,7 +1597,7 @@ describe('AgentTool', () => {
           cwd: repo,
         });
 
-        const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+        const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
         fs.mkdirSync(path.dirname(wt), { recursive: true });
         execFileSync(
           'git',
@@ -1700,9 +1700,9 @@ describe('AgentTool', () => {
           cwd: repo,
         });
 
-        // fetch-pr creates the worktree at <cwd>/.qwen/tmp/review-pr-<n> and
+        // fetch-pr creates the worktree at <cwd>/.hopcode/tmp/review-pr-<n> and
         // the /review skill passes that repo-relative path verbatim.
-        const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+        const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
         fs.mkdirSync(path.dirname(wt), { recursive: true });
         execFileSync(
           'git',
@@ -1722,7 +1722,7 @@ describe('AgentTool', () => {
           prompt: 'Review the diff',
           subagent_type: 'file-search',
           // Relative form, exactly as the skill passes it.
-          working_dir: path.join('.qwen', 'tmp', 'review-pr-1'),
+          working_dir: path.join('.hopcode', 'tmp', 'review-pr-1'),
         });
         await invocation.execute();
 
@@ -1836,7 +1836,7 @@ describe('AgentTool', () => {
         // A detached worktree is registered but has no branch, so
         // getRegisteredWorktreeBranch returns null for it. That must not gate
         // the pin — `git worktree add --detach` is a legitimate setup.
-        const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+        const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
         fs.mkdirSync(path.dirname(wt), { recursive: true });
         execFileSync('git', ['worktree', 'add', '--detach', wt, 'HEAD'], {
           cwd: repo,
@@ -1885,7 +1885,7 @@ describe('AgentTool', () => {
         execFileSync('git', ['commit', '-q', '-m', 'init', '--no-verify'], {
           cwd: repo,
         });
-        const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+        const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
         fs.mkdirSync(path.dirname(wt), { recursive: true });
         execFileSync(
           'git',
@@ -1945,7 +1945,7 @@ describe('AgentTool', () => {
         execFileSync('git', ['commit', '-q', '-m', 'init', '--no-verify'], {
           cwd: repo,
         });
-        const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+        const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
         fs.mkdirSync(path.dirname(wt), { recursive: true });
         execFileSync(
           'git',
@@ -2002,11 +2002,11 @@ describe('AgentTool', () => {
 
         // fetch-pr creates the worktree cwd-relative (git resolves a relative
         // worktree path against the process cwd), so when the CLI runs from a
-        // package subdirectory the worktree lands under the SUBDIR's .qwen,
+        // package subdirectory the worktree lands under the SUBDIR's .hopcode,
         // NOT the repo root's. Mimic that exactly.
         const subdir = path.join(repo, 'packages', 'core');
         fs.mkdirSync(subdir, { recursive: true });
-        const wt = path.join(subdir, '.qwen', 'tmp', 'review-pr-1');
+        const wt = path.join(subdir, '.hopcode', 'tmp', 'review-pr-1');
         fs.mkdirSync(path.dirname(wt), { recursive: true });
         execFileSync(
           'git',
@@ -2015,7 +2015,7 @@ describe('AgentTool', () => {
             'add',
             '-b',
             'review-pr-1',
-            path.join('.qwen', 'tmp', 'review-pr-1'),
+            path.join('.hopcode', 'tmp', 'review-pr-1'),
             'HEAD',
           ],
           { cwd: subdir },
@@ -2033,8 +2033,8 @@ describe('AgentTool', () => {
           prompt: 'Review the diff',
           subagent_type: 'file-search',
           // Relative form, resolved against the subdir cwd — must land on the
-          // subdir worktree, not <repo>/.qwen/tmp/review-pr-1.
-          working_dir: path.join('.qwen', 'tmp', 'review-pr-1'),
+          // subdir worktree, not <repo>/.hopcode/tmp/review-pr-1.
+          working_dir: path.join('.hopcode', 'tmp', 'review-pr-1'),
         });
         await invocation.execute();
 

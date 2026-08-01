@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 // The parts of a review plan that `fetch-pr` and `plan-diff` both emit. Keeping

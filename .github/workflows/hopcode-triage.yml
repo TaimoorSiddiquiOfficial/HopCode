@@ -173,7 +173,7 @@ jobs:
     # so it stops queueing behind the hosted CI/e2e/macOS/Windows concurrency
     # cap while the ECS pool sits idle. Forks fall back to ubuntu-latest unless
     # they deliberately change this workflow in their own repo.
-    runs-on: "${{ (github.repository == 'QwenLM/qwen-code' && vars.MAINTAINER_ECS_RUNNER_DISABLED != 'true') && fromJSON('[\"self-hosted\", \"linux\", \"x64\", \"ecs-qwen\"]') || fromJSON('[\"ubuntu-latest\"]') }}"
+    runs-on: "${{ (github.repository == 'TaimoorSiddiquiOfficial/HopCode' && vars.MAINTAINER_ECS_RUNNER_DISABLED != 'true') && fromJSON('[\"self-hosted\", \"linux\", \"x64\", \"ecs-hopcode\"]') || fromJSON('[\"ubuntu-latest\"]') }}"
     # startsWith (not contains) prevents false triggers from comments that
     # mention the phrase in quoted text or mid-sentence descriptions.
     # always() so the job still evaluates when the upstream `authorize` job is
@@ -296,7 +296,7 @@ jobs:
           success() &&
           github.event_name == 'issue_comment' &&
           github.event.issue.pull_request &&
-          startsWith(github.event.comment.body, '@qwen-code /triage')
+          startsWith(github.event.comment.body, '@hopcode /triage')
         shell: 'bash'
         env:
           GH_TOKEN: '${{ secrets.QWEN_CODE_BOT_TOKEN || secrets.CI_BOT_PAT }}'
@@ -379,7 +379,7 @@ jobs:
         }}
       cancel-in-progress: false
     timeout-minutes: 45
-    runs-on: ['self-hosted', 'linux', 'x64', 'ecs-qwen']
+    runs-on: ['self-hosted', 'linux', 'x64', 'ecs-hopcode']
     # The job checks out and executes PR code. Run the steps in a container so
     # package scripts/builds cannot persist changes in the self-hosted runner's
     # host filesystem across workflow runs.

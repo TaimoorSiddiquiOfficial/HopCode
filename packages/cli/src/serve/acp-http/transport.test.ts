@@ -4780,7 +4780,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       result: {
         v: 1,
         isTrusted: true,
-        workspace: { path: '/ws/.qwen/settings.json' },
+        workspace: { path: '/ws/.hopcode/settings.json' },
       },
     });
   });

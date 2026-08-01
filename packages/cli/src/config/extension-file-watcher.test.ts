@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -90,7 +90,7 @@ function fireAllEvent(
 }
 
 describe('ExtensionFileWatcher', () => {
-  const extensionsDir = '/home/user/.qwen/extensions';
+  const extensionsDir = '/home/user/.hopcode/extensions';
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -569,11 +569,11 @@ describe('ExtensionFileWatcher', () => {
     const ignored = mockWatchers[0].options['ignored'] as (
       filePath: string,
     ) => boolean;
-    expect(ignored('C:/Users/me/.qwen/extensions/alpha/.git/config')).toBe(
+    expect(ignored('C:/Users/me/.hopcode/extensions/alpha/.git/config')).toBe(
       true,
     );
     expect(
-      ignored('C:/Users/me/.qwen/extensions/alpha/node_modules/pkg/index.js'),
+      ignored('C:/Users/me/.hopcode/extensions/alpha/node_modules/pkg/index.js'),
     ).toBe(true);
   });
 
@@ -590,9 +590,9 @@ describe('ExtensionFileWatcher', () => {
 
     expect(mockWatch).toHaveBeenCalledTimes(2);
     expect(mockWatchers[0].target).toEqual([
-      '/home/user/.qwen/extension-store/state.json',
+      '/home/user/.hopcode/extension-store/state.json',
     ]);
-    expect(mockWatchers[1].target).toBe('/home/user/.qwen');
+    expect(mockWatchers[1].target).toBe('/home/user/.hopcode');
     expect(mockWatchers[1].options).toEqual(
       expect.objectContaining({
         ignoreInitial: true,

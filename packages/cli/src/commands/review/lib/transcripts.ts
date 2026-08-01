@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -236,7 +236,7 @@ function parseTranscript(file: string, diffPath?: string): AgentRecord | null {
       const fc = (part as FunctionCallPart).functionCall;
       if (!fc) continue;
       // Serialize only the ARGUMENTS. The diff path is a path the agent was told
-      // to open; a tool *result* that quotes it (a grep over `.qwen/tmp`, this
+      // to open; a tool *result* that quotes it (a grep over `.hopcode/tmp`, this
       // file in a diff) says nothing about what the agent opened.
       const args = (fc.args ?? {}) as Record<string, unknown>;
       // Match the path as a whole JSON string value, quotes included: a bare

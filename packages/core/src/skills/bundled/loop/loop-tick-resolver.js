@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as path from 'node:path';
@@ -9,7 +9,7 @@ import { LOOP_TASK_FILE_MAX_BYTES, readLoopTaskFile, } from './loop-task-file.js
 import { AUTONOMOUS_PREAMBLE, AUTONOMOUS_PREAMBLE_MARKER, CRON_REARM, autonomousTickText, keepAliveRearm, } from './autonomous-loop.js';
 export { AUTONOMOUS_SENTINEL_CRON, AUTONOMOUS_SENTINEL_DYNAMIC, AutonomousLoopTickResolver, detectAutonomousSentinel, } from './autonomous-loop.js';
 /**
- * Fire-time resolver for `.qwen/loop.md`-driven loops.
+ * Fire-time resolver for `.hopcode/loop.md`-driven loops.
  *
  * A `/loop` whose scheduled prompt is one of these sentinels re-reads loop.md
  * on every fire and gets either the FULL task block (first delivery, or whenever
@@ -177,14 +177,14 @@ export class LoopTickResolver {
      * reminder — and the caller's sanitized resolve-error — names the location
      * actually checked (QWEN_HOME-aware), but must NEVER surface a raw absolute
      * path: it flows into model/API text, leaking the host's filesystem layout.
-     *   - under $HOME             → tilde-abbreviated `~/.qwen/loop.md`;
+     *   - under $HOME             → tilde-abbreviated `~/.hopcode/loop.md`;
      *   - relocated via $QWEN_HOME → the literal `$QWEN_HOME/loop.md`, not the
      *     resolved dir (`tildeifyPath` only abbreviates $HOME, so it's a no-op for
      *     a $QWEN_HOME outside $HOME and would otherwise pass the path through);
      *   - any other out-of-$HOME dir → a generic placeholder, never the path.
      * The real absolute path stays in LOCAL debug logs only. */
     homeLoopLabel() {
-        const homeQwenDir = this.deps.homeQwenDir ?? path.join(this.deps.homeDir, '.qwen');
+        const homeQwenDir = this.deps.homeQwenDir ?? path.join(this.deps.homeDir, '.hopcode');
         const homeLoopPath = path.join(homeQwenDir, 'loop.md');
         const tildeified = tildeifyPath(homeLoopPath);
         if (tildeified !== homeLoopPath) {
@@ -196,7 +196,7 @@ export class LoopTickResolver {
         // `<homeQwenDir>/loop.md`, so swap the whole resolved dir for `$QWEN_HOME` and
         // re-attach the user-facing POSIX slash + basename directly. Deriving the tail from the
         // resolved path's length instead mishandles edge dirs: a trailing slash
-        // (`$QWEN_HOME=/x/.qwen/`) over-counts the separator, and a filesystem-root
+        // (`$QWEN_HOME=/x/.hopcode/`) over-counts the separator, and a filesystem-root
         // homeQwenDir (`$QWEN_HOME=/` → homeLoopPath `/loop.md`, dirname `/`) drops the
         // leading separator — both garbling the tail into `$QWEN_HOMEloop.md`.
         if (process.env['QWEN_HOME']) {
@@ -207,13 +207,13 @@ export class LoopTickResolver {
     /** The checked-candidate "where" string shared by the absent reminder and the
      * caller's sanitized resolve-error. Names the project candidate ONLY when it
      * was actually read (`projectChecked` — a trusted folder), so neither path can
-     * claim `.qwen/loop.md (project)` for an untrusted folder where the project
+     * claim `.hopcode/loop.md (project)` for an untrusted folder where the project
      * file is skipped. The home label is the QWEN_HOME-aware, never-absolute
      * homeLoopLabel(). Single source of truth so the two messages can't drift. */
     absentLocations(projectChecked) {
         const homeLabel = this.homeLoopLabel();
         return projectChecked
-            ? `.qwen/loop.md (project) or ${homeLabel} (home)`
+            ? `.hopcode/loop.md (project) or ${homeLabel} (home)`
             : `${homeLabel} (home)`;
     }
     /** A model-facing no-op tick for a loop.md that is unreadable THIS tick (a

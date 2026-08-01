@@ -59,7 +59,7 @@ jobs:
     # base-repo context), else a busy hosted pool delays it and blocks the
     # ECS-bound jobs. The kill-switch is read here, so flipping it reverts
     # everything to hosted.
-    runs-on: '${{ (vars.MAINTAINER_ECS_RUNNER_DISABLED != ''true'' && (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == ''merge_group'')) && fromJSON(''["self-hosted", "linux", "x64", "ecs-qwen"]'') || fromJSON(''["ubuntu-latest"]'') }}'
+    runs-on: '${{ (vars.MAINTAINER_ECS_RUNNER_DISABLED != ''true'' && (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == ''merge_group'')) && fromJSON(''["self-hosted", "linux", "x64", "ecs-hopcode"]'') || fromJSON(''["ubuntu-latest"]'') }}'
     continue-on-error: true
     outputs:
       skip_ci: '${{ steps.release_sync.outputs.skip_ci }}'
@@ -115,10 +115,10 @@ jobs:
           ubuntu_runner='["ubuntu-latest"]'
           if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
             if [[ "${ECS_DISABLED}" != "true" && "${DISPATCH_LINUX_RUNNER}" == "self-hosted" ]]; then
-              ubuntu_runner='["self-hosted", "linux", "x64", "ecs-qwen"]'
+              ubuntu_runner='["self-hosted", "linux", "x64", "ecs-hopcode"]'
             fi
           elif [[ "${ECS_DISABLED}" != "true" && ( "${SAME_REPO}" == "true" || "${EVENT_NAME}" == "merge_group" ) ]]; then
-            ubuntu_runner='["self-hosted", "linux", "x64", "ecs-qwen"]'
+            ubuntu_runner='["self-hosted", "linux", "x64", "ecs-hopcode"]'
           fi
           echo "ubuntu_runner=${ubuntu_runner}" >> "${GITHUB_OUTPUT}"
           echo "Selected Linux runner: ${ubuntu_runner}"

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -55,15 +55,15 @@ describe('readLoopTaskFile', () => {
 
   const writeProject = (content: string) =>
     fs
-      .mkdir(path.join(projectRoot, '.qwen'), { recursive: true })
+      .mkdir(path.join(projectRoot, '.hopcode'), { recursive: true })
       .then(() =>
-        fs.writeFile(path.join(projectRoot, '.qwen', 'loop.md'), content),
+        fs.writeFile(path.join(projectRoot, '.hopcode', 'loop.md'), content),
       );
   const writeHome = (content: string) =>
     fs
-      .mkdir(path.join(homeDir, '.qwen'), { recursive: true })
+      .mkdir(path.join(homeDir, '.hopcode'), { recursive: true })
       .then(() =>
-        fs.writeFile(path.join(homeDir, '.qwen', 'loop.md'), content),
+        fs.writeFile(path.join(homeDir, '.hopcode', 'loop.md'), content),
       );
 
   // Wrap the next fs.open so each handle.read() length is recorded against a real
@@ -104,7 +104,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(projectRoot, '.qwen', 'loop.md'),
+      path: path.join(projectRoot, '.hopcode', 'loop.md'),
       source: 'project',
       content: 'project tasks',
       truncated: false,
@@ -122,7 +122,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -130,10 +130,10 @@ describe('readLoopTaskFile', () => {
   });
 
   it('does not follow symlinked project loop task files', async () => {
-    await fs.mkdir(path.join(projectRoot, '.qwen'), { recursive: true });
+    await fs.mkdir(path.join(projectRoot, '.hopcode'), { recursive: true });
     const outside = path.join(tempDir, 'secret.txt');
     await fs.writeFile(outside, 'secret tasks');
-    await fs.symlink(outside, path.join(projectRoot, '.qwen', 'loop.md'));
+    await fs.symlink(outside, path.join(projectRoot, '.hopcode', 'loop.md'));
     await writeHome('user tasks');
 
     const result = await readLoopTaskFile({
@@ -144,20 +144,20 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
     });
   });
 
-  it('refuses a project loop.md whose .qwen ancestor symlinks outside the workspace', async () => {
-    // `.qwen -> <outside>` makes a final-component lstat pass while the file
+  it('refuses a project loop.md whose .hopcode ancestor symlinks outside the workspace', async () => {
+    // `.hopcode -> <outside>` makes a final-component lstat pass while the file
     // resolves outside the project; realpath must catch the ancestor symlink.
     const outside = path.join(tempDir, 'outside');
     await fs.mkdir(outside, { recursive: true });
     await fs.writeFile(path.join(outside, 'loop.md'), 'escaped tasks');
-    await fs.symlink(outside, path.join(projectRoot, '.qwen'));
+    await fs.symlink(outside, path.join(projectRoot, '.hopcode'));
     await writeHome('user tasks');
 
     const result = await readLoopTaskFile({
@@ -168,7 +168,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -178,17 +178,17 @@ describe('readLoopTaskFile', () => {
   it('refuses a project loop.md resolving to a SIBLING dir that shares a name prefix', async () => {
     // isWithin appends path.sep before startsWith, so root `<ws>/foo` must NOT
     // accept a candidate under the sibling `<ws>/foobar`. Make projectRoot
-    // `<ws>/foo` and symlink its `.qwen` to `<ws>/foobar/.qwen`; realpath then
+    // `<ws>/foo` and symlink its `.hopcode` to `<ws>/foobar/.hopcode`; realpath then
     // resolves loop.md into `foobar`, whose canonical path bare-startsWith
     // `<ws>/foo` yet is NOT a descendant. A regression to a bare
     // `real.startsWith(root)` (no separator) would wave this cross-workspace
     // read through — this test fails the moment that separator is dropped.
     const fooRoot = path.join(tempDir, 'foo');
-    const siblingQwen = path.join(tempDir, 'foobar', '.qwen');
+    const siblingQwen = path.join(tempDir, 'foobar', '.hopcode');
     await fs.mkdir(fooRoot, { recursive: true });
     await fs.mkdir(siblingQwen, { recursive: true });
     await fs.writeFile(path.join(siblingQwen, 'loop.md'), 'sibling tasks');
-    await fs.symlink(siblingQwen, path.join(fooRoot, '.qwen'));
+    await fs.symlink(siblingQwen, path.join(fooRoot, '.hopcode'));
     await writeHome('user tasks');
 
     const result = await readLoopTaskFile({
@@ -200,7 +200,7 @@ describe('readLoopTaskFile', () => {
     // Refused → falls through to home; the sibling content is never returned.
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -209,15 +209,15 @@ describe('readLoopTaskFile', () => {
 
   it('does not read a project loop.md symlinked to an in-workspace file (exfiltration guard)', async () => {
     // The dangerous case confinement alone misses: a repo-committed
-    // `.qwen/loop.md -> ../.env` resolves INSIDE the workspace, so the realpath
+    // `.hopcode/loop.md -> ../.env` resolves INSIDE the workspace, so the realpath
     // confinement passes — yet it must NOT be read. A symlinked project loop.md
     // is refused outright; only a real regular file at the literal path is read.
-    await fs.mkdir(path.join(projectRoot, '.qwen'), { recursive: true });
+    await fs.mkdir(path.join(projectRoot, '.hopcode'), { recursive: true });
     const secret = path.join(projectRoot, '.env');
     await fs.writeFile(secret, 'SECRET=should-not-be-read');
     await fs.symlink(
       path.join('..', '.env'),
-      path.join(projectRoot, '.qwen', 'loop.md'),
+      path.join(projectRoot, '.hopcode', 'loop.md'),
     );
     await writeHome('user tasks');
 
@@ -229,7 +229,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -237,16 +237,16 @@ describe('readLoopTaskFile', () => {
   });
 
   it('does not read a HARD-LINKED project loop.md (exfiltration guard)', async () => {
-    // The case the symlink guard misses: `ln <secret> .qwen/loop.md` makes
+    // The case the symlink guard misses: `ln <secret> .hopcode/loop.md` makes
     // loop.md an ordinary regular file (lstat sees no symlink, isFile() true)
     // that SHARES the secret's inode (nlink === 2). It resolves to itself inside
     // the workspace, so confinement passes too — only the `nlink > 1` guard
     // refuses it. Mutation check: drop that guard and the secret is returned as
     // the project source instead of falling through to home.
-    await fs.mkdir(path.join(projectRoot, '.qwen'), { recursive: true });
+    await fs.mkdir(path.join(projectRoot, '.hopcode'), { recursive: true });
     const secret = path.join(tempDir, 'secret-env');
     await fs.writeFile(secret, 'SECRET=should-not-be-read');
-    const projectLoop = path.join(projectRoot, '.qwen', 'loop.md');
+    const projectLoop = path.join(projectRoot, '.hopcode', 'loop.md');
     await fs.link(secret, projectLoop); // hard link → nlink 2, same inode
     // Precondition: the link really is a hard link to the secret, not a symlink.
     const linkStat = await fs.lstat(projectLoop);
@@ -264,7 +264,7 @@ describe('readLoopTaskFile', () => {
     // is never returned from any candidate.
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -276,14 +276,14 @@ describe('readLoopTaskFile', () => {
   });
 
   it('does not read a HARD-LINKED home loop.md (exfiltration guard)', async () => {
-    // Same hard-link vector on the home candidate: `ln <secret> ~/.qwen/loop.md`.
+    // Same hard-link vector on the home candidate: `ln <secret> ~/.hopcode/loop.md`.
     // fs.stat follows to a regular file with nlink 2, so isFile()/confinement
     // pass — only the `nlink > 1` guard refuses it. No project file here, so the
     // result is `missing`; the secret content is never returned.
-    await fs.mkdir(path.join(homeDir, '.qwen'), { recursive: true });
+    await fs.mkdir(path.join(homeDir, '.hopcode'), { recursive: true });
     const secret = path.join(tempDir, 'home-secret');
     await fs.writeFile(secret, 'SECRET=should-not-be-read');
-    const homeLoop = path.join(homeDir, '.qwen', 'loop.md');
+    const homeLoop = path.join(homeDir, '.hopcode', 'loop.md');
     await fs.link(secret, homeLoop);
     const linkStat = await fs.lstat(homeLoop);
     expect(linkStat.nlink).toBeGreaterThan(1);
@@ -297,8 +297,8 @@ describe('readLoopTaskFile', () => {
     expect(result).toEqual({
       status: 'missing',
       checkedPaths: [
-        path.join(projectRoot, '.qwen', 'loop.md'),
-        path.join(homeDir, '.qwen', 'loop.md'),
+        path.join(projectRoot, '.hopcode', 'loop.md'),
+        path.join(homeDir, '.hopcode', 'loop.md'),
       ],
     });
   });
@@ -341,7 +341,7 @@ describe('readLoopTaskFile', () => {
     // fragile); the load-bearing proof is that fs.open is never called on the
     // project path, so no blocking open() can happen.
     await writeHome('user tasks');
-    const projectLoop = path.join(projectRoot, '.qwen', 'loop.md');
+    const projectLoop = path.join(projectRoot, '.hopcode', 'loop.md');
     const actual =
       await vi.importActual<typeof import('node:fs/promises')>(
         'node:fs/promises',
@@ -374,11 +374,11 @@ describe('readLoopTaskFile', () => {
     // The user's own dotfile may legitimately be a symlink (e.g. into a synced
     // dotfiles repo). Follow it, as long as the target is a real regular file
     // that resolves WITHIN $HOME (the confinement added for escapes).
-    await fs.mkdir(path.join(homeDir, '.qwen'), { recursive: true });
+    await fs.mkdir(path.join(homeDir, '.hopcode'), { recursive: true });
     const target = path.join(homeDir, 'dotfiles', 'loop.md');
     await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.writeFile(target, 'symlinked user tasks');
-    await fs.symlink(target, path.join(homeDir, '.qwen', 'loop.md'));
+    await fs.symlink(target, path.join(homeDir, '.hopcode', 'loop.md'));
 
     const result = await readLoopTaskFile({
       projectRoot,
@@ -388,7 +388,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'symlinked user tasks',
       truncated: false,
@@ -397,12 +397,12 @@ describe('readLoopTaskFile', () => {
 
   it('skips a home loop.md whose symlink target escapes $HOME', async () => {
     // Home symlinks are allowed (dotfiles repos), but only if they resolve
-    // WITHIN $HOME. A `~/.qwen/loop.md -> /etc/passwd`-style escape (here a
+    // WITHIN $HOME. A `~/.hopcode/loop.md -> /etc/passwd`-style escape (here a
     // sibling outside homeDir) must be skipped, not read and fed to the model.
-    await fs.mkdir(path.join(homeDir, '.qwen'), { recursive: true });
+    await fs.mkdir(path.join(homeDir, '.hopcode'), { recursive: true });
     const outside = path.join(tempDir, 'outside-secret');
     await fs.writeFile(outside, 'SECRET=should-not-be-read');
-    await fs.symlink(outside, path.join(homeDir, '.qwen', 'loop.md'));
+    await fs.symlink(outside, path.join(homeDir, '.hopcode', 'loop.md'));
 
     const result = await readLoopTaskFile({
       projectRoot,
@@ -413,15 +413,15 @@ describe('readLoopTaskFile', () => {
     expect(result).toEqual({
       status: 'missing',
       checkedPaths: [
-        path.join(projectRoot, '.qwen', 'loop.md'),
-        path.join(homeDir, '.qwen', 'loop.md'),
+        path.join(projectRoot, '.hopcode', 'loop.md'),
+        path.join(homeDir, '.hopcode', 'loop.md'),
       ],
     });
   });
 
   it('reads the home loop.md from a relocated homeQwenDir (QWEN_HOME)', async () => {
     // The home candidate lives in the QWEN_HOME-aware global dir, not always
-    // <homeDir>/.qwen — write loop.md into a relocated global dir and confirm it
+    // <homeDir>/.hopcode — write loop.md into a relocated global dir and confirm it
     // is read as the `home` source from <homeQwenDir>/loop.md.
     const relocated = path.join(tempDir, 'relocated-qwen');
     await fs.mkdir(relocated, { recursive: true });
@@ -464,7 +464,7 @@ describe('readLoopTaskFile', () => {
     expect(result).toEqual({
       status: 'missing',
       checkedPaths: [
-        path.join(projectRoot, '.qwen', 'loop.md'),
+        path.join(projectRoot, '.hopcode', 'loop.md'),
         path.join(relocated, 'loop.md'),
       ],
     });
@@ -474,8 +474,8 @@ describe('readLoopTaskFile', () => {
     // fs.stat follows the home symlink; a self-referential link raises ELOOP.
     // That must be treated as a skippable candidate (→ missing), not crash the
     // tick — without ELOOP in the skip whitelist this rethrows and aborts.
-    await fs.mkdir(path.join(homeDir, '.qwen'), { recursive: true });
-    const loop = path.join(homeDir, '.qwen', 'loop.md');
+    await fs.mkdir(path.join(homeDir, '.hopcode'), { recursive: true });
+    const loop = path.join(homeDir, '.hopcode', 'loop.md');
     await fs.symlink(loop, loop); // points at itself → ELOOP on stat
 
     const result = await readLoopTaskFile({
@@ -486,7 +486,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'missing',
-      checkedPaths: [path.join(projectRoot, '.qwen', 'loop.md'), loop],
+      checkedPaths: [path.join(projectRoot, '.hopcode', 'loop.md'), loop],
     });
   });
 
@@ -495,7 +495,7 @@ describe('readLoopTaskFile', () => {
     // symlinked) target is a directory/FIFO it must be skipped — the project
     // path proves this via lstat, but the home path's fs.stat needs its own
     // coverage so a blocking open / directory read never happens.
-    const homeLoop = path.join(homeDir, '.qwen', 'loop.md');
+    const homeLoop = path.join(homeDir, '.hopcode', 'loop.md');
     await fs.mkdir(path.dirname(homeLoop), { recursive: true });
     await fs.writeFile(homeLoop, '- user tasks'); // real file so realpath resolves
     const actual =
@@ -536,7 +536,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -557,7 +557,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -573,14 +573,14 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'missing',
-      checkedPaths: [path.join(homeDir, '.qwen', 'loop.md')],
+      checkedPaths: [path.join(homeDir, '.hopcode', 'loop.md')],
     });
   });
 
-  it('skips a non-directory component at .qwen (ENOTDIR) and falls through', async () => {
-    // A regular file where the `.qwen` dir should be → reading .qwen/loop.md
+  it('skips a non-directory component at .hopcode (ENOTDIR) and falls through', async () => {
+    // A regular file where the `.hopcode` dir should be → reading .hopcode/loop.md
     // raises ENOTDIR; skip to home rather than throwing.
-    await fs.writeFile(path.join(projectRoot, '.qwen'), 'not a dir');
+    await fs.writeFile(path.join(projectRoot, '.hopcode'), 'not a dir');
     await writeHome('user tasks');
 
     const result = await readLoopTaskFile({
@@ -591,7 +591,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -600,7 +600,7 @@ describe('readLoopTaskFile', () => {
 
   it('skips a directory at the loop.md path and falls through', async () => {
     // A directory at the project path yields EISDIR on read — skip it, not throw.
-    await fs.mkdir(path.join(projectRoot, '.qwen', 'loop.md'), {
+    await fs.mkdir(path.join(projectRoot, '.hopcode', 'loop.md'), {
       recursive: true,
     });
     await writeHome('user tasks');
@@ -613,7 +613,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -669,7 +669,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(projectRoot, '.qwen', 'loop.md'),
+      path: path.join(projectRoot, '.hopcode', 'loop.md'),
       source: 'project',
       content: 'project tasks',
       truncated: false,
@@ -691,7 +691,7 @@ describe('readLoopTaskFile', () => {
 
     expect(result).toEqual({
       status: 'found',
-      path: path.join(homeDir, '.qwen', 'loop.md'),
+      path: path.join(homeDir, '.hopcode', 'loop.md'),
       source: 'home',
       content: 'user tasks',
       truncated: false,
@@ -716,7 +716,7 @@ describe('readLoopTaskFile', () => {
     expect(result).toMatchObject({ source: 'home', content: 'user tasks' });
     expect(debugSpy).toHaveBeenCalledWith('skipping whitespace-only loop.md', {
       source: 'project',
-      filePath: path.join(projectRoot, '.qwen', 'loop.md'),
+      filePath: path.join(projectRoot, '.hopcode', 'loop.md'),
     });
   });
 
@@ -733,8 +733,8 @@ describe('readLoopTaskFile', () => {
     expect(result).toEqual({
       status: 'missing',
       checkedPaths: [
-        path.join(projectRoot, '.qwen', 'loop.md'),
-        path.join(homeDir, '.qwen', 'loop.md'),
+        path.join(projectRoot, '.hopcode', 'loop.md'),
+        path.join(homeDir, '.hopcode', 'loop.md'),
       ],
     });
   });
@@ -745,8 +745,8 @@ describe('readLoopTaskFile', () => {
     ).resolves.toEqual({
       status: 'missing',
       checkedPaths: [
-        path.join(projectRoot, '.qwen', 'loop.md'),
-        path.join(homeDir, '.qwen', 'loop.md'),
+        path.join(projectRoot, '.hopcode', 'loop.md'),
+        path.join(homeDir, '.hopcode', 'loop.md'),
       ],
     });
   });
@@ -884,8 +884,8 @@ describe('readLoopTaskFile', () => {
     const partial = Buffer.from([0xf0, 0x9f, 0xa6]); // 3 of a 4-byte char...
     const tail = Buffer.from([0x62]); // ...then 'b' (non-continuation) → incomplete
     const raw = Buffer.concat([head, partial, tail]); // cap + 1 bytes → truncated
-    await fs.mkdir(path.join(projectRoot, '.qwen'), { recursive: true });
-    await fs.writeFile(path.join(projectRoot, '.qwen', 'loop.md'), raw);
+    await fs.mkdir(path.join(projectRoot, '.hopcode'), { recursive: true });
+    await fs.writeFile(path.join(projectRoot, '.hopcode', 'loop.md'), raw);
 
     const result = await readLoopTaskFile({
       projectRoot,
@@ -918,8 +918,8 @@ describe('readLoopTaskFile', () => {
     const head = Buffer.alloc(N - 3, 0x61); // 'a' * (N-3)
     const tail = Buffer.from([0xc3, 0x41, 0x80, 0x80]); // 2-byte lead, 'A', 2 conts
     const raw = Buffer.concat([head, tail]); // N + 1 bytes → truncated
-    await fs.mkdir(path.join(projectRoot, '.qwen'), { recursive: true });
-    await fs.writeFile(path.join(projectRoot, '.qwen', 'loop.md'), raw);
+    await fs.mkdir(path.join(projectRoot, '.hopcode'), { recursive: true });
+    await fs.writeFile(path.join(projectRoot, '.hopcode', 'loop.md'), raw);
 
     const result = await readLoopTaskFile({
       projectRoot,
@@ -946,8 +946,8 @@ describe('readLoopTaskFile', () => {
     const head = Buffer.alloc(N - 4, 0x61); // 'a' * (N-4)
     const tail = Buffer.from([0xe4, 0xb8, 0x41, 0x80, 0x80]); // lead+1 cont, 'A', 2 conts
     const raw = Buffer.concat([head, tail]); // N + 1 bytes → truncated
-    await fs.mkdir(path.join(projectRoot, '.qwen'), { recursive: true });
-    await fs.writeFile(path.join(projectRoot, '.qwen', 'loop.md'), raw);
+    await fs.mkdir(path.join(projectRoot, '.hopcode'), { recursive: true });
+    await fs.writeFile(path.join(projectRoot, '.hopcode', 'loop.md'), raw);
 
     const result = await readLoopTaskFile({
       projectRoot,
@@ -977,8 +977,8 @@ describe('readLoopTaskFile', () => {
     const head = Buffer.alloc(N - 5, 0x61); // 'a' * (N-5)
     const tail = Buffer.from([0xc3, 0x41, 0x80, 0x80, 0x80, 0x61]); // orphan lead, 'A', 3 conts, 'a'
     const raw = Buffer.concat([head, tail]); // N + 1 bytes → truncated
-    await fs.mkdir(path.join(projectRoot, '.qwen'), { recursive: true });
-    await fs.writeFile(path.join(projectRoot, '.qwen', 'loop.md'), raw);
+    await fs.mkdir(path.join(projectRoot, '.hopcode'), { recursive: true });
+    await fs.writeFile(path.join(projectRoot, '.hopcode', 'loop.md'), raw);
 
     const result = await readLoopTaskFile({
       projectRoot,
@@ -1005,7 +1005,7 @@ describe('readLoopTaskFile', () => {
     // typo'd entry would start throwing on a real ENAMETOOLONG instead of falling
     // through. Drive it via a mocked lstat on the project path; home still reads.
     await writeHome('user tasks');
-    const projectLoop = path.join(projectRoot, '.qwen', 'loop.md');
+    const projectLoop = path.join(projectRoot, '.hopcode', 'loop.md');
     const actual =
       await vi.importActual<typeof import('node:fs/promises')>(
         'node:fs/promises',

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -253,17 +253,17 @@ describe('captureLocalDiff — untracked files', () => {
     expect(res.text).not.toContain('dirlink');
   });
 
-  it('does not capture the review own .qwen/tmp scratch files', () => {
-    // The review writes its args/parse-args/diff/plan under .qwen/tmp before this
-    // capture runs; in a repo that does not ignore .qwen they would show up as
+  it('does not capture the review own .hopcode/tmp scratch files', () => {
+    // The review writes its args/parse-args/diff/plan under .hopcode/tmp before this
+    // capture runs; in a repo that does not ignore .hopcode they would show up as
     // the user's untracked work and the review would report on its own plumbing.
-    write('.qwen/tmp/qwen-skill-args-review.txt', '6771 --comment\n');
-    write('.qwen/tmp/qwen-review-local-plan.json', '{}\n');
+    write('.hopcode/tmp/qwen-skill-args-review.txt', '6771 --comment\n');
+    write('.hopcode/tmp/qwen-review-local-plan.json', '{}\n');
     write('real.ts', 'export const r = 1;\n');
 
     const res = capture();
     expect(res.untracked).toEqual(['real.ts']);
-    expect(res.text).not.toContain('.qwen/tmp');
+    expect(res.text).not.toContain('.hopcode/tmp');
   });
 
   it('reports an oversized tracked diff instead of inlining it', () => {

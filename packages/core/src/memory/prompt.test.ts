@@ -152,9 +152,9 @@ describe('managed auto-memory prompt helpers', () => {
   });
 
   it('condensed prompt with empty indexes is significantly shorter than full', () => {
-    const condensed = buildManagedAutoMemoryPrompt('/tmp/project/.qwen/memory');
+    const condensed = buildManagedAutoMemoryPrompt('/tmp/project/.hopcode/memory');
     const full = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       undefined,
       undefined,
       undefined,
@@ -167,7 +167,7 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('emits full prompt when at least one index has content', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       '- [User Memory](user/terse.md) — User prefers terse responses.',
     );
 
@@ -179,7 +179,7 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('emits full prompt with forceFullProtocol even when all indexes are empty', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
       undefined,
       undefined,
@@ -194,15 +194,15 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('emits condensed prompt for multi-tier setup when all indexes are empty', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
-      { memoryDir: '/home/u/.qwen/memories', indexContent: null },
+      { memoryDir: '/home/u/.hopcode/memories', indexContent: null },
     );
 
     // Condensed multi-tier still shows both dirs
     expect(prompt).toContain('two persistent, file-based memory directories');
-    expect(prompt).toContain('/home/u/.qwen/memories');
-    expect(prompt).toContain('/tmp/project/.qwen/memory');
+    expect(prompt).toContain('/home/u/.hopcode/memories');
+    expect(prompt).toContain('/tmp/project/.hopcode/memory');
     // Uses condensed sections
     expect(prompt).toContain('## Memory types');
     expect(prompt).toContain('## How to save memories');
@@ -214,10 +214,10 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('emits condensed prompt for three-tier setup with team section when all indexes are empty', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
-      { memoryDir: '/home/u/.qwen/memories', indexContent: null },
-      { memoryDir: '/tmp/project/.qwen/team-memory', indexContent: null },
+      { memoryDir: '/home/u/.hopcode/memories', indexContent: null },
+      { memoryDir: '/tmp/project/.hopcode/team-memory', indexContent: null },
     );
 
     expect(prompt).toContain('three persistent, file-based memory directories');
@@ -237,7 +237,7 @@ describe('managed auto-memory prompt helpers', () => {
   it('appendManagedAutoMemoryToUserMemory passes through options', () => {
     const withOptions = appendManagedAutoMemoryToUserMemory(
       '',
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
       undefined,
       undefined,
@@ -245,7 +245,7 @@ describe('managed auto-memory prompt helpers', () => {
     );
     const without = appendManagedAutoMemoryToUserMemory(
       '',
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
     );
 
@@ -258,10 +258,10 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('emits full prompt when only userSection has content (project index empty)', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
       {
-        memoryDir: '/home/u/.qwen/memories',
+        memoryDir: '/home/u/.hopcode/memories',
         indexContent: '- [Pref](user/pref.md) — prefers dark mode.',
       },
     );
@@ -275,7 +275,7 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('treats whitespace-only indexContent as empty (triggers condensed)', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       '   \n  \t  \n  ',
     );
 
@@ -289,10 +289,10 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('emits condensed prompt for project+team two-tier without userSection (all empty)', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
       undefined,
-      { memoryDir: '/tmp/project/.qwen/team-memory', indexContent: null },
+      { memoryDir: '/tmp/project/.hopcode/team-memory', indexContent: null },
     );
 
     // Two-tier (project + team), no user section
@@ -314,7 +314,7 @@ describe('managed auto-memory prompt helpers', () => {
   });
 
   it('condensed prompt includes maintenance directives', () => {
-    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.qwen/memory');
+    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.hopcode/memory');
 
     expect(prompt).toContain('Keep the name, description, and type fields');
     expect(prompt).toContain('Organize memories semantically by topic');
@@ -324,7 +324,7 @@ describe('managed auto-memory prompt helpers', () => {
   });
 
   it('condensed prompt includes read-path behavioral guidance', () => {
-    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.qwen/memory');
+    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.hopcode/memory');
 
     expect(prompt).toContain('## Accessing memories');
     expect(prompt).toContain(
@@ -335,14 +335,14 @@ describe('managed auto-memory prompt helpers', () => {
   });
 
   it('condensed prompt includes surprising/non-obvious heuristic in do-not-save', () => {
-    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.qwen/memory');
+    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.hopcode/memory');
 
     expect(prompt).toContain('surprising');
     expect(prompt).toContain('non-obvious');
   });
 
   it('condensed prompt includes date normalization for project type and negative judgement for user type', () => {
-    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.qwen/memory');
+    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.hopcode/memory');
 
     expect(prompt).toContain('convert relative dates to absolute dates');
     expect(prompt).toContain('negative judgement');
@@ -350,9 +350,9 @@ describe('managed auto-memory prompt helpers', () => {
 
   it('condensed multi-tier prompt includes cross-directory duplicate check', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
-      { memoryDir: '/home/u/.qwen/memories', indexContent: null },
+      { memoryDir: '/home/u/.hopcode/memories', indexContent: null },
     );
 
     expect(prompt).toContain(
@@ -395,14 +395,14 @@ describe('managed auto-memory prompt helpers', () => {
   });
 
   it('condensed save section includes index truncation warning', () => {
-    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.qwen/memory');
+    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.hopcode/memory');
     expect(prompt).toContain('lines after 200 will be truncated');
     expect(prompt).toContain('keep each index concise');
   });
 
   it('emits condensed prompt when forceFullProtocol is explicitly false', () => {
     const prompt = buildManagedAutoMemoryPrompt(
-      '/tmp/project/.qwen/memory',
+      '/tmp/project/.hopcode/memory',
       null,
       undefined,
       undefined,
@@ -452,7 +452,7 @@ describe('managed auto-memory prompt helpers', () => {
   });
 
   it('condensed prompt includes persistence guidance', () => {
-    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.qwen/memory');
+    const prompt = buildManagedAutoMemoryPrompt('/tmp/project/.hopcode/memory');
     expect(prompt).toContain(
       'Use plans and tasks for in-conversation work; reserve memory for durable cross-conversation knowledge',
     );

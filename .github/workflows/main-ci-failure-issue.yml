@@ -18,7 +18,7 @@ defaults:
 jobs:
   create_issue:
     name: 'Create autofix issue'
-    if: "${{ github.repository == 'QwenLM/qwen-code' && github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'push' }}"
+    if: "${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' && github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'push' }}"
     runs-on: 'ubuntu-latest'
     timeout-minutes: 5
     steps:
@@ -31,7 +31,7 @@ jobs:
           WORKFLOW_RUN_URL: '${{ github.event.workflow_run.html_url }}'
           HEAD_SHA: '${{ github.event.workflow_run.head_sha }}'
           HEAD_BRANCH: '${{ github.event.workflow_run.head_branch }}'
-          AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || 'qwen-code-dev-bot' }}"
+          AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || 'hopcode-dev-bot' }}"
           BUG_LABEL: 'type/bug'
           READY_FOR_AGENT_LABEL: 'status/ready-for-agent'
           AUTOFIX_APPROVED_LABEL: 'autofix/approved'

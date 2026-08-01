@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -112,7 +112,7 @@ function makeWorkspaceService(label: string): DaemonWorkspaceService {
         rules: { allow: [], ask: [], deny: [] },
       },
       workspace: {
-        path: `${ctx.workspaceCwd}/.qwen/settings.json`,
+        path: `${ctx.workspaceCwd}/.hopcode/settings.json`,
         rules: {
           allow: request.ruleType === 'allow' ? request.rules : [],
           ask: request.ruleType === 'ask' ? request.rules : [],

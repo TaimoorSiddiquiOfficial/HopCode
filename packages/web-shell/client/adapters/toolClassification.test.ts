@@ -33,7 +33,7 @@ describe('isBackgroundSubAgentToolCall', () => {
   it('keeps caller-owned working_dir launches in the foreground by default', () => {
     expect(
       isBackgroundSubAgentToolCall(
-        agentTool({ working_dir: '.qwen/worktrees/review' }),
+        agentTool({ working_dir: '.hopcode/worktrees/review' }),
       ),
     ).toBe(false);
   });

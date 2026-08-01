@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -851,8 +851,8 @@ export function buildRoleBrief(
     if (typeof base === 'string' && base && pr !== undefined && opts.planPath) {
       // Absolute, both of them. `worktreePath` and the plan path are repo-relative
       // in the report, and this agent's working directory IS the worktree — so a
-      // relative `.qwen/tmp/review-pr-6457` resolves to
-      // `<worktree>/.qwen/tmp/review-pr-6457`, which does not exist. Watched live:
+      // relative `.hopcode/tmp/review-pr-6457` resolves to
+      // `<worktree>/.hopcode/tmp/review-pr-6457`, which does not exist. Watched live:
       // Agent 7 of a real 29-agent run spent its time running
       // `find … -name "*6457*fetch*"`, hunting for a plan it had been handed a path
       // to that could not resolve from where it was standing.

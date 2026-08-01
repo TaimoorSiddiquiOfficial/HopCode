@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -21,7 +21,7 @@
 //
 // So: a small table of path → checklist, appended to the brief of every agent whose
 // territory actually contains a matching file. It is additive to the project's own
-// rules (`.qwen/review-rules.md` and friends), never a replacement: a project that
+// rules (`.hopcode/review-rules.md` and friends), never a replacement: a project that
 // says nothing about workflows still gets these, and a project that says something
 // gets both.
 //

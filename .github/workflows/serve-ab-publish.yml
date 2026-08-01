@@ -29,7 +29,7 @@ jobs:
   publish:
     name: 'Publish serve A/B to the PR'
     if: >-
-      github.repository == 'QwenLM/qwen-code' &&
+      github.repository == 'TaimoorSiddiquiOfficial/HopCode' &&
       github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
     runs-on: 'ubuntu-latest'

@@ -48,7 +48,7 @@ export function reviewBranch(prNumber: string | number): string {
  * `target` is a file-path review's own path — `src/foo.ts` — or a PR/local
  * label. Interpolated raw, `src/foo.ts` becomes `qwen-review-src/foo.ts-diff.txt`,
  * a nested path whose parent nobody created (ENOENT), and a crafted `../../evil`
- * escapes `.qwen/tmp` and lets `writeFileSync` land anywhere. Flatten every
+ * escapes `.hopcode/tmp` and lets `writeFileSync` land anywhere. Flatten every
  * separator and dot-segment to a single component so the file always sits
  * directly in the temp dir.
  */

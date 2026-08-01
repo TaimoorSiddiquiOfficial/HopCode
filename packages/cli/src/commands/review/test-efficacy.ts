@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -443,7 +443,7 @@ async function runTestEfficacy(args: TestEfficacyArgs): Promise<void> {
     // uncommitted in the shared tree is ever touched or discarded.
     //
     // `node_modules` resolves without a per-tree install because the probe tree
-    // is nested under the repo (`.qwen/tmp/…-probe`), so Node walks up to the
+    // is nested under the repo (`.hopcode/tmp/…-probe`), so Node walks up to the
     // repo-root `node_modules` — exactly how the shared review worktree already
     // runs vitest.
     const headSha = gitOut(worktree, 'rev-parse', 'HEAD');

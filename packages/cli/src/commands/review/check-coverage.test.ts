@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -319,7 +319,7 @@ function planPr(): string {
       diffLines: 300,
       prNumber: '6766',
       ownerRepo: 'QwenLM/qwen-code',
-      worktreePath: '.qwen/tmp/review-pr-6766',
+      worktreePath: '.hopcode/tmp/review-pr-6766',
       files: [{ path: 'a.ts', kind: 'source', removedLines: 0, heavy: false }],
       chunks: [
         { id: 1, startLine: 1, endLine: 100 },

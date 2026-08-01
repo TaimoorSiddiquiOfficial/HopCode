@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -355,7 +355,7 @@ describe('isAllowedMemoryPath with a symlinked project root', () => {
 
   beforeEach(async () => {
     // Local-memory mode anchors the managed-memory root at
-    // `<projectRoot>/.qwen/memory`, so routing the project root through an
+    // `<projectRoot>/.hopcode/memory`, so routing the project root through an
     // explicit symlink puts a symlink component in the memory-root path on
     // every platform — not only where os.tmpdir() happens to be a symlink
     // (e.g. macOS `/var` -> `/private/var`). The memory root is deliberately
@@ -392,7 +392,7 @@ describe('isAllowedMemoryPath with a symlinked project root', () => {
 
   it('still denies a path outside the symlinked managed-memory root', () => {
     // The symmetric resolution must not become overly permissive: a normal
-    // project file that is not under `<projectRoot>/.qwen/memory` — reached
+    // project file that is not under `<projectRoot>/.hopcode/memory` — reached
     // through the same symlinked root — is still rejected.
     const outsideFile = path.join(projectRoot, 'notes.md');
     expect(isAllowedMemoryPath(outsideFile, projectRoot)).toBe(false);
@@ -402,9 +402,9 @@ describe('isAllowedMemoryPath with a symlinked project root', () => {
 describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
   // Unlike the block above (where the symlink sits ABOVE the trusted anchor —
   // the project root itself is a symlink, like macOS `/var`), here the symlink
-  // is a repo-tracked `.qwen` INSIDE the managed suffix pointing outside the
+  // is a repo-tracked `.hopcode` INSIDE the managed suffix pointing outside the
   // project. Canonicalizing such a symlink would relocate the "allowed" root
-  // out of the project, so the anchor is canonicalized but the `.qwen/memory`
+  // out of the project, so the anchor is canonicalized but the `.hopcode/memory`
   // suffix is appended literally and the write is denied.
   const originalMemoryLocal = process.env['HOPCODE_CODE_MEMORY_LOCAL'];
   let baseDir: string;
@@ -418,9 +418,9 @@ describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
     outsideDir = path.join(baseDir, 'outside');
     await fs.mkdir(projectRoot, { recursive: true });
     await fs.mkdir(outsideDir, { recursive: true });
-    // The whole `.qwen` dir is a symlink escaping the project — a malicious
+    // The whole `.hopcode` dir is a symlink escaping the project — a malicious
     // repo can ship this as a git-tracked symlink.
-    await fs.symlink(outsideDir, path.join(projectRoot, '.qwen'));
+    await fs.symlink(outsideDir, path.join(projectRoot, '.hopcode'));
     clearAutoMemoryRootCache();
   });
 
@@ -434,16 +434,16 @@ describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
     await fs.rm(baseDir, { recursive: true, force: true });
   });
 
-  it('denies a write via a `.qwen` symlink escaping the project when the target is absent', () => {
-    // `.qwen -> /outside` with `/outside/memory` not yet created: the candidate
+  it('denies a write via a `.hopcode` symlink escaping the project when the target is absent', () => {
+    // `.hopcode -> /outside` with `/outside/memory` not yet created: the candidate
     // resolves to `/outside/memory/project.md`, but the allowed root keeps the
-    // literal `.qwen/memory` suffix, so the escape is rejected before it can
+    // literal `.hopcode/memory` suffix, so the escape is rejected before it can
     // create `/outside/memory/project.md`.
     const memoryFile = path.join(getAutoMemoryRoot(projectRoot), 'project.md');
     expect(isAllowedMemoryPath(memoryFile, projectRoot)).toBe(false);
   });
 
-  it('denies a write via a `.qwen` symlink escaping the project when the target already exists', async () => {
+  it('denies a write via a `.hopcode` symlink escaping the project when the target already exists', async () => {
     // The same escape must stay denied even once `/outside/memory` exists —
     // otherwise realpath'ing the whole root would resolve the symlink on both
     // sides and let the write through.
@@ -502,7 +502,7 @@ describe('isAllowedMemoryPath in default (shared) memory mode', () => {
     clearAutoMemoryRootCache();
 
     // Sanity: this is the default (shared) mode — the root lives under the
-    // (symlinked) base dir, not under `<projectRoot>/.qwen`. Guards the test
+    // (symlinked) base dir, not under `<projectRoot>/.hopcode`. Guards the test
     // against silently falling back into local mode.
     const root = getAutoMemoryRoot(projectRoot);
     expect(root.startsWith(linkBase + path.sep)).toBe(true);

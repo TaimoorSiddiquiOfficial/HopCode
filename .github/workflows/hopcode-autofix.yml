@@ -63,7 +63,7 @@ permissions:
 env:
   # Identity of the autofix bot. All open in-repo PRs authored by this bot are
   # eligible for the review phase — not limited to autofix/issue-* branches.
-  AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || 'qwen-code-dev-bot' }}"
+  AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || 'hopcode-dev-bot' }}"
   # Branch-name prefix used by the issue phase when creating PRs. Also used
   # for duplicate-PR detection and issue-number extraction from branch names.
   BRANCH_PREFIX: 'autofix/issue-'
@@ -127,7 +127,7 @@ jobs:
       # and a trusted sender the payload misses merely loses coalescing. The
       # association list mirrors TRUSTED_ASSOC; the login mirrors REVIEW_BOT.
       group: >-
-        ${{ github.event_name == 'schedule' && 'qwen-autofix-route-cron' || (github.event_name == 'pull_request_review' && (contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.review.author_association) || github.event.review.user.login == 'qwen-code-ci-bot') && format('qwen-autofix-route-pr-{0}', github.event.pull_request.number)) || (github.event_name == 'issues' && format('qwen-autofix-route-issue-{0}', github.event.issue.number)) || format('qwen-autofix-route-{0}', github.run_id) }}
+        ${{ github.event_name == 'schedule' && 'qwen-autofix-route-cron' || (github.event_name == 'pull_request_review' && (contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.review.author_association) || github.event.review.user.login == 'hopcode-ci-bot') && format('qwen-autofix-route-pr-{0}', github.event.pull_request.number)) || (github.event_name == 'issues' && format('qwen-autofix-route-issue-{0}', github.event.issue.number)) || format('qwen-autofix-route-{0}', github.run_id) }}
       cancel-in-progress: |-
         ${{ github.event_name != 'workflow_dispatch' }}
     permissions:
@@ -395,7 +395,7 @@ jobs:
 
       - name: 'Install dependencies and build'
         env:
-          QWEN_SKIP_PREPARE: '1'
+          HOPCODE_SKIP_PREPARE: '1'
         run: |-
           for attempt in 1 2 3; do
             if npm ci --prefer-offline --no-audit --progress=false; then
@@ -603,8 +603,8 @@ jobs:
               }
             }
         run: |-
-          rm -rf "${QWEN_HOME}"
-          mkdir -p .qwen "${QWEN_HOME}"
+          rm -rf "${HOPCODE_HOME}"
+          mkdir -p .qwen "${HOPCODE_HOME}"
           if [[ -z "${OPENAI_API_KEY:-}" ]]; then
             echo '::error::AUTOFIX_OPENAI_API_KEY secret is required for Qwen Autofix.'
             exit 1
@@ -1253,7 +1253,7 @@ jobs:
             # bot's own eval markers, and known non-actionable bot comments
             # (triage stages, coverage reports, legacy suggestion summaries,
             # force-push reminders).
-            BOT_COMMENT_FILTER='<!-- (autofix-eval|qwen-triage|qwen-review-suggestion-summary|pr-force-push|qwen-review-ack) '
+            BOT_COMMENT_FILTER='<!-- (autofix-eval|qwen-triage|qwen-review-suggestion-summary|pr-force-push|hopcode-review-ack) '
             N_ISSUE_COMMENTS="$(jq --arg wm "${EFF_WM}" --arg rb "${REVIEW_BOT}" --arg ab "${AUTOFIX_BOT}" \
               --argjson trust "${TRUSTED_ASSOC}" --arg bf "${BOT_COMMENT_FILTER}" '
               [ .[]
@@ -1393,7 +1393,7 @@ jobs:
 
       - name: 'Install dependencies and build'
         env:
-          QWEN_SKIP_PREPARE: '1'
+          HOPCODE_SKIP_PREPARE: '1'
         run: |-
           for attempt in 1 2 3; do
             if npm ci --prefer-offline --no-audit --progress=false; then
@@ -1518,7 +1518,7 @@ jobs:
             + (.[2] | map(select((.created_at // "") > $wm)
               | select((.user.login // "") != $ab)
               | select(((.author_association // "") | IN($trust[])) or (.user.login // "") == $rb)
-              | select((.body // "") | test("<!-- (autofix-eval|qwen-triage|qwen-review-suggestion-summary|pr-force-push|qwen-review-ack) ") | not) | .created_at))
+              | select((.body // "") | test("<!-- (autofix-eval|qwen-triage|qwen-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not) | .created_at))
             + (.[3] | map(select((.conclusion // .state // "") | IN("FAILURE", "FAILED", "ERROR", "TIMED_OUT", "ACTION_REQUIRED", "CANCELLED"))
               | select(((.workflowName // "") != "Qwen Autofix") or (((.name // "") | startswith("review-address"))))
               | select((.completedAt // .updatedAt // "") > $wm)
@@ -1563,7 +1563,7 @@ jobs:
               + (.[2] | map(select((.created_at // "") > $wm)
                 | select((.user.login // "") != $ab)
                 | select(((.author_association // "") | IN($trust[])) or (.user.login // "") == $rb)
-                | select((.body // "") | test("<!-- (autofix-eval|qwen-triage|qwen-review-suggestion-summary|pr-force-push|qwen-review-ack) ") | not)) | length)
+                | select((.body // "") | test("<!-- (autofix-eval|qwen-triage|qwen-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not)) | length)
               + (.[3] | map(select((.conclusion // .state // "") | IN("FAILURE", "FAILED", "ERROR", "TIMED_OUT", "ACTION_REQUIRED", "CANCELLED"))
                 | select(((.workflowName // "") != "Qwen Autofix") or (((.name // "") | startswith("review-address"))))
                 | select((.completedAt // .updatedAt // "") > $wm)) | length)' \
@@ -1639,7 +1639,7 @@ jobs:
               | select((.created_at // "") > $wm)
               | select((.user.login // "") != $ab)
               | select(((.author_association // "") | IN($trust[])) or (.user.login // "") == $rb)
-              | select((.body // "") | test("<!-- (autofix-eval|qwen-triage|qwen-review-suggestion-summary|pr-force-push|qwen-review-ack) ") | not)
+              | select((.body // "") | test("<!-- (autofix-eval|qwen-triage|qwen-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not)
               | "- @\(.user.login): \(.body // "" | gsub("\r"; ""))"' \
               "${WORKDIR}/ic.json"
             echo

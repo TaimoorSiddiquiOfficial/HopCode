@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -54,7 +54,7 @@ describe('GitWorktreeService.isRegisteredLinkedWorktree() (real git)', () => {
 
   it('returns true for a linked worktree created via `git worktree add`', async () => {
     const repo = initRepo('qwen-linked-wt-');
-    const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+    const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
     fs.mkdirSync(path.dirname(wt), { recursive: true });
     execFileSync('git', ['worktree', 'add', '-b', 'review-pr-1', wt, 'HEAD'], {
       cwd: repo,
@@ -110,7 +110,7 @@ describe('GitWorktreeService.isRegisteredLinkedWorktree() (real git)', () => {
     // symlink so it runs everywhere. Without the realpath the symlink path
     // would not match the registry's canonical entry and this would be false.
     const repo = initRepo('qwen-linked-symlink-');
-    const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+    const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
     fs.mkdirSync(path.dirname(wt), { recursive: true });
     execFileSync('git', ['worktree', 'add', '-b', 'review-pr-1', wt, 'HEAD'], {
       cwd: repo,
@@ -132,7 +132,7 @@ describe('GitWorktreeService.isRegisteredLinkedWorktree() (real git)', () => {
     // git dir. But that entry's `gitdir` pointer names the REAL worktree, not
     // this copy, so verifying the pointer rejects it.
     const repo = initRepo('qwen-linked-fake-');
-    const realWt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+    const realWt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
     fs.mkdirSync(path.dirname(realWt), { recursive: true });
     execFileSync(
       'git',
@@ -153,7 +153,7 @@ describe('GitWorktreeService.isRegisteredLinkedWorktree() (real git)', () => {
     // can point at the real repo and whose `gitdir` can point back at itself.
     // Only reading `<commonDir>/worktrees/*` on the REPO side defeats this.
     const repo = initRepo('qwen-linked-fabricated-');
-    const realWt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+    const realWt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
     fs.mkdirSync(path.dirname(realWt), { recursive: true });
     execFileSync(
       'git',
@@ -191,7 +191,7 @@ describe('GitWorktreeService.isRegisteredLinkedWorktree() (real git)', () => {
     // Probing the path itself catches this: with no `.git` of its own, git
     // resolves it into the main repo, where --git-dir == --git-common-dir.
     const repo = initRepo('qwen-linked-stale-');
-    const wt = path.join(repo, '.qwen', 'tmp', 'review-pr-1');
+    const wt = path.join(repo, '.hopcode', 'tmp', 'review-pr-1');
     fs.mkdirSync(path.dirname(wt), { recursive: true });
     execFileSync('git', ['worktree', 'add', '-b', 'review-pr-1', wt, 'HEAD'], {
       cwd: repo,

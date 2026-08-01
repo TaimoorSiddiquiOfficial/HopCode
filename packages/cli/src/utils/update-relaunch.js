@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Code
+ * Copyright 2026 HopCode
  * SPDX-License-Identifier: Apache-2.0
  */
 import { writeStderrLine } from './stdioHelpers.js';

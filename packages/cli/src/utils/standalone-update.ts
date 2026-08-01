@@ -485,7 +485,7 @@ function checkDeferredSwap(standaloneDir: string): void {
   if (fs.existsSync(`${standaloneDir}.new`)) {
     throw new Error(
       `A previous update left a pending swap at ${standaloneDir}.new. ` +
-        'If no qwen-update.bat process is running, remove the pending swap and .qwen-update.lock, then try again.',
+        'If no qwen-update.bat process is running, remove the pending swap and .hopcode-update.lock, then try again.',
     );
   }
 }
@@ -980,7 +980,7 @@ export async function performStandaloneUpdate(
   // updates. Acquire lock BEFORE creating standaloneDir to prevent a
   // concurrent process from seeing the empty directory and throwing a
   // misleading error.
-  const lockPath = path.join(parentDir, '.qwen-update.lock');
+  const lockPath = path.join(parentDir, '.hopcode-update.lock');
   if (!acquireLock(lockPath, standaloneDir)) {
     throw new Error('Another update is already in progress');
   }

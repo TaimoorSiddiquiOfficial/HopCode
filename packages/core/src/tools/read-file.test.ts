@@ -589,7 +589,7 @@ describe('ReadFileTool', () => {
             getProjectTempDir: () => path.join(tempRootDir, '.temp'),
             getProjectDir: () => path.join(tempRootDir, '.project'),
             getUserSkillsDirs: () => [
-              path.join(os.homedir(), '.qwen', 'skills'),
+              path.join(os.homedir(), '.hopcode', 'skills'),
             ],
           },
           getTruncateToolOutputThreshold: () => 2500,
@@ -1153,7 +1153,7 @@ describe('ReadFileTool', () => {
             getProjectTempDir: () => path.join(tempRootDir, '.temp'),
             getProjectDir: () => path.join(tempRootDir, '.project'),
             getUserSkillsDirs: () => [
-              path.join(os.homedir(), '.qwen', 'skills'),
+              path.join(os.homedir(), '.hopcode', 'skills'),
             ],
           },
           getTruncateToolOutputThreshold: () => 2500,

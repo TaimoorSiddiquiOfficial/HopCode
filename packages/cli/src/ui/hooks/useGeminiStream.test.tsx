@@ -6520,7 +6520,7 @@ describe('useGeminiStream', () => {
         request: {
           callId: 'write-memory-call-1',
           name: 'write_file',
-          args: { file_path: '/workspace/.qwen/memory/project.md' },
+          args: { file_path: '/workspace/.hopcode/memory/project.md' },
           isClientInitiated: false,
           prompt_id: 'prompt-id-memory-write',
         },
@@ -6588,7 +6588,7 @@ describe('useGeminiStream', () => {
         [
           {
             toolName: 'write_file',
-            args: { file_path: '/workspace/.qwen/memory/project.md' },
+            args: { file_path: '/workspace/.hopcode/memory/project.md' },
             status: 'success',
           },
         ],
@@ -6630,7 +6630,7 @@ describe('useGeminiStream', () => {
         request: {
           callId: 'write-memory-call-1',
           name: 'write_file',
-          args: { file_path: '/workspace/.qwen/memory/project.md' },
+          args: { file_path: '/workspace/.hopcode/memory/project.md' },
           isClientInitiated: false,
           prompt_id: 'prompt-id-memory-write',
         },
@@ -6703,7 +6703,7 @@ describe('useGeminiStream', () => {
           },
           {
             toolName: 'write_file',
-            args: { file_path: '/workspace/.qwen/memory/project.md' },
+            args: { file_path: '/workspace/.hopcode/memory/project.md' },
             status: 'success',
           },
         ],

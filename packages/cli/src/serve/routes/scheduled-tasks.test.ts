@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -101,7 +101,7 @@ async function makeHarness(): Promise<Harness> {
   const workspace = path.join(scratch, 'workspace');
   await fsp.mkdir(workspace, { recursive: true });
   // The durable tasks file lands under the runtime base dir, not the real
-  // ~/.qwen — redirect it into the scratch dir for the duration of the test.
+  // ~/.hopcode — redirect it into the scratch dir for the duration of the test.
   Storage.setRuntimeBaseDir(scratch);
 
   const bridge = makeStubBridge();

@@ -143,10 +143,10 @@ export function worktreeReleaseResult(
  * `reason` when it is still there.
  *
  * `git worktree remove` needs the directory. A user reclaiming disk with
- * `rm -rf .qwen/tmp` leaves the worktree *registered but missing*, and from then
+ * `rm -rf .hopcode/tmp` leaves the worktree *registered but missing*, and from then
  * on git refuses both of the things the next review needs:
  *
- *     $ git worktree add .qwen/tmp/review-pr-6457 qwen-review/pr-6457
+ *     $ git worktree add .hopcode/tmp/review-pr-6457 qwen-review/pr-6457
  *     fatal: '...' is a missing but already registered worktree;
  *     use 'add -f' to override, or 'prune' or 'remove' to clear
  *

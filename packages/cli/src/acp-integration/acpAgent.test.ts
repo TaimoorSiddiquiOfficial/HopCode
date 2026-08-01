@@ -721,7 +721,7 @@ vi.mock('../utils/languageUtils.js', () => ({
   ),
   getOutputLanguageFilePath: vi
     .fn()
-    .mockReturnValue('/mock/.qwen/output-language.md'),
+    .mockReturnValue('/mock/.hopcode/output-language.md'),
   resolveOutputLanguage: vi.fn((v: string | null | undefined) => v ?? 'auto'),
   resolveOutputLanguageOrPreserveAuto: vi.fn(
     (v: string | null | undefined) => v ?? 'auto',
@@ -1975,12 +1975,12 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 
   function expectedDefaultAcpLocalReadRoots(): string[] {
     return [
-      '/project/.qwen/tmp',
+      '/project/.hopcode/tmp',
       path.join('/project', 'subagents'),
       '/tmp/qwen-global-temp',
-      '/project/.qwen/memory',
+      '/project/.hopcode/memory',
       '/tmp/user-memory',
-      '/home/test/.qwen/skills',
+      '/home/test/.hopcode/skills',
       '/tmp/qwen-extensions',
       ...(process.platform === 'win32' ? [] : ['/tmp']),
     ];
@@ -2007,9 +2007,9 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
       getFileSystemService: vi.fn().mockReturnValue(fallbackFileSystem),
       setFileSystemService: vi.fn(),
       storage: {
-        getProjectTempDir: vi.fn().mockReturnValue('/project/.qwen/tmp'),
+        getProjectTempDir: vi.fn().mockReturnValue('/project/.hopcode/tmp'),
         getProjectDir: vi.fn().mockReturnValue('/project'),
-        getUserSkillsDirs: vi.fn().mockReturnValue(['/home/test/.qwen/skills']),
+        getUserSkillsDirs: vi.fn().mockReturnValue(['/home/test/.hopcode/skills']),
       },
     };
     vi.mocked(loadSettings).mockReturnValue(makeSessionSettings());
@@ -12980,13 +12980,13 @@ describe('sessionLanguage multi-session propagation', () => {
       getSessionId: vi.fn().mockReturnValue('s-a'),
       getOutputLanguageFilePath: vi
         .fn()
-        .mockReturnValue('/proj-a/.qwen/output-language.md'),
+        .mockReturnValue('/proj-a/.hopcode/output-language.md'),
     });
     const cfgB = makeConfig({
       getSessionId: vi.fn().mockReturnValue('s-b'),
       getOutputLanguageFilePath: vi
         .fn()
-        .mockReturnValue('/proj-b/.qwen/output-language.md'),
+        .mockReturnValue('/proj-b/.hopcode/output-language.md'),
     });
 
     const sessionConfigs = [cfgA, cfgB];
@@ -13055,7 +13055,7 @@ describe('sessionLanguage multi-session propagation', () => {
     );
     expect(updateOutputLanguageFile).toHaveBeenCalledWith(
       'auto',
-      '/proj-b/.qwen/output-language.md',
+      '/proj-b/.hopcode/output-language.md',
     );
     expect(resolveOutputLanguageOrPreserveAuto).toHaveBeenCalledWith('auto');
     expect(result).toMatchObject({ outputLanguage: 'auto' });

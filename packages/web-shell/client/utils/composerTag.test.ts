@@ -86,15 +86,15 @@ describe('getComposerTagViewModel', () => {
 
   it('hides labels for built-in tag kinds and resolves icons', () => {
     const model = getComposerTagViewModel({
-      id: 'file:@.qwen/',
+      id: 'file:@.hopcode/',
       kind: 'file',
       label: 'File',
-      value: '.qwen/',
+      value: '.hopcode/',
     });
 
     expect(model.tagLabel).toBe('');
-    expect(model.tagValue).toBe('.qwen/');
-    expect(model.fallback).toBe('file:@.qwen/');
+    expect(model.tagValue).toBe('.hopcode/');
+    expect(model.fallback).toBe('file:@.hopcode/');
     expect(model.iconUrl).toBeTruthy();
   });
 
@@ -444,14 +444,14 @@ describe('composer tag input annotations', () => {
   });
 
   it('leaves unannotated references as text', () => {
-    expect(splitComposerTagContentByAnnotations('list @.qwen/ files')).toEqual([
-      { type: 'text', text: 'list @.qwen/ files' },
+    expect(splitComposerTagContentByAnnotations('list @.hopcode/ files')).toEqual([
+      { type: 'text', text: 'list @.hopcode/ files' },
     ]);
   });
 
   it('leaves invalid annotation ranges as text', () => {
     expect(
-      splitComposerTagContentByAnnotations('list @.qwen/ files', [
+      splitComposerTagContentByAnnotations('list @.hopcode/ files', [
         {
           type: 'reference',
           start: 5,
@@ -465,20 +465,20 @@ describe('composer tag input annotations', () => {
           },
         },
       ]),
-    ).toEqual([{ type: 'text', text: 'list @.qwen/ files' }]);
+    ).toEqual([{ type: 'text', text: 'list @.hopcode/ files' }]);
   });
 
   it('leaves malformed reference annotations as text', () => {
     expect(
-      splitComposerTagContentByAnnotations('list @.qwen/ files', [
+      splitComposerTagContentByAnnotations('list @.hopcode/ files', [
         {
           type: 'reference',
           start: 5,
           end: 12,
-          text: '@.qwen/',
+          text: '@.hopcode/',
         } as unknown as DaemonInputAnnotation,
       ]),
-    ).toEqual([{ type: 'text', text: 'list @.qwen/ files' }]);
+    ).toEqual([{ type: 'text', text: 'list @.hopcode/ files' }]);
   });
 
   it('skips overlapping annotations', () => {

@@ -220,10 +220,10 @@ describe('AgentTool.toAutoClassifierInput', () => {
         description: 'review',
         prompt: 'review the diff',
         subagent_type: 'file-search',
-        working_dir: '.qwen/tmp/review-pr-1',
+        working_dir: '.hopcode/tmp/review-pr-1',
       },
     );
-    expect(result['working_dir']).toBe('.qwen/tmp/review-pr-1');
+    expect(result['working_dir']).toBe('.hopcode/tmp/review-pr-1');
     expect(result['subagent_type']).toBe('file-search');
   });
 });

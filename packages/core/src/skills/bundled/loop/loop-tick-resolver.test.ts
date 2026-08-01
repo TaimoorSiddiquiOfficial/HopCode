@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -65,15 +65,15 @@ describe('LoopTickResolver', () => {
   let homeDir: string;
   let resolver: LoopTickResolver;
 
-  const projectFile = () => path.join(projectRoot, '.qwen', 'loop.md');
-  const homeFile = () => path.join(homeDir, '.qwen', 'loop.md');
+  const projectFile = () => path.join(projectRoot, '.hopcode', 'loop.md');
+  const homeFile = () => path.join(homeDir, '.hopcode', 'loop.md');
   const writeProject = (content: string) =>
     fs
-      .mkdir(path.join(projectRoot, '.qwen'), { recursive: true })
+      .mkdir(path.join(projectRoot, '.hopcode'), { recursive: true })
       .then(() => fs.writeFile(projectFile(), content));
   const writeHome = (content: string) =>
     fs
-      .mkdir(path.join(homeDir, '.qwen'), { recursive: true })
+      .mkdir(path.join(homeDir, '.hopcode'), { recursive: true })
       .then(() => fs.writeFile(homeFile(), content));
 
   beforeEach(async () => {
@@ -453,8 +453,8 @@ describe('LoopTickResolver', () => {
     expect(absent.modelText).toContain('loop.md is not currently present');
   });
 
-  it('names the real home loop.md in the absent reminder (QWEN_HOME-aware, not a hardcoded ~/.qwen)', async () => {
-    // Regression: the absent body hardcoded `~/.qwen/loop.md (home)`, which is
+  it('names the real home loop.md in the absent reminder (QWEN_HOME-aware, not a hardcoded ~/.hopcode)', async () => {
+    // Regression: the absent body hardcoded `~/.hopcode/loop.md (home)`, which is
     // wrong once the global dir is relocated (QWEN_HOME). The resolver checks
     // `<homeQwenDir>/loop.md`, but the label is MODEL-FACING, so a $QWEN_HOME
     // outside $HOME (tildeifyPath no-op there) must read as the literal
@@ -477,8 +477,8 @@ describe('LoopTickResolver', () => {
       );
       expect(relocatedTick.modelText).toContain('$QWEN_HOME/loop.md (home)');
       // The old hardcoded home location is gone; the project label stays relative.
-      expect(relocatedTick.modelText).not.toContain('~/.qwen/loop.md');
-      expect(relocatedTick.modelText).toContain('.qwen/loop.md (project)');
+      expect(relocatedTick.modelText).not.toContain('~/.hopcode/loop.md');
+      expect(relocatedTick.modelText).toContain('.hopcode/loop.md (project)');
       // Privacy: the raw absolute global dir never reaches the model text.
       expect(relocatedTick.modelText).not.toContain(relocated);
     } finally {
@@ -490,7 +490,7 @@ describe('LoopTickResolver', () => {
     // abbreviates, so the message reads `~/…/loop.md`, never the absolute $HOME.
     const underHome = path.join(
       os.homedir(),
-      `.qwen-loop-absent-${process.pid}`,
+      `.hopcode-loop-absent-${process.pid}`,
     );
     const homeTick = await new LoopTickResolver({
       projectRoot,
@@ -582,7 +582,7 @@ describe('LoopTickResolver', () => {
 
     // under-$HOME branch still behaves with a trailing slash: tilde-abbreviated.
     const underHomeTrailing =
-      path.join(os.homedir(), `.qwen-loop-trailing-${process.pid}`) + path.sep;
+      path.join(os.homedir(), `.hopcode-loop-trailing-${process.pid}`) + path.sep;
     const underHome = new LoopTickResolver({
       projectRoot,
       homeDir: os.homedir(),
@@ -590,7 +590,7 @@ describe('LoopTickResolver', () => {
       allowProjectFile: () => true,
     });
     expect(underHome.homeLoopLabel()).toBe(
-      `~/.qwen-loop-trailing-${process.pid}/loop.md`,
+      `~/.hopcode-loop-trailing-${process.pid}/loop.md`,
     );
     expect(underHome.homeLoopLabel()).not.toContain(os.homedir());
   });
@@ -677,11 +677,11 @@ describe('LoopTickResolver', () => {
       const windowsPathResolver = new WindowsPathResolver({
         projectRoot: 'C:\\project',
         homeDir: 'C:\\Users\\runneradmin',
-        homeQwenDir: 'C:\\Users\\runneradmin\\.qwen-loop',
+        homeQwenDir: 'C:\\Users\\runneradmin\\.hopcode-loop',
         allowProjectFile: () => true,
       });
 
-      expect(windowsPathResolver.homeLoopLabel()).toBe('~/.qwen-loop/loop.md');
+      expect(windowsPathResolver.homeLoopLabel()).toBe('~/.hopcode-loop/loop.md');
     } finally {
       vi.doUnmock('node:path');
       vi.doUnmock('node:os');

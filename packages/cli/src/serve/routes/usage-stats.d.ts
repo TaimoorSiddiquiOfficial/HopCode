@@ -7,12 +7,12 @@
  * Read-only usage-dashboard surface behind the Web Shell Daemon Status
  * "统计 / Usage" tab. Serves the selected range's (`today`/`week`/`month`)
  * flattened token totals plus a trailing per-day heatmap, computed by core's
- * `buildUsageDashboard` from the local usage history (global `~/.qwen`,
+ * `buildUsageDashboard` from the local usage history (global `~/.hopcode`,
  * cross-project). Uses `loadUsageHistoryWithLive`, which unions the durable
  * `usage_record.jsonl` (written only by the TUI `/clear` path) with a replay of
  * recent transcripts — so daemon / Web Shell sessions and any in-progress
  * session are counted here, unlike the TUI `/stats` view. The load is
- * read-only (never writes `~/.qwen`).
+ * read-only (never writes `~/.hopcode`).
  *
  * Open GET (no `mutate` gate), consistent with `GET /daemon/status` and
  * `GET /scheduled-tasks`: it exposes only aggregate local usage counts.

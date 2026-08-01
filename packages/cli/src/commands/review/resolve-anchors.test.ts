@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -134,7 +134,7 @@ describe('resolve-anchors (command boundary)', () => {
   });
 
   it('creates the output directory the caller chose', () => {
-    // `mkdirSync` created `.qwen/tmp` — our directory — and then wrote to the
+    // `mkdirSync` created `.hopcode/tmp` — our directory — and then wrote to the
     // caller's, which may be somewhere else entirely. `--out reports/x.json` is
     // a legal request and it answered with ENOENT. The sibling `compose-review`
     // had it right all along; this one did not copy it.

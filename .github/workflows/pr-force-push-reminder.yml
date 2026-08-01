@@ -23,7 +23,7 @@ jobs:
     name: 'Remind on force-push'
     timeout-minutes: 5
     if: |-
-      ${{ github.repository == 'QwenLM/qwen-code' }}
+      ${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' }}
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Detect force-push and post reminder'
@@ -45,13 +45,13 @@ jobs:
             // Skip automation-driven updates. A GitHub App push has
             // sender.type === 'Bot', but the repo's own autofix bot pushes
             // (including force-pushes) via a PAT as the user account
-            // qwen-code-dev-bot, which arrives with sender.type === 'User' — so
+            // hopcode-dev-bot, which arrives with sender.type === 'User' — so
             // also skip known automation logins. Only human contributors should
             // be reminded.
             const sender = context.payload.sender;
             const KNOWN_AUTOMATION = new Set([
-              'qwen-code-ci-bot',
-              'qwen-code-dev-bot',
+              'hopcode-ci-bot',
+              'hopcode-dev-bot',
               'github-actions',
               'github-actions[bot]',
               'gemini-cli-robot',

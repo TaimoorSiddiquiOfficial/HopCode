@@ -1267,7 +1267,7 @@ describe('BackgroundTasksDialog', () => {
 
     it('renders the full transcript path (wraps instead of truncating)', () => {
       const longPath =
-        '/home/runner/.qwen/projects/some-workspace-slug/subagents/2f9c1a7b-1234-4a5b-8c9d-abcdef012345/agent-general-purpose-call-9.jsonl';
+        '/home/runner/.hopcode/projects/some-workspace-slug/subagents/2f9c1a7b-1234-4a5b-8c9d-abcdef012345/agent-general-purpose-call-9.jsonl';
       const running = entry({ outputFile: longPath });
       const h = setup([running]);
       h.call(() => h.probe.current!.actions.openDialog());

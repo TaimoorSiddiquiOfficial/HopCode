@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 import { ToolNames } from '../tools/tool-names.js';
@@ -34,7 +34,7 @@ async function buildCleanMemorySystemPrompt(projectRoot) {
     }
     catch {
         // User-level memory is best-effort elsewhere in managed memory. Keep
-        // project memory usable if ~/.qwen/memories cannot be scaffolded.
+        // project memory usable if ~/.hopcode/memories cannot be scaffolded.
     }
     const [projectIndex, userIndex] = await Promise.all([
         readAutoMemoryIndex(projectRoot),
@@ -150,7 +150,7 @@ export async function runManagedRememberByAgent(params) {
             ? rebuildUserAutoMemoryIndex().catch((err) => {
                 // Mirrors existing managed-memory behavior: user memory is useful
                 // when available, but project memory writes should not fail because
-                // ~/.qwen/memories cannot be indexed.
+                // ~/.hopcode/memories cannot be indexed.
                 debugLogger.error('User memory index rebuild failed:', err);
             })
             : Promise.resolve(),

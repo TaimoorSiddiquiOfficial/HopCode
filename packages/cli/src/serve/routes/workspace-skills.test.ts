@@ -13,7 +13,7 @@ function createHarness() {
   const installWorkspaceSkill = vi.fn().mockResolvedValue({
     skillName: 'demo-skill',
     scope: 'workspace',
-    installedPath: '/workspace/.qwen/skills/demo-skill/SKILL.md',
+    installedPath: '/workspace/.hopcode/skills/demo-skill/SKILL.md',
   });
   const deleteWorkspaceSkill = vi.fn().mockResolvedValue({
     skillName: 'demo-skill',

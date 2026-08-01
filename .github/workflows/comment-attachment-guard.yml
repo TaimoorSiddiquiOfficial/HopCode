@@ -23,7 +23,7 @@ jobs:
   remove-suspicious-attachments:
     timeout-minutes: 2
     if: |-
-      ${{ github.repository == 'QwenLM/qwen-code' }}
+      ${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' }}
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Remove suspicious attachment comments'

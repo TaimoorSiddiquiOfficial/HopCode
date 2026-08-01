@@ -1,13 +1,13 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 import { type LoopMode } from './autonomous-loop.js';
 export { AUTONOMOUS_SENTINEL_CRON, AUTONOMOUS_SENTINEL_DYNAMIC, AutonomousLoopTickResolver, detectAutonomousSentinel, } from './autonomous-loop.js';
 export type { LoopMode } from './autonomous-loop.js';
 /**
- * Fire-time resolver for `.qwen/loop.md`-driven loops.
+ * Fire-time resolver for `.hopcode/loop.md`-driven loops.
  *
  * A `/loop` whose scheduled prompt is one of these sentinels re-reads loop.md
  * on every fire and gets either the FULL task block (first delivery, or whenever
@@ -29,7 +29,7 @@ export interface LoopTickResolverDeps {
     homeDir: string;
     /**
      * QWEN_HOME-aware global dir holding the home `loop.md` (`Storage.getGlobalQwenDir()`).
-     * Omitted → defaults to `<homeDir>/.qwen` inside readLoopTaskFile.
+     * Omitted → defaults to `<homeDir>/.hopcode` inside readLoopTaskFile.
      */
     homeQwenDir?: string;
     /**
@@ -37,7 +37,7 @@ export interface LoopTickResolverDeps {
      * never captured once: `isTrustedFolder()` is not process-stable in IDE
      * sessions (a workspace-trust update can flip it), and a trusted→untrusted
      * flip must immediately stop reading the repo-controlled project
-     * `.qwen/loop.md` (the user-owned `~/.qwen/loop.md` still is read).
+     * `.hopcode/loop.md` (the user-owned `~/.hopcode/loop.md` still is read).
      */
     allowProjectFile: () => boolean;
 }
@@ -80,7 +80,7 @@ export declare class LoopTickResolver {
      * reminder — and the caller's sanitized resolve-error — names the location
      * actually checked (QWEN_HOME-aware), but must NEVER surface a raw absolute
      * path: it flows into model/API text, leaking the host's filesystem layout.
-     *   - under $HOME             → tilde-abbreviated `~/.qwen/loop.md`;
+     *   - under $HOME             → tilde-abbreviated `~/.hopcode/loop.md`;
      *   - relocated via $QWEN_HOME → the literal `$QWEN_HOME/loop.md`, not the
      *     resolved dir (`tildeifyPath` only abbreviates $HOME, so it's a no-op for
      *     a $QWEN_HOME outside $HOME and would otherwise pass the path through);
@@ -90,7 +90,7 @@ export declare class LoopTickResolver {
     /** The checked-candidate "where" string shared by the absent reminder and the
      * caller's sanitized resolve-error. Names the project candidate ONLY when it
      * was actually read (`projectChecked` — a trusted folder), so neither path can
-     * claim `.qwen/loop.md (project)` for an untrusted folder where the project
+     * claim `.hopcode/loop.md (project)` for an untrusted folder where the project
      * file is skipped. The home label is the QWEN_HOME-aware, never-absolute
      * homeLoopLabel(). Single source of truth so the two messages can't drift. */
     absentLocations(projectChecked: boolean): string;

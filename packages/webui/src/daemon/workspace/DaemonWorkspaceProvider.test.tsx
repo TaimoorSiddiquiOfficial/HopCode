@@ -150,7 +150,7 @@ const sdkMocks = vi.hoisted(() => {
       installWorkspaceSkill.mockResolvedValue({
         skillName: 'review',
         scope: 'workspace',
-        installedPath: '/mock-workspace/.qwen/skills/review/SKILL.md',
+        installedPath: '/mock-workspace/.hopcode/skills/review/SKILL.md',
       });
       deleteWorkspaceSkill.mockReset();
       deleteWorkspaceSkill.mockResolvedValue({

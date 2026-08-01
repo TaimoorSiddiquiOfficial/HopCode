@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 import * as fs from 'node:fs/promises';
@@ -90,32 +90,32 @@ async function readBoundedTaskFile(filePath) {
     }
 }
 /**
- * Reads `.qwen/loop.md`, project before home, byte-capped at 25 KB. A missing,
+ * Reads `.hopcode/loop.md`, project before home, byte-capped at 25 KB. A missing,
  * directory, non-regular, or empty (whitespace-only) path is skipped to the next
  * candidate rather than treated as present; all candidates exhausted → missing.
  * Only the byte cap lives here — the fire-time resolver owns the user-facing
  * truncation notice so the byte-vs-line nuance stays in one place.
  *
  * Project candidate: must be a real regular file at the literal path, and is
- * stat'd BEFORE the blocking open. A symlinked `.qwen/loop.md` is refused
+ * stat'd BEFORE the blocking open. A symlinked `.hopcode/loop.md` is refused
  * outright — a repo-controlled symlink such as `-> ../.env` resolves *inside*
  * the workspace, so confinement alone would pass and exfiltrate that file to the
  * model. A FIFO/socket/device/dir is refused too, so a named pipe can never
  * wedge the tick (a blocking `open` on a FIFO waits for a writer) or be read as
  * a task list. The canonical path is still confined to the workspace root to
- * catch an *ancestor* symlink like a checked-in `.qwen -> /outside` that a
+ * catch an *ancestor* symlink like a checked-in `.hopcode -> /outside` that a
  * final-component `lstat` cannot see. When `allowProjectFile` is false (untrusted
  * folder) the candidate is dropped entirely.
  *
  * Home candidate: `<homeQwenDir>/loop.md` (the QWEN_HOME-aware global dir, not
- * always the real `~/.qwen`). It is the user's own dotfile, so a symlink IS
+ * always the real `~/.hopcode`). It is the user's own dotfile, so a symlink IS
  * followed (a common, legitimate setup — e.g. into a synced dotfiles repo), but
  * the resolved target must be a regular file AND stay within the home
  * confinement root (`homeDir`: `$QWEN_HOME` or `$HOME`) so a FIFO/device/dir
  * can't hang the tick and an escaping symlink (e.g. `-> /etc/passwd`) can't be
  * exfiltrated.
  */
-export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = path.join(homeDir, '.qwen'), allowProjectFile = false, realDirCache = moduleRealDirCache, }) {
+export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = path.join(homeDir, '.hopcode'), allowProjectFile = false, realDirCache = moduleRealDirCache, }) {
     if (!allowProjectFile) {
         // Repo-controlled file in an untrusted folder — never read it (the
         // candidate is dropped below; this is the trace for why).
@@ -126,7 +126,7 @@ export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = pat
             ? [
                 {
                     source: 'project',
-                    path: path.join(projectRoot, '.qwen', 'loop.md'),
+                    path: path.join(projectRoot, '.hopcode', 'loop.md'),
                 },
             ]
             : []),
@@ -153,7 +153,7 @@ export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = pat
                 }
                 // A hard-linked loop.md is an ordinary regular file (lstat sees no
                 // symlink) but shares a sensitive target's inode (e.g. `ln .env
-                // .qwen/loop.md`), so confinement passes on the same fs and the secret
+                // .hopcode/loop.md`), so confinement passes on the same fs and the secret
                 // would be read every tick. `nlink > 1` is the only tell — refuse it,
                 // mirroring canonicalizeKeytermsFile.
                 if (projectStat.nlink > 1) {
@@ -163,7 +163,7 @@ export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = pat
                     continue;
                 }
                 // A final-component lstat can't see an ANCESTOR symlink (e.g. a
-                // checked-in `.qwen -> /outside`); realpath resolves it, so confine the
+                // checked-in `.hopcode -> /outside`); realpath resolves it, so confine the
                 // canonical path to the workspace root before reading.
                 const realRoot = await resolveRealDir(projectRoot, realDirCache);
                 const real = await fs.realpath(filePath);
@@ -188,13 +188,13 @@ export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = pat
                 }
                 // Same hard-link guard as the project candidate: a `nlink > 1` regular
                 // file shares another inode's content (e.g. `ln ~/.ssh/id_ed25519
-                // ~/.qwen/loop.md`) and would otherwise be read and fed to the model.
+                // ~/.hopcode/loop.md`) and would otherwise be read and fed to the model.
                 if (homeStat.nlink > 1) {
                     debugLogger.debug('skipping hard-linked home loop.md', { filePath });
                     continue;
                 }
                 // A home symlink IS followed, but its target must stay WITHIN $HOME:
-                // otherwise `~/.qwen/loop.md -> /etc/passwd` (or `-> /dev/...`) would be
+                // otherwise `~/.hopcode/loop.md -> /etc/passwd` (or `-> /dev/...`) would be
                 // read and fed to the model every tick. In-home dotfile symlinks (e.g.
                 // `-> ~/dotfiles/loop.md`) still resolve inside $HOME and are allowed.
                 const realHome = await resolveRealDir(homeDir, realDirCache);
@@ -210,8 +210,8 @@ export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = pat
             const code = error.code;
             // None of these name a readable loop.md, so try the next candidate:
             // absent (ENOENT), a directory (EISDIR), a non-directory path component
-            // (ENOTDIR, e.g. a stray file where `.qwen` should be), a symlink loop
-            // (ELOOP, e.g. a self-referential `~/.qwen/loop.md`), or an over-long path
+            // (ENOTDIR, e.g. a stray file where `.hopcode` should be), a symlink loop
+            // (ELOOP, e.g. a self-referential `~/.hopcode/loop.md`), or an over-long path
             // (ENAMETOOLONG). Anything else (EACCES permissions, real I/O) surfaces
             // rather than being silently swallowed.
             if (code === 'ENOENT' ||

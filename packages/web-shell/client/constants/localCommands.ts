@@ -160,7 +160,7 @@ const BUILTIN_COMMAND_DESCRIPTION_KEYS: Record<string, string> = {
 
 /**
  * Skills whose author-written descriptions ship in English — the Qwen Code
- * bundled skills plus this repo's `.qwen/skills` project skills. We re-localize
+ * bundled skills plus this repo's `.hopcode/skills` project skills. We re-localize
  * their menu descriptions by name so a zh-CN slash menu isn't a mix of languages.
  * Keyed by skill name because a skill only carries a reliable `source` once a
  * session exists; the skill-tagging step keys off `connection.skills` instead, so
@@ -179,7 +179,7 @@ const SKILL_DESCRIPTION_KEYS: Record<string, string> = {
   review: 'skilldesc.review',
   simplify: 'skilldesc.simplify',
   stuck: 'skilldesc.stuck',
-  // This repo's project skills (.qwen/skills).
+  // This repo's project skills (.hopcode/skills).
   'agent-reproduce-align': 'skilldesc.agentReproduceAlign',
   'agent-reproduce-feature': 'skilldesc.agentReproduceFeature',
   autofix: 'skilldesc.autofix',

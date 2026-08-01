@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -427,7 +427,7 @@ describe('createDaemonWorkspaceService', () => {
           rules: { allow: [], ask: [], deny: [] },
         },
         workspace: {
-          path: '/workspace/.qwen/settings.json',
+          path: '/workspace/.hopcode/settings.json',
           rules: { allow: ['Shell(*)'], ask: [], deny: [] },
         },
         merged: { allow: ['Shell(*)'], ask: [], deny: [] },

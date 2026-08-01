@@ -184,7 +184,7 @@ describe('usage-stats route (real loader against seeded history)', () => {
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-route-'));
     originalQwenHome = process.env['HOPCODE_HOME'];
-    process.env['HOPCODE_HOME'] = path.join(tmpHome, '.qwen');
+    process.env['HOPCODE_HOME'] = path.join(tmpHome, '.hopcode');
     fs.mkdirSync(process.env['HOPCODE_HOME'], { recursive: true });
   });
 

@@ -1,11 +1,11 @@
-﻿/**
+/**
  * Resolve the ASR endpoint + credentials for desktop voice dictation.
  *
  * The desktop drives Qwen over ACP and stores no DashScope baseUrl/apiKey of its
- * own — the real credentials live in the qwen CLI's config (`~/.qwen`). We resolve
+ * own — the real credentials live in the qwen CLI's config (`~/.hopcode`). We resolve
  * them from, in order:
- *   1. OAuth login        — `~/.qwen/oauth_creds.json` (access_token + resource_url)
- *   2. API-key login      — `~/.qwen/settings.json` (a DashScope compatible-mode
+ *   1. OAuth login        — `~/.hopcode/oauth_creds.json` (access_token + resource_url)
+ *   2. API-key login      — `~/.hopcode/settings.json` (a DashScope compatible-mode
  *                           modelProvider, with its key from settings `env`)
  *   3. Environment        — DASHSCOPE_API_KEY, or OPENAI_API_KEY with OPENAI_BASE_URL
  *
@@ -69,15 +69,15 @@ export function normalizeBaseUrl(raw: string): string {
 
 /**
  * Resolve the global qwen config dir, mirroring core's
- * `Storage.getGlobalQwenDir()` so desktop voice reads the SAME `~/.qwen`
+ * `Storage.getGlobalQwenDir()` so desktop voice reads the SAME `~/.hopcode`
  * credentials the qwen CLI writes. QWEN_HOME is normalized exactly as core does:
  * a leading `~`/`~/` expands to homedir() and a relative value resolves to an
- * absolute path; an unset/empty value falls back to `~/.qwen`. Reading the raw
+ * absolute path; an unset/empty value falls back to `~/.hopcode`. Reading the raw
  * env value would point voice at a different dir than the rest of Qwen.
  * Exported for tests.
  */
 export function getQwenConfigDir(): string {
-  const envDir = process.env.QWEN_HOME;
+  const envDir = process.env.hopcode_HOME;
   if (envDir) {
     let resolved = envDir;
     if (
@@ -94,7 +94,7 @@ export function getQwenConfigDir(): string {
     return isAbsolute(resolved) ? resolved : resolve(resolved);
   }
   const home = homedir();
-  return home ? join(home, '.qwen') : join(tmpdir(), '.qwen');
+  return home ? join(home, '.hopcode') : join(tmpdir(), '.hopcode');
 }
 
 async function readQwenJsonFromDisk<T>(file: string): Promise<T | undefined> {
@@ -137,7 +137,7 @@ async function fromOAuth(
   };
 }
 
-// Provider shape in ~/.qwen/settings.json: the key is referenced by `envKey`
+// Provider shape in ~/.hopcode/settings.json: the key is referenced by `envKey`
 // (the env-var name), never stored inline.
 interface QwenProvider {
   baseUrl?: string;

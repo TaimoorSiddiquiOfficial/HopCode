@@ -191,8 +191,8 @@ npm run preflight  # Full check: clean → install → format → lint → build
    change touches multiple files or involves design decisions. Skip for small
    bugfixes.
 2. **Test plan for behavioral changes** — write an E2E test plan in
-   `.qwen/e2e-tests/` when the change affects user-observable behavior. Dry-run
-   against the global `qwen` CLI first to confirm the baseline.
+   `.hopcode/e2e-tests/` when the change affects user-observable behavior. Dry-run
+   against the global `hopcode` CLI first to confirm the baseline.
 3. **Build, typecheck, and test before declaring done**:
    `npm run build && npm run typecheck`, plus unit tests for the files you
    changed.
@@ -208,8 +208,8 @@ npm run preflight  # Full check: clean → install → format → lint → build
    pass suffices for a trivial change.
 5. **Code review** — run `/review` when available. Triage each comment:
    valid / false positive / overthinking. Fixes go back through steps 3-4.
-   Here, `/review` means the Codex code-review workflow, not Qwen Review or
-   the `qwen-review` plugin. Do not invoke Qwen Review unless the user
+   Here, `/review` means the Codex code-review workflow, not HopCode Review or
+   the `hopcode-review` plugin. Do not invoke HopCode Review unless the user
    explicitly requests it by name.
 
 ### Feature development
@@ -314,13 +314,13 @@ tracked in version control:
 | `docs/design/` | Design docs for planned features |
 | `docs/plans/`  | Implementation plans             |
 
-Other working artifacts live under `.qwen/` (git-ignored):
+Other working artifacts live under `.hopcode/` (git-ignored):
 
 | Directory               | Purpose                              |
 | ----------------------- | ------------------------------------ |
-| `.qwen/e2e-tests/`      | E2E test plans and results           |
-| `.qwen/issues/`         | Issue drafts before filing on GitHub |
-| `.qwen/pr-drafts/`      | PR drafts before submitting          |
-| `.qwen/pr-reviews/`     | PR review notes                      |
-| `.qwen/investigations/` | Structured debugging journals        |
-| `.qwen/scripts/`        | Utility scripts                      |
+| `.hopcode/e2e-tests/`      | E2E test plans and results           |
+| `.hopcode/issues/`         | Issue drafts before filing on GitHub |
+| `.hopcode/pr-drafts/`      | PR drafts before submitting          |
+| `.hopcode/pr-reviews/`     | PR review notes                      |
+| `.hopcode/investigations/` | Structured debugging journals        |
+| `.hopcode/scripts/`        | Utility scripts                      |

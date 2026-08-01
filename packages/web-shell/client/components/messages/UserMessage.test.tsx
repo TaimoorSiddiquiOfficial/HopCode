@@ -69,29 +69,29 @@ describe('UserMessage', () => {
   });
 
   it('renders file references as chips from input annotations', () => {
-    const content = 'list @.qwen/ files';
+    const content = 'list @.hopcode/ files';
     const container = render(
       <UserMessage
         content={content}
         inputAnnotations={[
-          referenceAnnotation(content, '@.qwen/', {
-            id: 'file:@.qwen/',
+          referenceAnnotation(content, '@.hopcode/', {
+            id: 'file:@.hopcode/',
             kind: 'file',
-            value: '.qwen/',
-            serialized: '@.qwen/',
+            value: '.hopcode/',
+            serialized: '@.hopcode/',
           }),
         ]}
       />,
     );
-    const chip = container.querySelector('[title="@.qwen/"]');
+    const chip = container.querySelector('[title="@.hopcode/"]');
 
     expect(chip).not.toBeNull();
-    expect(chip?.textContent).toBe('.qwen/');
-    expect(container.textContent).toContain('list .qwen/ files');
+    expect(chip?.textContent).toBe('.hopcode/');
+    expect(container.textContent).toContain('list .hopcode/ files');
   });
 
   it('uses configured composer tag icons for annotation chips', () => {
-    const content = 'list @.qwen/ files';
+    const content = 'list @.hopcode/ files';
     const container = render(
       <WebShellCustomizationProvider
         value={{
@@ -101,18 +101,18 @@ describe('UserMessage', () => {
         <UserMessage
           content={content}
           inputAnnotations={[
-            referenceAnnotation(content, '@.qwen/', {
-              id: 'file:@.qwen/',
+            referenceAnnotation(content, '@.hopcode/', {
+              id: 'file:@.hopcode/',
               kind: 'file',
-              value: '.qwen/',
-              serialized: '@.qwen/',
+              value: '.hopcode/',
+              serialized: '@.hopcode/',
             }),
           ]}
         />
       </WebShellCustomizationProvider>,
     );
     const icon = container.querySelector<HTMLElement>(
-      '[title="@.qwen/"] [aria-hidden="true"]',
+      '[title="@.hopcode/"] [aria-hidden="true"]',
     );
 
     expect(icon).not.toBeNull();

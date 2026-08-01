@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -669,7 +669,7 @@ type QwenManagedSkillFile = {
   content: string;
 };
 
-const PROJECT_SKILL_DIRS = ['.qwen', '.agents'] as const;
+const PROJECT_SKILL_DIRS = ['.hopcode', '.agents'] as const;
 const SKILLS_DIR = 'skills';
 
 type DownloadedSkillFile = {

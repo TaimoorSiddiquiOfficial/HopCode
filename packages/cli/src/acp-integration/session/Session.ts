@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -4172,16 +4172,16 @@ export class Session implements SessionContext {
     // the current project; a fresh resolver also correctly re-delivers full.
     if (!this.loopTickResolver || this.loopTickResolverRoot !== root) {
       // Resolve the home/global loop.md from the HOPCODE_HOME-aware global dir (the
-      // rest of Qwen honors HOPCODE_HOME for `.qwen`); reading raw os.homedir() here
-      // would always hit the real `~/.qwen` and ignore a relocated config home.
+      // rest of Qwen honors HOPCODE_HOME for `.hopcode`); reading raw os.homedir() here
+      // would always hit the real `~/.hopcode` and ignore a relocated config home.
       const { homeConfineRoot, homeQwenDir } = resolveHomeLoopResolverRoots();
       this.loopTickResolver = new LoopTickResolver({
         projectRoot: root,
         homeDir: homeConfineRoot,
         homeQwenDir,
-        // The project `.qwen/loop.md` is repo-controlled, so an untrusted folder
+        // The project `.hopcode/loop.md` is repo-controlled, so an untrusted folder
         // must not read it and feed it to the model (mirrors getProjectHooks()'s
-        // trust gate). The home/global `~/.qwen/loop.md` is user-owned and stays
+        // trust gate). The home/global `~/.hopcode/loop.md` is user-owned and stays
         // allowed. Pass a getter, not a snapshot: isTrustedFolder() can flip
         // mid-session on an IDE workspace-trust update, and the resolver outlives
         // a single tick — re-read it on every resolve() so a trusted→untrusted
@@ -4250,7 +4250,7 @@ export class Session implements SessionContext {
                 try {
                   loopTick = await resolver.resolve(loopMode, trustedAtResolve);
                 } catch (resolveErr) {
-                  // resolve() reads .qwen/loop.md (project or home/global); an
+                  // resolve() reads .hopcode/loop.md (project or home/global); an
                   // EACCES/EIO here is a sentinel-RESOLUTION failure, not a
                   // model-call failure — tag it so the two are distinguishable
                   // in logs.
@@ -4260,7 +4260,7 @@ export class Session implements SessionContext {
                   // path (OS username + dir layout) — stays in this LOCAL debug
                   // log only; debug logs are never sent to the ACP client.
                   debugLogger.warn(
-                    `loop.md sentinel resolution failed (mode=${loopMode}, code=${code}) — check .qwen/loop.md permissions/IO`,
+                    `loop.md sentinel resolution failed (mode=${loopMode}, code=${code}) — check .hopcode/loop.md permissions/IO`,
                     resolveErr,
                   );
                   if (
@@ -4295,7 +4295,7 @@ export class Session implements SessionContext {
                     // so re-throwing the raw fs error would leak that absolute
                     // path. Surface only the candidate labels + errno code via the
                     // shared absentLocations() — reusing the HOPCODE_HOME-aware home
-                    // label (never a hardcoded `~/.qwen`) and naming the project
+                    // label (never a hardcoded `~/.hopcode`) and naming the project
                     // candidate only when it was actually read (the captured trust
                     // matches the resolve() probe, so an untrusted folder can't
                     // falsely claim `(project)`).

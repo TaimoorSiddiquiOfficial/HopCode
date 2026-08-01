@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -1035,7 +1035,7 @@ describe('BaseLlmClient', () => {
       await c.resolveForModel(`qwen3.7-plus\0${selectedBaseUrl}`);
 
       expect(getResolvedModel).toHaveBeenCalledWith(
-        AuthType.QWEN_OAUTH,
+        AuthType.hopcode_OAUTH,
         'qwen3.7-plus',
         selectedBaseUrl,
       );

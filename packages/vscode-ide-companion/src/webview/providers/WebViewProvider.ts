@@ -1128,7 +1128,7 @@ export class WebViewProvider {
       writeCodingPlanConfig(region, apiKey);
 
       logger.log(
-        `[WebViewProvider] Synced VSCode settings → ~/.qwen/settings.json (provider=${provider})`,
+        `[WebViewProvider] Synced VSCode settings → ~/.hopcode/settings.json (provider=${provider})`,
       );
       return true;
     } catch (error) {
@@ -1150,7 +1150,7 @@ export class WebViewProvider {
       }
 
       logger.log(
-        '[WebViewProvider] Syncing ~/.qwen/settings.json → VSCode settings',
+        '[WebViewProvider] Syncing ~/.hopcode/settings.json → VSCode settings',
       );
 
       // Set guard to prevent onDidChangeConfiguration from triggering a write-back
@@ -1181,7 +1181,7 @@ export class WebViewProvider {
 
       if (updates.length === 0) {
         logger.log(
-          '[WebViewProvider] VSCode settings already match ~/.qwen/settings.json',
+          '[WebViewProvider] VSCode settings already match ~/.hopcode/settings.json',
         );
         return;
       }

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -40,7 +40,7 @@ import { createDebugLogger, sessionIdContext } from '@hoptrendy/hopcode-core';
 const debugLogger = createDebugLogger('SKILL_ARGS_FILE');
 
 /** Where a skill finds the arguments it was invoked with. */
-export const SKILL_ARGS_DIR = join('.qwen', 'tmp');
+export const SKILL_ARGS_DIR = join('.hopcode', 'tmp');
 
 /** A component safe to put in a filename. */
 function safe(s: string): string {

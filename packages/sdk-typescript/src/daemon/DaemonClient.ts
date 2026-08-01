@@ -1612,10 +1612,10 @@ export class DaemonClient {
    * pre-flight `caps.features.workspace_memory` before calling
    * against an unknown daemon. Returns `initialized: false` and an
    * empty `files` array when no memory files exist at the bound
-   * workspace root or `~/.qwen`.
+   * workspace root or `~/.hopcode`.
    *
    * v1 discovers files at the bound workspace ROOT only, plus the
-   * user's global `~/.qwen` directory â€” it does NOT walk parent
+   * user's global `~/.hopcode` directory â€” it does NOT walk parent
    * directories or recurse into the workspace tree. The route's
    * companion helper `walkWorkspaceForMemory` keeps a guarded
    * upward-walk loop body for a future hierarchical mode but breaks

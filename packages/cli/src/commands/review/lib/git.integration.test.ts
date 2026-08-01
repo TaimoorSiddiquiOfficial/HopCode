@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -104,7 +104,7 @@ describe('releaseWorktree', () => {
   });
 
   it('frees a path whose directory was deleted by hand', () => {
-    // What `rm -rf .qwen/tmp` does to a review worktree.
+    // What `rm -rf .hopcode/tmp` does to a review worktree.
     git('worktree', 'add', '-q', 'wt', '-b', 'topic');
     rmSync(join(repo, 'wt'), { recursive: true, force: true });
 

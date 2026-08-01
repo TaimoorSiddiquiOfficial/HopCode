@@ -305,10 +305,10 @@ describe('TLS verification opt-out (insecure)', () => {
   });
 
   afterEach(() => {
-    if (savedEnv.QWEN_TLS_INSECURE === undefined) {
+    if (savedEnv.hopcode_TLS_INSECURE === undefined) {
       delete process.env['QWEN_TLS_INSECURE'];
     } else {
-      process.env['QWEN_TLS_INSECURE'] = savedEnv.QWEN_TLS_INSECURE;
+      process.env['QWEN_TLS_INSECURE'] = savedEnv.hopcode_TLS_INSECURE;
     }
     if (savedEnv.NODE_TLS_REJECT_UNAUTHORIZED === undefined) {
       delete process.env['NODE_TLS_REJECT_UNAUTHORIZED'];

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -45,7 +45,7 @@ const mockExtension = (name: string, isActive = true): Extension =>
     id: name,
     name,
     version: '1.0.0',
-    path: `/home/user/.qwen/extensions/${name}`,
+    path: `/home/user/.hopcode/extensions/${name}`,
     isActive,
     installMetadata: { type: 'git', source: `github:user/${name}` },
     mcpServers: {},

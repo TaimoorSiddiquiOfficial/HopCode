@@ -59,7 +59,7 @@ defaults:
 jobs:
   capture:
     name: 'Capture web-shell visuals (ubuntu-latest, Node 22.x)'
-    if: "${{ github.repository == 'QwenLM/qwen-code' }}"
+    if: "${{ github.repository == 'TaimoorSiddiquiOfficial/HopCode' }}"
     runs-on: 'ubuntu-latest'
     # ~2x the original: the job now also builds + renders the merge-base arm.
     timeout-minutes: 30

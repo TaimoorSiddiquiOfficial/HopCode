@@ -169,8 +169,8 @@ describe('extensionSettings', () => {
         await getScopedEnvContents(config, '12345', ExtensionSettingScope.USER),
       ).toEqual({});
       fs.renameSync(
-        path.join(tempWorkspaceDir, '.qwen-extension-settings.json'),
-        path.join(extensionDir, '.qwen-extension-settings.json'),
+        path.join(tempWorkspaceDir, '.hopcode-extension-settings.json'),
+        path.join(extensionDir, '.hopcode-extension-settings.json'),
       );
       expect(
         await getScopedEnvContents(config, '12345', ExtensionSettingScope.USER),
@@ -221,13 +221,13 @@ describe('extensionSettings', () => {
 
       const firstSelector = JSON.parse(
         fs.readFileSync(
-          path.join(firstDir, '.qwen-extension-settings.json'),
+          path.join(firstDir, '.hopcode-extension-settings.json'),
           'utf8',
         ),
       ) as { bundleKey: string };
       const secondSelector = JSON.parse(
         fs.readFileSync(
-          path.join(secondDir, '.qwen-extension-settings.json'),
+          path.join(secondDir, '.hopcode-extension-settings.json'),
           'utf8',
         ),
       ) as { bundleKey: string };
@@ -267,7 +267,7 @@ describe('extensionSettings', () => {
       );
       const selector = JSON.parse(
         fs.readFileSync(
-          path.join(stagingDir, '.qwen-extension-settings.json'),
+          path.join(stagingDir, '.hopcode-extension-settings.json'),
           'utf8',
         ),
       ) as { bundleKey: string };
@@ -303,7 +303,7 @@ describe('extensionSettings', () => {
       );
       const oldSelector = JSON.parse(
         fs.readFileSync(
-          path.join(extensionDir, '.qwen-extension-settings.json'),
+          path.join(extensionDir, '.hopcode-extension-settings.json'),
           'utf8',
         ),
       ) as { bundleKey: string };
@@ -323,13 +323,13 @@ describe('extensionSettings', () => {
       );
       const newSelector = JSON.parse(
         fs.readFileSync(
-          path.join(stagingDir, '.qwen-extension-settings.json'),
+          path.join(stagingDir, '.hopcode-extension-settings.json'),
           'utf8',
         ),
       ) as { bundleKey: string };
       fs.copyFileSync(
-        path.join(stagingDir, '.qwen-extension-settings.json'),
-        path.join(extensionDir, '.qwen-extension-settings.json'),
+        path.join(stagingDir, '.hopcode-extension-settings.json'),
+        path.join(extensionDir, '.hopcode-extension-settings.json'),
       );
 
       await prepared?.commit();
@@ -370,7 +370,7 @@ describe('extensionSettings', () => {
       );
       const selector = JSON.parse(
         fs.readFileSync(
-          path.join(extensionDir, '.qwen-extension-settings.json'),
+          path.join(extensionDir, '.hopcode-extension-settings.json'),
           'utf8',
         ),
       ) as { bundleKey: string };
@@ -1072,7 +1072,7 @@ describe('extensionSettings', () => {
       );
 
       await fsPromises.rm(
-        path.join(extensionDir, '.qwen-extension-settings.json'),
+        path.join(extensionDir, '.hopcode-extension-settings.json'),
       );
       await expect(
         getScopedEnvContents(config, '12345', ExtensionSettingScope.USER),

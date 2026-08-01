@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -86,9 +86,9 @@ describe('createWorkspaceSkillsStatusProvider', () => {
     const workspace = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-skills-disabled-'),
     );
-    await fsp.mkdir(path.join(workspace, '.qwen'), { recursive: true });
+    await fsp.mkdir(path.join(workspace, '.hopcode'), { recursive: true });
     await fsp.writeFile(
-      path.join(workspace, '.qwen', 'settings.json'),
+      path.join(workspace, '.hopcode', 'settings.json'),
       JSON.stringify({ skills: { disabled: ['disabled'] } }),
     );
     const provider = createWorkspaceSkillsStatusProvider();

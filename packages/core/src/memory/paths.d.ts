@@ -37,11 +37,11 @@ export declare function clearAutoMemoryRootCache(): void;
  * repo-tracked contents, and is therefore safe to canonicalize through symlinks.
  *
  * In local-memory mode (`HOPCODE_CODE_MEMORY_LOCAL=1`) the root is
- * `<projectRoot>/.qwen/memory`, so the anchor is the project root; otherwise the
+ * `<projectRoot>/.hopcode/memory`, so the anchor is the project root; otherwise the
  * root lives under the shared memory base dir, which is the anchor. The write
  * boundary (isAllowedMemoryPath) canonicalizes this anchor but appends the
  * managed suffix literally, so a symlink planted INSIDE the suffix (e.g. a
- * repo-tracked `.qwen -> /outside`) can't silently relocate the allowed root
+ * repo-tracked `.hopcode -> /outside`) can't silently relocate the allowed root
  * out of the trusted anchor.
  */
 export declare function getAutoMemoryTrustedAnchor(projectRoot: string): string;

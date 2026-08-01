@@ -3541,7 +3541,7 @@ describe('DaemonClient', () => {
       const response = {
         skillName: 'demo-skill',
         scope: 'workspace',
-        installedPath: '/workspace/.qwen/skills/demo-skill/SKILL.md',
+        installedPath: '/workspace/.hopcode/skills/demo-skill/SKILL.md',
       };
       const { fetch, calls } = recordingFetch(() =>
         jsonResponse(200, response),

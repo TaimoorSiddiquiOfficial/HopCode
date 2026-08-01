@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -19,20 +19,20 @@ describe('tmpFile — target is a single safe component', () => {
   });
 
   it('flattens a file-path target so its parent is not a missing directory', () => {
-    // `src/foo.ts` used to make `.qwen/tmp/qwen-review-src/foo.ts-diff.txt`, whose
+    // `src/foo.ts` used to make `.hopcode/tmp/qwen-review-src/foo.ts-diff.txt`, whose
     // `src/` parent nobody created — ENOENT.
     const p = tmpFile('src/foo.ts', 'diff.txt');
     expect(p).not.toContain('src/foo.ts');
-    expect(p).toContain('.qwen/tmp/');
+    expect(p).toContain('.hopcode/tmp/');
     // No path separator after the temp dir.
-    expect(p.split('.qwen/tmp/')[1]).not.toContain('/');
+    expect(p.split('.hopcode/tmp/')[1]).not.toContain('/');
   });
 
   it('refuses to escape the temp dir with a crafted target', () => {
     const p = tmpFile('../../evil', 'diff.txt');
-    expect(p).toContain('.qwen/tmp/');
+    expect(p).toContain('.hopcode/tmp/');
     expect(p).not.toContain('..');
-    expect(p.split('.qwen/tmp/')[1]).not.toContain('/');
+    expect(p.split('.hopcode/tmp/')[1]).not.toContain('/');
   });
 });
 
@@ -47,8 +47,8 @@ describe('probeWorktreePath', () => {
     // The probe drives `git worktree add` with the shared worktree as cwd, so a
     // relative probe path would resolve against that worktree and nest the probe
     // tree inside it. Absolute keeps it a sibling wherever it is called from.
-    expect(probeWorktreePath('.qwen/tmp/review-pr-1')).toBe(
-      `${resolve('.qwen/tmp/review-pr-1')}-probe`,
+    expect(probeWorktreePath('.hopcode/tmp/review-pr-1')).toBe(
+      `${resolve('.hopcode/tmp/review-pr-1')}-probe`,
     );
   });
 

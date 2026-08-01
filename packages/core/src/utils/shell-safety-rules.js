@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 const SED_ADDRESS = /^\s*(?:(?:\d+|\$)(?:\s*,\s*(?:\d+|\$))?|\/(?:\\[\s\S]|[^/\\])*\/)?\s*/;

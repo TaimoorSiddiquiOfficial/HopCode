@@ -1470,14 +1470,14 @@ describe('MemoryManager', () => {
       // Without forceFullProtocol (all indexes empty → condensed path)
       const condensed = mgr.appendToUserMemory(
         '',
-        '/project/.qwen/memory',
+        '/project/.hopcode/memory',
         null,
       );
 
       // With forceFullProtocol → full verbose path
       const full = mgr.appendToUserMemory(
         '',
-        '/project/.qwen/memory',
+        '/project/.hopcode/memory',
         null,
         undefined,
         undefined,

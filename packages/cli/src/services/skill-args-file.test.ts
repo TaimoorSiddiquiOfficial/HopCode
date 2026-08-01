@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -63,7 +63,7 @@ describe('writeSkillArgs', () => {
     // `.._.._etc_passwd`, and those dots are harmless once the separators are
     // gone. The property is that the *resolved* path is still inside the temp
     // directory, which is what a traversal would break.
-    const inside = resolve('.qwen', 'tmp');
+    const inside = resolve('.hopcode', 'tmp');
     const rel = relative(inside, resolve(path));
     expect(rel.startsWith('..')).toBe(false);
     expect(isAbsolute(rel)).toBe(false);
@@ -74,7 +74,7 @@ describe('writeSkillArgs', () => {
     // fixture would reach the real filesystem root, so assert on the fixture's
     // own tree — the traversal, had it worked, would have created these.)
     expect(existsSync(join(dir, 'etc'))).toBe(false);
-    expect(existsSync(join(dir, '.qwen', 'etc'))).toBe(false);
+    expect(existsSync(join(dir, '.hopcode', 'etc'))).toBe(false);
   });
 
   it('scopes the path to the session, and derives the same path both sides', () => {
@@ -103,7 +103,7 @@ describe('writeSkillArgs', () => {
     const target = join(dir, 'victim.txt');
     writeFileSync(target, 'precious');
     const linkPath = skillArgsPath('review');
-    mkdirSync(join(dir, '.qwen', 'tmp'), { recursive: true });
+    mkdirSync(join(dir, '.hopcode', 'tmp'), { recursive: true });
     symlinkSync(target, linkPath);
 
     expect(writeSkillArgs('review', 'attacker')).toBeNull();
@@ -135,8 +135,8 @@ describe('writeSkillArgs', () => {
       const victim = join(dir, 'victim');
       mkdirSync(victim, { recursive: true });
       writeFileSync(join(victim, 'qwen-skill-args-review.txt'), 'precious');
-      mkdirSync(join(dir, '.qwen', 'tmp'), { recursive: true });
-      symlinkSync(victim, join(dir, '.qwen', 'tmp', 's-attacker'));
+      mkdirSync(join(dir, '.hopcode', 'tmp'), { recursive: true });
+      symlinkSync(victim, join(dir, '.hopcode', 'tmp', 's-attacker'));
 
       expect(writeSkillArgs('review', '6771 --comment')).toBeNull();
       expect(

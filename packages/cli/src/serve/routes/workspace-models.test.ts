@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen Team
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -30,7 +30,7 @@ function readUserSettings(): Record<string, unknown> {
 }
 
 function writeWorkspaceSettings(settings: Record<string, unknown>): void {
-  const dir = path.join(workspace, '.qwen');
+  const dir = path.join(workspace, '.hopcode');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(
     path.join(dir, 'settings.json'),
@@ -40,7 +40,7 @@ function writeWorkspaceSettings(settings: Record<string, unknown>): void {
 
 function readWorkspaceSettings(): Record<string, unknown> {
   return JSON.parse(
-    fs.readFileSync(path.join(workspace, '.qwen', 'settings.json'), 'utf8'),
+    fs.readFileSync(path.join(workspace, '.hopcode', 'settings.json'), 'utf8'),
   );
 }
 
@@ -96,7 +96,7 @@ afterEach(() => {
 });
 
 describe('DELETE /workspace/models', () => {
-  it('removes a model from ~/.qwen/settings.json and keeps siblings', async () => {
+  it('removes a model from ~/.hopcode/settings.json and keeps siblings', async () => {
     writeUserSettings({
       modelProviders: {
         openai: [{ id: 'gpt-4o' }, { id: 'deepseek-v4' }],

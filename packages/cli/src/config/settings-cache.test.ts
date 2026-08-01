@@ -47,7 +47,7 @@ describe('loadSettingsCached', () => {
 
   const userSettingsPath = () => path.join(qwenHome, 'settings.json');
   const workspaceSettingsPath = (ws = workspaceDir) =>
-    path.join(ws, '.qwen', 'settings.json');
+    path.join(ws, '.hopcode', 'settings.json');
 
   const writeJson = (filePath: string, value: unknown) => {
     fs.mkdirSync(path.dirname(filePath), { recursive: true });

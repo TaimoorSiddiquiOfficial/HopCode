@@ -526,7 +526,7 @@ describe('Session', () => {
       getSessionId: vi.fn().mockReturnValue('test-session-id'),
       getWorkingDir: vi.fn().mockReturnValue(process.cwd()),
       getProjectRoot: vi.fn().mockReturnValue('/repo'),
-      // Folder trust gates the project `.qwen/loop.md`; default trusted (the
+      // Folder trust gates the project `.hopcode/loop.md`; default trusted (the
       // production default). Untrusted-folder tests override to false.
       isTrustedFolder: vi.fn().mockReturnValue(true),
       getTelemetryLogPromptsEnabled: vi.fn().mockReturnValue(false),
@@ -7188,7 +7188,7 @@ describe('Session', () => {
         const tmpDir = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-session-'),
         );
-        const loopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const loopMdPath = path.join(tmpDir, '.hopcode', 'loop.md');
         await fs.mkdir(path.dirname(loopMdPath), { recursive: true });
         await fs.writeFile(loopMdPath, '- finish the migration');
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
@@ -7282,7 +7282,7 @@ describe('Session', () => {
         const tmpDir = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-reminder-'),
         );
-        const loopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const loopMdPath = path.join(tmpDir, '.hopcode', 'loop.md');
         await fs.mkdir(path.dirname(loopMdPath), { recursive: true });
         await fs.writeFile(loopMdPath, '- finish the migration');
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
@@ -7372,14 +7372,14 @@ describe('Session', () => {
         // model (the unchanged OLD content is re-served as a short reminder).
         const oldDir = await fs.mkdtemp(path.join(os.tmpdir(), 'loop-md-old-'));
         const newDir = await fs.mkdtemp(path.join(os.tmpdir(), 'loop-md-new-'));
-        await fs.mkdir(path.join(oldDir, '.qwen'), { recursive: true });
-        await fs.mkdir(path.join(newDir, '.qwen'), { recursive: true });
+        await fs.mkdir(path.join(oldDir, '.hopcode'), { recursive: true });
+        await fs.mkdir(path.join(newDir, '.hopcode'), { recursive: true });
         await fs.writeFile(
-          path.join(oldDir, '.qwen', 'loop.md'),
+          path.join(oldDir, '.hopcode', 'loop.md'),
           '- task from OLD root',
         );
         await fs.writeFile(
-          path.join(newDir, '.qwen', 'loop.md'),
+          path.join(newDir, '.hopcode', 'loop.md'),
           '- task from NEW root',
         );
 
@@ -7460,8 +7460,8 @@ describe('Session', () => {
       });
 
       it('does not expand the project loop.md sentinel in an untrusted folder', async () => {
-        // An untrusted folder's repo-controlled .qwen/loop.md must not be read
-        // and fed to the model. With no user-owned ~/.qwen/loop.md the tick is
+        // An untrusted folder's repo-controlled .hopcode/loop.md must not be read
+        // and fed to the model. With no user-owned ~/.hopcode/loop.md the tick is
         // absent, which converges on the autonomous preamble — and the repo task
         // block still never reaches the model.
         const tmpDir = await fs.mkdtemp(
@@ -7470,7 +7470,7 @@ describe('Session', () => {
         const fakeHome = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-home-'),
         );
-        const loopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const loopMdPath = path.join(tmpDir, '.hopcode', 'loop.md');
         await fs.mkdir(path.dirname(loopMdPath), { recursive: true });
         await fs.writeFile(loopMdPath, '- finish the migration');
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
@@ -7655,11 +7655,11 @@ describe('Session', () => {
         // Minimal containers with no HOME make os.homedir() === ''. With HOPCODE_HOME
         // unset the home confinement root must NOT collapse to '': isWithin('',
         // anyPath) is trivially true, so an empty root lets a home
-        // `~/.qwen/loop.md` symlink resolve anywhere and bypass the confinement.
+        // `~/.hopcode/loop.md` symlink resolve anywhere and bypass the confinement.
         // The guard falls back to the parent of the global qwen dir
         // (Storage.getGlobalQwenDir(), itself empty-home-safe), which is the
         // homeQwenDir Session passes to the resolver.
-        const homeQwenDir = path.join(os.tmpdir(), '.qwen');
+        const homeQwenDir = path.join(os.tmpdir(), '.hopcode');
 
         const roots = resolveHomeLoopResolverRoots({
           homeDir: '',
@@ -7676,7 +7676,7 @@ describe('Session', () => {
       });
 
       it('confines the home loop resolver within HOPCODE_HOME when set', () => {
-        const homeQwenDir = path.join(os.tmpdir(), '.qwen-home');
+        const homeQwenDir = path.join(os.tmpdir(), '.hopcode-home');
 
         const roots = resolveHomeLoopResolverRoots({
           homeDir: path.join(os.tmpdir(), 'real-home'),
@@ -7688,7 +7688,7 @@ describe('Session', () => {
         expect(roots.homeQwenDir).toBe(homeQwenDir);
       });
 
-      it('reads the home loop.md from HOPCODE_HOME, not the real ~/.qwen', async () => {
+      it('reads the home loop.md from HOPCODE_HOME, not the real ~/.hopcode', async () => {
         // The home/global candidate must honor HOPCODE_HOME (the relocated global
         // dir) instead of always reading the real OS home. Point HOPCODE_HOME at a
         // dir holding loop.md, leave the project dir and fake $HOME empty, and
@@ -7776,7 +7776,7 @@ describe('Session', () => {
 
       it('propagates a sentinel resolve() error (EACCES) without leaking the absolute path to the client', async () => {
         // #executeCronPrompt: when resolve() throws (e.g. EACCES on
-        // .qwen/loop.md) it logs a loop.md-specific warn and RE-THROWS into the
+        // .hopcode/loop.md) it logs a loop.md-specific warn and RE-THROWS into the
         // cron catch. Regression guard: the failure must PROPAGATE (surface as a
         // cron error, never degrade to a default/normal tick sent to the model)
         // and the loop.md-tagged warn must fire so a resolution failure stays
@@ -7788,7 +7788,7 @@ describe('Session', () => {
         // message must be SANITIZED — relative label + errno code only, never the
         // absolute path. The full detail stays in the LOCAL debug warn.
         debugLoggerWarnSpy.mockClear();
-        const absoluteLoopMdPath = '/home/alice/project/.qwen/loop.md';
+        const absoluteLoopMdPath = '/home/alice/project/.hopcode/loop.md';
         const eacces = Object.assign(
           new Error(`EACCES: permission denied, open '${absoluteLoopMdPath}'`),
           { code: 'EACCES' },
@@ -7830,7 +7830,7 @@ describe('Session', () => {
           // client).
           await vi.waitFor(() => {
             expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-              'loop.md sentinel resolution failed (mode=cron, code=EACCES) — check .qwen/loop.md permissions/IO',
+              'loop.md sentinel resolution failed (mode=cron, code=EACCES) — check .hopcode/loop.md permissions/IO',
               eacces,
             );
           });
@@ -7863,7 +7863,7 @@ describe('Session', () => {
           for (const text of cronErrorTexts()) {
             // Relative label + errno code present...
             expect(text).toContain('EACCES');
-            expect(text).toContain('.qwen/loop.md (project)');
+            expect(text).toContain('.hopcode/loop.md (project)');
             // ...and NO absolute path leaked to the client/API.
             expect(text).not.toContain(absoluteLoopMdPath);
             expect(text).not.toContain('/home/alice');
@@ -7887,8 +7887,8 @@ describe('Session', () => {
         }
       });
 
-      it('names the HOPCODE_HOME-aware home path in the sanitized resolve error, not a hardcoded ~/.qwen', async () => {
-        // Regression: the sanitized resolve-error hardcoded `~/.qwen/loop.md
+      it('names the HOPCODE_HOME-aware home path in the sanitized resolve error, not a hardcoded ~/.hopcode', async () => {
+        // Regression: the sanitized resolve-error hardcoded `~/.hopcode/loop.md
         // (home)`, but the resolver's home candidate is HOPCODE_HOME-aware. With
         // HOPCODE_HOME relocated OUTSIDE $HOME, the error reuses homeLoopLabel(),
         // which names it via the literal `$HOPCODE_HOME/loop.md` — leak-safe (never
@@ -7914,7 +7914,7 @@ describe('Session', () => {
 
         const eacces = Object.assign(
           new Error(
-            `EACCES: permission denied, open '${path.join(tmpDir, '.qwen', 'loop.md')}'`,
+            `EACCES: permission denied, open '${path.join(tmpDir, '.hopcode', 'loop.md')}'`,
           ),
           { code: 'EACCES' },
         );
@@ -7972,12 +7972,12 @@ describe('Session', () => {
           for (const text of cronErrorTexts()) {
             // The HOPCODE_HOME-aware home path is named...
             expect(text).toContain(expectedHomeLabel);
-            expect(text).toContain('.qwen/loop.md (project)');
+            expect(text).toContain('.hopcode/loop.md (project)');
             // ...and the old hardcoded label is gone.
-            expect(text).not.toContain('~/.qwen/loop.md');
+            expect(text).not.toContain('~/.hopcode/loop.md');
             // Still leak-safe: neither the absolute project path nor the
             // resolved $HOPCODE_HOME global dir reaches the client/API.
-            expect(text).not.toContain(path.join(tmpDir, '.qwen', 'loop.md'));
+            expect(text).not.toContain(path.join(tmpDir, '.hopcode', 'loop.md'));
             expect(text).not.toContain(path.join(qwenHome, 'loop.md'));
           }
         } finally {
@@ -7992,12 +7992,12 @@ describe('Session', () => {
       });
 
       it('omits the project candidate from the sanitized resolve error in an untrusted folder', async () => {
-        // An untrusted folder never reads `.qwen/loop.md` (the resolver gets
+        // An untrusted folder never reads `.hopcode/loop.md` (the resolver gets
         // allowProjectFile=false), so the sanitized error must NOT claim the
         // project candidate was checked — it would be a lie. It still names the
         // HOPCODE_HOME-aware home candidate (the only one actually probed) and the
         // errno code, and stays leak-safe. Mutation guard: hardcoding
-        // `.qwen/loop.md (project)` back into the throw re-introduces the false
+        // `.hopcode/loop.md (project)` back into the throw re-introduces the false
         // claim and fails this test.
         debugLoggerWarnSpy.mockClear();
         const tmpDir = await fs.mkdtemp(
@@ -8010,7 +8010,7 @@ describe('Session', () => {
         mockConfig.isTrustedFolder = vi.fn().mockReturnValue(false);
         const restoreHome = setFakeHome(fakeHome);
 
-        const absoluteLoopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const absoluteLoopMdPath = path.join(tmpDir, '.hopcode', 'loop.md');
         const eacces = Object.assign(
           new Error(`EACCES: permission denied, open '${absoluteLoopMdPath}'`),
           { code: 'EACCES' },
@@ -8093,7 +8093,7 @@ describe('Session', () => {
         // trust arg (undefined), so the two no longer match.
         debugLoggerWarnSpy.mockClear();
         const eacces = Object.assign(
-          new Error("EACCES: permission denied, open '/home/x/.qwen/loop.md'"),
+          new Error("EACCES: permission denied, open '/home/x/.hopcode/loop.md'"),
           { code: 'EACCES' },
         );
         const resolveSpy = vi
@@ -8229,7 +8229,7 @@ describe('Session', () => {
           expect(errorEchoes()).toHaveLength(0);
           // The real errno is still recorded in the LOCAL debug warn.
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=EIO) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=EIO) — check .hopcode/loop.md permissions/IO',
             eio,
           );
           expect(debugLoggerDebugSpy).toHaveBeenCalledWith(
@@ -8367,7 +8367,7 @@ describe('Session', () => {
           // The loop did NOT surface an error (it survived).
           expect(errorEchoes()).toHaveLength(0);
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=EACCES) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=EACCES) — check .hopcode/loop.md permissions/IO',
             eacces,
           );
         } finally {
@@ -8441,7 +8441,7 @@ describe('Session', () => {
           // The loop did NOT surface an error (it survived).
           expect(errorEchoes()).toHaveLength(0);
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=EISDIR) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=EISDIR) — check .hopcode/loop.md permissions/IO',
             eisdir,
           );
         } finally {
@@ -8510,7 +8510,7 @@ describe('Session', () => {
           );
           expect(errorEchoes()).toHaveLength(0);
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=ENOTDIR) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=ENOTDIR) — check .hopcode/loop.md permissions/IO',
             enotdir,
           );
         } finally {
@@ -8586,7 +8586,7 @@ describe('Session', () => {
           expect(sentToModel()).not.toContain('# /loop tick');
           // The real (unsanitized) bug is still recorded in the LOCAL debug warn.
           expect(debugLoggerWarnSpy).toHaveBeenCalledWith(
-            'loop.md sentinel resolution failed (mode=dynamic, code=unknown) — check .qwen/loop.md permissions/IO',
+            'loop.md sentinel resolution failed (mode=dynamic, code=unknown) — check .hopcode/loop.md permissions/IO',
             bug,
           );
         } finally {
@@ -8779,7 +8779,7 @@ describe('Session', () => {
         const tmpDir = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-compact-'),
         );
-        const loopMdPath = path.join(tmpDir, '.qwen', 'loop.md');
+        const loopMdPath = path.join(tmpDir, '.hopcode', 'loop.md');
         await fs.mkdir(path.dirname(loopMdPath), { recursive: true });
         await fs.writeFile(loopMdPath, '- stable task list');
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
@@ -12678,7 +12678,7 @@ describe('Session', () => {
         {
           id: 'write_memory',
           name: core.ToolNames.WRITE_FILE,
-          args: { file_path: '/workspace/.qwen/memory/project.md' },
+          args: { file_path: '/workspace/.hopcode/memory/project.md' },
         },
       ]);
 
@@ -12689,7 +12689,7 @@ describe('Session', () => {
         [
           {
             toolName: core.ToolNames.WRITE_FILE,
-            args: { file_path: '/workspace/.qwen/memory/project.md' },
+            args: { file_path: '/workspace/.hopcode/memory/project.md' },
             status: 'success',
           },
         ],

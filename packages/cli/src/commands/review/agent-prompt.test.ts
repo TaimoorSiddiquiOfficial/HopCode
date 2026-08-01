@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -42,7 +42,7 @@ import {
 } from './lib/prompt-record.js';
 
 const PLAN = {
-  diffPathAbsolute: '/abs/.qwen/tmp/qwen-review-pr-6771-diff.txt',
+  diffPathAbsolute: '/abs/.hopcode/tmp/qwen-review-pr-6771-diff.txt',
   chunks: [
     {
       id: 13,
@@ -1683,7 +1683,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     ...PLAN,
     prNumber: '6766',
     ownerRepo: 'QwenLM/qwen-code',
-    worktreePath: '.qwen/tmp/review-pr-6766',
+    worktreePath: '.hopcode/tmp/review-pr-6766',
     mergeBaseSha: 'abc123',
   };
 
@@ -1725,7 +1725,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
 
   it('pins Agent 7 to the PR worktree and hands it the test-efficacy probe', () => {
     const p = buildRoleBrief(PR_PLAN, '7', { planPath: '/tmp/plan.json' });
-    expect(p).toContain('.qwen/tmp/review-pr-6766');
+    expect(p).toContain('.hopcode/tmp/review-pr-6766');
     expect(p).toContain(
       '"${HOPCODE_CODE_CLI:-qwen}" review test-efficacy /tmp/plan.json',
     );
@@ -1743,7 +1743,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
   it('gives Agent 7 ABSOLUTE paths — its cwd is the worktree, not the repo', () => {
     // `worktreePath` and the plan path are repo-relative in the report, and this
     // agent's working directory IS the worktree — so `--worktree
-    // .qwen/tmp/review-pr-6766` resolves to `<worktree>/.qwen/tmp/review-pr-6766`,
+    // .hopcode/tmp/review-pr-6766` resolves to `<worktree>/.hopcode/tmp/review-pr-6766`,
     // which does not exist. Watched live: Agent 7 of a real 29-agent run spent its
     // time running `find … -name "*6457*fetch*"`, hunting for a plan it had been
     // handed a path to that could not resolve from where it was standing.
@@ -1752,7 +1752,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
       '"${HOPCODE_CODE_CLI:-qwen}" review test-efficacy /abs/tmp/plan.json',
     );
     expect(p).toMatch(/--worktree \/[^\s]*review-pr-6766/);
-    expect(p).not.toMatch(/--worktree \.qwen/);
+    expect(p).not.toMatch(/--worktree \.hopcode/);
     expect(p).toContain('--out /abs/tmp/qwen-review-pr-6766-efficacy.json');
   });
 
@@ -1761,7 +1761,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     expect(p).toContain('"${HOPCODE_CODE_CLI:-qwen}" review build-test');
     expect(p).toContain('--plan /abs/tmp/plan.json');
     expect(p).toMatch(/--worktree \/[^\s]*review-pr-6766/);
-    expect(p).not.toMatch(/--plan \.qwen/);
+    expect(p).not.toMatch(/--plan \.hopcode/);
     expect(p).toContain('--out /abs/tmp/qwen-review-pr-6766-build-test.json');
   });
 
@@ -2088,7 +2088,7 @@ describe('path rules — they arrive where they belong, and nowhere else', () =>
 // does not write these prompts any more.
 describe('lightweight mode — the diff, and nothing else', () => {
   const LIGHT = { ...PLAN }; // no worktreePath, no untrackedFiles → diff-only
-  const LOCAL = { ...PLAN, worktreePath: '.qwen/tmp/review-pr-1' };
+  const LOCAL = { ...PLAN, worktreePath: '.hopcode/tmp/review-pr-1' };
 
   it('tells a code-reviewing agent there is no tree to read', () => {
     expect(buildRoleBrief(LIGHT, '1a')).toContain(

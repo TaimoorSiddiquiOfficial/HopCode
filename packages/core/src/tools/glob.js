@@ -94,7 +94,7 @@ class GlobToolInvocation extends BaseToolInvocation {
         const fileFilteringOptions = this.getFileFilteringOptions();
         // Prune ignored directories DURING traversal (glob's `childrenIgnored`)
         // rather than only post-filtering the results. Delegating to
-        // FileDiscoveryService reuses the real .gitignore/.qwenignore semantics
+        // FileDiscoveryService reuses the real .gitignore/.hopcodeignore semantics
         // (anchoring, negation/re-inclusion, nested ignore files) — a hand-rolled
         // gitignore→glob pattern conversion cannot reproduce these correctly.
         const isTraversalIgnored = (entry) => {

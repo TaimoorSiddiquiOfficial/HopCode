@@ -99,7 +99,7 @@ interface PendingRequest {
  * Map a `session/request_permission` JSON-RPC request (as the daemon sends it
  * on the session-scoped `/acp` stream) to a `permission_request` DaemonEvent,
  * mirroring what the REST surface emits so consumers handle it identically.
- * The agent-stamped `requestId` (in `_meta.qwen.requestId`) is the correlator
+ * The agent-stamped `requestId` (in `_meta.hopcode.requestId`) is the correlator
  * the eventual vote must echo (§1.7). Returns `undefined` if it can't be read.
  */
 function permissionRequestToEvent(

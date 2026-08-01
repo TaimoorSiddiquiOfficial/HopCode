@@ -589,7 +589,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
     );
 
     // The daemon dashboard loads read-only: it rebuilds + returns data but must
-    // not write to ~/.qwen on a GET.
+    // not write to ~/.hopcode on a GET.
     const records = await loadUsageHistory(undefined, {
       persistRebuild: false,
     });

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 export declare const LOOP_TASK_FILE_MAX_BYTES = 25000;
@@ -30,15 +30,15 @@ export interface ReadLoopTaskFileOptions {
      * Directory holding the home/global `loop.md` candidate (`<homeQwenDir>/loop.md`).
      * Pass the QWEN_HOME-aware global dir (`Storage.getGlobalQwenDir()`) so a
      * relocated config home is honored instead of always reading the real OS home.
-     * Defaults to `<homeDir>/.qwen` so a direct barrel caller keeps the `~/.qwen`
+     * Defaults to `<homeDir>/.hopcode` so a direct barrel caller keeps the `~/.hopcode`
      * layout.
      */
     homeQwenDir?: string;
     /**
-     * When false, the project `.qwen/loop.md` candidate is skipped entirely — it
+     * When false, the project `.hopcode/loop.md` candidate is skipped entirely — it
      * is repo-controlled, so an untrusted workspace must not read it and feed it
      * to the model (mirrors the folder-trust gate on project hooks). The
-     * home/global `~/.qwen/loop.md` is user-owned and always allowed.
+     * home/global `~/.hopcode/loop.md` is user-owned and always allowed.
      *
      * Defaults to false (fail-secure): this function is re-exported from the core
      * barrel, so a caller that omits the option must NOT silently read an
@@ -56,25 +56,25 @@ export interface ReadLoopTaskFileOptions {
     realDirCache?: Map<string, Promise<string>>;
 }
 /**
- * Reads `.qwen/loop.md`, project before home, byte-capped at 25 KB. A missing,
+ * Reads `.hopcode/loop.md`, project before home, byte-capped at 25 KB. A missing,
  * directory, non-regular, or empty (whitespace-only) path is skipped to the next
  * candidate rather than treated as present; all candidates exhausted → missing.
  * Only the byte cap lives here — the fire-time resolver owns the user-facing
  * truncation notice so the byte-vs-line nuance stays in one place.
  *
  * Project candidate: must be a real regular file at the literal path, and is
- * stat'd BEFORE the blocking open. A symlinked `.qwen/loop.md` is refused
+ * stat'd BEFORE the blocking open. A symlinked `.hopcode/loop.md` is refused
  * outright — a repo-controlled symlink such as `-> ../.env` resolves *inside*
  * the workspace, so confinement alone would pass and exfiltrate that file to the
  * model. A FIFO/socket/device/dir is refused too, so a named pipe can never
  * wedge the tick (a blocking `open` on a FIFO waits for a writer) or be read as
  * a task list. The canonical path is still confined to the workspace root to
- * catch an *ancestor* symlink like a checked-in `.qwen -> /outside` that a
+ * catch an *ancestor* symlink like a checked-in `.hopcode -> /outside` that a
  * final-component `lstat` cannot see. When `allowProjectFile` is false (untrusted
  * folder) the candidate is dropped entirely.
  *
  * Home candidate: `<homeQwenDir>/loop.md` (the QWEN_HOME-aware global dir, not
- * always the real `~/.qwen`). It is the user's own dotfile, so a symlink IS
+ * always the real `~/.hopcode`). It is the user's own dotfile, so a symlink IS
  * followed (a common, legitimate setup — e.g. into a synced dotfiles repo), but
  * the resolved target must be a regular file AND stay within the home
  * confinement root (`homeDir`: `$QWEN_HOME` or `$HOME`) so a FIFO/device/dir

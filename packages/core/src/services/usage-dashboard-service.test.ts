@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -79,7 +79,7 @@ describe('loadUsageDashboard', () => {
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-dashboard-'));
     originalQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(tmpHome, '.qwen');
+    process.env['QWEN_HOME'] = path.join(tmpHome, '.hopcode');
     fs.mkdirSync(process.env['QWEN_HOME'], { recursive: true });
   });
 

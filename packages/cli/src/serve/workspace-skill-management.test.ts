@@ -73,13 +73,13 @@ describe('workspace Skill management', () => {
     });
 
     expect(result.installedPath).toBe(
-      path.join(workspace, '.qwen', 'skills', 'demo-skill', 'SKILL.md'),
+      path.join(workspace, '.hopcode', 'skills', 'demo-skill', 'SKILL.md'),
     );
     expect(
       await fs.readFile(
         path.join(
           workspace,
-          '.qwen',
+          '.hopcode',
           'skills',
           'demo-skill',
           'references',
@@ -530,7 +530,7 @@ describe('workspace Skill management', () => {
       'Replacement instructions.',
     );
     await expect(
-      fs.readdir(path.join(workspace, '.qwen', 'skills')),
+      fs.readdir(path.join(workspace, '.hopcode', 'skills')),
     ).resolves.toEqual(['stable-skill']);
   });
 
@@ -551,14 +551,14 @@ describe('workspace Skill management', () => {
       }),
     ).rejects.toThrow('does not match requested name');
     await expect(
-      fs.readdir(path.join(workspace, '.qwen', 'skills')),
+      fs.readdir(path.join(workspace, '.hopcode', 'skills')),
     ).resolves.toEqual([]);
   });
 
   it('removes legacy install artifacts before installing', async () => {
     const workspace = await temporaryDirectory('qwen-skill-workspace-');
     const source = await temporaryDirectory('qwen-skill-source-');
-    const baseDir = path.join(workspace, '.qwen', 'skills');
+    const baseDir = path.join(workspace, '.hopcode', 'skills');
     const legacyBackup = path.join(baseDir, '.stable-skill.backup-legacy');
     const staleBackup = path.join(
       path.dirname(baseDir),

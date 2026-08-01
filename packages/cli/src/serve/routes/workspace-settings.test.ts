@@ -97,7 +97,7 @@ describe('POST /workspace/settings', () => {
     );
   });
 
-  it('persists to the user scope (~/.qwen/settings.json)', async () => {
+  it('persists to the user scope (~/.hopcode/settings.json)', async () => {
     const { app, persistSetting, broadcastSettingsChanged } = makeApp();
 
     const res = await request(app).post('/workspace/settings').send({
@@ -113,7 +113,7 @@ describe('POST /workspace/settings', () => {
       value: 7,
     });
     // 'user' must map to SettingScope.User ('User') so the value lands in
-    // ~/.qwen/settings.json rather than the workspace file.
+    // ~/.hopcode/settings.json rather than the workspace file.
     expect(persistSetting).toHaveBeenCalledWith(
       '/workspace',
       'User',

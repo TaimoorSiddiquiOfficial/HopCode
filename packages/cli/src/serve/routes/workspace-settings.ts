@@ -54,7 +54,7 @@ const WEB_SHELL_SETTINGS = new Set([
 ]);
 
 // The primary /workspace/settings route may write the global user scope
-// (~/.qwen/settings.json). The trust-gated workspace-qualified route stays
+// (~/.hopcode/settings.json). The trust-gated workspace-qualified route stays
 // workspace-only by design.
 const VALID_WRITE_SCOPES = new Set(['workspace', 'user']);
 const QUALIFIED_WRITE_SCOPES = new Set(['workspace']);

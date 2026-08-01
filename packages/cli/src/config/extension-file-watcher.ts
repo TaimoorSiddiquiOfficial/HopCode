@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -22,7 +22,7 @@ const TOP_LEVEL_FILES = new Set(['extension-enablement.json']);
 
 const EXTENSION_FILES = new Set([
   'qwen-extension.json',
-  '.qwen-extension-install.json',
+  '.hopcode-extension-install.json',
 ]);
 
 // Keep these sets in sync with extension directory conventions. New runtime

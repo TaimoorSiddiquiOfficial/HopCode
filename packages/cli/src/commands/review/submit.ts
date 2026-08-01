@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -565,7 +565,7 @@ export const submitCommand: CommandModule = {
       .option('skill-args', {
         type: 'string',
         describe:
-          "Path to the CLI-written record of the review's invocation arguments (defaults to .qwen/tmp/qwen-skill-args-review.txt). Its `--comment` is what authorises a post. Deliberately NOT the parser's JSON output: that is a document the caller writes, and a caller that wants to post can write anything in it.",
+          "Path to the CLI-written record of the review's invocation arguments (defaults to .hopcode/tmp/qwen-skill-args-review.txt). Its `--comment` is what authorises a post. Deliberately NOT the parser's JSON output: that is a document the caller writes, and a caller that wants to post can write anything in it.",
       })
       .option('user-authorized', {
         type: 'boolean',

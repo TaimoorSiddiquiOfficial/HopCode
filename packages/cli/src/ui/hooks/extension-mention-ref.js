@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Qwen
+ * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 import { MAX_SUGGESTIONS_TO_SHOW, } from '../utils/suggestions.js';

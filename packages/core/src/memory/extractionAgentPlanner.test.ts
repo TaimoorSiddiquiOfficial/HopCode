@@ -277,8 +277,8 @@ describe('runAutoMemoryExtractionByAgent', () => {
         'C:/Users/foo/.hopcode/memories/user/role.md',
       ],
       filesWritten: [
-        'C:/Users/foo/.qwen/projects/proj/memory/project/release.md',
-        'C:/Users/foo/.qwen/memories/user/role.md',
+        'C:/Users/foo/.hopcode/projects/proj/memory/project/release.md',
+        'C:/Users/foo/.hopcode/memories/user/role.md',
       ],
     });
 

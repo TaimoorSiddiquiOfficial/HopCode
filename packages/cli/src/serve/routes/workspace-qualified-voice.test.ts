@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -130,11 +130,11 @@ async function createApp(
 }
 
 async function enableSecondaryVoice(runtime: WorkspaceRuntime): Promise<void> {
-  await fsp.mkdir(path.join(runtime.workspaceCwd, '.qwen'), {
+  await fsp.mkdir(path.join(runtime.workspaceCwd, '.hopcode'), {
     recursive: true,
   });
   await fsp.writeFile(
-    path.join(runtime.workspaceCwd, '.qwen', 'settings.json'),
+    path.join(runtime.workspaceCwd, '.hopcode', 'settings.json'),
     JSON.stringify({
       voiceModel: 'secondary-asr',
       general: { voice: { enabled: true } },

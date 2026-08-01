@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Qwen Team
+ * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -353,13 +353,13 @@ export function captureLocalDiff(opts: {
   }
 
   if (includeUntracked) {
-    // The review writes its own scratch files under `.qwen/tmp` — the args
+    // The review writes its own scratch files under `.hopcode/tmp` — the args
     // record, the parsed-args verdict, the diff, the plan — *before* this
-    // capture runs. In a repo that does not ignore `.qwen`, `ls-files --others`
+    // capture runs. In a repo that does not ignore `.hopcode`, `ls-files --others`
     // lists them as the user's untracked work, and the review would report on
     // its own plumbing. They are never the change under review; drop them.
     const candidates = listUntracked(repoRoot, pathspec).filter(
-      (p) => !p.startsWith('.qwen/tmp/') && p !== '.qwen/tmp',
+      (p) => !p.startsWith('.hopcode/tmp/') && p !== '.hopcode/tmp',
     );
 
     if (candidates.length > MAX_UNTRACKED_FILES) {

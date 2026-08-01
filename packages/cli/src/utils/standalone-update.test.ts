@@ -361,7 +361,7 @@ describe('standalone-update', () => {
         }),
       );
 
-      const lockPath = path.join(parentDir, '.qwen-update.lock');
+      const lockPath = path.join(parentDir, '.hopcode-update.lock');
       fs.writeFileSync(lockPath, '999999999');
 
       await expect(
@@ -569,7 +569,7 @@ describe('standalone-update', () => {
   describe('acquireLock deferred marker handling', () => {
     it('rejects lock takeover while a deferred bat process is alive', () => {
       const standaloneDir = path.join(tempDir, 'qwen-code');
-      const lockPath = path.join(tempDir, '.qwen-update.lock');
+      const lockPath = path.join(tempDir, '.hopcode-update.lock');
       fs.writeFileSync(lockPath, '999999999');
       fs.writeFileSync(`${standaloneDir}.deferred`, String(process.pid));
 
@@ -582,7 +582,7 @@ describe('standalone-update', () => {
 
     it('cleans a stale deferred marker before taking over a dead lock', () => {
       const standaloneDir = path.join(tempDir, 'qwen-code');
-      const lockPath = path.join(tempDir, '.qwen-update.lock');
+      const lockPath = path.join(tempDir, '.hopcode-update.lock');
       fs.writeFileSync(lockPath, '999999999');
       fs.writeFileSync(`${standaloneDir}.deferred`, '999999998');
 
@@ -593,7 +593,7 @@ describe('standalone-update', () => {
 
     it('cleans an unparseable deferred marker before taking over a dead lock', () => {
       const standaloneDir = path.join(tempDir, 'qwen-code');
-      const lockPath = path.join(tempDir, '.qwen-update.lock');
+      const lockPath = path.join(tempDir, '.hopcode-update.lock');
       fs.writeFileSync(lockPath, '999999999');
       fs.writeFileSync(`${standaloneDir}.deferred`, 'not-a-pid');
 
