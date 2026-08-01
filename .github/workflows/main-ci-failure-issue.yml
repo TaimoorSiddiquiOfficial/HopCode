@@ -37,7 +37,7 @@ jobs:
           AUTOFIX_APPROVED_LABEL: 'autofix/approved'
         run: |-
           short_sha="${HEAD_SHA:0:12}"
-          marker="qwen-main-ci-failure:${HEAD_SHA}"
+          marker="hopcode-main-ci-failure:${HEAD_SHA}"
 
           apply_autofix_route() {
             gh issue edit "$1" \

@@ -37,7 +37,7 @@ jobs:
       contents: 'read'
       pull-requests: 'read'
       issues: 'write'
-    uses: './.github/workflows/qwen-pr-safety-precheck.yml'
+    uses: './.github/workflows/hopcode-pr-safety-precheck.yml'
     secrets:
       CI_BOT_PAT: '${{ secrets.CI_BOT_PAT }}'
 
@@ -215,7 +215,7 @@ jobs:
       - name: 'Clean stale agent state'
         run: |-
           set -uo pipefail
-          # Fresh per-run agent home (must match HOPCODE_HOME on the Qwen step
+          # Fresh per-run agent home (must match HOPCODE_HOME on the HopCode step
           # below) + drop any leftover stage drafts.
           HOPCODE_HOME="${RUNNER_TEMP:?}/hopcode-home"
           rm -rf "$HOPCODE_HOME" 2>/dev/null || true
@@ -247,7 +247,7 @@ jobs:
             echo "number=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: 'Run Qwen Triage'
+      - name: 'Run HopCode Triage'
         id: 'triage'
         uses: 'QwenLM/qwen-code-action@6d08e91aa807257b9c8af60edb5bb6bb2d7d951f'
         env:
@@ -286,7 +286,7 @@ jobs:
         run: |-
           set -uo pipefail
           if [[ -z "${RESPONSE}" || "${RESPONSE}" == "null" ]]; then
-            echo "::error title=Triage silent failure::Qwen Code exited without a response. Check the 'Run Qwen Triage' step stderr above for diagnostics."
+            echo "::error title=Triage silent failure::HopCode exited without a response. Check the 'Run HopCode Triage' step stderr above for diagnostics."
             exit 1
           fi
           echo "Triage response received (${#RESPONSE} chars)."
@@ -331,7 +331,7 @@ jobs:
             exit 0
           fi
           printf -v BODY '%s\n\n%s\n\n%s' \
-            '<!-- qwen-triage stage=rerun-summary -->' \
+            '<!-- hopcode-triage stage=rerun-summary -->' \
             'Triage re-run completed without a new review.' \
             "The stage comments above were updated with the latest result. [View workflow run]($RUN_URL)."
           gh api "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments" \
@@ -546,7 +546,7 @@ jobs:
         if: "steps.pr.outputs.decision == 'run' && steps.prepare.outputs.verdict == ''"
         id: 'run'
         # NOTE: no GitHub token here — this step runs untrusted PR code. The
-        # real model key is kept out of qwen's environment; qwen talks to a
+        # real model key is kept out of hopcode's environment; hopcode talks to a
         # root-owned loopback proxy with a dummy key instead.
         env:
           GITHUB_TOKEN: ''
@@ -558,14 +558,14 @@ jobs:
           REPOSITORY: '${{ github.repository }}'
         run: |-
           set -euo pipefail
-          if ! command -v qwen >/dev/null 2>&1; then
-            echo "::error::qwen CLI not found on runner"
+          if ! command -v hopcode >/dev/null 2>&1; then
+            echo "::error::hopcode CLI not found on runner"
             exit 1
           fi
 
-          # Bypass the runner proxy before launching qwen: the proxy cuts the
-          # SSE stream to the model host, and qwen reads HTTP(S)_PROXY directly
-          # without honoring NO_PROXY. Clear proxy env for qwen itself while
+          # Bypass the runner proxy before launching hopcode: the proxy cuts the
+          # SSE stream to the model host, and hopcode reads HTTP(S)_PROXY directly
+          # without honoring NO_PROXY. Clear proxy env for hopcode itself while
           # restoring it for child gh/git commands the agent may spawn.
           # shellcheck disable=SC2016
           configure_HOPCODE_network() {
@@ -984,7 +984,7 @@ jobs:
             case "${VERDICT:-}" in
               infra-error)
                 VERDICT_LABEL='infra-error (crash/OOM)'
-                DESCRIPTION='The tmux test did not complete because the qwen process failed or was killed. This is not a pass/fail result for the affected flow; check runner resources and PR code for crashes or memory leaks.'
+                DESCRIPTION='The tmux test did not complete because the hopcode process failed or was killed. This is not a pass/fail result for the affected flow; check runner resources and PR code for crashes or memory leaks.'
                 ;;
               timeout)
                 VERDICT_LABEL='timeout'

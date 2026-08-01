@@ -1,4 +1,4 @@
-﻿# .github/workflows/ci.yml
+# .github/workflows/ci.yml
 
 name: 'HopCode CI'
 
@@ -386,7 +386,7 @@ jobs:
           USERPROFILE: '${{ runner.temp }}/qwen-ci-home'
           OPENAI_API_KEY: ''
           DASHSCOPE_API_KEY: ''
-          QWEN_API_KEY: ''
+          HOPCODE_API_KEY: ''
           GEMINI_API_KEY: ''
           QWEN_DEFAULT_AUTH_TYPE: ''
         run: |-
@@ -600,7 +600,7 @@ jobs:
           USERPROFILE: '${{ runner.temp }}/qwen-ci-home'
           OPENAI_API_KEY: ''
           DASHSCOPE_API_KEY: ''
-          QWEN_API_KEY: ''
+          HOPCODE_API_KEY: ''
           GEMINI_API_KEY: ''
           QWEN_DEFAULT_AUTH_TYPE: ''
         run: |-
@@ -655,7 +655,7 @@ jobs:
           USERPROFILE: '${{ runner.temp }}/qwen-ci-home'
           OPENAI_API_KEY: ''
           DASHSCOPE_API_KEY: ''
-          QWEN_API_KEY: ''
+          HOPCODE_API_KEY: ''
           GEMINI_API_KEY: ''
           QWEN_DEFAULT_AUTH_TYPE: ''
         run: |-

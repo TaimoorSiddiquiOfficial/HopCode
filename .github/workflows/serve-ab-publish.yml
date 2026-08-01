@@ -96,7 +96,7 @@ jobs:
           gate
 
           BODY_FILE="${ART}/body.md"
-          MARKER='<!-- qwen:serve-ab -->'
+          MARKER='<!-- hopcode:serve-ab -->'
 
           # Dedup only against OUR prior comment (bot author + marker), and only
           # after a SUCCESSFUL listing (a failed list must not read as "none" and

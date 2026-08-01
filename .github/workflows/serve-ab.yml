@@ -1,6 +1,6 @@
 name: 'Serve A/B'
 
-# For PRs that touch the `qwen serve` daemon's response surface, build the CLI
+# For PRs that touch the `hopcode serve` daemon's response surface, build the CLI
 # from BOTH the PR base (`main`) and the PR head, drive a fixed set of endpoints
 # against each daemon, and diff the JSON responses into a before/after field
 # table posted on the PR. A PR with no response change → "no change". This is

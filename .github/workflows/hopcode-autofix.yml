@@ -127,7 +127,7 @@ jobs:
       # and a trusted sender the payload misses merely loses coalescing. The
       # association list mirrors TRUSTED_ASSOC; the login mirrors REVIEW_BOT.
       group: >-
-        ${{ github.event_name == 'schedule' && 'qwen-autofix-route-cron' || (github.event_name == 'pull_request_review' && (contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.review.author_association) || github.event.review.user.login == 'hopcode-ci-bot') && format('qwen-autofix-route-pr-{0}', github.event.pull_request.number)) || (github.event_name == 'issues' && format('qwen-autofix-route-issue-{0}', github.event.issue.number)) || format('qwen-autofix-route-{0}', github.run_id) }}
+        ${{ github.event_name == 'schedule' && 'hopcode-autofix-route-cron' || (github.event_name == 'pull_request_review' && (contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.review.author_association) || github.event.review.user.login == 'hopcode-ci-bot') && format('hopcode-autofix-route-pr-{0}', github.event.pull_request.number)) || (github.event_name == 'issues' && format('hopcode-autofix-route-issue-{0}', github.event.issue.number)) || format('hopcode-autofix-route-{0}', github.run_id) }}
       cancel-in-progress: |-
         ${{ github.event_name != 'workflow_dispatch' }}
     permissions:
@@ -303,7 +303,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     timeout-minutes: 180
     concurrency:
-      group: 'qwen-autofix-issue-${{ needs.route.outputs.issue_number || github.run_id }}'
+      group: 'hopcode-autofix-issue-${{ needs.route.outputs.issue_number || github.run_id }}'
       cancel-in-progress: false
     permissions:
       contents: 'read'
@@ -410,7 +410,7 @@ jobs:
           npm run build
           npm run bundle
 
-      - name: 'Prepare Qwen Code CLI'
+      - name: 'Prepare HopCode CLI'
         run: |-
           qwen_version="$(node -p "require('./package.json').version")"
           echo "Using checked-out Qwen Code bundle ${qwen_version}"
@@ -423,7 +423,7 @@ jobs:
           chmod +x "${qwen_bin}/qwen"
           echo "${qwen_bin}" >> "${GITHUB_PATH}"
           PATH="${qwen_bin}:${PATH}"
-          qwen --version
+          hopcode --version
 
       - name: 'Find candidate issues'
         id: 'scan'
@@ -1121,7 +1121,7 @@ jobs:
               # this skip is an optimization, and the address-side live-marker
               # revalidation is the correctness gate. If that revalidation is
               # ever removed, this read must become fail-closed instead.
-              gh run list --repo "${REPO}" --workflow qwen-autofix.yml \
+              gh run list --repo "${REPO}" --workflow hopcode-autofix.yml \
                 --status "${LIVE_STATUS}" --limit 50 --json databaseId \
                 --jq '.[].databaseId' 2> /dev/null || true
             done | sort -u
@@ -1408,7 +1408,7 @@ jobs:
           npm run build
           npm run bundle
 
-      - name: 'Prepare Qwen Code CLI'
+      - name: 'Prepare HopCode CLI'
         run: |-
           qwen_version="$(node -p "require('./package.json').version")"
           echo "Using checked-out Qwen Code bundle ${qwen_version}"
@@ -1421,7 +1421,7 @@ jobs:
           chmod +x "${qwen_bin}/qwen"
           echo "${qwen_bin}" >> "${GITHUB_PATH}"
           PATH="${qwen_bin}:${PATH}"
-          qwen --version
+          hopcode --version
 
       - name: 'Resolve sandbox image'
         run: |-

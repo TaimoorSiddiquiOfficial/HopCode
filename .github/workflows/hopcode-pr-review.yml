@@ -1,4 +1,4 @@
-name: '🧐 Qwen Pull Request Review'
+name: '🧐 HopCode Pull Request Review'
 
 on:
   pull_request_target:
@@ -54,8 +54,8 @@ concurrency:
   # Comment/review events use per-run groups to avoid cancelling active reviews.
   group: >-
     ${{ github.event_name == 'pull_request_target' &&
-    format('qwen-pr-review-pr-{0}', github.event.pull_request.number) ||
-    format('qwen-pr-review-run-{0}', github.run_id) }}
+    format('hopcode-pr-review-pr-{0}', github.event.pull_request.number) ||
+    format('hopcode-pr-review-run-{0}', github.run_id) }}
   cancel-in-progress: "${{ github.event_name == 'pull_request_target' && (github.event.action == 'synchronize' || github.event.action == 'closed') }}"
 
 jobs:
@@ -70,7 +70,7 @@ jobs:
       contents: 'read'
       pull-requests: 'read'
       issues: 'write'
-    uses: './.github/workflows/qwen-pr-safety-precheck.yml'
+    uses: './.github/workflows/hopcode-pr-safety-precheck.yml'
     secrets:
       CI_BOT_PAT: '${{ secrets.CI_BOT_PAT }}'
 
@@ -99,7 +99,7 @@ jobs:
          startsWith(github.event.review.body, '@hopcode /review ') ||
          startsWith(github.event.review.body, format('@hopcode /review{0}', '\n')))))
     concurrency:
-      group: 'qwen-pr-ack-${{ github.event.issue.number || github.event.pull_request.number }}'
+      group: 'hopcode-pr-ack-${{ github.event.issue.number || github.event.pull_request.number }}'
       cancel-in-progress: false
     runs-on: '${{ (github.repository == ''TaimoorSiddiquiOfficial/HopCode'' && vars.MAINTAINER_ECS_RUNNER_DISABLED != ''true'') && fromJSON(''["self-hosted", "linux", "x64", "ecs-hopcode"]'') || fromJSON(''["ubuntu-latest"]'') }}'
     timeout-minutes: 5
@@ -119,7 +119,7 @@ jobs:
             echo "PR #${PR_NUMBER} is ${PR_STATE}; skipping acknowledgement." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          ACK_BODY="<!-- hopcode-review-ack -->_Qwen Code review request accepted. Review is queued in [workflow run](${RUN_URL})._"
+          ACK_BODY="<!-- hopcode-review-ack -->_HopCode review request accepted. Review is queued in [workflow run](${RUN_URL})._"
           EXISTING_ACK_ID="$(
             # -F would otherwise make gh api default to POST.
             gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
@@ -167,9 +167,9 @@ jobs:
       needs.authorize.outputs.should_review == 'true'
     # Stays on hosted: the environment wait timer would otherwise idle a self-hosted ECS slot for the whole wait (GitHub allocates the runner before evaluating the environment timer).
     runs-on: 'ubuntu-latest'
-    # Wait timer is configured in repo settings (Settings → Environments → qwen-pr-review-delay), currently 10 minutes.
+    # Wait timer is configured in repo settings (Settings → Environments → hopcode-pr-review-delay), currently 10 minutes.
     environment:
-      name: 'qwen-pr-review-delay'
+      name: 'hopcode-pr-review-delay'
       deployment: false
     permissions:
       contents: 'read'
@@ -357,14 +357,14 @@ jobs:
       # Self-hosted runners reuse $HOME, /tmp and the workspace, so a prior run
       # can bleed into this one: its agent session/memory (under HOPCODE_HOME),
       # leftover draft comments (/tmp/stage-*.md, which survive `git clean`), or
-      # a stale `.qwen/tmp/review-pr-*` worktree / `qwen-review/*` branch from an
+      # a stale `.hopcode/tmp/review-pr-*` worktree / `hopcode-review/*` branch from an
       # interrupted review. Reset all three per run; never fail the job.
       - name: 'Clean stale agent state'
         run: |-
           set -uo pipefail
-          # Fresh per-run agent home (must match HOPCODE_HOME on the Qwen step
+          # Fresh per-run agent home (must match HOPCODE_HOME on the HopCode step
           # below) + drop any leftover stage drafts.
-          HOPCODE_HOME="${RUNNER_TEMP:?}/qwen-home"
+          HOPCODE_HOME="${RUNNER_TEMP:?}/hopcode-home"
           rm -rf "$HOPCODE_HOME" 2>/dev/null || true
           mkdir -p "$HOPCODE_HOME"
           rm -f /tmp/stage-*.md 2>/dev/null || true
@@ -374,9 +374,9 @@ jobs:
             echo "no prior workspace; nothing to clean"
             exit 0
           fi
-          rm -rf .qwen/tmp/review-pr-* 2>/dev/null || true
+          rm -rf .hopcode/tmp/review-pr-* 2>/dev/null || true
           git worktree prune -v || true
-          git for-each-ref --format='%(refname:short)' 'refs/heads/qwen-review/*' \
+          git for-each-ref --format='%(refname:short)' 'refs/heads/hopcode-review/*' \
             | while read -r stale_ref; do
                 if [ -n "$stale_ref" ]; then
                   git branch -D "$stale_ref" || true
@@ -456,16 +456,16 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: 'Install Qwen CLI if missing'
+      - name: 'Install HopCode CLI if missing'
         if: "steps.context.outputs.should_run == 'true'"
         run: |-
           set -euo pipefail
-          if command -v qwen >/dev/null 2>&1; then
-            qwen --version
+          if command -v hopcode >/dev/null 2>&1; then
+            hopcode --version
             exit 0
           fi
           npm install -g --registry=https://registry.npmjs.org '@hoptrendy/hopcode@latest'
-          qwen --version
+          hopcode --version
 
       - name: 'Run review'
         id: 'review'
@@ -474,14 +474,14 @@ jobs:
           GH_TOKEN: '${{ secrets.CI_BOT_PAT }}'
           OPENAI_API_KEY: '${{ secrets.REVIEW_OPENAI_API_KEY }}'
           OPENAI_BASE_URL: '${{ secrets.REVIEW_OPENAI_BASE_URL }}'
-          OPENAI_MODEL: '${{ vars.QWEN_PR_REVIEW_MODEL }}'
+          OPENAI_MODEL: '${{ vars.HOPCODE_PR_REVIEW_MODEL }}'
           PR_NUMBER: '${{ steps.context.outputs.pr_number }}'
           REVIEW_MODE: '${{ steps.context.outputs.review_mode }}'
           TIMEOUT_MINUTES: '${{ steps.context.outputs.timeout_minutes }}'
           # Per-run agent home so this review's session/memory cannot leak into
           # the next on the reused self-hosted workspace (reset in "Clean stale
           # agent state"). Must match the HOPCODE_HOME computed there.
-          HOPCODE_HOME: '${{ runner.temp }}/qwen-home'
+          HOPCODE_HOME: '${{ runner.temp }}/hopcode-home'
         run: |-
           set -euo pipefail
           fail() {
@@ -511,12 +511,12 @@ jobs:
           if [ -z "${OPENAI_BASE_URL:-}" ]; then
             fail "REVIEW_OPENAI_BASE_URL secret is required for Qwen PR review."
           fi
-          if ! command -v qwen >/dev/null 2>&1; then
+          if ! command -v hopcode >/dev/null 2>&1; then
             fail "qwen CLI is required on the review runner."
           fi
 
           # shellcheck disable=SC2016
-          configure_qwen_network() {
+          configure_hopcode_network() {
             local openai_host proxy_bin
             if ! command -v node >/dev/null 2>&1; then
               fail "node is required to parse OPENAI_BASE_URL for the proxy bypass."
@@ -531,34 +531,34 @@ jobs:
             # qwen currently reads HTTP(S)_PROXY directly and does not apply
             # NO_PROXY when constructing its proxy agent. Clear proxy env for
             # qwen itself, while restoring it for child gh/git commands.
-            export QWEN_CI_HTTPS_PROXY="${HTTPS_PROXY:-}"
-            export QWEN_CI_https_proxy="${https_proxy:-}"
-            export QWEN_CI_HTTP_PROXY="${HTTP_PROXY:-}"
-            export QWEN_CI_http_proxy="${http_proxy:-}"
+            export HOPCODE_CI_HTTPS_PROXY="${HTTPS_PROXY:-}"
+            export HOPCODE_CI_https_proxy="${https_proxy:-}"
+            export HOPCODE_CI_HTTP_PROXY="${HTTP_PROXY:-}"
+            export HOPCODE_CI_http_proxy="${http_proxy:-}"
             proxy_bin="${RUNNER_TEMP:-/tmp}/qwen-network-bin"
             mkdir -p "$proxy_bin"
 
             if command -v gh >/dev/null 2>&1; then
               local real_gh
               real_gh="$(command -v gh)"
-              export QWEN_CI_REAL_GH="$real_gh"
+              export HOPCODE_CI_REAL_GH="$real_gh"
               cat > "$proxy_bin/gh" <<'QWEN_GH_WRAPPER'
           #!/usr/bin/env bash
           set -euo pipefail
-          [ -n "${QWEN_CI_HTTPS_PROXY:-}" ] && export HTTPS_PROXY="$QWEN_CI_HTTPS_PROXY"
-          [ -n "${QWEN_CI_https_proxy:-}" ] && export https_proxy="$QWEN_CI_https_proxy"
-          [ -n "${QWEN_CI_HTTP_PROXY:-}" ] && export HTTP_PROXY="$QWEN_CI_HTTP_PROXY"
-          [ -n "${QWEN_CI_http_proxy:-}" ] && export http_proxy="$QWEN_CI_http_proxy"
+          [ -n "${HOPCODE_CI_HTTPS_PROXY:-}" ] && export HTTPS_PROXY="$HOPCODE_CI_HTTPS_PROXY"
+          [ -n "${HOPCODE_CI_https_proxy:-}" ] && export https_proxy="$HOPCODE_CI_https_proxy"
+          [ -n "${HOPCODE_CI_HTTP_PROXY:-}" ] && export HTTP_PROXY="$HOPCODE_CI_HTTP_PROXY"
+          [ -n "${HOPCODE_CI_http_proxy:-}" ] && export http_proxy="$HOPCODE_CI_http_proxy"
           guard_pr_write() {
-            local repo="${QWEN_CI_REVIEW_REPO:-}"
-            local pr_number="${QWEN_CI_REVIEW_PR_NUMBER:-}"
-            local expected_head="${QWEN_CI_REVIEW_EXPECTED_HEAD_SHA:-}"
+            local repo="${HOPCODE_CI_REVIEW_REPO:-}"
+            local pr_number="${HOPCODE_CI_REVIEW_PR_NUMBER:-}"
+            local expected_head="${HOPCODE_CI_REVIEW_EXPECTED_HEAD_SHA:-}"
             if [ -z "$repo" ] || [ -z "$pr_number" ]; then
-              echo "Blocked PR write: QWEN_CI_REVIEW_REPO and QWEN_CI_REVIEW_PR_NUMBER must be set." >&2
+              echo "Blocked PR write: HOPCODE_CI_REVIEW_REPO and HOPCODE_CI_REVIEW_PR_NUMBER must be set." >&2
               exit 90
             fi
             local pr_data state current_head
-            if ! pr_data="$("$QWEN_CI_REAL_GH" pr view "$pr_number" --repo "$repo" --json state,headRefOid --jq '[.state, .headRefOid] | @tsv')"; then
+            if ! pr_data="$("$HOPCODE_CI_REAL_GH" pr view "$pr_number" --repo "$repo" --json state,headRefOid --jq '[.state, .headRefOid] | @tsv')"; then
               echo "Blocked PR write: failed to verify PR #${pr_number} state." >&2
               exit 90
             fi
@@ -637,7 +637,7 @@ jobs:
               esac
               ;;
           esac
-          exec "$QWEN_CI_REAL_GH" "$@"
+          exec "$HOPCODE_CI_REAL_GH" "$@"
           QWEN_GH_WRAPPER
               chmod +x "$proxy_bin/gh"
             fi
@@ -645,14 +645,14 @@ jobs:
             if command -v git >/dev/null 2>&1; then
               local real_git
               real_git="$(command -v git)"
-              export QWEN_CI_REAL_GIT="$real_git"
+              export HOPCODE_CI_REAL_GIT="$real_git"
               {
                 printf '%s\n' '#!/usr/bin/env bash'
-                printf '%s\n' '[ -n "${QWEN_CI_HTTPS_PROXY:-}" ] && export HTTPS_PROXY="$QWEN_CI_HTTPS_PROXY"'
-                printf '%s\n' '[ -n "${QWEN_CI_https_proxy:-}" ] && export https_proxy="$QWEN_CI_https_proxy"'
-                printf '%s\n' '[ -n "${QWEN_CI_HTTP_PROXY:-}" ] && export HTTP_PROXY="$QWEN_CI_HTTP_PROXY"'
-                printf '%s\n' '[ -n "${QWEN_CI_http_proxy:-}" ] && export http_proxy="$QWEN_CI_http_proxy"'
-                printf '%s\n' 'exec "$QWEN_CI_REAL_GIT" "$@"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_HTTPS_PROXY:-}" ] && export HTTPS_PROXY="$HOPCODE_CI_HTTPS_PROXY"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_https_proxy:-}" ] && export https_proxy="$HOPCODE_CI_https_proxy"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_HTTP_PROXY:-}" ] && export HTTP_PROXY="$HOPCODE_CI_HTTP_PROXY"'
+                printf '%s\n' '[ -n "${HOPCODE_CI_http_proxy:-}" ] && export http_proxy="$HOPCODE_CI_http_proxy"'
+                printf '%s\n' 'exec "$HOPCODE_CI_REAL_GIT" "$@"'
               } > "$proxy_bin/git"
               chmod +x "$proxy_bin/git"
             fi
@@ -660,18 +660,18 @@ jobs:
             export PATH="$proxy_bin:$PATH"
             unset HTTPS_PROXY https_proxy HTTP_PROXY http_proxy
 
-            echo "qwen_path=$(command -v qwen)"
-            qwen --version
+            echo "qwen_path=$(command -v hopcode)"
+            hopcode --version
             echo "openai_host=${openai_host}"
             echo "qwen_http_proxy=disabled"
-            if [ -n "${QWEN_CI_HTTPS_PROXY}${QWEN_CI_https_proxy}${QWEN_CI_HTTP_PROXY}${QWEN_CI_http_proxy}" ]; then
+            if [ -n "${HOPCODE_CI_HTTPS_PROXY}${HOPCODE_CI_https_proxy}${HOPCODE_CI_HTTP_PROXY}${HOPCODE_CI_http_proxy}" ]; then
               echo "child_git_github_proxy=restored"
             else
               echo "child_git_github_proxy=unset"
             fi
           }
 
-          configure_qwen_network
+          configure_hopcode_network
 
           case "$TIMEOUT_MINUTES" in
             ''|*[!0-9]*)
@@ -705,9 +705,9 @@ jobs:
             fi
             EXPECTED_HEAD_SHA="$EVENT_HEAD_SHA"
           fi
-          export QWEN_CI_REVIEW_REPO="$REPO"
-          export QWEN_CI_REVIEW_PR_NUMBER="$PR_NUMBER"
-          export QWEN_CI_REVIEW_EXPECTED_HEAD_SHA="$EXPECTED_HEAD_SHA"
+          export HOPCODE_CI_REVIEW_REPO="$REPO"
+          export HOPCODE_CI_REVIEW_PR_NUMBER="$PR_NUMBER"
+          export HOPCODE_CI_REVIEW_EXPECTED_HEAD_SHA="$EXPECTED_HEAD_SHA"
           echo "expected_head_sha=$EXPECTED_HEAD_SHA" >> "$GITHUB_OUTPUT"
 
           PROMPT="/review ${REVIEW_URL}"
@@ -803,12 +803,12 @@ jobs:
           fi
           if [ "$FAILURE_KIND" = "timeout" ]; then
             if [ "$TIMEOUT_MINUTES" -lt 240 ]; then
-              body="**Qwen Code review timed out.** ${FAILURE_REASON} For large PRs, retry with a longer timeout by commenting: \`@hopcode /review --timeout=240\`. See [workflow logs](${RUN_URL})."
+              body="**HopCode review timed out.** ${FAILURE_REASON} For large PRs, retry with a longer timeout by commenting: \`@hopcode /review --timeout=240\`. See [workflow logs](${RUN_URL})."
             else
-              body="**Qwen Code review timed out.** ${FAILURE_REASON} This run already used the maximum 240 minute timeout. See [workflow logs](${RUN_URL})."
+              body="**HopCode review timed out.** ${FAILURE_REASON} This run already used the maximum 240 minute timeout. See [workflow logs](${RUN_URL})."
             fi
           else
-            body="**Qwen Code review did not complete successfully.** ${FAILURE_REASON} See [workflow logs](${RUN_URL})."
+            body="**HopCode review did not complete successfully.** ${FAILURE_REASON} See [workflow logs](${RUN_URL})."
           fi
           gh pr comment "$PR_NUMBER" \
             --repo "$GITHUB_REPOSITORY" \
@@ -1045,7 +1045,7 @@ jobs:
         with:
           OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
-          OPENAI_MODEL: '${{ vars.QWEN_PR_REVIEW_MODEL }}'
+          OPENAI_MODEL: '${{ vars.HOPCODE_PR_REVIEW_MODEL }}'
           # coreTools specifiers (e.g. `run_shell_command(git add)`) are advisory:
           # the permission manager keys on the tool name and drops the parenthesised
           # command. Real containment = sandbox + write authorization + no agent token.
@@ -1240,7 +1240,7 @@ jobs:
         run: |-
           set -euo pipefail
           {
-            echo "<!-- qwen-resolve-result -->"
+            echo "<!-- hopcode-resolve-result -->"
             echo "Qwen Code did not run conflict resolution for this request."
             echo
             echo "${SKIP_REASON}"
@@ -1336,7 +1336,7 @@ jobs:
           fi
 
           {
-            echo "<!-- qwen-resolve-result -->"
+            echo "<!-- hopcode-resolve-result -->"
             case "$OUTCOME" in
               fixed)
                 if [ "$push_failed" = "true" ]; then

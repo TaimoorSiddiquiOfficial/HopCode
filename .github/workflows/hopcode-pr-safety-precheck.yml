@@ -1,4 +1,4 @@
-name: 'Qwen PR Safety Precheck'
+name: 'HopCode PR Safety Precheck'
 
 on:
   workflow_call:
@@ -15,7 +15,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     timeout-minutes: 5
     concurrency:
-      group: 'qwen-pr-precheck-${{ github.event.pull_request.number }}'
+      group: 'hopcode-pr-precheck-${{ github.event.pull_request.number }}'
       cancel-in-progress: false
     permissions:
       contents: 'read'

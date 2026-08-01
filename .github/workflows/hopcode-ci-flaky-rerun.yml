@@ -1,4 +1,4 @@
-name: 'Qwen CI Failure Patrol'
+name: 'HopCode CI Failure Patrol'
 
 on:
   schedule:
@@ -77,7 +77,7 @@ jobs:
         with:
           OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
-          OPENAI_MODEL: '${{ vars.QWEN_PR_REVIEW_MODEL }}'
+          OPENAI_MODEL: '${{ vars.HOPCODE_PR_REVIEW_MODEL }}'
           qwen_cli_version: '0.19.9'
           settings: |-
             {

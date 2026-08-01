@@ -17,7 +17,7 @@ name: 'Fleet Shepherd'
 # place, never comment spam) so fleet state is observable at a glance.
 #
 # NON-GOAL: rerunning flaky-failed CI. That is owned by the CI Failure Patrol
-# (.github/workflows/qwen-ci-flaky-rerun.yml), which has its own markers,
+# (.github/workflows/hopcode-ci-flaky-rerun.yml), which has its own markers,
 # attempt caps, and a behaviorally-tested classifier — a second scheduled
 # rerun owner here raced it (observed live as rerun-vs-rerun cancellation
 # storms), so the shepherd only REPORTS red CI on the dashboard.
@@ -164,7 +164,7 @@ jobs:
           # the lever for the tick instead (same fail-closed rule as the other
           # reads).
           SCAN_RUNS_OK=true
-          if ! env GITHUB_TOKEN="${ACTIONS_TOKEN}" gh run list --repo "${REPO}" --workflow qwen-autofix.yml \
+          if ! env GITHUB_TOKEN="${ACTIONS_TOKEN}" gh run list --repo "${REPO}" --workflow hopcode-autofix.yml \
             --limit 50 --json event,createdAt,status,databaseId > /tmp/scan-runs.json 2> /dev/null; then
             SCAN_RUNS_OK=false
             echo "::warning::autofix run-list read failed; liveness lever and conflict dispatches skipped this tick"
@@ -200,7 +200,7 @@ jobs:
           if [[ "${DASH_LOOKUP_OK}" == "true" && "${SCAN_RUNS_OK}" == "true" && "${SCAN_AGE_MIN}" -ge "${SCAN_LIVENESS_MINUTES}" && "${SCAN_INFLIGHT}" == "0" ]]; then
             DISPATCH_T0="$(date -u -d '5 seconds ago' +%Y-%m-%dT%H:%M:%SZ)"
             if act "scan liveness: dispatch unforced review scan" \
-              env GITHUB_TOKEN="${ACTIONS_TOKEN}" gh workflow run qwen-autofix.yml --repo "${REPO}" -f phase=review; then
+              env GITHUB_TOKEN="${ACTIONS_TOKEN}" gh workflow run hopcode-autofix.yml --repo "${REPO}" -f phase=review; then
               LIVENESS_OUT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
               LIVENESS_RUN_OUT=''
               # Identify OUR run by id for next tick's in-flight attribution.
@@ -212,7 +212,7 @@ jobs:
               if [[ "${DRY_RUN}" != "true" ]]; then
                 for _ in 1 2 3 4 5; do
                   sleep 2
-                  LIVENESS_RUN_OUT="$(env GITHUB_TOKEN="${ACTIONS_TOKEN}" gh run list --repo "${REPO}" --workflow qwen-autofix.yml \
+                  LIVENESS_RUN_OUT="$(env GITHUB_TOKEN="${ACTIONS_TOKEN}" gh run list --repo "${REPO}" --workflow hopcode-autofix.yml \
                     --event workflow_dispatch --limit 5 --json databaseId,createdAt 2> /dev/null \
                     | jq -r --arg t0 "${DISPATCH_T0}" '[ .[] | select(.createdAt >= $t0) ] | first | .databaseId // "" | tostring' 2> /dev/null || true)"
                   if [[ -n "${LIVENESS_RUN_OUT}" && "${LIVENESS_RUN_OUT}" != "null" ]]; then break; fi
@@ -319,7 +319,7 @@ jobs:
                 ACTION_NOTE='conflict dispatch already sent for this head'
               elif [[ "${DISPATCHES}" -lt "${MAX_CONFLICT_DISPATCHES_PER_TICK}" ]]; then
                 if act "#${PR}: dispatch autofix for conflict resolution" \
-                  env GITHUB_TOKEN="${ACTIONS_TOKEN}" gh workflow run qwen-autofix.yml --repo "${REPO}" -f pr_number="${PR}"; then
+                  env GITHUB_TOKEN="${ACTIONS_TOKEN}" gh workflow run hopcode-autofix.yml --repo "${REPO}" -f pr_number="${PR}"; then
                   # The dispatch HAPPENED, so it counts against the per-tick
                   # budget regardless of the marker's fate (counting only on
                   # marker success would let a marker outage overspend the cap).
@@ -361,7 +361,7 @@ jobs:
               fi
 
             # 3) red CI → reruns are owned by the CI Failure Patrol
-            # (qwen-ci-flaky-rerun.yml): it has its own markers, caps, and a
+            # (hopcode-ci-flaky-rerun.yml): it has its own markers, caps, and a
             # tested classifier, and a second scheduled rerun owner here raced
             # it. The shepherd only surfaces the state on the dashboard.
             elif [[ -n "${FAILED_TEST_URL}" && "${PENDING}" == "0" ]]; then

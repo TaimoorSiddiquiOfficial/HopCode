@@ -241,7 +241,7 @@ jobs:
           # Dedup only against OUR OWN prior comment (bot author + marker), and
           # only after a SUCCESSFUL listing — a failed/partial list must not read
           # as "no existing comment" (that would POST a duplicate on every failure).
-          MARKER='<!-- qwen:web-shell-visuals -->'
+          MARKER='<!-- hopcode:web-shell-visuals -->'
           EXISTING=''
           listed=0
           for attempt in 1 2 3; do
