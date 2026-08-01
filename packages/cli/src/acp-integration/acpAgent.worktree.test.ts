@@ -55,6 +55,7 @@ vi.mock('@agentclientprotocol/sdk', () => ({
       return mockConnectionState.promise;
     },
   })),
+  ndJsonStream: vi.fn().mockReturnValue({}),
   RequestError: class RequestError extends Error {
     static authRequired = vi
       .fn()
@@ -74,9 +75,7 @@ vi.mock('@agentclientprotocol/sdk', () => ({
   PROTOCOL_VERSION: '1.0.0',
 }));
 
-vi.mock('@hoptrendy/acp-bridge/ndJsonStream', () => ({
-  ndJsonStream: vi.fn().mockReturnValue({}),
-}));
+// ndJsonStream is mocked via @agentclientprotocol/sdk above
 
 vi.mock('node:stream', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:stream')>();

@@ -104,6 +104,7 @@ vi.mock('@agentclientprotocol/sdk', () => ({
       return mockConnectionState.promise;
     },
   })),
+  ndJsonStream: vi.fn().mockReturnValue({}),
   RequestError: class RequestError extends Error {
     code: number;
     data: unknown;
@@ -147,9 +148,7 @@ vi.mock('@agentclientprotocol/sdk', () => ({
   PROTOCOL_VERSION: '1.0.0',
 }));
 
-vi.mock('@hoptrendy/acp-bridge/ndJsonStream', () => ({
-  ndJsonStream: vi.fn().mockReturnValue({}),
-}));
+// ndJsonStream is mocked via @agentclientprotocol/sdk above
 
 // Mock stream conversion
 vi.mock('node:stream', async (importOriginal) => {
