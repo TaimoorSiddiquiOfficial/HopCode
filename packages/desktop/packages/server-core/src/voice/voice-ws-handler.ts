@@ -39,7 +39,7 @@ import {
   type VoiceStreamConfig,
   type VoiceStreamSession,
 } from './voice-stream-session';
-import { openQwenAsrRealtimeStream } from './qwen-asr-realtime-session';
+import { openhopcodeasrrealtimestream } from './qwen-asr-realtime-session';
 import { openVoiceStreamWithRetry } from './voice-stream-retry';
 import { isStreamingVoiceModel, resolveVoiceTransport } from './voice-model';
 
@@ -101,7 +101,7 @@ async function defaultOpenStreamFor(
   const transport = resolveVoiceTransport(config.model);
   return openVoiceStreamWithRetry(() =>
     transport === 'qwen-asr-realtime'
-      ? openQwenAsrRealtimeStream(cfg, callbacks)
+      ? openhopcodeasrrealtimestream(cfg, callbacks)
       : openVoiceStream(cfg, callbacks),
   );
 }

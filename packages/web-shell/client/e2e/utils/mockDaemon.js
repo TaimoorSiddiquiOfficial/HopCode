@@ -72,7 +72,7 @@ export function createWebShellDaemonScenario(overrides = {}) {
         modelServices: ['hopcode-test'],
         transports: ['rest-sse'],
         workspaceCwd,
-        qwenCodeVersion: '0.0.0-e2e',
+        hopcodeversion: '0.0.0-e2e',
         ...(overrides.capabilities ?? {}),
     };
     const providers = {

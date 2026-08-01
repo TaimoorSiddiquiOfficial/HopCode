@@ -3,7 +3,7 @@
 ## Goal
 
 Workspaces added from the Web Shell survive a `hopcode serve` process restart
-when the daemon is relaunched with the same primary workspace and `QWEN_HOME`.
+when the daemon is relaunched with the same primary workspace and `hopcode_home`.
 
 ## State ownership
 
@@ -12,7 +12,7 @@ project configuration and not disposable runtime output. Registrations are
 stored under:
 
 ```text
-${QWEN_HOME:-~/.qwen}/daemon/workspaces/<primary-scope-sha256>.json
+${hopcode_home:-~/.qwen}/daemon/workspaces/<primary-scope-sha256>.json
 ```
 
 The scope hash is the full SHA-256 of the canonical primary workspace path

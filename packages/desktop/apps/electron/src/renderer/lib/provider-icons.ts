@@ -1,7 +1,7 @@
 /**
  * Provider Icons
  *
- * Maps the built-in Qwen backend to display metadata.
+ * Maps the built-in hopcode backend to display metadata.
  * Used in AI Settings page and anywhere connection logos are needed.
  */
 

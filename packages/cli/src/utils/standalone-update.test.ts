@@ -182,7 +182,7 @@ describe('standalone-update', () => {
       'escapes single quotes in Unix wrapper paths',
       () => {
         const libDir = path.join(tempDir, "o'brien", '.local', 'lib');
-        const standaloneDir = path.join(libDir, 'qwen-code');
+        const standaloneDir = path.join(libDir, 'hopcode');
         fs.mkdirSync(standaloneDir, { recursive: true });
 
         const origHome = process.env['HOME'];
@@ -201,7 +201,7 @@ describe('standalone-update', () => {
           "o'brien",
           '.local',
           'bin',
-          'qwen',
+          'hopcode',
         );
         const content = fs.readFileSync(wrapperPath, 'utf-8');
         expect(content).toContain("o'\\''brien");
@@ -212,7 +212,7 @@ describe('standalone-update', () => {
       'allows shell metacharacters in single-quoted Unix wrapper paths',
       () => {
         const libDir = path.join(tempDir, 'with$dollar', '.local', 'lib');
-        const standaloneDir = path.join(libDir, 'qwen-code');
+        const standaloneDir = path.join(libDir, 'hopcode');
         fs.mkdirSync(standaloneDir, { recursive: true });
 
         const origHome = process.env['HOME'];
@@ -231,7 +231,7 @@ describe('standalone-update', () => {
           'with$dollar',
           '.local',
           'bin',
-          'qwen',
+          'hopcode',
         );
         const content = fs.readFileSync(wrapperPath, 'utf-8');
         expect(content).toContain('with$dollar');
@@ -271,7 +271,7 @@ describe('standalone-update', () => {
       'throws when wrapper creation fails safety validation',
       () => {
         const libDir = path.join(tempDir, 'bad\npath', '.local', 'lib');
-        const standaloneDir = path.join(libDir, 'qwen-code');
+        const standaloneDir = path.join(libDir, 'hopcode');
         fs.mkdirSync(standaloneDir, { recursive: true });
 
         expect(() => ensureBinWrapper(standaloneDir, 'linux-x64')).toThrow(
@@ -349,7 +349,7 @@ describe('standalone-update', () => {
     });
 
     it('rejects a stale lock when a Windows deferred swap is pending', async () => {
-      const standaloneDir = path.join(tempDir, 'qwen-code');
+      const standaloneDir = path.join(tempDir, 'hopcode');
       const parentDir = path.dirname(standaloneDir);
       fs.mkdirSync(standaloneDir, { recursive: true });
       fs.mkdirSync(`${standaloneDir}.new`);
@@ -375,10 +375,10 @@ describe('standalone-update', () => {
 
   describe('isSafeTarEntryPath', () => {
     it('allows double dots inside a filename segment', () => {
-      expect(isSafeTarEntryPath('qwen-code/release..notes.md')).toBe(true);
-      expect(isSafeTarEntryPath('qwen-code/node/lib/foo..bar')).toBe(true);
-      expect(isSafeTarEntryPath('qwen-code/.../file.txt')).toBe(true);
-      expect(isSafeTarEntryPath('./qwen-code/bin/qwen')).toBe(true);
+      expect(isSafeTarEntryPath('hopcode/release..notes.md')).toBe(true);
+      expect(isSafeTarEntryPath('hopcode/node/lib/foo..bar')).toBe(true);
+      expect(isSafeTarEntryPath('hopcode/.../file.txt')).toBe(true);
+      expect(isSafeTarEntryPath('./hopcode/bin/qwen')).toBe(true);
     });
 
     it('rejects parent-directory segments and absolute paths', () => {
@@ -397,9 +397,9 @@ describe('standalone-update', () => {
     it('allows relative link targets inside the extraction directory', () => {
       const dest = path.join(tempDir, 'extract');
       expect(
-        isSafeTarLinkTarget('qwen-code/bin/qwen', '../lib/cli.js', dest),
+        isSafeTarLinkTarget('hopcode/bin/qwen', '../lib/cli.js', dest),
       ).toBe(true);
-      expect(isSafeTarLinkTarget('qwen-code/bin/qwen', './qwen', dest)).toBe(
+      expect(isSafeTarLinkTarget('hopcode/bin/qwen', './qwen', dest)).toBe(
         true,
       );
     });
@@ -407,21 +407,21 @@ describe('standalone-update', () => {
     it('allows symlink targets in child directories starting with two dots', () => {
       const dest = path.join(tempDir, 'extract');
       expect(
-        isSafeTarLinkTarget('qwen-code/bin/qwen', '../..hidden/tool', dest),
+        isSafeTarLinkTarget('hopcode/bin/qwen', '../..hidden/tool', dest),
       ).toBe(true);
     });
 
     it('rejects symlink targets outside the extraction directory', () => {
       const dest = path.join(tempDir, 'extract');
       expect(
-        isSafeTarLinkTarget('qwen-code/bin/qwen', '../../../etc/passwd', dest),
+        isSafeTarLinkTarget('hopcode/bin/qwen', '../../../etc/passwd', dest),
       ).toBe(false);
       expect(
-        isSafeTarLinkTarget('qwen-code/bin/qwen', '/etc/passwd', dest),
+        isSafeTarLinkTarget('hopcode/bin/qwen', '/etc/passwd', dest),
       ).toBe(false);
       expect(
         isSafeTarLinkTarget(
-          'qwen-code/bin/qwen',
+          'hopcode/bin/qwen',
           'C:\\Windows\\System32',
           dest,
         ),
@@ -431,10 +431,10 @@ describe('standalone-update', () => {
     it('rejects symlink targets outside the archive root that will be installed', () => {
       const dest = path.join(tempDir, 'extract');
       expect(
-        isSafeTarLinkTarget('qwen-code/bin/qwen', '../../shared/node', dest),
+        isSafeTarLinkTarget('hopcode/bin/qwen', '../../shared/node', dest),
       ).toBe(false);
       expect(
-        isSafeTarLinkTarget('./qwen-code/bin/qwen', '../../shared/node', dest),
+        isSafeTarLinkTarget('./hopcode/bin/qwen', '../../shared/node', dest),
       ).toBe(false);
     });
   });
@@ -444,7 +444,7 @@ describe('standalone-update', () => {
       const dest = path.join(tempDir, 'extract');
       expect(
         isSafeTarEntry(
-          'qwen-code/bin/qwen',
+          'hopcode/bin/qwen',
           { type: 'Link', linkpath: '../poc.txt' },
           dest,
         ),
@@ -453,15 +453,15 @@ describe('standalone-update', () => {
 
     it('allows safe regular entries and safe symlinks', () => {
       const dest = path.join(tempDir, 'extract');
-      expect(isSafeTarEntry('qwen-code/bin/qwen', { type: 'File' }, dest)).toBe(
+      expect(isSafeTarEntry('hopcode/bin/qwen', { type: 'File' }, dest)).toBe(
         true,
       );
-      expect(isSafeTarEntry('qwen-code/lib', { type: 'Directory' }, dest)).toBe(
+      expect(isSafeTarEntry('hopcode/lib', { type: 'Directory' }, dest)).toBe(
         true,
       );
       expect(
         isSafeTarEntry(
-          'qwen-code/bin/qwen',
+          'hopcode/bin/qwen',
           { type: 'SymbolicLink', linkpath: '../lib/cli.js' },
           dest,
         ),
@@ -474,7 +474,7 @@ describe('standalone-update', () => {
       fs.writeFileSync(filePath, 'entry');
 
       expect(
-        isSafeTarEntry('qwen-code/bin/qwen', fs.statSync(filePath), dest),
+        isSafeTarEntry('hopcode/bin/qwen', fs.statSync(filePath), dest),
       ).toBe(true);
     });
 
@@ -486,7 +486,7 @@ describe('standalone-update', () => {
         'FIFO',
         'ContiguousFile',
       ]) {
-        expect(isSafeTarEntry('qwen-code/bin/qwen', { type }, dest)).toBe(
+        expect(isSafeTarEntry('hopcode/bin/qwen', { type }, dest)).toBe(
           false,
         );
       }
@@ -504,21 +504,21 @@ describe('standalone-update', () => {
         process.env['SHELL'] = '/bin/bash';
 
         try {
-          const standaloneDir = path.join(home, '.local', 'lib', 'qwen-code');
+          const standaloneDir = path.join(home, '.local', 'lib', 'hopcode');
           const artifacts = ensureBinWrapper(standaloneDir, 'linux-x64');
-          const wrapperPath = path.join(home, '.local', 'bin', 'qwen');
+          const wrapperPath = path.join(home, '.local', 'bin', 'hopcode');
           const bashrc = path.join(home, '.bashrc');
 
           expect(fs.existsSync(wrapperPath)).toBe(true);
           expect(fs.readFileSync(bashrc, 'utf-8')).toContain(
-            '# Qwen Code PATH block begin',
+            '# HopCode PATH block begin',
           );
 
           cleanupFirstTimeMigrationArtifacts(artifacts);
 
           expect(fs.existsSync(wrapperPath)).toBe(false);
           expect(fs.readFileSync(bashrc, 'utf-8')).not.toContain(
-            '# Qwen Code PATH block begin',
+            '# HopCode PATH block begin',
           );
         } finally {
           process.env['HOME'] = originalHome;
@@ -568,7 +568,7 @@ describe('standalone-update', () => {
 
   describe('acquireLock deferred marker handling', () => {
     it('rejects lock takeover while a deferred bat process is alive', () => {
-      const standaloneDir = path.join(tempDir, 'qwen-code');
+      const standaloneDir = path.join(tempDir, 'hopcode');
       const lockPath = path.join(tempDir, '.hopcode-update.lock');
       fs.writeFileSync(lockPath, '999999999');
       fs.writeFileSync(`${standaloneDir}.deferred`, String(process.pid));
@@ -581,7 +581,7 @@ describe('standalone-update', () => {
     });
 
     it('cleans a stale deferred marker before taking over a dead lock', () => {
-      const standaloneDir = path.join(tempDir, 'qwen-code');
+      const standaloneDir = path.join(tempDir, 'hopcode');
       const lockPath = path.join(tempDir, '.hopcode-update.lock');
       fs.writeFileSync(lockPath, '999999999');
       fs.writeFileSync(`${standaloneDir}.deferred`, '999999998');
@@ -592,7 +592,7 @@ describe('standalone-update', () => {
     });
 
     it('cleans an unparseable deferred marker before taking over a dead lock', () => {
-      const standaloneDir = path.join(tempDir, 'qwen-code');
+      const standaloneDir = path.join(tempDir, 'hopcode');
       const lockPath = path.join(tempDir, '.hopcode-update.lock');
       fs.writeFileSync(lockPath, '999999999');
       fs.writeFileSync(`${standaloneDir}.deferred`, 'not-a-pid');
@@ -617,8 +617,8 @@ describe('standalone-update', () => {
       try {
         ensurePathInShellRc(binDir);
         const content = fs.readFileSync(zshrc, 'utf-8');
-        expect(content).toContain('# Qwen Code PATH block begin');
-        expect(content).toContain('# Qwen Code PATH block end');
+        expect(content).toContain('# HopCode PATH block begin');
+        expect(content).toContain('# HopCode PATH block end');
         // Uses single-quoted paths matching install-qwen-standalone.sh shell_quote
         expect(content).toContain(`export PATH='${binDir}':$PATH`);
       } finally {
@@ -632,7 +632,7 @@ describe('standalone-update', () => {
       const zshrc = path.join(tempDir, '.zshrc');
       fs.writeFileSync(
         zshrc,
-        `# Qwen Code PATH block begin\nexport PATH='${binDir}':$PATH\n# Qwen Code PATH block end\n`,
+        `# HopCode PATH block begin\nexport PATH='${binDir}':$PATH\n# HopCode PATH block end\n`,
       );
 
       const origShell = process.env['SHELL'];
@@ -643,7 +643,7 @@ describe('standalone-update', () => {
       try {
         ensurePathInShellRc(binDir);
         const content = fs.readFileSync(zshrc, 'utf-8');
-        const matches = content.match(/# Qwen Code PATH block begin/g);
+        const matches = content.match(/# HopCode PATH block begin/g);
         expect(matches).toHaveLength(1);
       } finally {
         process.env['SHELL'] = origShell;
@@ -669,7 +669,7 @@ describe('standalone-update', () => {
         const content = fs.readFileSync(zshrc, 'utf-8');
         const matches = content.match(/export PATH/g);
         expect(matches).toHaveLength(1);
-        expect(content).not.toContain('# Qwen Code PATH block begin');
+        expect(content).not.toContain('# HopCode PATH block begin');
       } finally {
         process.env['SHELL'] = origShell;
         process.env['HOME'] = origHome;
@@ -691,7 +691,7 @@ describe('standalone-update', () => {
       try {
         ensurePathInShellRc(binDir);
         expect(fs.readFileSync(bashrc, 'utf-8')).toContain(
-          '# Qwen Code PATH block begin',
+          '# HopCode PATH block begin',
         );
         expect(fs.readFileSync(profile, 'utf-8')).toBe('# profile\n');
       } finally {
@@ -713,7 +713,7 @@ describe('standalone-update', () => {
       try {
         ensurePathInShellRc(binDir);
         expect(fs.readFileSync(profile, 'utf-8')).toContain(
-          '# Qwen Code PATH block begin',
+          '# HopCode PATH block begin',
         );
         expect(fs.existsSync(path.join(tempDir, '.bashrc'))).toBe(false);
       } finally {
@@ -737,8 +737,8 @@ describe('standalone-update', () => {
         const content = fs.readFileSync(fishConfig, 'utf-8');
         // Matches install-qwen-standalone.sh's maybe_update_shell_path fish branch
         expect(content).toContain('set -gx PATH');
-        expect(content).toContain('# Qwen Code PATH block begin');
-        expect(content).toContain('# Qwen Code PATH block end');
+        expect(content).toContain('# HopCode PATH block begin');
+        expect(content).toContain('# HopCode PATH block end');
         expect(content).toContain(binDir);
       } finally {
         process.env['SHELL'] = origShell;

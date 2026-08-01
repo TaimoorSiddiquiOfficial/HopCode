@@ -371,7 +371,7 @@ describe('tool output session links', () => {
       <ToolLine
         tool={makeTool({
           toolName: 'custom_tool',
-          rawOutput: '[child](qwen-session://child-session)',
+          rawOutput: '[child](hopcode-session://child-session)',
         })}
         forceExpanded
       />

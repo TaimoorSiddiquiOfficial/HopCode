@@ -272,7 +272,7 @@ Device-flow is the one mirrored surface that is still app-global and must change
   bridge/env), not once against the primary bridge.
 - Workspace-qualified auth routes/methods
   (`GET/DELETE /workspaces/:workspace/auth/device-flow/:id` and the ACP
-  `_qwen/workspace/auth/device_flow/*` methods) must resolve the target runtime's
+  `_hopcode.workspace/auth/device_flow/*` methods) must resolve the target runtime's
   registry and reject/hide flows that belong to another workspace.
 - Shutdown must dispose every runtime's registry, not just
   `app.locals.deviceFlowRegistry`.
@@ -291,7 +291,7 @@ them for free. Phase 4 does **not** re-implement them; it only ensures each
 runtime's dispatcher is constructed with that runtime's dependencies. That set
 explicitly includes the per-runtime `deviceFlowRegistry` and
 `WorkspaceRememberTaskLane`: if either is left as the primary singleton,
-non-primary `_qwen/workspace/memory/remember` and `auth/device_flow` calls would
+non-primary `_hopcode.workspace/memory/remember` and `auth/device_flow` calls would
 silently run against the primary bridge.
 
 Consistency guarantee: since each mounted dispatcher is runtime-bound and
@@ -434,7 +434,7 @@ should add a test asserting this, and confirm the same guard covers `session/new
    endpoint does not map cleanly to N runtimes. Phase 4 keeps CDP on primary;
    confirm that is acceptable or scope a workspace-qualified CDP follow-up.
 4. **Voice deferral.** Confirm voice stays primary-only until Phase 4b even
-   though the ACP dispatcher already exposes `_qwen/workspace/voice` reads.
+   though the ACP dispatcher already exposes `_hopcode.workspace/voice` reads.
 5. **`archiveCoordinator` scope.** It is a single `SessionArchiveCoordinator`
    today (server.ts L596). Confirm sharing it across runtimes is safe given Phase
    3's workspace-qualified archive/organization, or make it per-runtime.

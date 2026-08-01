@@ -48,7 +48,7 @@ vi.mock('../../utils/stdioHelpers.js', () => ({
 let dir: string;
 let ENV: NodeJS.ProcessEnv;
 
-const DIFF = '/abs/qwen-review-pr-1-diff.txt';
+const DIFF = '/abs/hopcode-review-pr-1-diff.txt';
 
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), 'cov-'));
@@ -318,7 +318,7 @@ function planPr(): string {
       srcDiffLines: 200,
       diffLines: 300,
       prNumber: '6766',
-      ownerRepo: 'QwenLM/qwen-code',
+      ownerRepo: 'QwenLM/hopcode',
       worktreePath: '.hopcode/tmp/review-pr-6766',
       files: [{ path: 'a.ts', kind: 'source', removedLines: 0, heavy: false }],
       chunks: [
@@ -979,7 +979,7 @@ describe('the roster — who should have been here', () => {
       files: [{ path: 'a.ts', kind: 'source', removedLines: 0 }],
       chunks: [{ id: 1 }],
       prNumber: '6998',
-      ownerRepo: 'QwenLM/qwen-code',
+      ownerRepo: 'QwenLM/hopcode',
     } as RosterPlan);
     expect(withPr.map((r) => r.key)).toContain('0');
 

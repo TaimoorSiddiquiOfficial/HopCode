@@ -730,7 +730,7 @@ describe('transcript record provenance compaction', () => {
     }
     function withSources(event, sourceRecordIds) {
         const update = event.data.update;
-        update['_meta'] = { qwenTranscript: { sourceRecordIds } };
+        update['_meta'] = { hopcodetranscript: { sourceRecordIds } };
         return event;
     }
     it('merges text within one record but not across record boundaries', () => {
@@ -771,7 +771,7 @@ describe('transcript record provenance compaction', () => {
             .compactedTurns.find((event) => event.type === 'session_update' &&
             updateOf(event)['toolCallId'] === '__proto__');
         expect(updateOf(toolEvent)['_meta']).toMatchObject({
-            qwenTranscript: {
+            hopcodetranscript: {
                 sourceRecordIds: ['start-record', 'result-record'],
             },
         });

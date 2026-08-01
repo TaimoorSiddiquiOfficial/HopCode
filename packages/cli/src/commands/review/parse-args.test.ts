@@ -110,7 +110,7 @@ const CASES: Case[] = [
   },
   {
     name: 'PR URL → owner/repo/number extracted',
-    raw: 'https://github.com/QwenLM/qwen-code/pull/6711',
+    raw: 'https://github.com/QwenLM/hopcode/pull/6711',
     expect: { targetType: 'pr-url', effort: 'high', warningCount: 0 },
   },
   {
@@ -222,19 +222,19 @@ const CASES: Case[] = [
   },
   {
     name: 'numeric-prefix junk after /pull/ is not a PR URL (bug: /pull/42oops read as PR 42)',
-    raw: 'https://github.com/QwenLM/qwen-code/pull/42oops',
+    raw: 'https://github.com/QwenLM/hopcode/pull/42oops',
     expect: {
       targetType: 'local',
-      extraTokens: ['https://github.com/QwenLM/qwen-code/pull/42oops'],
+      extraTokens: ['https://github.com/QwenLM/hopcode/pull/42oops'],
       warningCount: 1,
     },
   },
   {
     name: 'shell metacharacters in owner never reach the verdict',
-    raw: '"https://github.com/$(rm -rf x)/qwen-code/pull/42"',
+    raw: '"https://github.com/$(rm -rf x)/hopcode/pull/42"',
     expect: {
       targetType: 'local',
-      extraTokens: ['https://github.com/$(rm -rf x)/qwen-code/pull/42'],
+      extraTokens: ['https://github.com/$(rm -rf x)/hopcode/pull/42'],
       warningCount: 1,
     },
   },
@@ -254,27 +254,27 @@ describe('parseReviewArgs', () => {
   });
 
   it('extracts host/owner/repo/number from a PR URL', () => {
-    const got = parseReviewArgs('https://github.com/QwenLM/qwen-code/pull/42');
+    const got = parseReviewArgs('https://github.com/QwenLM/hopcode/pull/42');
     expect(got.target).toEqual({
       type: 'pr-url',
-      url: 'https://github.com/QwenLM/qwen-code/pull/42',
+      url: 'https://github.com/QwenLM/hopcode/pull/42',
       host: 'github.com',
       owner: 'QwenLM',
-      repo: 'qwen-code',
+      repo: 'hopcode',
       number: 42,
     });
   });
 
   it('canonicalizes an uppercase scheme/host and drops query and fragment', () => {
     const got = parseReviewArgs(
-      'HTTPS://GitHub.com/QwenLM/qwen-code/pull/42?diff=split#discussion',
+      'HTTPS://GitHub.com/QwenLM/hopcode/pull/42?diff=split#discussion',
     );
     expect(got.target).toEqual({
       type: 'pr-url',
-      url: 'https://github.com/QwenLM/qwen-code/pull/42',
+      url: 'https://github.com/QwenLM/hopcode/pull/42',
       host: 'github.com',
       owner: 'QwenLM',
-      repo: 'qwen-code',
+      repo: 'hopcode',
       number: 42,
     });
     expect(got.warnings).toHaveLength(0);
@@ -282,18 +282,18 @@ describe('parseReviewArgs', () => {
 
   it('a trailing path segment after the number stays a valid URL boundary', () => {
     const got = parseReviewArgs(
-      'https://github.com/QwenLM/qwen-code/pull/42/files',
+      'https://github.com/QwenLM/hopcode/pull/42/files',
     );
     expect(got.target).toMatchObject({ type: 'pr-url', number: 42 });
   });
 
   it('refuses a junk PR URL instead of guessing (never a file path, never PR 42)', () => {
     const got = parseReviewArgs(
-      'https://github.com/QwenLM/qwen-code/pull/42oops',
+      'https://github.com/QwenLM/hopcode/pull/42oops',
     );
     expect(got.target).toEqual({ type: 'local' });
     expect(got.extraTokens).toEqual([
-      'https://github.com/QwenLM/qwen-code/pull/42oops',
+      'https://github.com/QwenLM/hopcode/pull/42oops',
     ]);
     expect(got.warnings[0]).toContain('not a GitHub PR URL');
   });

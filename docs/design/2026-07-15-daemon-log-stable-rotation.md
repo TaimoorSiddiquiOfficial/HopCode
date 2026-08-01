@@ -126,7 +126,7 @@ An internal close before handle publication drains daemon resources without wait
 
 Each runtime Express app owns a constant-space token bucket with burst 60 and refill 2 records/second, measured with a monotonic clock. Clock retreat never moves the refill baseline backward. Health, heartbeat, and successful SSE exclusions are unchanged.
 
-Route, session ID, and the first raw `x-qwen-client-id` occurrence are capped at 2 KiB, 256 bytes, and 256 bytes on UTF-8 boundaries. Truncated values carry an original-byte-count context field. Using the first raw header avoids merged duplicate headers becoming a new cardinality source.
+Route, session ID, and the first raw `x-hopcode-client-id` occurrence are capped at 2 KiB, 256 bytes, and 256 bytes on UTF-8 boundaries. Truncated values carry an original-byte-count context field. Using the first raw header avoids merged duplicate headers becoming a new cardinality source.
 
 When no token is available, only five fixed counters are retained: 2xx, 3xx, 4xx, 5xx, and other. On recovery a WARN `access logs suppressed` summary consumes the next token before any individual record. If that was the only token, the current request joins the next summary. Shutdown seals the controller after normal listener drain or the secondary deadline, emits a final summary, ignores late finish callbacks, and then records `daemon stopped`.
 

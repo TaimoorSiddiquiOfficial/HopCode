@@ -227,7 +227,7 @@ export function createDaemonWorkspaceService(
 
 ```ts
 export interface WorkspaceRequestContext {
-  originatorClientId?: string; // X-Qwen-Client-Id header（只读操作可缺失）
+  originatorClientId?: string; // X-hopcode-client-id header（只读操作可缺失）
   sessionId?: string; // audit 关联（如从 session context 内发起的操作）
   route: string; // audit trail（如 "POST /file/write"）
   workspaceCwd: string; // trust boundary root

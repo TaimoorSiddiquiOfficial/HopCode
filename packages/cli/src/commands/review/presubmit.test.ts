@@ -327,10 +327,10 @@ vi.mock('../../utils/stdioHelpers.js', () => ({
 describe('presubmitCommand', () => {
   const baseArgs = {
     _: [],
-    $0: 'qwen',
+    $0: 'hopcode',
     pr_number: '6387',
     commit_sha: 'abc123',
-    owner_repo: 'QwenLM/qwen-code',
+    owner_repo: 'QwenLM/hopcode',
     out_path: '/tmp/presubmit.json',
   };
 
@@ -385,7 +385,7 @@ describe('presubmitCommand', () => {
     expect(result.downgradeReasons.join(' ')).toContain('CI did not run');
   });
 
-  it('ignores the running Qwen PR review check when deciding whether CI is still pending', async () => {
+  it('ignores the running hopcode PR review check when deciding whether CI is still pending', async () => {
     ghApiAllNestedMock.mockImplementation((path: string) =>
       path.endsWith('/check-runs')
         ? [
@@ -399,7 +399,7 @@ describe('presubmitCommand', () => {
               status: 'in_progress',
               conclusion: null,
               details_url:
-                'https://github.com/QwenLM/qwen-code/actions/runs/28788268483/job/85362025778',
+                'https://github.com/QwenLM/hopcode/actions/runs/28788268483/job/85362025778',
             },
           ]
         : [],

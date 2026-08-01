@@ -304,7 +304,7 @@ describe('ReadFileTool', () => {
       expect(permission).toBe('allow');
     });
 
-    it('should return allow for paths within the global qwen temp directory', async () => {
+    it('should return allow for paths within the global hopcode temp directory', async () => {
       const params: ReadFileToolParams = {
         file_path: path.join(Storage.getGlobalTempDir(), 'temp-file.txt'),
       };

@@ -87,7 +87,7 @@ describe('skipHeadlessLoopSentinel', () => {
         expect(scheduler.sessionSize).toBe(1);
     });
     it('does not delete a durable sentinel job (it persists for a future session)', () => {
-        // Durable jobs live under ~/.qwen and never count toward sessionSize, so
+        // Durable jobs live under ~/ .hopcode and never count toward sessionSize, so
         // they don't pin the run; deleting one would wrongly remove it from disk.
         const scheduler = new CronScheduler();
         const job = scheduler.create('*/5 * * * *', LOOP_SENTINEL_CRON, true);

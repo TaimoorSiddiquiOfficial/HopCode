@@ -3348,7 +3348,7 @@ describe('Server Config (config.ts)', () => {
   });
 
   describe('model switching with different credentials (OpenAI)', () => {
-    it('returns undefined for bare Qwen OAuth fast models under active OpenAI auth', async () => {
+    it('returns undefined for bare hopcode OAuth fast models under active OpenAI auth', async () => {
       const config = new Config({
         ...baseParams,
         authType: AuthType.USE_OPENAI,
@@ -3718,7 +3718,7 @@ describe('Server Config (config.ts)', () => {
     const config = new Config({ ...baseParams, enableTeamMemory: true });
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
     vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-      memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+      memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
       fileCount: 1,
       ruleCount: 0,
       conditionalRules: [],
@@ -3751,7 +3751,7 @@ describe('Server Config (config.ts)', () => {
       });
       vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
       vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-        memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+        memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
         fileCount: 1,
         ruleCount: 0,
         conditionalRules: [],
@@ -3796,7 +3796,7 @@ describe('Server Config (config.ts)', () => {
       });
       vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
       vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-        memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+        memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
         fileCount: 1,
         ruleCount: 0,
         conditionalRules: [],
@@ -3841,7 +3841,7 @@ describe('Server Config (config.ts)', () => {
       });
       vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
       vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-        memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+        memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
         fileCount: 1,
         ruleCount: 0,
         conditionalRules: [],
@@ -3868,7 +3868,7 @@ describe('Server Config (config.ts)', () => {
     const config = new Config({ ...baseParams, enableTeamMemory: true });
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
     vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-      memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+      memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
       fileCount: 1,
       ruleCount: 0,
       conditionalRules: [],
@@ -4393,7 +4393,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     vi.mocked(loadServerHierarchicalMemory).mockResolvedValue({
-      memoryContent: '--- Context from: QWEN.md ---\nProject rules',
+      memoryContent: '--- Context from: HOPCODE.md ---\nProject rules',
       fileCount: 1,
       ruleCount: 0,
       conditionalRules: [],

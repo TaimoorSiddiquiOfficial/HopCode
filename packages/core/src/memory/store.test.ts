@@ -159,7 +159,7 @@ describe('auto-memory storage scaffold', () => {
     expect(getAutoMemoryRoot(worktree)).not.toBe(getAutoMemoryRoot(main));
   });
 
-  it('uses QWEN_RUNTIME_DIR for managed auto-memory', () => {
+  it('uses hopcode_runtime_dir for managed auto-memory', () => {
     delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     const envRuntimeDir = path.join(tempDir, 'env-runtime-output');
     process.env['HOPCODE_RUNTIME_DIR'] = envRuntimeDir;

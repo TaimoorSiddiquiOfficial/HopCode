@@ -407,7 +407,7 @@ function detectBackgroundEvents(
   const events: AgentEvent[] = [];
 
   // Background Task detection — Task/Agent tool with agentId in result.
-  // Qwen Agent calls default to background unless they explicitly opt out or
+  // hopcode agent calls default to background unless they explicitly opt out or
   // use a launch shape that stays foreground. Task keeps its provider-specific
   // explicit opt-in behavior.
   //
@@ -421,10 +421,10 @@ function detectBackgroundEvents(
   // If the routing rule changes in core, update all three. This copy does not
   // have the web-shell's `rawOutput.status === 'background'` fallback.
   const normalizedToolName = entry.name.toLowerCase();
-  const isTopLevelQwenAgent =
+  const isTopLevelhopcodeagent =
     normalizedToolName === 'agent' && parentToolUseId === undefined;
   const defaultsToBackground =
-    isTopLevelQwenAgent &&
+    isTopLevelhopcodeagent &&
     entry.input.run_in_background === undefined &&
     entry.input.working_dir === undefined &&
     entry.input.name === undefined &&
@@ -435,7 +435,7 @@ function detectBackgroundEvents(
       entry.input.subagent_type.toLowerCase() !== 'fork');
   const wasRunInBackground =
     (entry.input.run_in_background === true &&
-      (normalizedToolName !== 'agent' || isTopLevelQwenAgent)) ||
+      (normalizedToolName !== 'agent' || isTopLevelhopcodeagent)) ||
     defaultsToBackground;
   if (isParentTaskTool(entry.name) && wasRunInBackground && !isError && resultStr) {
     const agentIdMatch = resultStr.match(/agentId:\s*([a-zA-Z0-9_-]+)/);

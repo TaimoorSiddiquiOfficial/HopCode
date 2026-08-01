@@ -7,7 +7,7 @@
  * - Primary catalog: `group:<id>`, `recent`, `color:<name>`
  * - Workspace-scoped: `ws:<workspaceId>|group:<id>`, `ws:<workspaceId>|ungrouped`
  */
-export declare const COLLAPSED_SESSION_SECTIONS_STORAGE_KEY = "qwen-code-web-shell-collapsed-session-groups";
+export declare const COLLAPSED_SESSION_SECTIONS_STORAGE_KEY = "hopcode-web-shell-collapsed-session-groups";
 export declare function isPrimaryCollapsedSectionId(id: string): boolean;
 export declare function workspaceGroupSectionId(workspaceId: string, groupId: string): string;
 export declare function workspaceUngroupedSectionId(workspaceId: string): string;

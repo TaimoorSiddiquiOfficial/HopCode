@@ -28,7 +28,7 @@ export const SERVER_BUILD_ERRORS = {
 } as const;
 
 /**
- * MCP server configuration used by Qwen and the source pool.
+ * MCP server configuration used by hopcode and the source pool.
  * Supports HTTP/SSE (remote) and stdio (local subprocess) transports.
  */
 export type McpServerConfig =

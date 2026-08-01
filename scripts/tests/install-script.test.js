@@ -1758,7 +1758,7 @@ describe('standalone release packaging', () => {
         existsSync(path.join(extractDir, 'hopcode', 'node', 'node.exe')),
       ).toBe(true);
       const shim = readScript(
-        path.join(extractDir, 'qwen-code', 'bin', 'qwen.cmd'),
+        path.join(extractDir, 'hopcode', 'bin', 'qwen.cmd'),
       );
       expect(shim).toContain(
         'set "HOPCODE_CODE_LAUNCHER_PATH=%ROOT%\\bin\\hopcode.cmd"',
@@ -1802,16 +1802,16 @@ describe('standalone release packaging', () => {
 
       const extractDir = path.join(tmpDir, 'extract');
       mkdirSync(extractDir, { recursive: true });
-      extractZipForTest(path.join(outDir, 'qwen-code-win-x64.zip'), extractDir);
+      extractZipForTest(path.join(outDir, 'hopcode-win-x64.zip'), extractDir);
 
       expect(
-        existsSync(path.join(extractDir, 'qwen-code', 'lib', 'cli-entry.js')),
+        existsSync(path.join(extractDir, 'hopcode', 'lib', 'cli-entry.js')),
       ).toBe(true);
       expect(
-        existsSync(path.join(extractDir, 'qwen-code', 'lib', 'postinstall.js')),
+        existsSync(path.join(extractDir, 'hopcode', 'lib', 'postinstall.js')),
       ).toBe(false);
       expect(
-        existsSync(path.join(extractDir, 'qwen-code', 'lib', 'patches')),
+        existsSync(path.join(extractDir, 'hopcode', 'lib', 'patches')),
       ).toBe(false);
     } finally {
       rmSync(tmpDir, { recursive: true, force: true });
@@ -1928,10 +1928,10 @@ describe('standalone release packaging', () => {
         });
 
         expect(
-          existsSync(path.join(extractDir, 'qwen-code', 'lib', 'cli-entry.js')),
+          existsSync(path.join(extractDir, 'hopcode', 'lib', 'cli-entry.js')),
         ).toBe(true);
         const shim = readScript(
-          path.join(extractDir, 'qwen-code', 'bin', 'qwen'),
+          path.join(extractDir, 'hopcode', 'bin', 'hopcode'),
         );
         expect(shim).toContain(
           'HOPCODE_CODE_LAUNCHER_PATH="$ROOT/bin/hopcode" exec "$ROOT/node/bin/node" "$ROOT/lib/cli-entry.js" "$@"',
@@ -2019,7 +2019,7 @@ describe('standalone release packaging', () => {
 
       const clipboardScope = path.join(
         extractDir,
-        'qwen-code',
+        'hopcode',
         'lib',
         'node_modules',
         '@teddyzhu',
@@ -4536,7 +4536,7 @@ function packageFakeStandalone(
     args.push('--native-modules-dir', nativeModulesDir);
   }
   execFileSync('node', args, { stdio: 'pipe' });
-  return path.join(outDir, 'qwen-code-linux-x64.tar.gz');
+  return path.join(outDir, 'hopcode-linux-x64.tar.gz');
 }
 
 function createFakeClipboardModules(tmpDir, nativePackages) {

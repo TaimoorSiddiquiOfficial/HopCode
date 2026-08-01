@@ -18,7 +18,7 @@ One-shot structured output finalizes the recorder and waits up to two seconds fo
 
 ## Daemon protocol and durable live state
 
-The ACP child sends `qwen/notify/session/recording-degraded` with protocol version 1, the affected session ID, and `reason: "write_failed"`. The bridge validates the payload, publishes `session_recording_degraded`, and marks the live session entry as degraded. Notifications arriving before entry registration use the existing bounded early-event buffer; draining the buffer updates both the replay ring and entry state.
+The ACP child sends `hopcode/notify/session/recording-degraded` with protocol version 1, the affected session ID, and `reason: "write_failed"`. The bridge validates the payload, publishes `session_recording_degraded`, and marks the live session entry as degraded. Notifications arriving before entry registration use the existing bounded early-event buffer; draining the buffer updates both the replay ring and entry state.
 
 `session_snapshot.recordingDegraded` preserves the state after the live event leaves the replay ring. It is daemon-memory state only: a daemon restart creates a new recorder and begins healthy. The event is additive under `EVENT_SCHEMA_VERSION = 1`; no capability change is required.
 

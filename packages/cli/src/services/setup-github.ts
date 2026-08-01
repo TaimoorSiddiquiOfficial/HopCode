@@ -24,7 +24,7 @@ export const GITHUB_WORKFLOW_PATHS = [
   'qwen-assistant/qwen-invoke.yml',
   'issue-triage/hopcode-triage.yml',
   'issue-triage/qwen-scheduled-triage.yml',
-  'pr-review/qwen-review.yml',
+  'pr-review/hopcode-review.yml',
 ];
 
 const GITIGNORE_ENTRIES = ['.hopcode/', 'gha-creds-*.json'];

@@ -2,9 +2,9 @@ import { describe, expect, it } from 'bun:test';
 import { mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { QwenAgent } from '../qwen-agent.ts';
+import { hopcodeagent } from '../hopcode-agent.ts';
 
-type BackendConfig = ConstructorParameters<typeof QwenAgent>[0];
+type BackendConfig = ConstructorParameters<typeof hopcodeagent>[0];
 
 type QwenToolUpdateInternals = {
   handleToolCallUpdate: (update: Record<string, unknown>) => void;
@@ -13,13 +13,13 @@ type QwenToolUpdateInternals = {
   };
 };
 
-function createAgent(cwd: string): QwenAgent {
-  return new QwenAgent({
-    provider: 'qwen',
+function createAgent(cwd: string): hopcodeagent {
+  return new hopcodeagent({
+    provider: 'hopcode',
     workspace: {
       id: 'workspace-qwen',
-      name: 'Qwen Workspace',
-      slug: 'qwen-workspace',
+      name: 'hopcode.workspace',
+      slug: 'hopcode.workspace',
       rootPath: cwd,
       createdAt: Date.now(),
     },
@@ -35,7 +35,7 @@ function createAgent(cwd: string): QwenAgent {
   } as BackendConfig);
 }
 
-describe('QwenAgent tool_call_update handling', () => {
+describe('hopcodeagent tool_call_update handling', () => {
   it('ignores in_progress heartbeat frames and only emits tool_result on completion', async () => {
     const cwd = mkdtempSync(join(tmpdir(), 'hopcode-agent-tool-updates-'));
     const agent = createAgent(cwd);

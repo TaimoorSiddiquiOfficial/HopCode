@@ -57,7 +57,7 @@ const {
       workspaceCwd: '/tmp/project',
       capabilities: undefined as
         | {
-            qwenCodeVersion: string;
+            hopcodeversion: string;
             features: string[];
             workspaces: DaemonWorkspaceCapability[];
           }
@@ -66,7 +66,7 @@ const {
     workspace: {
       capabilities: undefined as
         | {
-            qwenCodeVersion: string;
+            hopcodeversion: string;
             features: string[];
             workspaces: DaemonWorkspaceCapability[];
           }
@@ -126,7 +126,7 @@ if (!Element.prototype.scrollIntoView) {
 }
 
 const capabilities = {
-  qwenCodeVersion: '1.2.3',
+  hopcodeversion: '1.2.3',
   features: [
     'multi_workspace_sessions',
     'workspace_runtime_removal',

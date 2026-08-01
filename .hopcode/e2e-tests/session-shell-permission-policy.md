@@ -24,7 +24,7 @@ an authenticated daemon.
 3. Start `hopcode serve --token <token> --enable-session-shell`.
    - `/capabilities.features` must include `session_shell_command`.
    - ACP initialize must advertise `_hopcode/session/shell`.
-   - REST shell without `X-Qwen-Client-Id` must return
+   - REST shell without `X-hopcode-client-id` must return
      `client_id_required`.
    - REST shell with the session-bound client id must execute and stream
      shell output through the session events.

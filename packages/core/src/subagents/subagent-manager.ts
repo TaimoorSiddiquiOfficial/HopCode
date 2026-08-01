@@ -1428,7 +1428,7 @@ function parseSubagentContent(
       | undefined;
     const colorRaw = frontmatter['color'];
     // CC silently drops colors outside the allowlist (_Y). Preserve the
-    // legacy qwen `auto` sentinel for backward compat with existing files.
+    // legacy hopcode `auto` sentinel for backward compat with existing files.
     const color =
       typeof colorRaw === 'string' && (isColor(colorRaw) || colorRaw === 'auto')
         ? colorRaw

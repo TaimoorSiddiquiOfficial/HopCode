@@ -50,7 +50,7 @@ function findGitRoot(startPath: string): string | null {
 /**
  * Returns the base directory for all auto-memory storage.
  * Defaults to the runtime output dir (`runtimeOutputDir`, `HOPCODE_RUNTIME_DIR`,
- * or the global qwen dir);
+ * or the global hopcode dir);
  * overridable via HOPCODE_CODE_MEMORY_BASE_DIR for tests.
  */
 export function getMemoryBaseDir(): string {

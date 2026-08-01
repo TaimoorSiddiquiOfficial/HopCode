@@ -19,7 +19,7 @@
 // to them would enable data exfiltration.
 
 export const PREAPPROVED_HOSTS: ReadonlySet<string> = new Set([
-  // Qwen ecosystem
+  // hopcode ecosystem
   'hoptrendy.github.io',
   'qwen.readthedocs.io',
   'github.com/QwenLM',

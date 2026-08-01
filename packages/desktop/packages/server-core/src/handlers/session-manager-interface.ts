@@ -185,7 +185,7 @@ export interface ISessionManager {
     ruleType: PermissionRuleType,
     rules: string[],
   ): Promise<HopCodePermissionSettings>
-  getSessionQwenCoreSettings(
+  getSessionhopcodecoreSettings(
     sessionId: string,
   ): Promise<HopCodeCoreSettingsSnapshot>
   listSessionHopCodeProviders(sessionId: string): Promise<HopCodeProviderCatalog>
@@ -193,31 +193,31 @@ export interface ISessionManager {
     sessionId: string,
     params: HopCodeProviderConnectParams,
   ): Promise<HopCodeProviderConnectResult>
-  setSessionQwenCoreSetting(
+  setSessionhopcodecoreSetting(
     sessionId: string,
     scope: HopCodeSettingsScope,
     key: HopCodeCoreSettingKey,
     value: HopCodeSettingValue,
   ): Promise<HopCodeCoreSettingsSnapshot>
-  setSessionQwenMcpServer(
+  setSessionhopcodemcpserver(
     sessionId: string,
     scope: HopCodeSettingsScope,
     name: string,
     server: HopCodeMcpServerConfig,
   ): Promise<HopCodeCoreSettingsSnapshot>
-  removeSessionQwenMcpServer(
+  removeSessionhopcodemcpserver(
     sessionId: string,
     scope: HopCodeSettingsScope,
     name: string,
   ): Promise<HopCodeCoreSettingsSnapshot>
-  setSessionQwenHook(
+  setSessionhopcodehook(
     sessionId: string,
     scope: HopCodeSettingsScope,
     event: HopCodeHookEvent,
     index: number | undefined,
     hook: HopCodeHookDefinition,
   ): Promise<HopCodeCoreSettingsSnapshot>
-  removeSessionQwenHook(
+  removeSessionhopcodehook(
     sessionId: string,
     scope: HopCodeSettingsScope,
     event: HopCodeHookEvent,
@@ -335,7 +335,7 @@ export interface ISessionManager {
     >
     error?: string
   }>
-  installQwenSkill(
+  installhopcodeskill(
     sessionId: string,
     skill: HopCodeSkillInstallRequest,
     options?: RefreshAvailableCommandsOptions,
@@ -349,7 +349,7 @@ export interface ISessionManager {
     >
     error?: string
   }>
-  deleteQwenSkill(
+  deletehopcodeskill(
     sessionId: string,
     skill: HopCodeSkillDeleteRequest,
     options?: RefreshAvailableCommandsOptions,
@@ -363,7 +363,7 @@ export interface ISessionManager {
     >
     error?: string
   }>
-  setQwenSkillEnabled(
+  sethopcodeskillEnabled(
     sessionId: string,
     skill: HopCodeSkillSetEnabledRequest,
     options?: RefreshAvailableCommandsOptions,

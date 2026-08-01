@@ -13,7 +13,7 @@ export interface ProviderMetadata {
 }
 
 /**
- * Metadata for the Qwen backend.
+ * Metadata for the hopcode backend.
  */
 const PROVIDER_METADATA: Record<string, ProviderMetadata> = {
   qwen: {

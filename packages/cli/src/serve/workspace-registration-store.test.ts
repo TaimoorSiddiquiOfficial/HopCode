@@ -19,7 +19,7 @@ import {
 const cleanup: string[] = [];
 
 async function tempHome(): Promise<string> {
-  const dir = await fs.mkdtemp(path.join(tmpdir(), 'qwen-workspace-store-'));
+  const dir = await fs.mkdtemp(path.join(tmpdir(), 'hopcode.workspace-store-'));
   cleanup.push(dir);
   return dir;
 }

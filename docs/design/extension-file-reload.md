@@ -6,7 +6,7 @@ Extension changes currently enter the runtime from two different directions.
 User-initiated UI mutations, such as enable, disable, install, uninstall, and
 update, already go through `ExtensionManager` and can refresh runtime state
 directly. Out-of-band filesystem changes, such as editing an installed
-extension's `skills/`, `commands/`, `hooks/`, or `qwen-extension.json`, are not
+extension's `skills/`, `commands/`, `hooks/`, or `hopcode-extension.json`, are not
 owned by a single UI action and therefore need a watcher-driven path.
 
 This design adds that missing watcher path while preserving the direct mutation
@@ -141,8 +141,8 @@ The classification is deliberately conservative.
 | `skills/**`                      | `auto`  | Skill cache and slash command loaders can rebuild without changing package identity.             |
 | `agents/**`                      | `auto`  | Subagent cache can rebuild without changing package identity.                                    |
 | `hooks/**`                       | `stale` | Hook execution behavior should be reloaded from a coherent package snapshot.                     |
-| `qwen-extension.json`            | `stale` | Manifest can change commands, skills, agents, hooks, MCP, LSP, context file names, and metadata. |
-| `.qwen-extension-install.json`   | `stale` | Install metadata affects linked source roots and package identity.                               |
+| `hopcode-extension.json`            | `stale` | Manifest can change commands, skills, agents, hooks, MCP, LSP, context file names, and metadata. |
+| `.hopcode-extension-install.json`   | `stale` | Install metadata affects linked source roots and package identity.                               |
 | configured context files         | `stale` | Model context can change and should be reloaded explicitly.                                      |
 | extension directory add/remove   | `stale` | Installed extension topology changed.                                                            |
 | top-level extension config files | `stale` | Enablement, preferences, or marketplaces changed outside UI mutation path.                       |
@@ -428,7 +428,7 @@ edit extension commands/skills/agents file
 ### Package-Level File Edit
 
 ```text
-edit qwen-extension.json/hooks/context/install metadata/topology
+edit hopcode-extension.json/hooks/context/install metadata/topology
   -> ExtensionFileWatcher classifies as stale
   -> ExtensionRefreshState.markExtensionsChanged()
   -> useSlashCommandProcessor prints:
@@ -571,7 +571,7 @@ Manual verification should cover:
    completion updates automatically.
 5. Edit an agent file under `agents/` and confirm agent cache behavior reflects
    the change.
-6. Edit `hooks/hooks.json`, `qwen-extension.json`, install metadata, context
+6. Edit `hooks/hooks.json`, `hopcode-extension.json`, install metadata, context
    files, or extension directory topology and confirm the UI asks for
    `/reload-plugins`.
 7. Run `/reload-plugins` and confirm the summary reports extensions, commands,

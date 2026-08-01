@@ -108,7 +108,7 @@ function permissionRequestToEvent(
 ): DaemonEvent | undefined {
   const params = isRecord(msg['params']) ? msg['params'] : {};
   const meta = isRecord(params['_meta']) ? params['_meta'] : undefined;
-  const qwenMeta = meta && isRecord(meta['qwen']) ? meta['qwen'] : undefined;
+  const qwenMeta = meta && isRecord(meta['hopcode']) ? meta['hopcode'] : undefined;
   const requestId =
     qwenMeta && typeof qwenMeta['requestId'] === 'string'
       ? qwenMeta['requestId']

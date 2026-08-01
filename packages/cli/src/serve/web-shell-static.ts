@@ -114,7 +114,7 @@ function createSendIndex(
     // through a dotfile directory (e.g. ~/.nvm/.../web-shell/index.html).
     // The `send` library defaults to 'ignore' which returns a 404 for any
     // path containing a segment starting with '.', breaking users who
-    // installed qwen via nvm.
+    // installed hopcode via nvm.
     res.sendFile(
       indexPath,
       { cacheControl: false, dotfiles: 'allow' },

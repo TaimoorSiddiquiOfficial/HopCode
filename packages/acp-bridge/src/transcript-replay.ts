@@ -166,7 +166,7 @@ function buildUpdateMeta(
 ): Record<string, unknown> | undefined {
   const timestamp = toTranscriptEpochMs(options.timestamp);
   const sourceRecordIds = dedupeStrings(options.sourceRecordIds ?? []);
-  const qwenTranscript = {
+  const hopcodetranscript = {
     ...(sourceRecordIds.length > 0 ? { sourceRecordIds } : {}),
     ...(options.planToolCallId
       ? { planToolCallId: options.planToolCallId }
@@ -175,7 +175,7 @@ function buildUpdateMeta(
   const meta: Record<string, unknown> = {
     ...(options.extra ?? {}),
     ...(timestamp !== undefined ? { timestamp } : {}),
-    ...(Object.keys(qwenTranscript).length > 0 ? { qwenTranscript } : {}),
+    ...(Object.keys(hopcodetranscript).length > 0 ? { hopcodetranscript } : {}),
   };
   return Object.keys(meta).length > 0 ? meta : undefined;
 }
@@ -595,7 +595,7 @@ class DefaultTranscriptReplayMachine implements TranscriptReplayMachine {
             ? functionCall['id']
             : undefined;
         const callId = this.allocateToolCallId(
-          explicitId ?? `qwen-replay-tool:${record.uuid}:${partIndex}`,
+          explicitId ?? `hopcode-replay-tool:${record.uuid}:${partIndex}`,
         );
         const update = createTranscriptToolCallStartUpdate({
           toolName,
@@ -759,7 +759,7 @@ class DefaultTranscriptReplayMachine implements TranscriptReplayMachine {
       'A tool result could not be matched to exactly one pending tool call.',
       recordId,
     );
-    return this.allocateToolCallId(`qwen-replay-tool:${recordId}:result`);
+    return this.allocateToolCallId(`hopcode-replay-tool:${recordId}:result`);
   }
 
   private allocateToolCallId(candidate: string, reuse = false): string {

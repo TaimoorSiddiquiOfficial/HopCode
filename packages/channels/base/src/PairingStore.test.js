@@ -5,29 +5,29 @@ import * as path from 'node:path';
 import { PairingStore } from './PairingStore.js';
 import { getWorkspaceScopeDirName } from './paths.js';
 describe('PairingStore workspace scoping (#7017)', () => {
-    let qwenHome;
+    let hopcodeHome;
     let workspaceA;
     let workspaceB;
-    let prevQwenHome;
+    let prevhopcodeHome;
     beforeEach(() => {
-        qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'pairing-home-'));
+        hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'pairing-home-'));
         workspaceA = fs.mkdtempSync(path.join(os.tmpdir(), 'pairing-ws-a-'));
         workspaceB = fs.mkdtempSync(path.join(os.tmpdir(), 'pairing-ws-b-'));
-        prevQwenHome = process.env['QWEN_HOME'];
-        process.env['QWEN_HOME'] = qwenHome;
+        prevhopcodeHome = process.env['hopcode_home'];
+        process.env['hopcode_home'] = hopcodeHome;
     });
     afterEach(() => {
-        if (prevQwenHome === undefined) {
-            delete process.env['QWEN_HOME'];
+        if (prevhopcodeHome === undefined) {
+            delete process.env['hopcode_home'];
         }
         else {
-            process.env['QWEN_HOME'] = prevQwenHome;
+            process.env['hopcode_home'] = prevhopcodeHome;
         }
-        for (const dir of [qwenHome, workspaceA, workspaceB]) {
+        for (const dir of [hopcodeHome, workspaceA, workspaceB]) {
             fs.rmSync(dir, { recursive: true, force: true });
         }
     });
-    const channelsRoot = () => path.join(qwenHome, 'channels');
+    const channelsRoot = () => path.join(hopcodeHome, 'channels');
     it('isolates pending requests between workspaces using the same channel name', () => {
         const storeA = new PairingStore('support-bot', workspaceA);
         const storeB = new PairingStore('support-bot', workspaceB);

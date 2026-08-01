@@ -75,7 +75,7 @@ export class BridgeChannelClosedError extends Error {
 }
 
 /**
- * Raised by `defaultSpawnChannelFactory` when neither `QWEN_CLI_ENTRY` nor
+ * Raised by `defaultSpawnChannelFactory` when neither `hopcode_cli_entry` nor
  * `process.argv[1]` resolves to a path that can be re-spawned for the ACP
  * child. Replaces a generic `new Error(...)` so `mapDomainErrorToErrorKind`
  * can return `'missing_binary'` via `instanceof` rather than regex-matching
@@ -86,35 +86,35 @@ export class MissingCliEntryError extends Error {
   constructor() {
     super(
       'Cannot determine CLI entry path for spawning the ACP child: ' +
-        'process.argv[1] is empty and QWEN_CLI_ENTRY is unset. ' +
-        'Set QWEN_CLI_ENTRY to the absolute path of the qwen entry ' +
-        'script (e.g. `export QWEN_CLI_ENTRY=$(which qwen)`) to override.',
+        'process.argv[1] is empty and hopcode_cli_entry is unset. ' +
+        'Set hopcode_cli_entry to the absolute path of the hopcode entry ' +
+        'script (e.g. `export hopcode_cli_entry=$(which qwen)`) to override.',
     );
     this.name = 'MissingCliEntryError';
   }
 }
 
 export const SERVE_STATUS_EXT_METHODS = {
-  workspaceMcp: 'qwen/status/workspace/mcp',
-  workspaceMcpTools: 'qwen/status/workspace/mcp/tools',
-  workspaceMcpResources: 'qwen/status/workspace/mcp/resources',
-  workspaceSkills: 'qwen/status/workspace/skills',
-  workspaceTools: 'qwen/status/workspace/tools',
-  workspaceProviders: 'qwen/status/workspace/providers',
-  workspaceMemory: 'qwen/status/workspace/memory',
-  workspaceAgents: 'qwen/status/workspace/agents',
-  workspacePreflight: 'qwen/status/workspace/preflight',
-  sessionContext: 'qwen/status/session/context',
-  sessionContextUsage: 'qwen/status/session/context_usage',
-  sessionSupportedCommands: 'qwen/status/session/supported_commands',
-  sessionTasks: 'qwen/status/session/tasks',
-  sessionStats: 'qwen/status/session/stats',
-  sessionLspStatus: 'qwen/status/session/lsp',
-  sessionTranscript: 'qwen/status/session/transcript',
-  sessionRewindSnapshots: 'qwen/status/session/rewind_snapshots',
-  workspaceHooks: 'qwen/status/workspace/hooks',
-  sessionHooks: 'qwen/status/session/hooks',
-  workspaceExtensions: 'qwen/status/workspace/extensions',
+  workspaceMcp: 'hopcode.status/workspace/mcp',
+  workspaceMcpTools: 'hopcode.status/workspace/mcp/tools',
+  workspaceMcpResources: 'hopcode.status/workspace/mcp/resources',
+  workspaceSkills: 'hopcode.status/workspace/skills',
+  workspaceTools: 'hopcode.status/workspace/tools',
+  workspaceProviders: 'hopcode.status/workspace/providers',
+  workspaceMemory: 'hopcode.status/workspace/memory',
+  workspaceAgents: 'hopcode.status/workspace/agents',
+  workspacePreflight: 'hopcode.status/workspace/preflight',
+  sessionContext: 'hopcode.status/session/context',
+  sessionContextUsage: 'hopcode.status/session/context_usage',
+  sessionSupportedCommands: 'hopcode.status/session/supported_commands',
+  sessionTasks: 'hopcode.status/session/tasks',
+  sessionStats: 'hopcode.status/session/stats',
+  sessionLspStatus: 'hopcode.status/session/lsp',
+  sessionTranscript: 'hopcode.status/session/transcript',
+  sessionRewindSnapshots: 'hopcode.status/session/rewind_snapshots',
+  workspaceHooks: 'hopcode.status/workspace/hooks',
+  sessionHooks: 'hopcode.status/session/hooks',
+  workspaceExtensions: 'hopcode.status/workspace/extensions',
   // Process-wide rss/cpu of this ACP child, self-reported to the daemon for
   // the Daemon Status resource charts (workspace-scoped; no sessionId).
   workspaceResource: 'hopcode/status/workspace/resource',
@@ -262,7 +262,7 @@ export interface ServeWorkspaceMcpServerStatus extends ServeStatusCell {
    * resource-browser affordance without a separate fetch. Absent on
    * older daemons; present (including `0`) on newer daemons for
    * non-disabled servers. The full list is fetched lazily via
-   * `qwen/status/workspace/mcp/resources`.
+   * `hopcode.status/workspace/mcp/resources`.
    */
   resourceCount?: number;
   /**
@@ -759,7 +759,7 @@ export interface ServeWorkspaceMemoryFile {
   path: string;
   /**
    * 'workspace' for files under the bound workspace tree, 'global' for
-   * `~/.hopcode/QWEN.md` style entries. Helps adapters render scope chips.
+   * `~/.hopcode/HOPCODE.md` style entries. Helps adapters render scope chips.
    */
   scope: ServeContextFileScope;
   /** Size in bytes of the file's serialized contents on disk. */
@@ -774,7 +774,7 @@ export interface ServeWorkspaceMemoryStatus {
   /** Total bytes across all hierarchical files (sum of `files[].bytes`). */
   totalBytes: number;
   /**
-   * Number of merged QWEN.md / AGENTS.md files the loader pulled in.
+   * Number of merged HOPCODE.md / AGENTS.md files the loader pulled in.
    * Mirrors `LoadServerHierarchicalMemoryResponse.fileCount`.
    */
   fileCount: number;
@@ -974,7 +974,7 @@ export const IDLE_HOOK_EVENTS: Record<HookEventName, ServeHookEventMeta> = {
   MessageDisplay: {
     description: 'Repeatedly, as the assistant reply streams',
   },
-  Stop: { description: 'Right before Qwen Code concludes its response' },
+  Stop: { description: 'Right before HopCode concludes its response' },
   SubagentStart: {
     description: 'When a subagent is started',
     matcherKind: 'agentType',

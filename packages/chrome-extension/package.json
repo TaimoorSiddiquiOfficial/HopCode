@@ -5,12 +5,12 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/QwenLM/qwen-code.git",
+    "url": "https://github.com/QwenLM/hopcode.git",
     "directory": "packages/chrome-extension"
   },
   "keywords": [
     "chrome-extension",
-    "qwen",
+    "hopcode",
     "cli",
     "bridge",
     "mcp",

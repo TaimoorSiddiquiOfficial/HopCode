@@ -201,7 +201,7 @@ jobs:
 
   authorize:
     needs: ['precheck-pr']
-    # Single source of truth for "may this trigger spend Qwen command compute".
+    # Single source of truth for "may this trigger spend hopcode command compute".
     # Automatic PR events are allowed after the fork PR precheck above (or for
     # same-repo PRs). Manual command events and review_requested are still
     # gated on the actor/requester having write+ permission.
@@ -499,20 +499,20 @@ jobs:
 
           REPO="${GITHUB_REPOSITORY}"
           REVIEW_URL="${GITHUB_SERVER_URL}/${REPO}/pull/${PR_NUMBER}"
-          LOG_PATH="${RUNNER_TEMP:-/tmp}/qwen-review-pr-${PR_NUMBER}.jsonl"
+          LOG_PATH="${RUNNER_TEMP:-/tmp}/hopcode-review-pr-${PR_NUMBER}.jsonl"
           trap 'rm -f "$LOG_PATH"' EXIT
 
           if [ -z "${GH_TOKEN:-}" ]; then
-            fail "CI_BOT_PAT secret is required for Qwen PR review."
+            fail "CI_BOT_PAT secret is required for hopcode PR review."
           fi
           if [ -z "${OPENAI_API_KEY:-}" ]; then
-            fail "REVIEW_OPENAI_API_KEY secret is required for Qwen PR review."
+            fail "REVIEW_OPENAI_API_KEY secret is required for hopcode PR review."
           fi
           if [ -z "${OPENAI_BASE_URL:-}" ]; then
-            fail "REVIEW_OPENAI_BASE_URL secret is required for Qwen PR review."
+            fail "REVIEW_OPENAI_BASE_URL secret is required for hopcode PR review."
           fi
           if ! command -v hopcode >/dev/null 2>&1; then
-            fail "qwen CLI is required on the review runner."
+            fail "hopcode CLI is required on the review runner."
           fi
 
           # shellcheck disable=SC2016
@@ -528,9 +528,9 @@ jobs:
             export NO_PROXY="${NO_PROXY:+$NO_PROXY,}${openai_host}"
             export no_proxy="${no_proxy:+$no_proxy,}${openai_host}"
 
-            # qwen currently reads HTTP(S)_PROXY directly and does not apply
+            # hopcode currently reads HTTP(S)_PROXY directly and does not apply
             # NO_PROXY when constructing its proxy agent. Clear proxy env for
-            # qwen itself, while restoring it for child gh/git commands.
+            # hopcode itself, while restoring it for child gh/git commands.
             export HOPCODE_CI_HTTPS_PROXY="${HTTPS_PROXY:-}"
             export HOPCODE_CI_https_proxy="${https_proxy:-}"
             export HOPCODE_CI_HTTP_PROXY="${HTTP_PROXY:-}"
@@ -723,7 +723,7 @@ jobs:
           QWEN_TIMEOUT="$TIMEOUT_MINUTES"
           set +e
           # GNU timeout times out command children unless --foreground is used.
-          timeout --kill-after=10s "${QWEN_TIMEOUT}m" qwen \
+          timeout --kill-after=10s "${QWEN_TIMEOUT}m" hopcode \
             --auth-type openai \
             --approval-mode yolo \
             "${MODEL_ARGS[@]}" \
@@ -736,7 +736,7 @@ jobs:
           tee_status="${pipeline_status[1]}"
 
           if [ "$tee_status" -ne 0 ]; then
-            fail "Failed to write qwen review log."
+            fail "Failed to write hopcode review log."
           fi
           # GNU timeout may report 137 if --kill-after escalates to SIGKILL.
           if [ "$qwen_status" -eq 124 ] || [ "$qwen_status" -eq 137 ]; then
@@ -750,7 +750,7 @@ jobs:
             fail "Qwen review completed but produced no output."
           fi
 
-          # qwen can exit 0 even when the run aborted mid-review (e.g. the model
+          # hopcode can exit 0 even when the run aborted mid-review (e.g. the model
           # connection dropped before the review was posted). In that case the
           # final stream-json `result` event still renders the error inline and
           # carries subtype=success / is_error=false, so the checks above all
@@ -1037,7 +1037,7 @@ jobs:
       - name: 'Resolve conflicts'
         if: "steps.prepare.outputs.decision == 'run'"
         id: 'resolve_conflicts'
-        uses: 'QwenLM/qwen-code-action@6d08e91aa807257b9c8af60edb5bb6bb2d7d951f'
+        uses: 'QwenLM/hopcode-action@6d08e91aa807257b9c8af60edb5bb6bb2d7d951f'
         env:
           PR_NUMBER: '${{ steps.resolve.outputs.pr_number }}'
           BASE_REF: '${{ steps.prepare.outputs.base_ref }}'
@@ -1241,7 +1241,7 @@ jobs:
           set -euo pipefail
           {
             echo "<!-- hopcode-resolve-result -->"
-            echo "Qwen Code did not run conflict resolution for this request."
+            echo "HopCode did not run conflict resolution for this request."
             echo
             echo "${SKIP_REASON}"
           } > "${WORKDIR}/report.md"
@@ -1342,33 +1342,33 @@ jobs:
                 if [ "$push_failed" = "true" ]; then
                   case "$push_fail_reason" in
                     workflow_scope)
-                      echo "Qwen Code resolved the merge conflicts, but could not push to \`${HEAD_REPO}\`: resolving merges the base branch in, which includes its \`.github/workflows/**\` changes, and GitHub blocks a token without the **\`workflow\`** scope from updating workflow files. A maintainer needs to grant that scope to the push bot (classic PAT: check \`workflow\`; fine-grained PAT: Workflows → Read and write), then re-run /resolve. The resolved diff is attached as the \`qwen-resolve-pr-${PR_NUMBER}\` artifact on the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+                      echo "HopCode resolved the merge conflicts, but could not push to \`${HEAD_REPO}\`: resolving merges the base branch in, which includes its \`.github/workflows/**\` changes, and GitHub blocks a token without the **\`workflow\`** scope from updating workflow files. A maintainer needs to grant that scope to the push bot (classic PAT: check \`workflow\`; fine-grained PAT: Workflows → Read and write), then re-run /resolve. The resolved diff is attached as the \`qwen-resolve-pr-${PR_NUMBER}\` artifact on the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
                       ;;
                     permission)
-                      echo "Qwen Code resolved the merge conflicts, but could not push to \`${HEAD_REPO}\`. For a fork PR this needs **Allow edits by maintainers** enabled, and GitHub blocks maintainer edits on forks owned by an organization. The resolved diff is attached as the \`qwen-resolve-pr-${PR_NUMBER}\` artifact on the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+                      echo "HopCode resolved the merge conflicts, but could not push to \`${HEAD_REPO}\`. For a fork PR this needs **Allow edits by maintainers** enabled, and GitHub blocks maintainer edits on forks owned by an organization. The resolved diff is attached as the \`qwen-resolve-pr-${PR_NUMBER}\` artifact on the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
                       ;;
                     moved)
-                      echo "Qwen Code resolved the merge conflicts, but the head branch changed while resolving, so the update was not pushed. Re-run /resolve. The resolved diff is attached as the \`qwen-resolve-pr-${PR_NUMBER}\` artifact on the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+                      echo "HopCode resolved the merge conflicts, but the head branch changed while resolving, so the update was not pushed. Re-run /resolve. The resolved diff is attached as the \`qwen-resolve-pr-${PR_NUMBER}\` artifact on the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
                       ;;
                     *)
-                      echo "Qwen Code resolved the merge conflicts, but pushing to \`${HEAD_REPO}\` failed. The resolved diff is attached as the \`qwen-resolve-pr-${PR_NUMBER}\` artifact on the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+                      echo "HopCode resolved the merge conflicts, but pushing to \`${HEAD_REPO}\` failed. The resolved diff is attached as the \`qwen-resolve-pr-${PR_NUMBER}\` artifact on the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
                       ;;
                   esac
                 elif [ "$DRY_RUN" = "true" ]; then
-                  echo "Qwen Code resolved the merge conflicts in dry-run mode. No branch update was pushed."
+                  echo "HopCode resolved the merge conflicts in dry-run mode. No branch update was pushed."
                 else
-                  echo "Qwen Code resolved the merge conflicts and pushed the branch update."
+                  echo "HopCode resolved the merge conflicts and pushed the branch update."
                 fi
                 echo
                 append_safe_file "${WORKDIR}/address-summary.md"
                 ;;
               noop)
-                echo "Qwen Code checked this PR and did not push changes."
+                echo "HopCode checked this PR and did not push changes."
                 echo
                 append_safe_file "${WORKDIR}/no-action.md"
                 ;;
               *)
-                echo "Qwen Code attempted to resolve merge conflicts but the run did not complete successfully."
+                echo "HopCode attempted to resolve merge conflicts but the run did not complete successfully."
                 echo
                 for file in failure.md address-summary.md no-action.md; do
                   if [ -s "${WORKDIR}/${file}" ]; then

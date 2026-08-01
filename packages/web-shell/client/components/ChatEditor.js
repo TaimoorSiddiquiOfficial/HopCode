@@ -801,7 +801,7 @@ export const ChatEditor = memo(forwardRef(function ChatEditor(props, ref) {
     const modeLabel = getModeLabel(currentMode, t);
     const currentModelLabel = currentModel
         ? (availableModels.find((model) => model.id === currentModel)?.label ??
-            (currentModel.startsWith('qwen-route:')
+            (currentModel.startsWith('hopcode-route:')
                 ? ''
                 : getModelDisplayName(currentModel)))
         : '';

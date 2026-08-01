@@ -7,7 +7,7 @@ import { pathToFileURL } from 'url'
 const STORAGE_MODULE_PATH = pathToFileURL(join(import.meta.dir, '..', 'storage.ts')).href
 
 function setupConfigDir(iconUrl: string) {
-  const configDir = join(tmpdir(), `qwen-workspace-icon-${crypto.randomUUID()}`)
+  const configDir = join(tmpdir(), `hopcode.workspace-icon-${crypto.randomUUID()}`)
   const workspaceRoot = join(configDir, 'workspace')
   mkdirSync(workspaceRoot, { recursive: true })
   writeFileSync(join(workspaceRoot, 'icon.svg'), '<svg />', 'utf-8')

@@ -371,7 +371,7 @@ describe('BundledSkillLoader', () => {
     );
 
     // An argument-bearing invoke writes the args file; keep it in a throwaway
-    // cwd so the suite does not leave `.hopcode/tmp/qwen-skill-args-review.txt` in
+    // cwd so the suite does not leave `.hopcode/tmp/hopcode-skill-args-review.txt` in
     // the real repository.
     const argDir = mkdtempSync(join(tmpdir(), 'bundled-model-args-'));
     const argCwd = process.cwd();

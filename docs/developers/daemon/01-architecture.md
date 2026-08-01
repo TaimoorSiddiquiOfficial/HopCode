@@ -29,7 +29,7 @@ flowchart LR
     end
 
     subgraph child["ACP child process (hopcode --acp)"]
-        AGT["QwenAgent runtime"]
+        AGT["hopcodeagent runtime"]
         POOL["McpTransportPool<br/>(F2, core/src/tools)"]
         BDG["WorkspaceMcpBudget"]
     end

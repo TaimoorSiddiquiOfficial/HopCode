@@ -72,7 +72,7 @@ describe('workspace image path boundaries', () => {
   let outsideDir: string
 
   beforeEach(() => {
-    rootDir = mkdtempSync(join(tmpdir(), 'qwen-workspace-image-'))
+    rootDir = mkdtempSync(join(tmpdir(), 'hopcode.workspace-image-'))
     workspaceRoot = join(rootDir, 'workspace')
     outsideDir = join(rootDir, 'outside')
     mkdirSync(workspaceRoot)

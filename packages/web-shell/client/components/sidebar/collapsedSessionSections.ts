@@ -9,7 +9,7 @@
  */
 
 export const COLLAPSED_SESSION_SECTIONS_STORAGE_KEY =
-  'qwen-code-web-shell-collapsed-session-groups';
+  'hopcode-web-shell-collapsed-session-groups';
 
 const WORKSPACE_SECTION_PREFIX = 'ws:';
 

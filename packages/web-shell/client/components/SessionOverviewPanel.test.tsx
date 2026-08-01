@@ -250,7 +250,7 @@ describe('deriveSessionCards', () => {
       [session('s')],
       [
         statusSession('s', {
-          currentModelId: 'qwen-route:v1:abcdefghijklmnop',
+          currentModelId: 'hopcode-route:v1:abcdefghijklmnop',
         }),
       ],
       undefined,

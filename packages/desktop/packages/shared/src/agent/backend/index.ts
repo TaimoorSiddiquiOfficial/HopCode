@@ -1,7 +1,7 @@
 /**
  * Agent Backend Abstraction Layer
  *
- * This module provides the Qwen backend interface used by sessions.
+ * This module provides the hopcode backend interface used by sessions.
  *
  * Usage:
  * ```typescript

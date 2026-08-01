@@ -2956,19 +2956,19 @@ describe('SessionService', () => {
       realTmpDir = fs.mkdtempSync(
         realPath.join(realOs.tmpdir(), 'fork-session-'),
       );
-      originalhopcodeHome = process.env['QWEN_HOME'];
-      process.env['QWEN_HOME'] = realTmpDir;
-      process.env['QWEN_RUNTIME_DIR'] = realTmpDir;
+      originalhopcodeHome = process.env['hopcode_home'];
+      process.env['hopcode_home'] = realTmpDir;
+      process.env['hopcode_runtime_dir'] = realTmpDir;
       cwd = process.cwd();
       service = new SessionService(cwd);
     });
 
     afterEach(() => {
-      delete process.env['QWEN_RUNTIME_DIR'];
+      delete process.env['hopcode_runtime_dir'];
       if (originalhopcodeHome === undefined) {
-        delete process.env['QWEN_HOME'];
+        delete process.env['hopcode_home'];
       } else {
-        process.env['QWEN_HOME'] = originalhopcodeHome;
+        process.env['hopcode_home'] = originalhopcodeHome;
       }
       try {
         fs.rmSync(realTmpDir, { recursive: true, force: true });
@@ -3941,13 +3941,13 @@ describe('SessionService', () => {
       realTmpDir = fs.mkdtempSync(
         realPath.join(realOs.tmpdir(), 'parent-session-id-'),
       );
-      process.env['QWEN_RUNTIME_DIR'] = realTmpDir;
+      process.env['hopcode_runtime_dir'] = realTmpDir;
       cwd = process.cwd();
       service = new SessionService(cwd);
     });
 
     afterEach(() => {
-      delete process.env['QWEN_RUNTIME_DIR'];
+      delete process.env['hopcode_runtime_dir'];
       try {
         fs.rmSync(realTmpDir, { recursive: true, force: true });
       } catch {

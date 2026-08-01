@@ -79,7 +79,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // it to every shell subprocess, and a caller prefers it over a bare `hopcode`.
 //
 // Assignment, not `||=`: an inherited value is another session's CLI — an outer
-// qwen shelling out to this one — and honouring it re-creates the exact skew above,
+// hopcode shelling out to this one — and honouring it re-creates the exact skew above,
 // one level up. Each entry stamps itself, so nested sessions each call their own
 // build. Nothing downstream overwrites this: the spawn below runs dist/cli.js,
 // which never re-executes this wrapper, and the post-update relaunch re-enters
@@ -93,7 +93,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // nothing. Read before the spawn path deletes the variable below.
 // Captured AND deleted here, not just read: the serve/mcp fast path below never
 // reaches the spawn branch that used to delete it, so the hint leaked into every
-// child of a standalone daemon — and a child qwen from a DIFFERENT checkout
+// child of a standalone daemon — and a child hopcode from a DIFFERENT checkout
 // would read the outer shim and republish it as its own entry: the wrong build,
 // wearing this one's stamp.
 const standaloneShim = process.env['HOPCODE_CODE_LAUNCHER_PATH'];
@@ -138,7 +138,7 @@ if (isInProcessFastPath()) {
   const { spawnSync } = await import('node:child_process');
   const UPDATE_COMPLETE_EXIT_CODE = 44;
   const launcherNames =
-    process.platform === 'win32' ? ['qwen.cmd', 'qwen.exe', 'qwen'] : ['qwen'];
+    process.platform === 'win32' ? ['qwen.cmd', 'qwen.exe', 'hopcode'] : ['hopcode'];
   const entryPath = resolve(process.argv[1]);
   const entryRootLength = parse(entryPath).root.length;
   const launcherFromEnv = standaloneShim;
@@ -193,7 +193,7 @@ if (isInProcessFastPath()) {
   } else {
     if (!launcher) {
       process.stderr.write(
-        'Update installed. Restart Qwen Code to use the new version.\n',
+        'Update installed. Restart HopCode to use the new version.\n',
       );
       process.exit(0);
     }

@@ -60,8 +60,8 @@ import {
   type PrepareExtensionInstallOptions,
   type PreparedExtensionMutation,
   type SessionListItem,
-} from '@hopcode/qwen-code-core';
-import * as qwenCore from '@hopcode/qwen-code-core';
+} from '@hopcode/hopcode-core';
+import * as hopcodecore from '@hopcode/hopcode-core';
 import type { DaemonStatusProvider } from '@hopcode/acp-bridge';
 import {
   CancelSentinelCollisionError,
@@ -2813,7 +2813,7 @@ describe('createServeApp', () => {
     it('serves the shell when webShellDir is under a dotfile path (e.g. ~/.nvm)', async () => {
       // Regression: the send library defaults to dotfiles:'ignore', which
       // returns 404 for any path containing a segment starting with '.'.
-      // Users who installed qwen via nvm have the package under
+      // Users who installed hopcode via nvm have the package under
       // ~/.nvm/.../web-shell/index.html.
       const dotParent = await fsp.mkdtemp(path.join(os.tmpdir(), '.fake-nvm-'));
       const nestedShellDir = path.join(dotParent, 'web-shell');
@@ -3324,7 +3324,7 @@ describe('createServeApp', () => {
         const expectedWorkspaceCwd = await fsp.realpath(wsRoot);
         const bridge = fakeBridge();
         const invokeWorkspaceCommand = vi.fn(async () => {
-          throw new SessionNotFoundError('workspace-command:qwen/permissions');
+          throw new SessionNotFoundError('workspace-command:hopcode/permissions');
         });
         bridge.invokeWorkspaceCommand = invokeWorkspaceCommand;
         const app = createServeApp(
@@ -3352,7 +3352,7 @@ describe('createServeApp', () => {
         expect(write.status).toBe(409);
         expect(write.body.code).toBe('permission_session_required');
         expect(invokeWorkspaceCommand).toHaveBeenCalledWith(
-          'qwen/permissions/setRules',
+          'hopcode/permissions/setRules',
           {
             cwd: expectedWorkspaceCwd,
             scope: 'user',
@@ -4007,7 +4007,7 @@ describe('createServeApp', () => {
         vi
           .spyOn(ExtensionManager.prototype, 'prepareExtensionUpdate')
           .mockImplementation(async function ({ extension, signal }) {
-            const state = await qwenCore.checkForExtensionUpdate(
+            const state = await hopcodecore.checkForExtensionUpdate(
               extension,
               this,
               signal,
@@ -4153,7 +4153,7 @@ describe('createServeApp', () => {
       const previousTrustedFoldersPath =
         process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
       const tempHome = await fsp.mkdtemp(
-        path.join(os.tmpdir(), 'qwen-extension-trust-'),
+        path.join(os.tmpdir(), 'hopcode-extension-trust-'),
       );
       let managerTrustedFlag: boolean | undefined;
       const restore = mockExtensionManagerMethods({
@@ -4732,7 +4732,7 @@ describe('createServeApp', () => {
         });
 
         const invalid = await install(
-          'C:\\Users\\test\\missing-qwen-extension',
+          'C:\\Users\\test\\missing-hopcode-extension',
         );
         expect(invalid.status).toBe(400);
 
@@ -6442,7 +6442,7 @@ describe('createServeApp', () => {
     it('queues extension update when an update is available', async () => {
       const restore = mockExtensionManagerMethods();
       const checkForExtensionUpdate = vi
-        .spyOn(qwenCore, 'checkForExtensionUpdate')
+        .spyOn(hopcodecore, 'checkForExtensionUpdate')
         .mockResolvedValue(ExtensionUpdateState.UPDATE_AVAILABLE);
       try {
         const tokenOpts: ServeOptions = { ...baseOpts, token: 'secret' };
@@ -6505,7 +6505,7 @@ describe('createServeApp', () => {
         },
       });
       const checkForExtensionUpdate = vi
-        .spyOn(qwenCore, 'checkForExtensionUpdate')
+        .spyOn(hopcodecore, 'checkForExtensionUpdate')
         .mockResolvedValue(ExtensionUpdateState.UPDATE_AVAILABLE);
       try {
         const tokenOpts: ServeOptions = { ...baseOpts, token: 'secret' };
@@ -6617,7 +6617,7 @@ describe('createServeApp', () => {
     it('broadcasts failed extension update when no update is available', async () => {
       const restore = mockExtensionManagerMethods();
       const checkForExtensionUpdate = vi
-        .spyOn(qwenCore, 'checkForExtensionUpdate')
+        .spyOn(hopcodecore, 'checkForExtensionUpdate')
         .mockResolvedValue(ExtensionUpdateState.UP_TO_DATE);
       try {
         const tokenOpts: ServeOptions = { ...baseOpts, token: 'secret' };
@@ -6652,7 +6652,7 @@ describe('createServeApp', () => {
     it('broadcasts failed extension update when update check fails', async () => {
       const restore = mockExtensionManagerMethods();
       const checkForExtensionUpdate = vi
-        .spyOn(qwenCore, 'checkForExtensionUpdate')
+        .spyOn(hopcodecore, 'checkForExtensionUpdate')
         .mockRejectedValue(
           new Error('https://user:token@example.com/check failed'),
         );
@@ -13482,7 +13482,7 @@ describe('createServeApp', () => {
     });
 
     it('POST /workspace/trust/request publishes trust_change_requested without writing trustedFolders', async () => {
-      const atomicWriteSpy = vi.spyOn(qwenCore, 'atomicWriteFileSync');
+      const atomicWriteSpy = vi.spyOn(hopcodecore, 'atomicWriteFileSync');
       const requestWorkspaceTrustChange = vi.fn(async () => ({
         accepted: true,
         desiredState: 'untrusted' as const,
@@ -15010,7 +15010,7 @@ describe('createServeApp', () => {
       expect(res.headers['cache-control']).toBe('no-store');
       expect(res.headers['x-content-type-options']).toBe('nosniff');
       expect(res.headers['content-disposition']).toMatch(
-        /^attachment; filename="qwen-code-export-.+\.html"$/,
+        /^attachment; filename="hopcode-export-.+\.html"$/,
       );
       expect(res.text).toContain('id="chat-data"');
       expect(res.text).toContain('hello export');
@@ -17763,17 +17763,17 @@ describe('createServeApp', () => {
         const primaryResponse = await request(app)
           .post('/channels/primary-channel/webhooks/ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('x-qwen-webhook-secret', 'primary-secret')
+          .set('x-hopcode-webhook-secret', 'primary-secret')
           .send({ eventType: 'ci', targetRef: 'default', title: 'Primary' });
         const secondaryResponse = await request(app)
           .post('/channels/secondary-channel/webhooks/ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('x-qwen-webhook-secret', 'secondary-secret')
+          .set('x-hopcode-webhook-secret', 'secondary-secret')
           .send({ eventType: 'ci', targetRef: 'default', title: 'Secondary' });
         const leakedSecretResponse = await request(app)
           .post('/channels/secondary-channel/webhooks/ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('x-qwen-webhook-secret', 'primary-secret')
+          .set('x-hopcode-webhook-secret', 'primary-secret')
           .send({ eventType: 'ci', targetRef: 'default', title: 'Wrong' });
 
         expect(primaryResponse.status).toBe(202);
@@ -17878,7 +17878,7 @@ describe('createServeApp', () => {
           request(app)
             .post(`/channels/${channel}/webhooks/ci`)
             .set('Host', `127.0.0.1:${baseOpts.port}`)
-            .set('x-qwen-webhook-secret', secret)
+            .set('x-hopcode-webhook-secret', secret)
             .send({ eventType: 'ci', targetRef: 'default', title: 'Build' });
 
         expect((await send('old', 'old-secret')).status).toBe(202);
@@ -17976,7 +17976,7 @@ describe('createServeApp', () => {
         const mounted = await request(withEnqueue)
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('x-qwen-webhook-secret', 'secret-value')
+          .set('x-hopcode-webhook-secret', 'secret-value')
           .send({
             eventType: 'ci_failed',
             targetRef: 'default',
@@ -18005,7 +18005,7 @@ describe('createServeApp', () => {
         const webhookSecretOnly = await request(withBearerAuth)
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('x-qwen-webhook-secret', 'secret-value')
+          .set('x-hopcode-webhook-secret', 'secret-value')
           .send({
             eventType: 'ci_failed',
             targetRef: 'default',
@@ -18017,7 +18017,7 @@ describe('createServeApp', () => {
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
           .set('Content-Type', 'application/json')
-          .set('x-qwen-webhook-secret', 'wrong')
+          .set('x-hopcode-webhook-secret', 'wrong')
           .send('{');
         expect(invalidSecretMalformedJson.status).toBe(401);
 
@@ -18025,7 +18025,7 @@ describe('createServeApp', () => {
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
           .set('Authorization', 'Bearer secret')
-          .set('x-qwen-webhook-secret', 'secret-value')
+          .set('x-hopcode-webhook-secret', 'secret-value')
           .send({
             eventType: 'ci_failed',
             targetRef: 'default',
@@ -18052,11 +18052,11 @@ describe('createServeApp', () => {
           .set('Access-Control-Request-Method', 'POST')
           .set(
             'Access-Control-Request-Headers',
-            'X-Qwen-Webhook-Secret, Content-Type',
+            'X-hopcode-webhook-secret, Content-Type',
           );
         expect(preflight.status).toBe(204);
         expect(preflight.headers['access-control-allow-headers']).not.toContain(
-          'X-Qwen-Webhook-Secret',
+          'X-hopcode-webhook-secret',
         );
 
         const rateLimited = createServeApp(
@@ -18076,7 +18076,7 @@ describe('createServeApp', () => {
         const firstWebhook = await request(rateLimited)
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('x-qwen-webhook-secret', 'secret-value')
+          .set('x-hopcode-webhook-secret', 'secret-value')
           .send({
             eventType: 'ci_failed',
             targetRef: 'default',
@@ -18087,7 +18087,7 @@ describe('createServeApp', () => {
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
           .set('X-HopCode-Client-Id', 'rotated-client')
-          .set('x-qwen-webhook-secret', 'secret-value')
+          .set('x-hopcode-webhook-secret', 'secret-value')
           .send({
             eventType: 'ci_failed',
             targetRef: 'default',
@@ -18139,7 +18139,7 @@ describe('createServeApp', () => {
         const res = await request(app)
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('x-qwen-webhook-secret', 'secret-value')
+          .set('x-hopcode-webhook-secret', 'secret-value')
           .send({
             eventType: 'ci_failed',
             targetRef: 'default',
@@ -18222,7 +18222,7 @@ describe('createServeApp', () => {
         const res = await request(app)
           .post('/channels/dingtalk-main/webhooks/github-ci')
           .set('Host', `127.0.0.1:${baseOpts.port}`)
-          .set('x-qwen-webhook-secret', 'secret-value')
+          .set('x-hopcode-webhook-secret', 'secret-value')
           .send({
             eventType: 'ci_failed',
             targetRef: 'default',

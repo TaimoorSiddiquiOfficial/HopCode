@@ -49,13 +49,13 @@ describe('channel startup profile parsing', () => {
     it('maps a valid profile to fixed span attributes', () => {
         const attributes = getChannelStartupProfileAttributes(makeResponse(makeProfile()), 1_007, 10_000);
         expect(attributes).toMatchObject({
-            'qwen-code.daemon.acp_startup.profile.version': 1,
-            'qwen-code.daemon.acp_startup.profile.complete': true,
-            'qwen-code.daemon.acp_startup.child.process_to_response_ms': 900,
-            'qwen-code.daemon.acp_startup.child.unattributed_ms': 139,
-            'qwen-code.daemon.acp_startup.phase.gemini_import_ms': 200,
-            'qwen-code.daemon.acp_startup.config.ripgrep_probe_ms': 50,
-            'qwen-code.daemon.acp_startup.response_transport_ms': 7,
+            'hopcode.daemon.acp_startup.profile.version': 1,
+            'hopcode.daemon.acp_startup.profile.complete': true,
+            'hopcode.daemon.acp_startup.child.process_to_response_ms': 900,
+            'hopcode.daemon.acp_startup.child.unattributed_ms': 139,
+            'hopcode.daemon.acp_startup.phase.gemini_import_ms': 200,
+            'hopcode.daemon.acp_startup.config.ripgrep_probe_ms': 50,
+            'hopcode.daemon.acp_startup.response_transport_ms': 7,
         });
     });
     it('ignores missing and unsupported profiles', () => {
@@ -69,17 +69,17 @@ describe('channel startup profile parsing', () => {
         profile.config.toolRegistryMs = -1;
         profile.config.toolWarmupMs = 600_001;
         const attributes = getChannelStartupProfileAttributes(makeResponse({ ...profile, extra: 'ignored' }), 1_007, 10_000);
-        expect(attributes?.['qwen-code.daemon.acp_startup.profile.complete']).toBe(false);
-        expect(attributes).not.toHaveProperty('qwen-code.daemon.acp_startup.phase.gemini_import_ms');
-        expect(attributes).not.toHaveProperty('qwen-code.daemon.acp_startup.phase.args_parse_ms');
-        expect(attributes).not.toHaveProperty('qwen-code.daemon.acp_startup.config.tool_registry_ms');
-        expect(attributes).not.toHaveProperty('qwen-code.daemon.acp_startup.config.tool_warmup_ms');
+        expect(attributes?.['hopcode.daemon.acp_startup.profile.complete']).toBe(false);
+        expect(attributes).not.toHaveProperty('hopcode.daemon.acp_startup.phase.gemini_import_ms');
+        expect(attributes).not.toHaveProperty('hopcode.daemon.acp_startup.phase.args_parse_ms');
+        expect(attributes).not.toHaveProperty('hopcode.daemon.acp_startup.config.tool_registry_ms');
+        expect(attributes).not.toHaveProperty('hopcode.daemon.acp_startup.config.tool_warmup_ms');
     });
     it('omits an invalid cross-process transport estimate', () => {
         const profile = makeProfile();
         profile.responseBuiltAtEpochMs = 2_000;
         const attributes = getChannelStartupProfileAttributes(makeResponse(profile), 1_000, 10_000);
-        expect(attributes).not.toHaveProperty('qwen-code.daemon.acp_startup.response_transport_ms');
+        expect(attributes).not.toHaveProperty('hopcode.daemon.acp_startup.response_transport_ms');
     });
 });
 //# sourceMappingURL=channel-startup-profile.test.js.map

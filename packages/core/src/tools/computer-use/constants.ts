@@ -44,7 +44,7 @@ export const CUA_DRIVER_VERSION = '0.5.2';
  * Shared hopcode-assets OSS mirror base (reliable in CN where GitHub release
  * downloads are slow/blocked). Assets live under
  * `<base>/cua-driver-rs/v<version>/<asset>` and are mirrored from the upstream
- * trycua/cua release by the Qwen project. The HopCode fork consumes this same
+ * trycua/cua release by the hopcode project. The HopCode fork consumes this same
  * public mirror because we do not operate our own OSS bucket.
  *
  * The upstream workflow that populates this mirror is

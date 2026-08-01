@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -44,7 +44,7 @@ afterEach(() => {
 
 describe('resolveSeatbeltProfileFile', () => {
   it('strips the chunks segment from bundled seatbelt profile paths', () => {
-    const bundleDir = path.resolve(path.sep, 'tmp', 'qwen', 'lib');
+    const bundleDir = path.resolve(path.sep, 'tmp', 'hopcode', 'lib');
     const chunkUrl = pathToFileURL(
       path.join(bundleDir, 'chunks', 'sandbox-AAAA.js'),
     ).toString();
@@ -73,7 +73,7 @@ describe('resolveSeatbeltProfileFile', () => {
   });
 
   it('keeps custom seatbelt profiles under project settings', () => {
-    const bundleDir = path.resolve(path.sep, 'tmp', 'qwen', 'lib');
+    const bundleDir = path.resolve(path.sep, 'tmp', 'hopcode', 'lib');
     const chunkUrl = pathToFileURL(
       path.join(bundleDir, 'chunks', 'sandbox-AAAA.js'),
     ).toString();

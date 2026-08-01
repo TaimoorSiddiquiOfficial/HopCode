@@ -11,7 +11,7 @@ describe('shouldLoadWorkspaceSkills', () => {
     ).toBe(true)
   })
 
-  it('loads Qwen skills in the background once connections are available', () => {
+  it('loads hopcode skills in the background once connections are available', () => {
     expect(
       shouldLoadWorkspaceSkills({
         isSkillsNavigation: false,

@@ -116,10 +116,10 @@ describe('SessionArtifactStore', () => {
             status: 'available',
             sizeBytes: 5,
             metadata: {
-                'qwen.workspace.sha256': createHash('sha256')
+                'hopcode.workspace.sha256': createHash('sha256')
                     .update('hello')
                     .digest('hex'),
-                'qwen.workspace.mtimeMs': expect.any(Number),
+                'hopcode.workspace.mtimeMs': expect.any(Number),
             },
         });
         await expect(store.get('missing')).resolves.toBeUndefined();
@@ -150,10 +150,10 @@ describe('SessionArtifactStore', () => {
         expect(created.changes[0]?.artifact).toMatchObject({
             metadata: {
                 payload: metadata.payload,
-                'qwen.workspace.sha256': createHash('sha256')
+                'hopcode.workspace.sha256': createHash('sha256')
                     .update('budget')
                     .digest('hex'),
-                'qwen.workspace.mtimeMs': expect.any(Number),
+                'hopcode.workspace.mtimeMs': expect.any(Number),
             },
         });
     });
@@ -167,8 +167,8 @@ describe('SessionArtifactStore', () => {
                 title: 'Missing workspace artifact',
                 workspacePath: 'missing.txt',
                 metadata: {
-                    'qwen.workspace.sha256': 'a'.repeat(64),
-                    'qwen.workspace.mtimeMs': 123,
+                    'hopcode.workspace.sha256': 'a'.repeat(64),
+                    'hopcode.workspace.mtimeMs': 123,
                     keep: true,
                 },
             },
@@ -1076,13 +1076,13 @@ describe('SessionArtifactStore', () => {
         expect(updated.changes[0]?.artifact).toMatchObject({
             metadata: {
                 payload: metadata.payload,
-                'qwen.workspace.sha256': newSha,
-                'qwen.workspace.mtimeMs': expect.any(Number),
+                'hopcode.workspace.sha256': newSha,
+                'hopcode.workspace.mtimeMs': expect.any(Number),
             },
             status: 'available',
         });
         expect(updated.changes[0]?.artifact?.metadata).not.toMatchObject({
-            'qwen.workspace.sha256': oldSha,
+            'hopcode.workspace.sha256': oldSha,
         });
     });
     it('does not merge client metadata into a published tool artifact', async () => {
@@ -3198,10 +3198,10 @@ describe('SessionArtifactStore', () => {
                     workspacePath,
                     sizeBytes: stat.size,
                     metadata: {
-                        'qwen.workspace.sha256': createHash('sha256')
+                        'hopcode.workspace.sha256': createHash('sha256')
                             .update(content)
                             .digest('hex'),
-                        'qwen.workspace.mtimeMs': stat.mtimeMs - 1,
+                        'hopcode.workspace.mtimeMs': stat.mtimeMs - 1,
                     },
                     retention: 'restorable',
                     clientRetained: false,
@@ -3626,8 +3626,8 @@ describe('SessionArtifactStore', () => {
         const persistedSha = createHash('sha256').update('hello').digest('hex');
         const metadata = {
             payload: 'x'.repeat(4096),
-            'qwen.workspace.sha256': persistedSha,
-            'qwen.workspace.mtimeMs': 0,
+            'hopcode.workspace.sha256': persistedSha,
+            'hopcode.workspace.mtimeMs': 0,
         };
         while (Buffer.byteLength(JSON.stringify({ payload: metadata.payload }), 'utf8') >
             4096) {
@@ -3670,8 +3670,8 @@ describe('SessionArtifactStore', () => {
                     status: 'changed',
                     metadata: {
                         payload: metadata.payload,
-                        'qwen.workspace.sha256': persistedSha,
-                        'qwen.workspace.mtimeMs': 0,
+                        'hopcode.workspace.sha256': persistedSha,
+                        'hopcode.workspace.mtimeMs': 0,
                     },
                 },
             ],

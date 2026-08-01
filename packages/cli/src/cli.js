@@ -25,8 +25,8 @@ export const TOP_LEVEL_COMMANDS = [
         'serve',
         'Run HopCode as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
     ],
-    ['sessions <command>', 'Manage Qwen Code sessions'],
-    ['update', 'Check for Qwen Code updates and install if available'],
+    ['sessions <command>', 'Manage HopCode sessions'],
+    ['update', 'Check for HopCode updates and install if available'],
 ];
 export const MCP_COMMANDS = [
     ['add <name> <commandOrUrl> [args...]', 'Add a server'],
@@ -137,8 +137,8 @@ function hasFlag(argv, long, short) {
 async function buildTopLevelHelpParser() {
     const { default: yargs } = await import('yargs');
     const parser = yargs([])
-        .scriptName('qwen')
-        .usage('Usage: qwen [options] [command]\n\nHopCode - Launch an interactive CLI, use -p/--prompt for non-interactive mode')
+        .scriptName('hopcode')
+        .usage('Usage: hopcode [options] [command]\n\nHopCode - Launch an interactive CLI, use -p/--prompt for non-interactive mode')
         .version(process.env['CLI_VERSION'] || 'unknown')
         .alias('v', 'version')
         .help()
@@ -199,12 +199,12 @@ async function printTopLevelHelp() {
 }
 function printMcpHelp() {
     const lines = [
-        'Usage: qwen mcp <command>',
+        'Usage: hopcode mcp <command>',
         '',
         'Manage MCP servers',
         '',
         'Commands:',
-        ...MCP_COMMANDS.map(([command, description]) => `  qwen mcp ${command}  ${description}`),
+        ...MCP_COMMANDS.map(([command, description]) => `  hopcode mcp ${command}  ${description}`),
     ];
     writeStdoutLine(lines.join('\n'));
 }
@@ -228,7 +228,7 @@ async function runMcpFastPath(rawArgv) {
         import('./commands/mcp.js'),
     ]);
     const parser = yargsInstance([])
-        .scriptName('qwen')
+        .scriptName('hopcode')
         .command(mcpCommand)
         .version(false)
         .help()

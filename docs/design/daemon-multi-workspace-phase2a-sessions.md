@@ -139,7 +139,7 @@ Later or primary-only routes:
 - Runtime env is computed from daemon base env plus workspace `.env`, settings
   env, and Cloud Shell defaults without mutating parent `process.env` during
   runtime initialization.
-- The env helper intentionally does not virtualize `QWEN_HOME`, Storage, or
+- The env helper intentionally does not virtualize `hopcode_home`, Storage, or
   global config routing. Those remain daemon boot/base-env responsibilities.
 - ACP child spawn accepts an explicit `sourceEnv`, and low-cost
   workspace-scoped status/config readers use injected env instead of direct

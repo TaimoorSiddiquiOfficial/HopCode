@@ -274,12 +274,12 @@ describe('acpRouteTable – matchRoute', () => {
         expect(result).not.toBeNull();
         expect(result.mapping.method).toBe('_hopcode/workspace/mcp');
     });
-    it('POST /workspace/mcp/reload maps to _qwen/workspace/mcp/reload', () => {
+    it('POST /workspace/mcp/reload maps to _hopcode.workspace/mcp/reload', () => {
         const result = matchRoute('/workspace/mcp/reload', 'POST');
         expect(result).not.toBeNull();
-        expect(result.mapping.method).toBe('_qwen/workspace/mcp/reload');
+        expect(result.mapping.method).toBe('_hopcode.workspace/mcp/reload');
     });
-    it('GET /workspace/skills maps to _qwen/workspace/skills', () => {
+    it('GET /workspace/skills maps to _hopcode.workspace/skills', () => {
         const result = matchRoute('/workspace/skills', 'GET');
         expect(result).not.toBeNull();
         expect(result.mapping.method).toBe('_hopcode/workspace/skills');
@@ -455,16 +455,16 @@ describe('acpRouteTable – matchRoute', () => {
         const params = result.mapping.extractParams(result.segments, { sessionIds: ['a', 'b'] }, 'POST');
         expect(params).toEqual({ sessionIds: ['a', 'b'] });
     });
-    it('POST /sessions/archive maps to _qwen/sessions/archive', () => {
+    it('POST /sessions/archive maps to _hopcode/sessions/archive', () => {
         const result = matchRoute('/sessions/archive', 'POST');
         expect(result).not.toBeNull();
-        expect(result.mapping.method).toBe('_qwen/sessions/archive');
+        expect(result.mapping.method).toBe('_hopcode/sessions/archive');
         expect(result.mapping.extractParams([], { sessionIds: ['s-1'] }, 'POST')).toEqual({ sessionIds: ['s-1'] });
     });
-    it('POST /sessions/unarchive maps to _qwen/sessions/unarchive', () => {
+    it('POST /sessions/unarchive maps to _hopcode/sessions/unarchive', () => {
         const result = matchRoute('/sessions/unarchive', 'POST');
         expect(result).not.toBeNull();
-        expect(result.mapping.method).toBe('_qwen/sessions/unarchive');
+        expect(result.mapping.method).toBe('_hopcode/sessions/unarchive');
     });
     // ---- Removed routes (no dispatcher handler) ----------------------------
     it('returns null for removed route /session/:id/approval-mode', () => {

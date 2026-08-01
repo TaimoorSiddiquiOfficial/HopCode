@@ -19,7 +19,7 @@ type MockConnection = {
   models: Array<{ id: string; label?: string }>;
   commands: unknown[];
   skills: string[];
-  capabilities: { qwenCodeVersion: string; features: string[] };
+  capabilities: { hopcodeversion: string; features: string[] };
   loadingTranscript: boolean;
   catchingUp: boolean;
   error?: string;
@@ -69,12 +69,12 @@ const {
     clientId: 'client-1',
     displayName: 'Session One',
     workspaceCwd: '/tmp/project',
-    currentModel: 'qwen',
+    currentModel: 'hopcode',
     currentMode: 'default',
-    models: [{ id: 'qwen', label: 'Qwen' }],
+    models: [{ id: 'hopcode', label: 'hopcode' }],
     commands: [],
     skills: [],
-    capabilities: { qwenCodeVersion: '1.2.3', features: [] },
+    capabilities: { hopcodeversion: '1.2.3', features: [] },
     loadingTranscript: false,
     catchingUp: false,
   };

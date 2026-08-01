@@ -420,13 +420,13 @@ describe('getCommandRoot — parameter expansion in command position', () => {
   });
 
   it('resolves ${VAR:-default} to the default when unset OR empty — POSIX :-', () => {
-    expect(getCommandRoot(`"\${${NAME}:-qwen}" review foo`)).toBe('qwen');
+    expect(getCommandRoot(`"\${${NAME}:-qwen}" review foo`)).toBe('hopcode');
     process.env[NAME] = '';
-    expect(getCommandRoot(`"\${${NAME}:-qwen}" review foo`)).toBe('qwen');
+    expect(getCommandRoot(`"\${${NAME}:-qwen}" review foo`)).toBe('hopcode');
   });
 
   it('resolves ${VAR-default} to the default only when unset — POSIX -', () => {
-    expect(getCommandRoot(`"\${${NAME}-qwen}" review foo`)).toBe('qwen');
+    expect(getCommandRoot(`"\${${NAME}-qwen}" review foo`)).toBe('hopcode');
     process.env[NAME] = '';
     // Empty-but-set: `-` keeps the empty value; nothing to name, no root.
     expect(getCommandRoot(`"\${${NAME}-qwen}" review foo`)).toBeUndefined();
@@ -434,7 +434,7 @@ describe('getCommandRoot — parameter expansion in command position', () => {
 
   it('resolves a bare "$VAR" head, and yields no root when it is unset', () => {
     process.env[NAME] = '/usr/local/bin/qwen';
-    expect(getCommandRoot(`"$${NAME}" review foo`)).toBe('qwen');
+    expect(getCommandRoot(`"$${NAME}" review foo`)).toBe('hopcode');
     delete process.env[NAME];
     // Unset with no default resolves to nothing: the command stays refusable,
     // exactly as an empty command would be — there is nothing to name.
@@ -472,7 +472,7 @@ describe('getCommandRoot — parameter expansion in command position', () => {
       getCommandRoots(
         `"\${${NAME}:-qwen}" review fetch-pr 7 --out x.json && echo done`,
       ),
-    ).toEqual(['qwen', 'echo']);
+    ).toEqual(['hopcode', 'echo']);
   });
 });
 
@@ -681,7 +681,7 @@ describe('detectSelfKillCommand', () => {
     expect(detectSelfKillCommand('command -p killall node')).toBe(true);
   });
 
-  it('detects kill commands using pgrep selectors for qwen-code hosts', () => {
+  it('detects kill commands using pgrep selectors for hopcode hosts', () => {
     expect(detectSelfKillCommand('kill -9 $(pgrep node)')).toBe(true);
     expect(detectSelfKillCommand('kill $(pgrep -f node)')).toBe(true);
     expect(detectSelfKillCommand('kill -9 $(pgrep node | head -1)')).toBe(true);

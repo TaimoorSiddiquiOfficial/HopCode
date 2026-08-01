@@ -72,7 +72,7 @@ Migration note for existing TypeScript plugins: if your adapter constructor or f
 
 Channel adapters can run in two host modes:
 
-- `hopcode channel start [name]` is the standalone service. It uses `AcpBridge` over a `qwen-code --acp` child process and remains the default channel command.
+- `hopcode channel start [name]` is the standalone service. It uses `AcpBridge` over a `hopcode --acp` child process and remains the default channel command.
 - `hopcode serve --channel <name>` and `hopcode serve --channel all` are experimental daemon-managed modes. Named channels are grouped by owning workspace and `hopcode serve` starts one out-of-process worker per owning runtime. Each worker connects back to the daemon through the SDK, and adapters receive a `DaemonChannelBridge`-backed `ChannelAgentBridge` facade. `--channel all` stays primary-only.
 
 In daemon-managed mode, every named channel's `cwd` must resolve to exactly one registered, trusted workspace. Its worker receives that runtime's cwd and environment overlay; an ambiguous or untrusted selection fails instead of using primary. The optional `shellCommand` method is exposed to adapters only when the daemon advertises the `session_shell_command` capability.

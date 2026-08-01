@@ -15,10 +15,10 @@ It does not change webhook configuration or proactive delivery, query a platform
 The daemon workspace runtime owns the registry:
 
 ```text
-$QWEN_HOME/channels/daemon/<workspaceHash>/observed-contacts.json
+$hopcode_home/channels/daemon/<workspaceHash>/observed-contacts.json
 ```
 
-`QWEN_HOME` is process-level, but `<workspaceHash>` partitions data by canonical workspace path. The registry is not stored in the workspace checkout and is not shared as one process-global graph. Its directory uses mode `0700` where supported; the atomic JSON file uses mode `0600`.
+`hopcode_home` is process-level, but `<workspaceHash>` partitions data by canonical workspace path. The registry is not stored in the workspace checkout and is not shared as one process-global graph. Its directory uses mode `0700` where supported; the atomic JSON file uses mode `0600`.
 
 The registry stores at most 500 relationship observations across all channels and conversations in the workspace. Each observation contains `channelName`, a user identity, an optional group identity, an optional topic identity, and `lastObservedAt`. The deduplication key is `[channelName, user.id, group?.id, topic?.id]`. A noisy conversation can therefore evict older observations from another conversation. Observations older than the maximum 365-day readable window are removed on the next accepted write.
 

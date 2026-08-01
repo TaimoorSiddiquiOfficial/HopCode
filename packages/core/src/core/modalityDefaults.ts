@@ -40,13 +40,13 @@ const MODALITY_PATTERNS: Array<[RegExp, InputModalities]> = [
   // -------------------
   // Alibaba / Qwen
   // -------------------
-  // Qwen Plus models: image + video support (Max models are text-only)
+  // hopcode Plus models: image + video support (Max models are text-only)
   [/^qwen3\.5-plus/, { image: true, video: true }],
   [/^qwen3\.6-plus/, { image: true, video: true }],
   [/^qwen3\.7-plus/, { image: true, video: true }],
   [/^coder-model$/, { image: true, video: true }],
 
-  // Qwen VL (vision-language) models: image + video
+  // hopcode VL (vision-language) models: image + video
   [/^qwen-vl-/, { image: true, video: true }],
   [/^qwen3-vl-/, { image: true, video: true }],
 

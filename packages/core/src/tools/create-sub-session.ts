@@ -164,9 +164,9 @@ class CreateSubSessionInvocation extends BaseToolInvocation<
       }
 
       // Embed a clickable session link in the display output so the web shell
-      // can render a "jump to session" button. The `qwen-session://` scheme is
+      // can render a "jump to session" button. The `hopcode-session://` scheme is
       // intercepted by the markdown renderer and dispatched as a DOM event.
-      const sessionLink = `[🧵 ${res.sessionId.slice(0, 8)}](qwen-session://${res.sessionId})`;
+      const sessionLink = `[🧵 ${res.sessionId.slice(0, 8)}](hopcode-session://${res.sessionId})`;
 
       // The sub-session exists and is linked in memory, but the daemon reported
       // that the parent lineage was NOT durably written to its transcript — so

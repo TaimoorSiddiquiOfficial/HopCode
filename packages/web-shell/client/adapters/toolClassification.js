@@ -33,8 +33,8 @@ export function isBackgroundSubAgentToolCall(tool) {
     const rawOutput = getRecord(tool.rawOutput);
     const name = tool.toolName.toLowerCase();
     const args = tool.args;
-    const isTopLevelQwenAgent = name === 'agent' && tool.parentToolCallId === undefined;
-    const defaultsToBackground = isTopLevelQwenAgent &&
+    const isTopLevelhopcodeagent = name === 'agent' && tool.parentToolCallId === undefined;
+    const defaultsToBackground = isTopLevelhopcodeagent &&
         args?.run_in_background === undefined &&
         args?.working_dir === undefined &&
         args?.name === undefined &&
@@ -44,7 +44,7 @@ export function isBackgroundSubAgentToolCall(tool) {
         (typeof args?.subagent_type !== 'string' ||
             args.subagent_type.toLowerCase() !== 'fork');
     const explicitlyBackground = args?.run_in_background === true &&
-        (name !== 'agent' || isTopLevelQwenAgent);
+        (name !== 'agent' || isTopLevelhopcodeagent);
     return (rawOutput?.['status'] === 'background' ||
         explicitlyBackground ||
         defaultsToBackground);

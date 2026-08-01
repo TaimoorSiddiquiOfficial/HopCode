@@ -379,7 +379,7 @@ describe('package asset scripts', () => {
     createBundleArtifacts(rootDir);
     writeFile(
       rootDir,
-      'dist/node_modules/@hoptrendy/hopcode-audio-capture/prebuilds/darwin-arm64/@qwen-code+audio-capture.node',
+      'dist/node_modules/@hoptrendy/hopcode-audio-capture/prebuilds/darwin-arm64/@hopcode+audio-capture.node',
       'stale native addon\n',
     );
     stubConsole();

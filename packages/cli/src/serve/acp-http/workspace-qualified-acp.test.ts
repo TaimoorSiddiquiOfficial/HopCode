@@ -117,7 +117,7 @@ async function writeStoredSession(sessionId: string, cwd: string) {
 async function withRuntimeDir<T>(fn: () => Promise<T>): Promise<T> {
   const previousRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
   const runtimeDir = await fsp.mkdtemp(
-    path.join(os.tmpdir(), 'qwen-workspace-qualified-acp-'),
+    path.join(os.tmpdir(), 'hopcode.workspace-qualified-acp-'),
   );
   process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
   try {
@@ -390,7 +390,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
     const secondary = await sendWsRequest('/workspaces/secondary-id/acp', {
       jsonrpc: '2.0',
       id: 2,
-      method: '_qwen/workspace/setup-github',
+      method: '_hopcode.workspace/setup-github',
       params: { consent: true },
     });
     expect(secondary['result']).toMatchObject({ workspaceCwd: '/ws-b' });
@@ -404,7 +404,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
     const primary = await sendWsRequest('/acp', {
       jsonrpc: '2.0',
       id: 3,
-      method: '_qwen/workspace/setup-github',
+      method: '_hopcode.workspace/setup-github',
       params: { consent: true },
     });
     expect(primary['result']).toMatchObject({ workspaceCwd: '/ws' });
@@ -431,7 +431,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
     const response = await sendWsRequest('/workspaces/empty-overlay-id/acp', {
       jsonrpc: '2.0',
       id: 4,
-      method: '_qwen/workspace/setup-github',
+      method: '_hopcode.workspace/setup-github',
       params: { consent: true },
     });
 
@@ -1295,8 +1295,8 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
               JSON.stringify({
                 jsonrpc: '2.0',
                 id: 2,
-                method: '_qwen/workspace/auth/device_flow/start',
-                params: { providerId: 'qwen' },
+                method: '_hopcode.workspace/auth/device_flow/start',
+                params: { providerId: 'hopcode' },
               }),
             );
             return;
@@ -1323,7 +1323,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
     await sendWsRequest('/workspaces/secondary-id/acp', {
       jsonrpc: '2.0',
       id: 2,
-      method: '_qwen/workspace/memory/remember',
+      method: '_hopcode.workspace/memory/remember',
       params: { content: 'secondary-only memory' },
     });
 

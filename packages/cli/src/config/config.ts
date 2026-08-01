@@ -2147,13 +2147,13 @@ export async function loadCliConfig(
     // through the CDP tunnel (far lighter than the OS-level computer-use
     // driver), so disable computer-use to keep the agent off that heavy path.
     computerUseEnabled: (() => {
-      const tunnelOn = process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'] === '1';
+      const tunnelOn = process.env['hopcode_serve_cdp_tunnel_over_ws'] === '1';
       // Surface the override when it contradicts an explicit opt-in, so the
       // effective config isn't a silent surprise during debugging.
       if (tunnelOn && settings.tools?.computerUse?.enabled === true) {
         writeStderrLine(
           'hopcode serve: ignoring tools.computerUse.enabled=true — the CDP ' +
-            'tunnel (QWEN_SERVE_CDP_TUNNEL_OVER_WS) routes browser automation ' +
+            'tunnel (hopcode_serve_cdp_tunnel_over_ws) routes browser automation ' +
             'through the CDP tunnel, so computer-use stays disabled.',
         );
       }

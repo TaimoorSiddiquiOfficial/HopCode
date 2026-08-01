@@ -926,7 +926,7 @@ describe('gemini.tsx main function', () => {
     } as never);
     vi.mocked(loadSandboxConfig).mockResolvedValue({
       command,
-      image: 'ghcr.io/qwenlm/qwen-code:1.0.0',
+      image: 'ghcr.io/qwenlm/hopcode:1.0.0',
     });
     vi.mocked(loadCliConfig).mockResolvedValue({
       getModelsConfig: () => ({ getCurrentAuthType: () => null }),

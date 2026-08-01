@@ -363,7 +363,7 @@ export async function loadMarketplaceConfigFromSource(
     }
     const content = await fetchUrl(
       trimmed,
-      { 'User-Agent': 'qwen-code' },
+      { 'User-Agent': 'hopcode' },
       networkPolicy,
     );
     if (!content) {

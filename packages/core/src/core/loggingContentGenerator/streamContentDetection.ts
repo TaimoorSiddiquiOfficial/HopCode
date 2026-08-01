@@ -18,7 +18,7 @@ import type { GenerateContentResponse } from '@google/genai';
  *   - functionCall (tool use — even tool-call-only responses count)
  *   - inlineData (image, binary blob)
  *   - executableCode (sandbox / code-execution responses)
- *   - thought / reasoning content (provider-dependent; o1, Qwen thinking, Anthropic <thinking>)
+ *   - thought / reasoning content (provider-dependent; o1, hopcode thinking, Anthropic <thinking>)
  *
  * Chunks containing only role metadata, only usageMetadata (final summary
  * chunk), or empty parts are NOT user-visible — TTFT should not fire on these.

@@ -105,9 +105,9 @@ describe('remember memory helper', () => {
       '<user-content>\nhidden context\n</user-content>',
     );
 
-    const bare = buildBareRememberPrompt('  appends to qwen  ');
+    const bare = buildBareRememberPrompt('  appends to hopcode  ');
     expect(bare).toBe(
-      'Please save the following fact to memory (e.g. append to QWEN.md in the project root):\n\nappends to qwen',
+      'Please save the following fact to memory (e.g. append to HOPCODE.md in the project root):\n\nappends to qwen',
     );
   });
 

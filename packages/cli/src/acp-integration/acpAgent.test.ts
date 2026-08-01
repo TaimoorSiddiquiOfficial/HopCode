@@ -1361,10 +1361,10 @@ describe('toHttpServer', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Tests for QwenAgent.initialize() mcpCapabilities + newSession SSE/HTTP
+// Tests for hopcodeagent.initialize() mcpCapabilities + newSession SSE/HTTP
 // ---------------------------------------------------------------------------
 
-describe('QwenAgent MCP SSE/HTTP support', () => {
+describe('hopcodeagent MCP SSE/HTTP support', () => {
   // We need to capture the agent factory from AgentSideConnection constructor
   let capturedAgentFactory:
     | ((conn: AgentSideConnectionLike) => AgentLike)
@@ -1981,7 +1981,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
       '/project/.hopcode/memory',
       '/tmp/user-memory',
       '/home/test/.hopcode/skills',
-      '/tmp/qwen-extensions',
+      '/tmp/hopcode-extensions',
       ...(process.platform === 'win32' ? [] : ['/tmp']),
     ];
   }
@@ -2985,7 +2985,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
           ],
         },
       ]),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getAllConfiguredModels: vi.fn().mockReturnValue([
         {
           id: 'qwen-plus',
@@ -3317,7 +3317,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('extMethod qwen/status/workspace/preflight returns 6 ACP-side cells', async () => {
+  it('extMethod hopcode.status/workspace/preflight returns 6 ACP-side cells', async () => {
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
@@ -3327,7 +3327,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getModelsConfig: vi.fn().mockReturnValue({
         getGenerationConfig: vi.fn().mockReturnValue({}),
-        getCurrentAuthType: vi.fn().mockReturnValue('qwen'),
+        getCurrentAuthType: vi.fn().mockReturnValue('hopcode'),
         syncAfterAuthRefresh: vi.fn(),
       }),
       getSkillManager: vi.fn().mockReturnValue({
@@ -3451,7 +3451,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getModelsConfig: vi.fn().mockReturnValue({
         getGenerationConfig: vi.fn().mockReturnValue({}),
-        getCurrentAuthType: vi.fn().mockReturnValue('qwen'),
+        getCurrentAuthType: vi.fn().mockReturnValue('hopcode'),
         syncAfterAuthRefresh: vi.fn(),
       }),
       getSkillManager: vi.fn(() => {
@@ -3821,25 +3821,25 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
-      getAuthType: vi.fn().mockReturnValue('qwen'),
+      getAuthType: vi.fn().mockReturnValue('hopcode'),
       getActiveRuntimeModelSnapshot: vi.fn().mockReturnValue(undefined),
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getAllConfiguredModels: vi.fn().mockReturnValue([
         {
           id: 'qwen-plus',
           label: 'Qwen Plus',
-          authType: 'qwen',
+          authType: 'hopcode',
         },
         {
           id: 'qwen-flash',
           label: 'Qwen Flash',
-          authType: 'qwen',
+          authType: 'hopcode',
           fastOnly: true,
         },
         {
           id: 'qwen-asr',
           label: 'Qwen ASR',
-          authType: 'qwen',
+          authType: 'hopcode',
           voiceOnly: true,
         },
       ]),
@@ -3890,7 +3890,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
         {
           id: 'qwen-plus',
           runtimeSnapshotId: 'runtime-qwen-plus',
-          label: 'Runtime Qwen Plus',
+          label: 'Runtime hopcode Plus',
           authType: 'hopcode',
           isRuntimeModel: true,
         },
@@ -4088,8 +4088,8 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 
     expect(new Set(modelIds)).toHaveLength(2);
     expect(modelIds).toEqual([
-      expect.stringMatching(/^qwen-route:v1:/),
-      expect.stringMatching(/^qwen-route:v1:/),
+      expect.stringMatching(/^hopcode-route:v1:/),
+      expect.stringMatching(/^hopcode-route:v1:/),
     ]);
     expect(modelOption?.options.map((option) => option.value)).toEqual(
       modelIds,
@@ -6534,7 +6534,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     return { agent, agentPromise };
   }
 
-  it('qwen/permissions/getSettings returns user workspace merged and trust state', async () => {
+  it('hopcode/permissions/getSettings returns user workspace merged and trust state', async () => {
     const settings = makeCoreSettings();
     settings.setValue(SettingScope.User, 'permissions.allow', [
       'ShellTool(git status)',
@@ -6547,7 +6547,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     ]);
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = await agent.extMethod('qwen/permissions/getSettings', {});
+    const result = await agent.extMethod('hopcode/permissions/getSettings', {});
 
     expect(result).toEqual({
       v: 1,
@@ -7186,39 +7186,39 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/permissions/setRules validates scope and ruleType', async () => {
+  it('hopcode/permissions/setRules validates scope and ruleType', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/permissions/setRules', {
+      agent.extMethod('hopcode/permissions/setRules', {
         scope: 'global',
         ruleType: 'allow',
         rules: [],
       }),
     ).rejects.toThrowError(/scope must be/);
     await expect(
-      agent.extMethod('qwen/permissions/setRules', {
+      agent.extMethod('hopcode/permissions/setRules', {
         scope: 'user',
         ruleType: 'maybe',
         rules: [],
       }),
     ).rejects.toThrowError(/ruleType must be/);
     await expect(
-      agent.extMethod('qwen/permissions/setRules', {
+      agent.extMethod('hopcode/permissions/setRules', {
         scope: 'user',
         ruleType: 'allow',
       }),
     ).rejects.toThrowError(/rules must be an array/);
     await expect(
-      agent.extMethod('qwen/permissions/setRules', {
+      agent.extMethod('hopcode/permissions/setRules', {
         scope: 'user',
         ruleType: 'allow',
         rules: 'ShellTool(git status)',
       }),
     ).rejects.toThrowError(/rules must be an array/);
     await expect(
-      agent.extMethod('qwen/permissions/setRules', {
+      agent.extMethod('hopcode/permissions/setRules', {
         scope: 'user',
         ruleType: 'allow',
         rules: [''],
@@ -7230,12 +7230,12 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/permissions/setRules rejects new malformed permission rules', async () => {
+  it('hopcode/permissions/setRules rejects new malformed permission rules', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/permissions/setRules', {
+      agent.extMethod('hopcode/permissions/setRules', {
         scope: 'user',
         ruleType: 'allow',
         rules: ['ShellTool(git status'],
@@ -7247,12 +7247,12 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/permissions/setRules rejects oversized permission rule lists', async () => {
+  it('hopcode/permissions/setRules rejects oversized permission rule lists', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/permissions/setRules', {
+      agent.extMethod('hopcode/permissions/setRules', {
         scope: 'user',
         ruleType: 'allow',
         rules: Array.from(
@@ -7269,12 +7269,12 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/permissions/setRules rejects oversized permission rule strings', async () => {
+  it('hopcode/permissions/setRules rejects oversized permission rule strings', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/permissions/setRules', {
+      agent.extMethod('hopcode/permissions/setRules', {
         scope: 'user',
         ruleType: 'allow',
         rules: [`ShellTool(${'x'.repeat(MAX_PERMISSION_RULE_LENGTH + 1)})`],
@@ -7288,7 +7288,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/permissions/setRules preserves already-stored malformed permission rules', async () => {
+  it('hopcode/permissions/setRules preserves already-stored malformed permission rules', async () => {
     const settings = makeCoreSettings();
     settings.setValue(SettingScope.User, 'permissions.allow', [
       'ShellTool(git status',
@@ -7296,7 +7296,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     vi.mocked(settings.setValue).mockClear();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    await agent.extMethod('qwen/permissions/setRules', {
+    await agent.extMethod('hopcode/permissions/setRules', {
       scope: 'user',
       ruleType: 'allow',
       rules: ['ShellTool(git status', 'ShellTool(npm test)'],
@@ -7312,11 +7312,11 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/permissions/setRules persists normalized rules for the requested scope', async () => {
+  it('hopcode/permissions/setRules persists normalized rules for the requested scope', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = await agent.extMethod('qwen/permissions/setRules', {
+    const result = await agent.extMethod('hopcode/permissions/setRules', {
       scope: 'user',
       ruleType: 'allow',
       rules: ['ShellTool(git status)'],
@@ -7337,7 +7337,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/permissions/setRules syncs live permission managers after replacement', async () => {
+  it('hopcode/permissions/setRules syncs live permission managers after replacement', async () => {
     const settings = makeCoreSettings();
     settings.setValue(SettingScope.User, 'permissions.allow', [
       'ShellTool(git status)',
@@ -7366,7 +7366,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     }) as AgentLike;
     await agent.newSession({ cwd: '/tmp', mcpServers: [] });
 
-    await agent.extMethod('qwen/permissions/setRules', {
+    await agent.extMethod('hopcode/permissions/setRules', {
       scope: 'user',
       ruleType: 'allow',
       rules: ['ShellTool(git diff)', 'ShellTool(npm test)'],
@@ -7514,7 +7514,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/status/session/transcript returns id-less replay events from transcript reader pages', async () => {
+  it('hopcode.status/session/transcript returns id-less replay events from transcript reader pages', async () => {
     const settings = makeCoreSettings();
     mockRunExitCleanup.mockResolvedValue(undefined);
     const gaps = [{ childUuid: 'u1', missingParentUuid: 'missing-a1' }];
@@ -7787,7 +7787,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await vi.waitFor(() => expect(toolRegistry.stop).toHaveBeenCalledOnce());
   });
 
-  it('qwen/status/session/transcript rejects malformed cursor and limit params before reading', async () => {
+  it('hopcode.status/session/transcript rejects malformed cursor and limit params before reading', async () => {
     const settings = makeCoreSettings();
     const readPage = vi.fn();
     vi.mocked(SessionTranscriptReader).mockImplementation(
@@ -7822,7 +7822,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/status/session/transcript terminates pagination on replay errors', async () => {
+  it('hopcode.status/session/transcript terminates pagination on replay errors', async () => {
     const settings = makeCoreSettings();
     vi.mocked(loadCliConfig).mockResolvedValue({
       ...makeInnerConfig(),
@@ -7888,7 +7888,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/status/session/transcript maps oversized snapshots to structured errors', async () => {
+  it('hopcode.status/session/transcript maps oversized snapshots to structured errors', async () => {
     const settings = makeCoreSettings();
     const readPage = vi
       .fn()
@@ -7924,7 +7924,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/status/session/transcript maps oversized pages to structured errors', async () => {
+  it('hopcode.status/session/transcript maps oversized pages to structured errors', async () => {
     const settings = makeCoreSettings();
     const readPage = vi
       .fn()
@@ -8001,7 +8001,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
       },
     },
   ])(
-    'qwen/status/session/transcript maps $name',
+    'hopcode.status/session/transcript maps $name',
     async ({ error, cursor, expected }) => {
       const settings = makeCoreSettings();
       vi.mocked(SessionTranscriptReader).mockImplementation(
@@ -8460,7 +8460,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
   });
 
   it('qwen/skills/install installs a GitHub directory skill through ACP', async () => {
-    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
+    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-skill-'));
     vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
 
     const refreshCache = vi.fn().mockResolvedValue(undefined);
@@ -8612,7 +8612,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
   });
 
   it('qwen/skills setEnabled and delete manage global skills through ACP', async () => {
-    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
+    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-skill-'));
     vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
 
     const skillDir = path.join(tempHome, 'skills', 'pptx');
@@ -8698,7 +8698,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
   });
 
   it('qwen/skills rejects path-traversal slugs without touching the global dir', async () => {
-    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
+    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-skill-'));
     vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
     // A sentinel that a `..` traversal could overwrite (install) or delete.
     const sentinel = path.join(tempHome, 'settings.json');
@@ -8755,7 +8755,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
   });
 
   it('qwen/skills setEnabled preserves comments and nested hooks in frontmatter', async () => {
-    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
+    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-skill-'));
     vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
 
     const skillDir = path.join(tempHome, 'skills', 'pptx');
@@ -8977,7 +8977,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
   });
 
   it('qwen/skills setEnabled resolves user and project skill files through ACP', async () => {
-    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-'));
+    const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-skill-'));
     const tempProject = await fs.mkdtemp(
       path.join(os.tmpdir(), 'qwen-project-skill-'),
     );
@@ -9923,7 +9923,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
   });
 
   it('per-session newSession surfaces MCP failures to stderr (round-7 fix: was silent before)', async () => {
-    // Round-7 regression: `QwenAgent.initializeConfig()` (per-session ACP
+    // Round-7 regression: `hopcodeagent.initializeConfig()` (per-session ACP
     // path) reports MCP failures after readiness settles. Per-session configs
     // with failed MCP servers must not fall back to built-in tools silently.
     const innerConfig = await setupSessionMocks('session-failed-mcp');
@@ -10256,7 +10256,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
 // recording service's in-memory `currentCustomTitle` stale, and the next
 // re-anchor (every 32KB) or finalize() silently reverted the rename by
 // re-emitting the cached old title at EOF.
-describe('QwenAgent extMethod renameSession routing', () => {
+describe('hopcodeagent extMethod renameSession routing', () => {
   type AgentSideConnectionLike = { closed: Promise<void> };
   type AgentLike = {
     initialize: (args: Record<string, unknown>) => Promise<unknown>;
@@ -10636,7 +10636,7 @@ describe('QwenAgent extMethod renameSession routing', () => {
   });
 });
 
-describe('QwenAgent unstable_listSessions cursor parsing', () => {
+describe('hopcodeagent unstable_listSessions cursor parsing', () => {
   let capturedAgentFactory:
     | ((conn: { closed: Promise<void> }) => {
         unstable_listSessions: (
@@ -10904,11 +10904,11 @@ describe('QwenAgent unstable_listSessions cursor parsing', () => {
   });
 });
 
-// Tests for QwenAgent.loadSession() and QwenAgent.unstable_resumeSession()
+// Tests for hopcodeagent.loadSession() and hopcodeagent.unstable_resumeSession()
 // — locks the session-existence guard, the resourceNotFound error contract,
 // and the resume-vs-load semantic difference (load replays UI history,
 // resume does not).
-describe('QwenAgent loadSession / unstable_resumeSession', () => {
+describe('hopcodeagent loadSession / unstable_resumeSession', () => {
   let capturedAgentFactory:
     | ((conn: { closed: Promise<void> }) => {
         loadSession: (args: Record<string, unknown>) => Promise<unknown>;
@@ -11588,12 +11588,12 @@ describe('QwenAgent loadSession / unstable_resumeSession', () => {
       cwd: '/tmp',
       sessionId: 'persisted-1',
       mcpServers: [],
-      _meta: { 'qwen.session.loadReplayMode': 'bulk' },
+      _meta: { 'hopcode.session.loadReplayMode': 'bulk' },
     })) as {
       _meta?: Record<string, { v: number; updates: unknown[] }>;
     };
 
-    expect(response._meta?.['qwen.session.loadReplay']).toEqual({
+    expect(response._meta?.['hopcode.session.loadReplay']).toEqual({
       v: 1,
       updates: [{ ...replayUpdate, timestamp: 4242 }],
     });
@@ -11662,14 +11662,14 @@ describe('QwenAgent loadSession / unstable_resumeSession', () => {
       sessionId: 'persisted-1',
       mcpServers: [],
       _meta: {
-        'qwen.session.loadReplayMode': 'bulk',
-        'qwen.session.loadReplayPageSize': 2,
+        'hopcode.session.loadReplayMode': 'bulk',
+        'hopcode.session.loadReplayPageSize': 2,
       },
     })) as {
       _meta?: Record<string, { hasMore?: boolean }>;
     };
 
-    expect(response._meta?.['qwen.session.loadReplay']?.hasMore).toBe(true);
+    expect(response._meta?.['hopcode.session.loadReplay']?.hasMore).toBe(true);
     expect(lastSessionMock?.primeTurnFromHistory).toHaveBeenCalledWith(
       messages,
     );
@@ -11716,15 +11716,15 @@ describe('QwenAgent loadSession / unstable_resumeSession', () => {
       sessionId: 'persisted-long-turn',
       mcpServers: [],
       _meta: {
-        'qwen.session.loadReplayMode': 'bulk',
-        'qwen.session.loadReplayPageSize': 2,
+        'hopcode.session.loadReplayMode': 'bulk',
+        'hopcode.session.loadReplayPageSize': 2,
       },
     })) as {
       _meta?: Record<string, { hasMore?: boolean }>;
     };
 
     expect(
-      response._meta?.['qwen.session.loadReplay']?.hasMore,
+      response._meta?.['hopcode.session.loadReplay']?.hasMore,
     ).toBeUndefined();
     expect(lastSessionMock?.primeTurnFromHistory).toHaveBeenCalledWith(
       messages,
@@ -11757,7 +11757,7 @@ describe('QwenAgent loadSession / unstable_resumeSession', () => {
       cwd: '/tmp',
       sessionId: 'persisted-1',
       mcpServers: [],
-      _meta: { 'qwen.session.loadReplayMode': 'bulk' },
+      _meta: { 'hopcode.session.loadReplayMode': 'bulk' },
     })) as {
       _meta?: Record<
         string,
@@ -11770,7 +11770,7 @@ describe('QwenAgent loadSession / unstable_resumeSession', () => {
       >;
     };
 
-    expect(response._meta?.['qwen.session.loadReplay']).toMatchObject({
+    expect(response._meta?.['hopcode.session.loadReplay']).toMatchObject({
       v: 1,
       updates: [],
       partial: true,
@@ -11813,7 +11813,7 @@ describe('QwenAgent loadSession / unstable_resumeSession', () => {
         cwd: '/tmp',
         sessionId: 'persisted-1',
         mcpServers: [],
-        _meta: { 'qwen.session.loadReplayMode': 'bulk' },
+        _meta: { 'hopcode.session.loadReplayMode': 'bulk' },
       }),
     ).rejects.toThrow('prime boom');
 
@@ -11827,7 +11827,7 @@ describe('QwenAgent loadSession / unstable_resumeSession', () => {
         cwd: '/tmp',
         sessionId: 'persisted-1',
         mcpServers: [],
-        _meta: { 'qwen.session.loadReplayMode': 'bulk' },
+        _meta: { 'hopcode.session.loadReplayMode': 'bulk' },
       }),
     ).resolves.toMatchObject({
       modes: expect.anything(),
@@ -11955,7 +11955,7 @@ describe('QwenAgent loadSession / unstable_resumeSession', () => {
 // T2.8 (#4514): extMethod runtime-add / runtime-remove
 // ---------------------------------------------------------------------------
 
-describe('QwenAgent extMethod runtime MCP add/remove (T2.8)', () => {
+describe('hopcodeagent extMethod runtime MCP add/remove (T2.8)', () => {
   let capturedAgentFactory:
     | ((conn: { closed: Promise<void> }) => {
         initialize: (args: Record<string, unknown>) => Promise<unknown>;

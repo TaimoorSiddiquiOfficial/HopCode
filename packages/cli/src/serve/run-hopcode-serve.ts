@@ -1579,7 +1579,7 @@ function createDeferredChannelWebhookAuth(
       source,
       configSource.env,
     );
-    if (!matchesWebhookSecret(req.get('x-qwen-webhook-secret'), secret)) {
+    if (!matchesWebhookSecret(req.get('x-hopcode-webhook-secret'), secret)) {
       daemonLog.warn('deferred webhook auth failed', {
         channelName,
         source,
@@ -3371,7 +3371,7 @@ async function runHopCodeServeImpl(
     let invalidatePrimaryServeFeaturesCache = () => {};
     const workspaceService = runtime.createDaemonWorkspaceService({
       boundWorkspace,
-      contextFilename: contextFilenameForInit ?? 'QWEN.md',
+      contextFilename: contextFilenameForInit ?? 'HOPCODE.md',
       statusProvider,
       workspaceProvidersStatusProvider,
       workspaceSkillsStatusProvider,
@@ -3684,7 +3684,7 @@ async function runHopCodeServeImpl(
       );
       const secondaryWorkspaceService = runtime.createDaemonWorkspaceService({
         boundWorkspace: workspaceInput.cwd,
-        contextFilename: contextFilenameForInit ?? 'QWEN.md',
+        contextFilename: contextFilenameForInit ?? 'HOPCODE.md',
         statusProvider: secondaryStatusProvider,
         workspaceProvidersStatusProvider:
           runtime.createWorkspaceProvidersStatusProvider({
@@ -4055,7 +4055,7 @@ async function runHopCodeServeImpl(
       try {
         wsService = runtime.createDaemonWorkspaceService({
           boundWorkspace: cwd,
-          contextFilename: contextFilenameForInit ?? 'QWEN.md',
+          contextFilename: contextFilenameForInit ?? 'HOPCODE.md',
           statusProvider: runtime.createDaemonStatusProvider({
             env: wsEnv.effectiveEnv,
           }),

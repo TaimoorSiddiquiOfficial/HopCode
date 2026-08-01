@@ -17,7 +17,7 @@ import {
   transcribeVoiceAudio,
 } from '../../services/voice-transcriber.js';
 import { openVoiceStream } from '../../ui/voice/voice-stream-session.js';
-import { openQwenAsrRealtimeStream } from '../../ui/voice/hopcode-asr-realtime-session.js';
+import { openhopcodeasrrealtimestream } from '../../ui/voice/hopcode-asr-realtime-session.js';
 import { openVoiceStreamWithRetry } from '../../ui/voice/voice-stream-retry.js';
 import { writeStderrLine } from '../../utils/stdioHelpers.js';
 import type {
@@ -100,7 +100,7 @@ async function defaultOpenStream(
     return await openVoiceStreamWithRetry(
       () =>
         cfg.transport === 'qwen-asr-realtime'
-          ? openQwenAsrRealtimeStream(cfg, callbacks, { abortSignal })
+          ? openhopcodeasrrealtimestream(cfg, callbacks, { abortSignal })
           : openVoiceStream(cfg, callbacks, { abortSignal }),
       { abortSignal },
     );

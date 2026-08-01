@@ -107,7 +107,7 @@ Channel identity:
 - description: Helps the ops group coordinate repository maintenance.
 
 Memory scope:
-- namespace: qwen-tag:ops
+- namespace: hopcode-tag:ops
 - mode: metadata-only
 - data from other channels must not be shared.
 ```

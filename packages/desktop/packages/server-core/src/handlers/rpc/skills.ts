@@ -219,7 +219,7 @@ async function getInstalledMarketplaceSkillSlugs(
   );
   if (!result.success) {
     deps.platform.logger?.warn(
-      `SKILLS_MARKETPLACE_LIST: Qwen ACP skill discovery failed for ${workspaceId}: ${result.error ?? 'unknown error'}`,
+      `SKILLS_MARKETPLACE_LIST: hopcode ACP skill discovery failed for ${workspaceId}: ${result.error ?? 'unknown error'}`,
     );
     return new Set();
   }
@@ -282,7 +282,7 @@ async function broadcastAvailableSkills(
   );
   if (!result.success) {
     deps.platform.logger?.warn(
-      `SKILLS_MARKETPLACE_INSTALL: Qwen ACP skill refresh failed for ${workspaceId}: ${result.error ?? 'unknown error'}`,
+      `SKILLS_MARKETPLACE_INSTALL: hopcode ACP skill refresh failed for ${workspaceId}: ${result.error ?? 'unknown error'}`,
     );
     if (additionalSkills.length > 0) {
       pushTyped(
@@ -379,14 +379,14 @@ export function registerSkillsHandlers(
         );
         if (!result.success) {
           deps.platform.logger?.warn(
-            `SKILLS_GET: Qwen ACP skill discovery failed for ${workspaceId}: ${result.error ?? 'unknown error'}`,
+            `SKILLS_GET: hopcode ACP skill discovery failed for ${workspaceId}: ${result.error ?? 'unknown error'}`,
           );
           return [];
         }
 
         const skills = providerSkillsFromAvailableCommands(result);
         deps.platform.logger?.info(
-          `SKILLS_GET: Loaded ${skills.length} skills from Qwen ACP for ${workspaceId}`,
+          `SKILLS_GET: Loaded ${skills.length} skills from hopcode ACP for ${workspaceId}`,
         );
         return skills;
       }
@@ -430,7 +430,7 @@ export function registerSkillsHandlers(
         throw new Error(`Unknown marketplace skill: ${skillId}`);
       }
 
-      const result = await deps.sessionManager.installQwenSkill(
+      const result = await deps.sessionManager.installhopcodeskill(
         skillAcpSessionId('skills-marketplace', workspaceId, activeSessionId),
         {
           id: marketplaceSkill.id,
@@ -556,7 +556,7 @@ export function registerSkillsHandlers(
         (await shouldLoadSkillsFromQwenAcp(workspace.rootPath));
 
       if (shouldTryQwenAcp) {
-        const result = await deps.sessionManager.deleteQwenSkill(
+        const result = await deps.sessionManager.deletehopcodeskill(
           skillAcpSessionId('skills-discovery', workspaceId, activeSessionId),
           { slug: skillSlug, scope: 'global' },
           { workspaceId, workingDirectory },
@@ -572,7 +572,7 @@ export function registerSkillsHandlers(
           activeSessionId,
         );
         forgetInstalledMarketplaceSkill(workspaceId, skillSlug);
-        deps.platform.logger?.info(`Deleted Qwen skill: ${skillSlug}`);
+        deps.platform.logger?.info(`Deleted hopcode skill: ${skillSlug}`);
         return;
       }
 
@@ -600,10 +600,10 @@ export function registerSkillsHandlers(
         hasActiveAcpSession(activeSessionId) ||
         (await shouldLoadSkillsFromQwenAcp(workspace.rootPath));
       if (!shouldTryQwenAcp) {
-        throw new Error('Skill enablement is only supported for Qwen skills');
+        throw new Error('Skill enablement is only supported for hopcode skills');
       }
 
-      const result = await deps.sessionManager.setQwenSkillEnabled(
+      const result = await deps.sessionManager.sethopcodeskillEnabled(
         skillAcpSessionId('skills-discovery', workspaceId, activeSessionId),
         { slug: skillSlug, enabled, scope: scope ?? 'global' },
         { workspaceId, workingDirectory },
@@ -619,7 +619,7 @@ export function registerSkillsHandlers(
         activeSessionId,
       );
       deps.platform.logger?.info(
-        `Set Qwen skill ${skillSlug} enabled=${enabled}`,
+        `Set hopcode skill ${skillSlug} enabled=${enabled}`,
       );
     },
   );

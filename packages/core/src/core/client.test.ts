@@ -4635,7 +4635,7 @@ hello
         // consume
       }
 
-      // Memory must come AFTER the functionResponse part so the Qwen API
+      // Memory must come AFTER the functionResponse part so the hopcode API
       // call/response pairing isn't broken (see client.ts:1209-1213).
       const lastCallArgs = mockTurnRunFn.mock.lastCall;
       const requestArr = lastCallArgs![1] as unknown[];

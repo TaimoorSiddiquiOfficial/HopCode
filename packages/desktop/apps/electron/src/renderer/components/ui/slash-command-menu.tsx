@@ -12,7 +12,7 @@ import type { AvailableSlashCommand } from '../../../shared/types'
 // ============================================================================
 
 export type HopCodeSlashCommandId = `qwen:${string}`
-export type HopCodeSkillCommandId = `qwen-skill:${string}`
+export type HopCodeSkillCommandId = `hopcode-skill:${string}`
 export type SlashCommandId = PermissionMode | 'compact' | HopCodeSlashCommandId | HopCodeSkillCommandId
 
 /** Union type for all item types in the slash menu */
@@ -28,7 +28,7 @@ export interface SlashCommand {
   color?: string
   /** Text inserted into the input when selected. Commands without this are handled as UI actions. */
   insertText?: string
-  source?: 'mode' | 'app' | 'hopcode' | 'qwen-skill'
+  source?: 'mode' | 'app' | 'hopcode' | 'hopcode-skill'
 }
 
 /** Folder item for the slash menu */
@@ -105,7 +105,7 @@ const compactCommand: SlashCommand = {
 }
 
 const HOPCODE_COMMAND_ID_PREFIX = 'qwen:'
-const HOPCODE_SKILL_ID_PREFIX = 'qwen-skill:'
+const HOPCODE_SKILL_ID_PREFIX = 'hopcode-skill:'
 const HIDDEN_HOPCODE_SLASH_NAMES = new Set(['model', 'skills'])
 const EMPTY_AVAILABLE_COMMANDS: AvailableSlashCommand[] = []
 const EMPTY_AVAILABLE_SKILLS: string[] = []
@@ -192,7 +192,7 @@ export function createQwenSlashSections({
       description: 'HopCode skill',
       icon: <Sparkles className={MENU_ICON_SIZE} />,
       insertText: `/${name} `,
-      source: 'qwen-skill',
+      source: 'hopcode-skill',
     })
   }
 

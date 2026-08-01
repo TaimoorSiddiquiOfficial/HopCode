@@ -766,7 +766,7 @@ export function buildRoleBrief(
       );
     }
     const ctx = opts.planPath
-      ? join(dirname(resolve(opts.planPath)), `qwen-review-pr-${pr}-context.md`)
+      ? join(dirname(resolve(opts.planPath)), `hopcode-review-pr-${pr}-context.md`)
       : null;
     parts.push(
       '',
@@ -820,12 +820,12 @@ export function buildRoleBrief(
     if (buildTree && opts.planPath) {
       // The `--out` name uses the PR number when there is one and a stable local name
       // otherwise. Never interpolate `pr` unguarded: an absent `prNumber` would write
-      // `qwen-review-pr-undefined-build-test.json`, a literal "undefined" the agent
+      // `hopcode-review-pr-undefined-build-test.json`, a literal "undefined" the agent
       // writes and downstream never finds.
       const outName =
         pr !== undefined
-          ? `qwen-review-pr-${pr}-build-test.json`
-          : 'qwen-review-build-test.json';
+          ? `hopcode-review-pr-${pr}-build-test.json`
+          : 'hopcode-review-build-test.json';
       parts.push(
         '',
         '**Build and test what the diff changed.** Give this one call a long tool ' +
@@ -866,7 +866,7 @@ export function buildRoleBrief(
         `"\${HOPCODE_CODE_CLI:-qwen}" review test-efficacy ${resolve(opts.planPath)} \\`,
         `  --worktree ${typeof wt === 'string' ? resolve(wt) : '<worktree>'} \\`,
         `  --base ${base} \\`,
-        `  --out ${resolve(dirname(opts.planPath), `qwen-review-pr-${pr}-efficacy.json`)}`,
+        `  --out ${resolve(dirname(opts.planPath), `hopcode-review-pr-${pr}-efficacy.json`)}`,
         '```',
         '',
         'Read its `findings[]`. `kind: "unreachable"` is a test the project\'s test command ' +

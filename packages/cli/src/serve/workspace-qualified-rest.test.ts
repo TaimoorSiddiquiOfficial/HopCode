@@ -133,7 +133,7 @@ function makeWorkspaceService(label: string): DaemonWorkspaceService {
       sessionsFailed: 0,
     })),
     initWorkspace: vi.fn(async (ctx) => ({
-      path: `${ctx.workspaceCwd}/QWEN.md`,
+      path: `${ctx.workspaceCwd}/HOPCODE.md`,
       action: 'created' as const,
     })),
     restartMcpServer: vi.fn(async (_ctx, serverName) => ({
@@ -185,7 +185,7 @@ async function makeHarness(opts?: {
   persistSetting?: boolean;
 }) {
   const scratch = await fsp.mkdtemp(
-    path.join(os.tmpdir(), 'qwen-workspace-qualified-rest-'),
+    path.join(os.tmpdir(), 'hopcode.workspace-qualified-rest-'),
   );
   const primaryCwd = canonicalizeWorkspace(path.join(scratch, 'primary'));
   const secondaryCwd = canonicalizeWorkspace(
@@ -263,7 +263,7 @@ async function makeHarness(opts?: {
 
 async function makeWindowsSelectorHarness() {
   const scratch = await fsp.mkdtemp(
-    path.join(os.tmpdir(), 'qwen-workspace-qualified-rest-win-'),
+    path.join(os.tmpdir(), 'hopcode.workspace-qualified-rest-win-'),
   );
   const primaryCwd = canonicalizeWorkspace(path.join(scratch, 'primary'));
   await fsp.mkdir(primaryCwd, { recursive: true });
@@ -734,7 +734,7 @@ describe('workspace-qualified core REST', () => {
         .set('Host', host())
         .send({ force: true });
       expect(init.status).toBe(200);
-      expect(init.body.path).toBe(`${h.secondaryCwd}/QWEN.md`);
+      expect(init.body.path).toBe(`${h.secondaryCwd}/HOPCODE.md`);
 
       const reload = await request(h.app)
         .post(`/workspaces/${encodeURIComponent(h.secondaryId)}/reload`)
@@ -1102,7 +1102,7 @@ describe('workspace-qualified core REST', () => {
           content: '# Secondary memory\n',
         });
       expect(write.status).toBe(200);
-      expect(write.body.filePath).toBe(path.join(h.secondaryCwd, 'QWEN.md'));
+      expect(write.body.filePath).toBe(path.join(h.secondaryCwd, 'HOPCODE.md'));
       expect(write.body.changed).toBe(true);
 
       const read = await request(h.app)
@@ -1114,7 +1114,7 @@ describe('workspace-qualified core REST', () => {
       expect(read.body.files).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            path: path.join(h.secondaryCwd, 'QWEN.md'),
+            path: path.join(h.secondaryCwd, 'HOPCODE.md'),
             scope: 'workspace',
           }),
         ]),
@@ -1148,7 +1148,7 @@ describe('workspace-qualified core REST', () => {
     const h = await makeHarness({ token: 'secret' });
     try {
       await fsp.writeFile(
-        path.join(h.secondaryCwd, 'QWEN.md'),
+        path.join(h.secondaryCwd, 'HOPCODE.md'),
         'x'.repeat(17 * 1024 * 1024),
         'utf8',
       );

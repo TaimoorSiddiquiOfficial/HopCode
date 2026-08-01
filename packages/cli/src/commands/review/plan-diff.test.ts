@@ -83,12 +83,12 @@ describe('plan-diff', () => {
       out,
       maxChunkLines: 400,
       pr: 6998,
-      repo: 'QwenLM/qwen-code',
+      repo: 'QwenLM/hopcode',
     });
 
     const plan = JSON.parse(readFileSync(out, 'utf8'));
     expect(plan.prNumber).toBe('6998');
-    expect(plan.ownerRepo).toBe('QwenLM/qwen-code');
+    expect(plan.ownerRepo).toBe('QwenLM/hopcode');
     // And no worktree appears — the identity does not fake a tree.
     expect(plan.worktreePath).toBeUndefined();
   });

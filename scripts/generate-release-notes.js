@@ -624,7 +624,7 @@ Usage:
   node scripts/generate-release-notes.js --tag=<tag> --previous-tag=<tag> [options]
 
 Options:
-  --repo=<owner/name>            Repository (default: $GITHUB_REPOSITORY or QwenLM/qwen-code).
+  --repo=<owner/name>            Repository (default: $GITHUB_REPOSITORY or QwenLM/hopcode).
   --tag=<tag>                    Release tag to generate.
   --previous-tag=<tag>           Previous release tag.
   --target=<ref>                 Target commitish (default: HEAD).
@@ -650,7 +650,7 @@ async function main() {
     throw new Error('--tag and --previous-tag are required.');
   }
 
-  const repo = args.repo || process.env.GITHUB_REPOSITORY || 'QwenLM/qwen-code';
+  const repo = args.repo || process.env.GITHUB_REPOSITORY || 'QwenLM/hopcode';
   const generatedBody = fetchGeneratedNotes({
     repo,
     tag: args.tag,

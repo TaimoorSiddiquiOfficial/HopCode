@@ -180,7 +180,7 @@ export const LOCAL_ONLY_CHANNELS = new Set<string>([
   RPC_CHANNELS.caching.GET_ENABLE_1M_CONTEXT,
   RPC_CHANNELS.caching.SET_ENABLE_1M_CONTEXT,
 
-  // memory — Qwen managed auto-memory settings
+  // memory — hopcode managed auto-memory settings
   RPC_CHANNELS.memory.GET_SETTINGS,
   RPC_CHANNELS.memory.SET_SETTINGS,
   RPC_CHANNELS.memory.GET_SETTINGS_PATH,

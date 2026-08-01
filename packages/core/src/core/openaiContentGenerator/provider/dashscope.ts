@@ -217,9 +217,9 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
     const extraBody = this.contentGeneratorConfig.extra_body;
 
     // When the user picks a reasoning effort (/effort), turn thinking on for
-    // qwen hybrid models. qwen has no per-tier `reasoning_effort` field yet, so
+    // hopcode hybrid models. hopcode has no per-tier `reasoning_effort` field yet, so
     // the unified effort maps onto the on/off `enable_thinking` switch — extend
-    // this to a real tier mapping when qwen ships one. User extra_body wins
+    // this to a real tier mapping when hopcode ships one. User extra_body wins
     // (merged last); the disable path (reasoning: false) is handled upstream in
     // the pipeline.
     const enableThinkingFromEffort = this.shouldEnableThinkingFromEffort(
@@ -243,7 +243,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
         ...(this.buildMetadata(userPromptId) || {}),
         ...dashscopeExtras,
       };
-      // qwen drives thinking via `enable_thinking`, not the OpenAI-style nested
+      // hopcode drives thinking via `enable_thinking`, not the OpenAI-style nested
       // `reasoning` object the pipeline injects from /effort. Drop it so we
       // don't ship two competing knobs (mirrors deepseek.ts / zai.ts). User
       // extra_body still wins (merged last).
@@ -269,7 +269,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
       ...(this.buildMetadata(userPromptId) || {}),
       ...dashscopeExtras,
     };
-    // qwen drives thinking via `enable_thinking`, not the OpenAI-style nested
+    // hopcode drives thinking via `enable_thinking`, not the OpenAI-style nested
     // `reasoning` object the pipeline injects from /effort. Drop it so we don't
     // ship two competing knobs (mirrors deepseek.ts / zai.ts). User extra_body
     // still wins (merged last).
@@ -300,7 +300,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
       this.contentGeneratorConfig.model ??
       ''
     ).toLowerCase();
-    return wireModel.startsWith('qwen') || wireModel === 'coder-model';
+    return wireModel.startsWith('hopcode') || wireModel === 'coder-model';
   }
 
   buildMetadata(userPromptId: string): DashScopeRequestMetadata {

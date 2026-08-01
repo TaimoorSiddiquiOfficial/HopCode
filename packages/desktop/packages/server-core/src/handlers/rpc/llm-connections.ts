@@ -179,7 +179,7 @@ export function registerLlmConnectionsHandlers(
         const message =
           error instanceof Error ? error.message : 'Unknown error';
         deps.platform.logger?.error(
-          'Failed to connect Qwen provider:',
+          'Failed to connect hopcode provider:',
           message,
         );
         return { success: false, error: message };
@@ -225,7 +225,7 @@ export function registerLlmConnectionsHandlers(
         const message =
           error instanceof Error ? error.message : 'Unknown error';
         deps.platform.logger?.error(
-          'Failed to setup Qwen connection:',
+          'Failed to setup hopcode connection:',
           message,
         );
         return { success: false, error: message };
@@ -331,7 +331,7 @@ export function registerLlmConnectionsHandlers(
         await sessionManager.reinitializeAuth(hopcodeConnection.slug);
         return { success: true };
       } catch (error) {
-        deps.platform.logger?.error('Failed to save Qwen connection:', error);
+        deps.platform.logger?.error('Failed to save hopcode connection:', error);
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -354,7 +354,7 @@ export function registerLlmConnectionsHandlers(
         }
         return { success };
       } catch (error) {
-        deps.platform.logger?.error('Failed to delete Qwen connection:', error);
+        deps.platform.logger?.error('Failed to delete hopcode connection:', error);
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Unknown error',
@@ -454,7 +454,7 @@ export function registerLlmConnectionsHandlers(
       } catch (error) {
         const msg = error instanceof Error ? error.message : 'Unknown error';
         deps.platform.logger?.error(
-          `Failed to refresh Qwen models for ${slug}: ${msg}`,
+          `Failed to refresh hopcode models for ${slug}: ${msg}`,
         );
         return { success: false, error: msg };
       }

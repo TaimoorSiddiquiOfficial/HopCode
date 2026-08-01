@@ -202,7 +202,7 @@ describe('LSTool', () => {
       expect(result.returnDisplay).toBe('Listed 3 item(s) (2 hopcode-ignored)');
     });
 
-    it('should respect configured custom qwen ignore files', async () => {
+    it('should respect configured custom hopcode ignore files', async () => {
       await fs.writeFile(path.join(tempRootDir, 'file1.txt'), 'content1');
       await fs.writeFile(
         path.join(tempRootDir, 'cursor-secret.log'),

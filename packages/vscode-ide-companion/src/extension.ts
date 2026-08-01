@@ -13,7 +13,7 @@ import {
   detectIdeFromEnv,
   IDE_DEFINITIONS,
   type IdeInfo,
-} from '@hopcode/qwen-code-core';
+} from '@hopcode/hopcode-core';
 import { redactLogCredentials } from '@hopcode/acp-bridge/logRedaction';
 import { WebViewProvider } from './webview/providers/WebViewProvider.js';
 import { ChatProviderRegistry } from './webview/providers/ChatProviderRegistry.js';

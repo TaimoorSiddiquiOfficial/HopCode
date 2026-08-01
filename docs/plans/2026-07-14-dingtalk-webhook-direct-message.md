@@ -174,7 +174,7 @@ E2E 计划应使用隔离的 `HOME` 和真实凭据启动本地 daemon，然后�
 
 ```bash
 curl -i -X POST 'http://127.0.0.1:4170/channels/dingtalk-main/webhooks/manual-test' \
-  -H "x-qwen-webhook-secret: $QWEN_CHANNEL_DINGTALK_TEST_SECRET" \
+  -H "x-hopcode-webhook-secret: $QWEN_CHANNEL_DINGTALK_TEST_SECRET" \
   -H 'Content-Type: application/json' \
   -d '{"eventType":"manual_test","targetRef":"operator","title":"DingTalk DM self-test","payload":{"source":"curl"}}'
 ```
@@ -204,7 +204,7 @@ Run:
 ```bash
 cd packages/channels/base && npx vitest run src/ChannelBase.test.ts && npm run build
 cd packages/channels/dingtalk && npx vitest run src/DingtalkAdapter.test.ts && npm run build
-cd /Users/ben/workspace/qwen-code && npm run build && npm run typecheck
+cd /Users/ben/workspace/hopcode && npm run build && npm run typecheck
 ```
 
 Expected: 两个受影响 package 的测试和构建退出码为 0。根目录 build/typecheck 也应运行；若最新 `origin/main` 自身存在阻塞，则记录基线文件和错误，并确认本分支未修改该范围。

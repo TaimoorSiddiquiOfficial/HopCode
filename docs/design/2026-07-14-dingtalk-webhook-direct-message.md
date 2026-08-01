@@ -3,7 +3,7 @@
 ## 状态
 
 已实现并完成单聊真实链路验证。对应 Issue：
-[QwenLM/qwen-code#6883](https://github.com/QwenLM/qwen-code/issues/6883)。
+[QwenLM/hopcode#6883](https://github.com/QwenLM/hopcode/issues/6883)。
 
 ## 背景
 

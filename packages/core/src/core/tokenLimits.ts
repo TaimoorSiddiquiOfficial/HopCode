@@ -195,7 +195,7 @@ const PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^qwen3-vl-plus/, LIMITS['256k']],
   // Open-source Qwen3 variants: 256K native
   [/^qwen3-coder-/, LIMITS['256k']],
-  // Qwen fallback (VL, turbo, plus, 2.5, etc.): 256K
+  // hopcode fallback (VL, turbo, plus, 2.5, etc.): 256K
   [/^qwen/, LIMITS['256k']],
 
   // -------------------
@@ -257,7 +257,7 @@ const OUTPUT_PATTERNS: Array<[RegExp, TokenCount]> = [
   [/^qwen3\.\d/, LIMITS['64k']],
   [/^qwen3-max/, LIMITS['32k']],
   [/^coder-model$/, LIMITS['64k']],
-  [/^hopcode/, LIMITS['32k']], // Qwen fallback (VL, turbo, plus, etc.): 8K
+  [/^hopcode/, LIMITS['32k']], // hopcode fallback (VL, turbo, plus, etc.): 8K
 
   // DeepSeek
   [/^deepseek-v4/, LIMITS['384k']], // DeepSeek V4 (flash, pro): 384K

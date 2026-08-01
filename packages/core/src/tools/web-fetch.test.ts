@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -78,7 +78,7 @@ describe('WebFetchTool', () => {
       getBaseLlmClient: mockGetBaseLlmClient,
       getFastModel: vi.fn(() => undefined),
       getSessionId: vi.fn(() => 'test-session-id'),
-      getModel: vi.fn(() => 'qwen-coder'),
+      getModel: vi.fn(() => 'HopCode'),
       getCliVersion: vi.fn(() => '1.2.3'),
       getToolResultBytesWritten: vi.fn(() => 0),
       trackToolResultBytes: vi.fn(),
@@ -979,7 +979,7 @@ describe('WebFetchTool', () => {
       expect(
         await tool
           .build({
-            url: 'https://raw.githubusercontent.com/QwenLM/qwen-code/main/README.md',
+            url: 'https://raw.githubusercontent.com/QwenLM/hopcode/main/README.md',
             prompt: 'summarize',
           })
           .getDefaultPermission(),
@@ -1000,13 +1000,13 @@ describe('WebFetchTool', () => {
           contentType: 'text/markdown',
           body: Buffer.from('# Raw QwenLM readme'),
           finalUrl:
-            'https://raw.githubusercontent.com/QwenLM/qwen-code/main/README.md',
+            'https://raw.githubusercontent.com/QwenLM/hopcode/main/README.md',
         }),
       );
 
       const tool = new WebFetchTool(mockConfig);
       const invocation = tool.build({
-        url: 'https://github.com/QwenLM/qwen-code/blob/main/README.md',
+        url: 'https://github.com/QwenLM/hopcode/blob/main/README.md',
         prompt: 'summarize',
       });
       const result = await invocation.execute(new AbortController().signal);

@@ -392,7 +392,7 @@ describe('ExtensionFileWatcher', () => {
     );
     watcher.startWatching();
 
-    fireAllEvent(0, 'change', `${extensionsDir}/alpha/qwen-extension.json`);
+    fireAllEvent(0, 'change', `${extensionsDir}/alpha/hopcode-extension.json`);
     fireAllEvent(0, 'change', `${extensionsDir}/alpha/hooks/hooks.json`);
     fireAllEvent(0, 'change', `${extensionsDir}/extension-enablement.json`);
 
@@ -435,7 +435,7 @@ describe('ExtensionFileWatcher', () => {
 
   it('treats content events as stale when the extension manifest is gone', () => {
     mockExistsSync.mockImplementation(
-      (filePath: string) => !filePath.endsWith('/alpha/qwen-extension.json'),
+      (filePath: string) => !filePath.endsWith('/alpha/hopcode-extension.json'),
     );
     const refreshState = createRefreshState();
     const watcher = new ExtensionFileWatcher(
@@ -467,7 +467,7 @@ describe('ExtensionFileWatcher', () => {
     );
     watcher.startWatching();
 
-    fireAllEvent(0, 'change', '/tmp/linked-extension/qwen-extension.json');
+    fireAllEvent(0, 'change', '/tmp/linked-extension/hopcode-extension.json');
     fireAllEvent(0, 'change', '/tmp/linked-extension/GEMINI.md');
     fireAllEvent(0, 'change', '/tmp/linked-extension/commands/run.toml');
 
@@ -512,13 +512,13 @@ describe('ExtensionFileWatcher', () => {
             path: activeSource,
             config: {},
             installMetadata: { type: 'link', source: activeSource },
-            contextFiles: [`${activeSource}/QWEN.md`],
+            contextFiles: [`${activeSource}/HOPCODE.md`],
           },
           {
             path: inactiveSource,
             config: {},
             installMetadata: { type: 'link', source: inactiveSource },
-            contextFiles: [`${inactiveSource}/QWEN.md`],
+            contextFiles: [`${inactiveSource}/HOPCODE.md`],
           },
         ],
         getActiveExtensions: () => [
@@ -526,7 +526,7 @@ describe('ExtensionFileWatcher', () => {
             path: activeSource,
             config: {},
             installMetadata: { type: 'link', source: activeSource },
-            contextFiles: [`${activeSource}/QWEN.md`],
+            contextFiles: [`${activeSource}/HOPCODE.md`],
           },
         ],
         getExtensionManager: () => ({
@@ -544,7 +544,7 @@ describe('ExtensionFileWatcher', () => {
       activeSource,
     ]);
 
-    fireAllEvent(0, 'change', `${inactiveSource}/QWEN.md`);
+    fireAllEvent(0, 'change', `${inactiveSource}/HOPCODE.md`);
     fireAllEvent(0, 'change', `${inactiveSource}/commands/run.toml`);
 
     expect(refreshState.markExtensionsChanged).not.toHaveBeenCalled();

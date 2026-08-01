@@ -1224,7 +1224,7 @@ describe('loadServerHierarchicalMemory', () => {
     it('skips HOPCODE.local.md when cwd === homedir without .git (avoids global-dir collision)', async () => {
       // When cwd is the home directory and there is no `.git` there, the
       // would-be slot path resolves to `<homedir>/.hopcode/HOPCODE.local.md` —
-      // i.e. inside the GLOBAL Qwen dir. Loading that as a project-local
+      // i.e. inside the GLOBAL hopcode dir. Loading that as a project-local
       // override is wrong: there is no project. Pin the "skip" behavior.
       await fsPromises.rm(path.join(projectRoot, '.git'), {
         recursive: true,

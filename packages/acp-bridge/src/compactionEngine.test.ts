@@ -898,7 +898,7 @@ describe('transcript record provenance compaction', () => {
     sourceRecordIds: string[],
   ): BridgeEvent {
     const update = (event.data as { update: Record<string, unknown> }).update;
-    update['_meta'] = { qwenTranscript: { sourceRecordIds } };
+    update['_meta'] = { hopcodetranscript: { sourceRecordIds } };
     return event;
   }
 
@@ -962,7 +962,7 @@ describe('transcript record provenance compaction', () => {
           updateOf(event)['toolCallId'] === '__proto__',
       );
     expect(updateOf(toolEvent!)['_meta']).toMatchObject({
-      qwenTranscript: {
+      hopcodetranscript: {
         sourceRecordIds: ['start-record', 'result-record'],
       },
     });

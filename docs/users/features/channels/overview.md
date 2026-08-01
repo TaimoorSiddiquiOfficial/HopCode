@@ -255,7 +255,7 @@ By default, hopcode ignores unmentioned group messages and does not store them a
 - Group-level `groupHistoryLimit` overrides the channel-level value.
 - Only messages from authorized senders are persisted.
 - Messages rejected by `groupPolicy` or group allowlist are not persisted.
-- Pending group history is stored as local JSONL under `~/.hopcode/channels/<channel-name>-group-history.jsonl` or `$QWEN_HOME/channels/<channel-name>-group-history.jsonl`.
+- Pending group history is stored as local JSONL under `~/.hopcode/channels/<channel-name>-group-history.jsonl` or `$hopcode_home/channels/<channel-name>-group-history.jsonl`.
 - Cached messages are injected as untrusted context on the next real trigger and are not written as standalone session turns.
 
 ### How group messages are evaluated
@@ -429,7 +429,7 @@ hopcode serve --channel my-channel
 hopcode serve --channel all
 
 # Or enable channels later on a token-protected daemon
-QWEN_SERVER_TOKEN=secret hopcode serve
+hopcode_server_token=secret hopcode serve
 qwen channel set my-channel --token secret
 
 # Query or stop the daemon-managed selection
@@ -491,7 +491,7 @@ For DingTalk, set `isGroup` explicitly on every target. A direct-message target 
 Daemon-managed DingTalk, Feishu, Telegram, and WeCom channels dynamically observe contacts from authorized inbound messages. List contacts observed in the primary workspace during the default seven-day freshness window:
 
 ```bash
-curl -H "Authorization: Bearer $QWEN_SERVER_TOKEN" \
+curl -H "Authorization: Bearer $hopcode_server_token" \
   http://127.0.0.1:4170/workspace/channel/observed-contacts
 ```
 
@@ -528,19 +528,19 @@ The response returns complete platform IDs and labels. Group labels use names al
 }
 ```
 
-These nested users are observed participants, not authoritative group membership. Only messages that pass direct/group, mention, sender, and pairing gates are recorded. Repeated observations refresh labels and timestamps; passive observation cannot detect a leave or deletion until the relationship becomes stale. Message content is never stored. The bounded registry lives under `$QWEN_HOME/channels/daemon/<workspaceHash>/observed-contacts.json`, outside the workspace checkout and partitioned per workspace. Its 500-observation limit is shared by all channels and conversations in that workspace, and observations older than 365 days are removed on the next accepted write. If the registry becomes malformed or uses an unsupported version, delete that file to reset it; accepted traffic recreates it. Webhook configuration and delivery are unchanged.
+These nested users are observed participants, not authoritative group membership. Only messages that pass direct/group, mention, sender, and pairing gates are recorded. Repeated observations refresh labels and timestamps; passive observation cannot detect a leave or deletion until the relationship becomes stale. Message content is never stored. The bounded registry lives under `$hopcode_home/channels/daemon/<workspaceHash>/observed-contacts.json`, outside the workspace checkout and partitioned per workspace. Its 500-observation limit is shared by all channels and conversations in that workspace, and observations older than 365 days are removed on the next accepted write. If the registry becomes malformed or uses an unsupported version, delete that file to reset it; accepted traffic recreates it. Webhook configuration and delivery are unchanged.
 
 Start `hopcode serve` with the channel worker enabled:
 
 ```bash
-QWEN_SERVER_TOKEN="$QWEN_SERVER_TOKEN" hopcode serve --require-auth --channel dingtalk-main
+hopcode_server_token="$hopcode_server_token" hopcode serve --require-auth --channel dingtalk-main
 ```
 
 Example request:
 
 ```bash
 curl -X POST "http://127.0.0.1:4170/channels/dingtalk-main/webhooks/github-ci" \
-  -H "x-qwen-webhook-secret: $QWEN_CHANNEL_GITHUB_CI_SECRET" \
+  -H "x-hopcode-webhook-secret: $QWEN_CHANNEL_GITHUB_CI_SECRET" \
   -H "Content-Type: application/json" \
   -d '{
     "eventType": "push",
@@ -548,7 +548,7 @@ curl -X POST "http://127.0.0.1:4170/channels/dingtalk-main/webhooks/github-ci" \
     "title": "CI pipeline finished",
     "payload": {
       "targetRef": "refs/heads/main",
-      "repository": "qwen-code",
+      "repository": "hopcode",
       "status": "success"
     }
   }'

@@ -30,7 +30,7 @@ import { stopCommand } from './stop.js';
 async function invokeStop(argv: Record<string, unknown> = {}): Promise<void> {
   const handler = stopCommand.handler;
   if (!handler) throw new Error('stop handler missing');
-  await handler({ _: [], $0: 'qwen', ...argv } as never);
+  await handler({ _: [], $0: 'hopcode', ...argv } as never);
 }
 
 beforeEach(() => {

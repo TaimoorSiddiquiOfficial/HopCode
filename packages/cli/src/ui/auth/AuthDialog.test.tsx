@@ -480,7 +480,7 @@ describe('AuthDialog', { timeout: 15000 }, () => {
 
       const { lastFrame } = renderAuthDialog(settings);
 
-      // QWEN OAuth no longer has a UI entry; the dialog falls back to the
+      // hopcode OAuth no longer has a UI entry; the dialog falls back to the
       // default Alibaba ModelStudio option.
       expect(lastFrame()).toContain('Alibaba ModelStudio');
     });

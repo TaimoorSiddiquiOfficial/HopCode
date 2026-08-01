@@ -78,19 +78,19 @@ describe('loadUsageDashboard', () => {
 
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-dashboard-'));
-    originalhopcodeHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(tmpHome, '.hopcode');
-    fs.mkdirSync(process.env['QWEN_HOME'], { recursive: true });
+    originalhopcodeHome = process.env['hopcode_home'];
+    process.env['hopcode_home'] = path.join(tmpHome, '.hopcode');
+    fs.mkdirSync(process.env['hopcode_home'], { recursive: true });
   });
 
   afterEach(() => {
-    if (originalhopcodeHome === undefined) delete process.env['QWEN_HOME'];
-    else process.env['QWEN_HOME'] = originalhopcodeHome;
+    if (originalhopcodeHome === undefined) delete process.env['hopcode_home'];
+    else process.env['hopcode_home'] = originalhopcodeHome;
     fs.rmSync(tmpHome, { recursive: true, force: true });
   });
 
   function seed(records: UsageSummaryRecord[]): void {
-    const file = path.join(process.env['QWEN_HOME']!, 'usage_record.jsonl');
+    const file = path.join(process.env['hopcode_home']!, 'usage_record.jsonl');
     fs.writeFileSync(
       file,
       records.map((r) => JSON.stringify(r)).join('\n') + '\n',
@@ -106,7 +106,7 @@ describe('loadUsageDashboard', () => {
     const cwd = '/daemon/project';
     const ts = new Date().toISOString();
     const chatsDir = path.join(
-      process.env['QWEN_HOME']!,
+      process.env['hopcode_home']!,
       'projects',
       'daemon-project',
       'chats',

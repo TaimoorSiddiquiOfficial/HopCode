@@ -42,7 +42,7 @@ session, and exposes status via polling.
                                                                   │ ACP stdio (JSON-RPC)
                                                      ┌────────────▼────────────┐
                                                      │  hopcode --acp child       │
-                                                     │  (QwenAgent.extMethod)  │
+                                                     │  (hopcodeagent.extMethod)  │
                                                      │  → remember / forget /  │
                                                      │    dream core logic     │
                                                      └─────────────────────────┘
@@ -86,7 +86,7 @@ Queue a new remember task.
 **Headers:**
 
 - `Authorization: Bearer <token>` (required)
-- `X-Qwen-Client-Id: <clientId>` (optional — scopes task visibility)
+- `X-hopcode-client-id: <clientId>` (optional — scopes task visibility)
 
 **Response `202 Accepted`:**
 
@@ -106,7 +106,7 @@ Queue a new remember task.
 | ------ | ---------------------------- | ----------------------------------------------- |
 | 400    | `invalid_content`            | Missing, empty, or oversized content            |
 | 400    | `invalid_context_mode`       | Unrecognized contextMode value                  |
-| 400    | `invalid_client_id`          | X-Qwen-Client-Id not registered with the bridge |
+| 400    | `invalid_client_id`          | X-hopcode-client-id not registered with the bridge |
 | 409    | `managed_memory_unavailable` | Managed memory not configured for workspace     |
 | 429    | `remember_queue_full`        | 16 pending tasks already queued                 |
 | 500    | `remember_failed`            | Availability check threw unexpectedly           |
@@ -118,7 +118,7 @@ Poll task status.
 **Headers:**
 
 - `Authorization: Bearer <token>` (required)
-- `X-Qwen-Client-Id: <clientId>` (optional — must match originator to see task)
+- `X-hopcode-client-id: <clientId>` (optional — must match originator to see task)
 
 **Response `200 OK` (queued/running):**
 
@@ -176,7 +176,7 @@ Poll task status.
 
 | Status | Code                      | Condition                                            |
 | ------ | ------------------------- | ---------------------------------------------------- |
-| 400    | `invalid_client_id`       | X-Qwen-Client-Id not registered                      |
+| 400    | `invalid_client_id`       | X-hopcode-client-id not registered                      |
 | 404    | `remember_task_not_found` | Task does not exist or belongs to a different client |
 
 ---
@@ -327,7 +327,7 @@ Workspace memory methods added to `BridgeInterface`
 Both methods call `ensureChannel()` (spawning the ACP child if needed) and
 restart the idle timer afterwards if no sessions are active.
 
-### 5.3 ACP Child Execution (`QwenAgent.extMethod`)
+### 5.3 ACP Child Execution (`hopcodeagent.extMethod`)
 
 In `packages/cli/src/acp-integration/acpAgent.ts`, the handler for
 `workspaceMemoryRemember`, `workspaceMemoryForget`, and `workspaceMemoryDream`:
@@ -481,7 +481,7 @@ The SDK normalizer maps the raw `memory_changed` SSE event (with
 ```
 
 This extends the existing `workspace.memory.changed` event type, which
-previously only carried `scope: 'workspace' | 'global'` for file-based QWEN.md
+previously only carried `scope: 'workspace' | 'global'` for file-based HOPCODE.md
 writes.
 
 ---

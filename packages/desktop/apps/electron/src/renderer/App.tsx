@@ -839,7 +839,7 @@ export default function App() {
         try {
           const result = await window.electronAPI.refreshLlmConnectionModels(hopcodeConnectionToRefresh.slug)
           if (!result.success) {
-            console.warn('[App] Qwen model refresh failed:', result.error)
+            console.warn('[App] hopcode model refresh failed:', result.error)
             hopcodeModelRefreshAttemptedRef.current.delete(hopcodeConnectionToRefresh.slug)
             return
           }
@@ -849,7 +849,7 @@ export default function App() {
           setLlmConnections(refreshedConnections)
           setDefaultLlmConnectionSlug(resolveDefaultConnectionSlug(refreshedConnections))
         } catch (error) {
-          console.warn('[App] Qwen model refresh failed:', error)
+          console.warn('[App] hopcode model refresh failed:', error)
         } finally {
           hopcodeModelRefreshInFlightRef.current = null
         }
@@ -1213,7 +1213,7 @@ export default function App() {
         return
       }
 
-      // In-place id rename (e.g. Qwen managed session adopting the ACP session
+      // In-place id rename (e.g. hopcode managed session adopting the ACP session
       // id after its first turn). This is NOT a delete+create: migrate the
       // active selection and per-session state from previousId -> sessionId so
       // the open chat keeps working (otherwise the next session-scoped action,

@@ -321,7 +321,7 @@ describe('loadWorkspaceSkills', () => {
 describe('loadAllSkills', () => {
   const getWorkspaceSkillsDir = () => join(workspaceRoot, 'skills');
   const getProjectSkillsDir = () => join(projectRoot, '.agents', 'skills');
-  const getProjectQwenSkillsDir = () => join(projectRoot, '.hopcode', 'skills');
+  const getProjecthopcodeskillsDir = () => join(projectRoot, '.hopcode', 'skills');
 
   // Use unique slugs that won't collide with real global skills
   const TEST_PREFIX = '_test_storage_';
@@ -357,9 +357,9 @@ describe('loadAllSkills', () => {
     }
   });
 
-  it('should load Qwen project skills without requiring a Craft workspace skills directory', () => {
+  it('should load hopcode project skills without requiring a Craft workspace skills directory', () => {
     const baselineGlobal = getExistingGlobalSlugs();
-    const hopcodeProjDir = getProjectQwenSkillsDir();
+    const hopcodeProjDir = getProjecthopcodeskillsDir();
     mkdirSync(hopcodeProjDir, { recursive: true });
 
     createSkill(hopcodeProjDir, `${TEST_PREFIX}HOPCODE_proj`, {
@@ -378,7 +378,7 @@ describe('loadAllSkills', () => {
 
   it('should prefer .hopcode project skills over .agents project skills with the same slug', () => {
     const baselineGlobal = getExistingGlobalSlugs();
-    const hopcodeProjDir = getProjectQwenSkillsDir();
+    const hopcodeProjDir = getProjecthopcodeskillsDir();
     const agentsProjDir = getProjectSkillsDir();
     mkdirSync(hopcodeProjDir, { recursive: true });
     mkdirSync(agentsProjDir, { recursive: true });

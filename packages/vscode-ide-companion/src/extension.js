@@ -8,7 +8,7 @@ import { IDEServer } from './ide-server.js';
 import semver from 'semver';
 import { DiffContentProvider, DiffManager } from './diff-manager.js';
 import { createLogger, logger, resetLoggerSink } from './utils/logger.js';
-import { detectIdeFromEnv, IDE_DEFINITIONS, } from '@hopcode/qwen-code-core';
+import { detectIdeFromEnv, IDE_DEFINITIONS, } from '@hopcode/hopcode-core';
 import { redactLogCredentials } from '@hopcode/acp-bridge/logRedaction';
 import { WebViewProvider } from './webview/providers/WebViewProvider.js';
 import { ChatProviderRegistry } from './webview/providers/ChatProviderRegistry.js';
@@ -84,7 +84,7 @@ async function checkForUpdates(context, log) {
     }
 }
 export async function activate(context) {
-    outputChannel = vscode.window.createOutputChannel('Qwen Code Companion');
+    outputChannel = vscode.window.createOutputChannel('HopCode Companion');
     createLogger(outputChannel, redactLogCredentials);
     logger.info('Extension activated');
     checkForUpdates(context, logger.info);

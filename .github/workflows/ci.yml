@@ -258,7 +258,7 @@ jobs:
       - name: 'Configure persistent npm cache (self-hosted)'
         if: "${{ needs.classify_pr.outputs.skip_ci != 'true' && steps.ci_profile.outputs.ci_profile == 'full' && runner.environment == 'self-hosted' }}"
         run: |-
-          cache_dir="${HOME}/.cache/qwen-code/npm"
+          cache_dir="${HOME}/.cache/hopcode/npm"
           mkdir -p "${cache_dir}"
           echo "NPM_CONFIG_CACHE=${cache_dir}" >> "${GITHUB_ENV}"
           echo "Using persistent npm cache at ${cache_dir}"
@@ -382,13 +382,13 @@ jobs:
         if: "${{ needs.classify_pr.outputs.skip_ci != 'true' && steps.ci_profile.outputs.ci_profile == 'full' }}"
         env:
           NO_COLOR: true
-          HOME: '${{ runner.temp }}/qwen-ci-home'
-          USERPROFILE: '${{ runner.temp }}/qwen-ci-home'
+          HOME: '${{ runner.temp }}/hopcode-ci-home'
+          USERPROFILE: '${{ runner.temp }}/hopcode-ci-home'
           OPENAI_API_KEY: ''
           DASHSCOPE_API_KEY: ''
           HOPCODE_API_KEY: ''
           GEMINI_API_KEY: ''
-          QWEN_DEFAULT_AUTH_TYPE: ''
+          HOPCODE_DEFAULT_AUTH_TYPE: ''
         run: |-
           node -e "const fs = require('node:fs'); for (const key of ['HOME', 'USERPROFILE']) { const dir = process.env[key]; if (dir) fs.mkdirSync(dir, { recursive: true }); }"
           npm run test:ci
@@ -481,7 +481,7 @@ jobs:
       - name: 'Configure persistent npm cache (self-hosted)'
         if: "${{ runner.environment == 'self-hosted' }}"
         run: |-
-          cache_dir="${HOME}/.cache/qwen-code/npm"
+          cache_dir="${HOME}/.cache/hopcode/npm"
           mkdir -p "${cache_dir}"
           echo "NPM_CONFIG_CACHE=${cache_dir}" >> "${GITHUB_ENV}"
           echo "Using persistent npm cache at ${cache_dir}"
@@ -596,13 +596,13 @@ jobs:
         if: "${{ needs.classify_pr.outputs.skip_ci != 'true' }}"
         env:
           NO_COLOR: true
-          HOME: '${{ runner.temp }}/qwen-ci-home'
-          USERPROFILE: '${{ runner.temp }}/qwen-ci-home'
+          HOME: '${{ runner.temp }}/hopcode-ci-home'
+          USERPROFILE: '${{ runner.temp }}/hopcode-ci-home'
           OPENAI_API_KEY: ''
           DASHSCOPE_API_KEY: ''
           HOPCODE_API_KEY: ''
           GEMINI_API_KEY: ''
-          QWEN_DEFAULT_AUTH_TYPE: ''
+          HOPCODE_DEFAULT_AUTH_TYPE: ''
         run: |-
           node -e "const fs = require('node:fs'); for (const key of ['HOME', 'USERPROFILE']) { const dir = process.env[key]; if (dir) fs.mkdirSync(dir, { recursive: true }); }"
           npm run test:ci
@@ -651,13 +651,13 @@ jobs:
         if: "${{ needs.classify_pr.outputs.skip_ci != 'true' }}"
         env:
           NO_COLOR: true
-          HOME: '${{ runner.temp }}/qwen-ci-home'
-          USERPROFILE: '${{ runner.temp }}/qwen-ci-home'
+          HOME: '${{ runner.temp }}/hopcode-ci-home'
+          USERPROFILE: '${{ runner.temp }}/hopcode-ci-home'
           OPENAI_API_KEY: ''
           DASHSCOPE_API_KEY: ''
           HOPCODE_API_KEY: ''
           GEMINI_API_KEY: ''
-          QWEN_DEFAULT_AUTH_TYPE: ''
+          HOPCODE_DEFAULT_AUTH_TYPE: ''
         run: |-
           node -e "const fs = require('node:fs'); for (const key of ['HOME', 'USERPROFILE']) { const dir = process.env[key]; if (dir) fs.mkdirSync(dir, { recursive: true }); }"
           npm run test:ci
@@ -782,7 +782,7 @@ jobs:
       - name: 'Configure persistent npm cache (self-hosted)'
         if: "${{ runner.environment == 'self-hosted' }}"
         run: |-
-          cache_dir="${HOME}/.cache/qwen-code/npm"
+          cache_dir="${HOME}/.cache/hopcode/npm"
           mkdir -p "${cache_dir}"
           echo "NPM_CONFIG_CACHE=${cache_dir}" >> "${GITHUB_ENV}"
           echo "Using persistent npm cache at ${cache_dir}"

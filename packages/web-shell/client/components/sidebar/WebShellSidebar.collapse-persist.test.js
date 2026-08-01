@@ -114,7 +114,7 @@ function makeSession(sessionId, over = {}) {
     };
 }
 const organizationCapabilities = {
-    qwenCodeVersion: '1.2.3',
+    hopcodeversion: '1.2.3',
     features: ['session_organization'],
 };
 const namedGroup = {
@@ -185,7 +185,7 @@ afterEach(() => {
     vi.restoreAllMocks();
 });
 describe('WebShellSidebar collapsed session group persistence', () => {
-    it('writes collapsed section ids with the qwen-code-web-shell-* key', async () => {
+    it('writes collapsed section ids with the hopcode-web-shell-* key', async () => {
         renderSidebar();
         await flushSidebar();
         const backend = container.querySelector('section[aria-label="Backend"]');

@@ -8,7 +8,7 @@
 
 ## Constraints
 
-- Persist under `$QWEN_HOME/channels/daemon/<workspaceHash>/observed-contacts.json`.
+- Persist under `$hopcode_home/channels/daemon/<workspaceHash>/observed-contacts.json`.
 - Record after inbound preflight and before command or Agent handling.
 - Record each Envelope once; never record rejected input, bot output, proactive sends, or webhook traffic.
 - Return complete IDs and sanitized/fallback labels.

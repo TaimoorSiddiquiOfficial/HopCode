@@ -93,7 +93,7 @@ import {
 } from '../../constants/sessions';
 import styles from './WebShellSidebar.module.css';
 
-const SIDEBAR_WIDTH_STORAGE_KEY = 'qwen-code-web-shell-sidebar-width';
+const SIDEBAR_WIDTH_STORAGE_KEY = 'hopcode-web-shell-sidebar-width';
 const SIDEBAR_DEFAULT_WIDTH = 260;
 const SIDEBAR_MIN_WIDTH = 220;
 const SIDEBAR_MAX_WIDTH = 420;
@@ -384,7 +384,7 @@ function IconNewChat() {
 }
 
 /**
- * Qwen brand mark. Same artwork as the browser-tab favicon in index.html and
+ * hopcode brand mark. Same artwork as the browser-tab favicon in index.html and
  * the QwenLM GitHub avatar; inlined as an SVG rather than hot-linked because
  * the Web Shell CSP is `img-src 'self' data: blob:` (see web-shell-static.ts),
  * which blocks remote images. The purple #6D44E8 fill is legible on both the
@@ -901,7 +901,7 @@ export function WebShellSidebar({
     workspaceQualifiedRestCoreEnabled,
     workspaceSessionsReloadToken,
   ]);
-  const qwenCodeVersion = connection.capabilities?.qwenCodeVersion || '';
+  const hopcodeversion = connection.capabilities?.hopcodeversion || '';
   // Numeric releases render as "v1.2.3"; a non-semver fallback such as
   // "unknown" is shown as-is so we never produce a bogus "vunknown".
   const versionLabel = hopCodeVersion
@@ -3346,7 +3346,7 @@ export function WebShellSidebar({
                   <IconQwenLogo />
                 </span>
                 {!collapsed && (
-                  <span className={styles.brandName}>Qwen Code</span>
+                  <span className={styles.brandName}>HopCode</span>
                 )}
               </>
             )}

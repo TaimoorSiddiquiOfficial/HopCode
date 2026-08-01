@@ -2863,7 +2863,7 @@ export class Config {
   async refreshHierarchicalMemory(
     loadReason: Exclude<InstructionLoadReason, 'include'> = 'refresh',
   ): Promise<void> {
-    // Safe mode: skip all context file loading (QWEN.md, AGENTS.md, rules)
+    // Safe mode: skip all context file loading (HOPCODE.md, AGENTS.md, rules)
     if (this.isSafeMode()) {
       this.setUserMemory('');
       this.setGeminiMdFileCount(0);

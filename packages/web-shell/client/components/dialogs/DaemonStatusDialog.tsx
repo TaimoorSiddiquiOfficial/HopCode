@@ -795,10 +795,10 @@ function DaemonStatusDialogInner() {
           className={styles.grid}
         >
           <Card title={t('daemon.overview.title')}>
-            {daemon.qwenCodeVersion && (
+            {daemon.hopcodeversion && (
               <Row
                 label={t('daemon.overview.version')}
-                value={daemon.qwenCodeVersion}
+                value={daemon.hopcodeversion}
               />
             )}
             <Row label={t('daemon.overview.pid')} value={daemon.pid} />

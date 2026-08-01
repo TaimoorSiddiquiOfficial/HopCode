@@ -250,7 +250,7 @@ Options:
                           Staged native node_modules directory. Missing
                           clipboard packages are fatal when this is supplied.
   --out-dir DIR           Output directory. Defaults to dist/standalone.
-  --version VERSION       Qwen Code version. Defaults to package.json version.
+  --version VERSION       HopCode version. Defaults to package.json version.
   --skip-checksums        Do not update SHA256SUMS. Used by release packaging.
   -h, --help              Show this help message.`);
 }

@@ -65,7 +65,7 @@ export class BridgeChannelClosedError extends Error {
     }
 }
 /**
- * Raised by `defaultSpawnChannelFactory` when neither `QWEN_CLI_ENTRY` nor
+ * Raised by `defaultSpawnChannelFactory` when neither `hopcode_cli_entry` nor
  * `process.argv[1]` resolves to a path that can be re-spawned for the ACP
  * child. Replaces a generic `new Error(...)` so `mapDomainErrorToErrorKind`
  * can return `'missing_binary'` via `instanceof` rather than regex-matching
@@ -75,33 +75,33 @@ export class BridgeChannelClosedError extends Error {
 export class MissingCliEntryError extends Error {
     constructor() {
         super('Cannot determine CLI entry path for spawning the ACP child: ' +
-            'process.argv[1] is empty and QWEN_CLI_ENTRY is unset. ' +
-            'Set QWEN_CLI_ENTRY to the absolute path of the qwen entry ' +
-            'script (e.g. `export QWEN_CLI_ENTRY=$(which qwen)`) to override.');
+            'process.argv[1] is empty and hopcode_cli_entry is unset. ' +
+            'Set hopcode_cli_entry to the absolute path of the hopcode entry ' +
+            'script (e.g. `export hopcode_cli_entry=$(which qwen)`) to override.');
         this.name = 'MissingCliEntryError';
     }
 }
 export const SERVE_STATUS_EXT_METHODS = {
-    workspaceMcp: 'qwen/status/workspace/mcp',
-    workspaceMcpTools: 'qwen/status/workspace/mcp/tools',
-    workspaceMcpResources: 'qwen/status/workspace/mcp/resources',
-    workspaceSkills: 'qwen/status/workspace/skills',
-    workspaceTools: 'qwen/status/workspace/tools',
-    workspaceProviders: 'qwen/status/workspace/providers',
-    workspaceMemory: 'qwen/status/workspace/memory',
-    workspaceAgents: 'qwen/status/workspace/agents',
-    workspacePreflight: 'qwen/status/workspace/preflight',
-    sessionContext: 'qwen/status/session/context',
-    sessionContextUsage: 'qwen/status/session/context_usage',
-    sessionSupportedCommands: 'qwen/status/session/supported_commands',
-    sessionTasks: 'qwen/status/session/tasks',
-    sessionStats: 'qwen/status/session/stats',
-    sessionLspStatus: 'qwen/status/session/lsp',
-    sessionTranscript: 'qwen/status/session/transcript',
-    sessionRewindSnapshots: 'qwen/status/session/rewind_snapshots',
-    workspaceHooks: 'qwen/status/workspace/hooks',
-    sessionHooks: 'qwen/status/session/hooks',
-    workspaceExtensions: 'qwen/status/workspace/extensions',
+    workspaceMcp: 'hopcode.status/workspace/mcp',
+    workspaceMcpTools: 'hopcode.status/workspace/mcp/tools',
+    workspaceMcpResources: 'hopcode.status/workspace/mcp/resources',
+    workspaceSkills: 'hopcode.status/workspace/skills',
+    workspaceTools: 'hopcode.status/workspace/tools',
+    workspaceProviders: 'hopcode.status/workspace/providers',
+    workspaceMemory: 'hopcode.status/workspace/memory',
+    workspaceAgents: 'hopcode.status/workspace/agents',
+    workspacePreflight: 'hopcode.status/workspace/preflight',
+    sessionContext: 'hopcode.status/session/context',
+    sessionContextUsage: 'hopcode.status/session/context_usage',
+    sessionSupportedCommands: 'hopcode.status/session/supported_commands',
+    sessionTasks: 'hopcode.status/session/tasks',
+    sessionStats: 'hopcode.status/session/stats',
+    sessionLspStatus: 'hopcode.status/session/lsp',
+    sessionTranscript: 'hopcode.status/session/transcript',
+    sessionRewindSnapshots: 'hopcode.status/session/rewind_snapshots',
+    workspaceHooks: 'hopcode.status/workspace/hooks',
+    sessionHooks: 'hopcode.status/session/hooks',
+    workspaceExtensions: 'hopcode.status/workspace/extensions',
     // Process-wide rss/cpu of this ACP child, self-reported to the daemon for
     // the Daemon Status resource charts (workspace-scoped; no sessionId).
     workspaceResource: 'hopcode/status/workspace/resource',
@@ -114,46 +114,46 @@ export const SERVE_STATUS_EXT_METHODS = {
  * which then mutates Config / ToolRegistry / McpClientManager state.
  */
 export const SERVE_CONTROL_EXT_METHODS = {
-    sessionClose: 'qwen/control/session/close',
-    sessionApprovalMode: 'qwen/control/session/approval_mode',
-    sessionBranch: 'qwen/control/session/branch',
-    sessionForkAgent: 'qwen/control/session/fork_agent',
-    sessionRecap: 'qwen/control/session/recap',
-    sessionGenerationStart: 'qwen/control/session/generation/start',
-    sessionGenerationCancel: 'qwen/control/session/generation/cancel',
-    sessionBtw: 'qwen/control/session/btw',
-    sessionShellHistory: 'qwen/control/session/shell_history',
-    sessionLanguage: 'qwen/control/session/language',
-    sessionRewind: 'qwen/control/session/rewind',
-    sessionContinue: 'qwen/control/session/continue',
-    sessionTitle: 'qwen/control/session/title',
-    sessionParent: 'qwen/control/session/parent',
-    sessionSource: 'qwen/control/session/source',
-    sessionArtifactsPersist: 'qwen/control/session/artifacts/persist',
-    workspaceMcpRestart: 'qwen/control/workspace/mcp/restart',
-    workspaceMcpManage: 'qwen/control/workspace/mcp/manage',
-    workspaceMcpInitialize: 'qwen/control/workspace/mcp/initialize',
-    workspaceMcpReload: 'qwen/control/workspace/mcp/reload',
-    workspaceAgentGenerate: 'qwen/control/workspace/agents/generate',
+    sessionClose: 'hopcode/control/session/close',
+    sessionApprovalMode: 'hopcode/control/session/approval_mode',
+    sessionBranch: 'hopcode/control/session/branch',
+    sessionForkAgent: 'hopcode/control/session/fork_agent',
+    sessionRecap: 'hopcode/control/session/recap',
+    sessionGenerationStart: 'hopcode/control/session/generation/start',
+    sessionGenerationCancel: 'hopcode/control/session/generation/cancel',
+    sessionBtw: 'hopcode/control/session/btw',
+    sessionShellHistory: 'hopcode/control/session/shell_history',
+    sessionLanguage: 'hopcode/control/session/language',
+    sessionRewind: 'hopcode/control/session/rewind',
+    sessionContinue: 'hopcode/control/session/continue',
+    sessionTitle: 'hopcode/control/session/title',
+    sessionParent: 'hopcode/control/session/parent',
+    sessionSource: 'hopcode/control/session/source',
+    sessionArtifactsPersist: 'hopcode/control/session/artifacts/persist',
+    workspaceMcpRestart: 'hopcode/control/workspace/mcp/restart',
+    workspaceMcpManage: 'hopcode/control/workspace/mcp/manage',
+    workspaceMcpInitialize: 'hopcode/control/workspace/mcp/initialize',
+    workspaceMcpReload: 'hopcode/control/workspace/mcp/reload',
+    workspaceAgentGenerate: 'hopcode/control/workspace/agents/generate',
     workspaceMemoryRememberAvailability: 'hopcode/control/workspace/memory/remember/availability',
     workspaceMemoryRemember: 'hopcode/control/workspace/memory/remember',
     workspaceMemoryForget: 'hopcode/control/workspace/memory/forget',
     workspaceMemoryDream: 'hopcode/control/workspace/memory/dream',
     // Runtime MCP server mutation ext-methods
-    sessionTaskCancel: 'qwen/control/session/task/cancel',
-    sessionGoalClear: 'qwen/control/session/goal/clear',
+    sessionTaskCancel: 'hopcode/control/session/task/cancel',
+    sessionGoalClear: 'hopcode/control/session/goal/clear',
     /**
      * Read a live session's `/goal` state. The active goal lives only in the
      * child's in-memory store, so this is the sole authoritative source for the
      * condition, its running turn count and the judge's last verdict. Params:
      * `{ sessionId }`; result: `{ active: ActiveGoalView | null }`.
      */
-    sessionGoalGet: 'qwen/control/session/goal/get',
-    workspaceMcpRuntimeAdd: 'qwen/control/workspace/mcp/runtime-add',
-    workspaceMcpRuntimeRemove: 'qwen/control/workspace/mcp/runtime-remove',
-    workspaceReload: 'qwen/control/workspace/reload',
-    workspaceSkillsRefresh: 'qwen/control/workspace/skills/refresh',
-    workspaceExtensionsRefresh: 'qwen/control/workspace/extensions/refresh',
+    sessionGoalGet: 'hopcode/control/session/goal/get',
+    workspaceMcpRuntimeAdd: 'hopcode/control/workspace/mcp/runtime-add',
+    workspaceMcpRuntimeRemove: 'hopcode/control/workspace/mcp/runtime-remove',
+    workspaceReload: 'hopcode/control/workspace/reload',
+    workspaceSkillsRefresh: 'hopcode/control/workspace/skills/refresh',
+    workspaceExtensionsRefresh: 'hopcode/control/workspace/extensions/refresh',
     /**
      * Reverse tool channel (issue #5626, Phase 2). Unlike every other entry
      * here — which the PARENT serve process calls DOWN into the `hopcode --acp`
@@ -164,8 +164,8 @@ export const SERVE_CONTROL_EXT_METHODS = {
      * client and returns the correlated response. Params: `{ server, payload }`;
      * result: `{ payload }`.
      */
-    clientMcpMessage: 'qwen/control/client_mcp/message',
-    sessionCd: 'qwen/control/session/cd',
+    clientMcpMessage: 'hopcode/control/client_mcp/message',
+    sessionCd: 'hopcode/control/session/cd',
     /**
      * Also called by the CHILD UP into the parent (like `clientMcpMessage`): the
      * `create_sub_session` tool, running inside a child's agent turn, asks the
@@ -174,7 +174,7 @@ export const SERVE_CONTROL_EXT_METHODS = {
      * result: `{ sessionId, result?, stopReason? }` (result present only for the
      * `first-turn` mode, which waits for the sub-session's first turn to finish).
      */
-    createSubSession: 'qwen/control/create-sub-session',
+    createSubSession: 'hopcode/control/create-sub-session',
 };
 export const IDLE_HOOK_EVENTS = {
     PreToolUse: { description: 'Before tool execution', matcherKind: 'toolName' },
@@ -200,7 +200,7 @@ export const IDLE_HOOK_EVENTS = {
     MessageDisplay: {
         description: 'Repeatedly, as the assistant reply streams',
     },
-    Stop: { description: 'Right before Qwen Code concludes its response' },
+    Stop: { description: 'Right before HopCode concludes its response' },
     SubagentStart: {
         description: 'When a subagent is started',
         matcherKind: 'agentType',

@@ -28,7 +28,7 @@ export function toTranscriptEpochMs(timestamp) {
 function buildUpdateMeta(options) {
     const timestamp = toTranscriptEpochMs(options.timestamp);
     const sourceRecordIds = dedupeStrings(options.sourceRecordIds ?? []);
-    const qwenTranscript = {
+    const hopcodetranscript = {
         ...(sourceRecordIds.length > 0 ? { sourceRecordIds } : {}),
         ...(options.planToolCallId
             ? { planToolCallId: options.planToolCallId }
@@ -37,7 +37,7 @@ function buildUpdateMeta(options) {
     const meta = {
         ...(options.extra ?? {}),
         ...(timestamp !== undefined ? { timestamp } : {}),
-        ...(Object.keys(qwenTranscript).length > 0 ? { qwenTranscript } : {}),
+        ...(Object.keys(hopcodetranscript).length > 0 ? { hopcodetranscript } : {}),
     };
     return Object.keys(meta).length > 0 ? meta : undefined;
 }
@@ -358,7 +358,7 @@ class DefaultTranscriptReplayMachine {
                     functionCall['id'].length > 0
                     ? functionCall['id']
                     : undefined;
-                const callId = this.allocateToolCallId(explicitId ?? `qwen-replay-tool:${record.uuid}:${partIndex}`);
+                const callId = this.allocateToolCallId(explicitId ?? `hopcode-replay-tool:${record.uuid}:${partIndex}`);
                 const update = createTranscriptToolCallStartUpdate({
                     toolName,
                     callId,
@@ -478,7 +478,7 @@ class DefaultTranscriptReplayMachine {
         if (candidates.length === 1)
             return candidates[0].callId;
         this.report('ambiguous_tool_call_correlation', 'A tool result could not be matched to exactly one pending tool call.', recordId);
-        return this.allocateToolCallId(`qwen-replay-tool:${recordId}:result`);
+        return this.allocateToolCallId(`hopcode-replay-tool:${recordId}:result`);
     }
     allocateToolCallId(candidate, reuse = false) {
         if (reuse && this.pendingToolCalls.has(candidate)) {

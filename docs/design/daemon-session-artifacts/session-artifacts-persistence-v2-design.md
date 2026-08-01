@@ -108,8 +108,8 @@ interface DaemonSessionArtifact {
     | 'restore_validation_failed'
     | 'sticky_override_active';
   metadata?: {
-    'qwen.workspace.sha256'?: string;
-    'qwen.workspace.mtimeMs'?: number;
+    'hopcode.workspace.sha256'?: string;
+    'hopcode.workspace.mtimeMs'?: number;
     [key: string]: string | number | boolean | null | undefined;
   };
 }
@@ -121,7 +121,7 @@ interface DaemonSessionArtifact {
 - `persistedAt`：metadata 最近成功落盘时间。
 - `restoreState`：恢复来源提示；不替代 `status`。
 - `persistenceWarning`：非阻塞持久化/恢复风险，前端可用它提示“此 artifact 不会跨重启保留”等状态。当前 wire shape 是固定字符串，避免把 host 绝对路径、credential、token、内部 storage path 或 connection id 写入 response。更结构化的 `{ code, message }` 可作为后续兼容扩展。
-- `status: "changed"`：仅用于 workspace artifact。daemon 在登记时写入 `sizeBytes`、`metadata["qwen.workspace.sha256"]` 和 `metadata["qwen.workspace.mtimeMs"]`；GET/list/restore 后 refresh 先 stat 当前文件，size 变化直接返回 `changed`，size/mtime 均未变化则不重读文件，只有 mtime 变化但 size 相同时才重新计算 sha256 兜底。
+- `status: "changed"`：仅用于 workspace artifact。daemon 在登记时写入 `sizeBytes`、`metadata["hopcode.workspace.sha256"]` 和 `metadata["hopcode.workspace.mtimeMs"]`；GET/list/restore 后 refresh 先 stat 当前文件，size 变化直接返回 `changed`，size/mtime 均未变化则不重读文件，只有 mtime 变化但 size 相同时才重新计算 sha256 兜底。
 
 ### 3.2 Status 与 restoreState 的关系
 
@@ -841,7 +841,7 @@ PR #6259 当前必须覆盖：
 - restore seed 与 concurrent POST 串行，不丢写、不重复。
 - quota 边界：200 条、201 条 prune、clientRetained/non-clientRetained 两层排序、全部 clientRetained restorable 仍可按确定性规则裁剪。
 - clientRetained setter：Add artifact request 能设置 boolean hint；后台自动 ingest 不能伪造用户保留。
-- workspace 三态：登记时写入 size + `metadata["qwen.workspace.sha256"]` + `metadata["qwen.workspace.mtimeMs"]`；GET/list refresh 能区分 `available`、`missing` 和 `changed`，且未变化文件只走 stat 快路径。
+- workspace 三态：登记时写入 size + `metadata["hopcode.workspace.sha256"]` + `metadata["hopcode.workspace.mtimeMs"]`；GET/list refresh 能区分 `available`、`missing` 和 `changed`，且未变化文件只走 stat 快路径。
 - authorization：token-holder/principal 审计路径允许和拒绝情况；V1 live same-principal guard 仅作为 live UX/audit hint，不作为 durable security boundary。
 - JSONL snapshot baseline advance：threshold 触发、post-snapshot replay 有界、snapshot payload 不再携带已被覆盖的 explicit tombstones、superseded sticky tombstone 允许显式同 id 重新出现、`stickyEphemeralIds` 保留 sticky state；JSONL 文件本身不被 artifact 子系统重写。
 - corrupt latest snapshot fallback：回退到较旧 valid snapshot 或一次顺序 artifact replay。

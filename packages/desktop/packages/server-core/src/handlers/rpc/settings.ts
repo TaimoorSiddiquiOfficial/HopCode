@@ -503,7 +503,7 @@ export function registerSettingsHandlers(
         ['name', 'pinned', 'workingDirectory'].includes(key)
       ) {
         throw new Error(
-          'This conversation workspace is managed by Qwen and cannot be renamed, pinned, or moved.',
+          'This conversation workspace is managed by hopcode and cannot be renamed, pinned, or moved.',
         );
       }
 

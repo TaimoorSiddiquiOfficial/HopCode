@@ -184,7 +184,7 @@ export function getHookShortDescription(eventName: string): string {
     [HookEventName.MessageDisplay]: t(
       'Repeatedly, as the assistant reply streams',
     ),
-    [HookEventName.Stop]: t('Right before Qwen Code concludes its response'),
+    [HookEventName.Stop]: t('Right before HopCode concludes its response'),
     [HookEventName.SubagentStart]: t(
       'When a subagent (Agent tool call) is started',
     ),

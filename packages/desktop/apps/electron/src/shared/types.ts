@@ -999,27 +999,27 @@ export interface ElectronAPI {
     level: ThinkingLevel,
   ): Promise<{ success: boolean; error?: string }>;
   getHopCodeCoreSettings(): Promise<HopCodeCoreSettingsSnapshot>;
-  setQwenCoreSetting(
+  sethopcodecoreSetting(
     scope: HopCodeSettingsScope,
     key: HopCodeCoreSettingKey,
     value: HopCodeSettingValue,
   ): Promise<HopCodeCoreSettingsSnapshot>;
-  setQwenMcpServer(
+  sethopcodemcpserver(
     scope: HopCodeSettingsScope,
     name: string,
     server: HopCodeMcpServerConfig,
   ): Promise<HopCodeCoreSettingsSnapshot>;
-  removeQwenMcpServer(
+  removehopcodemcpserver(
     scope: HopCodeSettingsScope,
     name: string,
   ): Promise<HopCodeCoreSettingsSnapshot>;
-  setQwenHook(
+  sethopcodehook(
     scope: HopCodeSettingsScope,
     event: HopCodeHookEvent,
     index: number | undefined,
     hook: HopCodeHookDefinition,
   ): Promise<HopCodeCoreSettingsSnapshot>;
-  removeQwenHook(
+  removehopcodehook(
     scope: HopCodeSettingsScope,
     event: HopCodeHookEvent,
     index: number,

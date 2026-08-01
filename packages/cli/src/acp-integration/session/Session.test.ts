@@ -1474,7 +1474,7 @@ describe('Session', () => {
       await expect(
         session.setModel({
           sessionId: 'test-session-id',
-          modelId: 'qwen-route:v1:abcdefghijklmnop',
+          modelId: 'hopcode-route:v1:abcdefghijklmnop',
         }),
       ).rejects.toThrow('Unknown or stale model route');
 
@@ -7656,7 +7656,7 @@ describe('Session', () => {
         // unset the home confinement root must NOT collapse to '': isWithin('',
         // anyPath) is trivially true, so an empty root lets a home
         // `~/.hopcode/loop.md` symlink resolve anywhere and bypass the confinement.
-        // The guard falls back to the parent of the global qwen dir
+        // The guard falls back to the parent of the global hopcode dir
         // (Storage.getGlobalhopcodeDir(), itself empty-home-safe), which is the
         // homehopcodeDir Session passes to the resolver.
         const homehopcodeDir = path.join(os.tmpdir(), '.hopcode');
@@ -7669,7 +7669,7 @@ describe('Session', () => {
 
         // Without the `|| path.dirname(homehopcodeDir)` guard this would be ''
         // (os.homedir()); the guard makes it the non-empty parent of the
-        // empty-home-safe global qwen dir.
+        // empty-home-safe global hopcode dir.
         expect(roots.homeConfineRoot).not.toBe('');
         expect(roots.homeConfineRoot).toBe(path.dirname(homehopcodeDir));
         expect(roots.homehopcodeDir).toBe(homehopcodeDir);

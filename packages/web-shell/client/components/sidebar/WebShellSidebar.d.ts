@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import type { DaemonWorkspaceCapability } from '@qwen-code/sdk/daemon';
+import type { DaemonWorkspaceCapability } from '@hopcode/sdk/daemon';
 import { type WebShellTheme } from '../../themeContext';
 export type WebShellSidebarFooterItem = 'settings' | 'version' | 'theme' | 'scheduledTasks' | 'goals' | 'sessionsOverview' | 'splitView' | 'daemonStatus' | 'collapse';
 export interface WebShellSidebarBranding {

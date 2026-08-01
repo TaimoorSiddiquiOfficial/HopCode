@@ -49,7 +49,7 @@ describe('projectChatRecordsToDaemonTranscript', () => {
             ['active'],
         ]);
         expect(first.blocks.every((block) => block.clientReceivedAt === 0)).toBe(true);
-        expect(first.blocks.every((block) => !('meta' in block) || !block.meta?.['qwenTranscript'])).toBe(true);
+        expect(first.blocks.every((block) => !('meta' in block) || !block.meta?.['hopcodetranscript'])).toBe(true);
     });
     it('finalizes earlier assistant blocks when record boundaries prevent merging', () => {
         const projection = projectChatRecordsToDaemonTranscript([
@@ -249,7 +249,7 @@ describe('projectChatRecordsToDaemonTranscript', () => {
         expect(projection.blocks[0]).toMatchObject({
             kind: 'tool',
             status: 'failed',
-            toolCallId: 'qwen-replay-tool:tool-start:0',
+            toolCallId: 'hopcode-replay-tool:tool-start:0',
         });
     });
     it('preserves assistant usage when the record ends with a tool call', () => {

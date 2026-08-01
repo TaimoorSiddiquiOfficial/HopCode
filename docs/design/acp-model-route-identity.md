@@ -11,7 +11,7 @@ Core already treats `(authType, modelId, configured baseUrl)` as the registry id
 Build ACP model options from the existing configured-model list:
 
 - Keep `modelId(authType)` when it is unique. This preserves existing IDs for the normal case.
-- When multiple options would share that ID, replace each with a deterministic `qwen-route:v1:<digest>` selector derived from non-secret model metadata and the public endpoint identity (credentials, query, and fragment removed).
+- When multiple options would share that ID, replace each with a deterministic `hopcode-route:v1:<digest>` selector derived from non-secret model metadata and the public endpoint identity (credentials, query, and fragment removed).
 - Reject routes that remain indistinguishable after sanitization instead of using array order, which could remap an old selector after configuration reordering.
 - Continue using `ModelInfo.name` and provider metadata for display. The route ID is an opaque machine selector.
 

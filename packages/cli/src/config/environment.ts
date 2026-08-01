@@ -483,7 +483,7 @@ export function loadEnvironment(
   for (const envFile of parsedEnvFiles.files) {
     const excludedVars =
       settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
-    // homeScoped: `.env` lives under the user's home Qwen dir or `~/.env` —
+    // homeScoped: `.env` lives under the user's home hopcode dir or `~/.env` —
     //   only these may set HOPCODE_HOME / HOPCODE_RUNTIME_DIR.
     // qwenScoped: any `.env` whose immediate parent is `.hopcode` (including
     //   `<repo>/.hopcode/.env`) — exempt from the user `excludedEnvVars` list.

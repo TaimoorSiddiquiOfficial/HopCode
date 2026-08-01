@@ -87,7 +87,7 @@ export const approveCommand: CommandModule = {
     'Approve a gated MCP server (.mcp.json or workspace .hopcode/settings.json)',
   builder: (yargs) =>
     yargs
-      .usage('Usage: qwen mcp approve [options] [name]')
+      .usage('Usage: hopcode mcp approve [options] [name]')
       .positional('name', {
         describe: 'Name of the gated server to approve',
         type: 'string',
@@ -112,7 +112,7 @@ export const rejectCommand: CommandModule = {
     'Reject a gated MCP server (.mcp.json or workspace .hopcode/settings.json)',
   builder: (yargs) =>
     yargs
-      .usage('Usage: qwen mcp reject [options] [name]')
+      .usage('Usage: hopcode mcp reject [options] [name]')
       .positional('name', {
         describe: 'Name of the gated server to reject',
         type: 'string',

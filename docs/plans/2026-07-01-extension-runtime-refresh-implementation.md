@@ -1,6 +1,6 @@
-﻿# Extension Runtime Refresh Implementation Plan
+# Extension Runtime Refresh Implementation Plan
 
-Tracking issue: https://github.com/QwenLM/qwen-code/issues/3696
+Tracking issue: https://github.com/QwenLM/hopcode/issues/3696
 
 Working branch: `feat/extension-runtime-refresh`
 
@@ -273,8 +273,8 @@ Detect external extension file changes and notify the user.
 Scope:
 
 - watch a conservative allowlist of extension-related files:
-  - `qwen-extension.json`;
-  - `.qwen-extension-install.json`;
+  - `hopcode-extension.json`;
+  - `.hopcode-extension-install.json`;
   - extension enablement, preferences, and source metadata;
   - `commands/**`;
   - `skills/**`;

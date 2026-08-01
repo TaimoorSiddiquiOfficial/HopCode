@@ -576,7 +576,7 @@ function resolvePluginRelativeFile(
 }
 
 /**
- * Builds a converted Qwen extension directory from a resolved Claude plugin
+ * Builds a converted hopcode extension directory from a resolved Claude plugin
  * source directory and its merged config. Shared by the marketplace-based
  * (`convertClaudePluginPackage`) and standalone (`convertClaudePluginStandalone`)
  * conversion paths.

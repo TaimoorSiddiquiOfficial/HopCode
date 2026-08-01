@@ -9,7 +9,7 @@
  * 2. Persisted connection.models — previously fetched, survives offline/restart
  * 3. MODEL_REGISTRY — hardcoded offline seed data, last resort
  *
- * Qwen is the exception: HopCode's ACP response is the source of truth, so
+ * hopcode is the exception: HopCode's ACP response is the source of truth, so
  * discovered models are kept in memory and never persisted to config.json.
  */
 
@@ -87,7 +87,7 @@ class ModelRefreshService {
 
   /**
    * Internal: actual refresh logic with fallback chain.
-   * Qwen ACP model metadata remains runtime-only and is never persisted.
+   * hopcode ACP model metadata remains runtime-only and is never persisted.
    */
   private async _doRefresh(slug: string): Promise<void> {
     const connection = getLlmConnection(slug)

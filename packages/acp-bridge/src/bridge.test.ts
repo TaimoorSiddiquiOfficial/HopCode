@@ -1238,7 +1238,7 @@ describe('createAcpSessionBridge', () => {
                 tasks: [],
               };
             }
-            if (method === 'qwen/status/session/lsp') {
+            if (method === 'hopcode.status/session/lsp') {
               return {
                 v: 1,
                 sessionId: params['sessionId'],
@@ -7733,12 +7733,12 @@ describe('createAcpSessionBridge', () => {
       });
       const session = await bridge.spawnOrAttach({
         workspaceCwd: WS_A,
-        modelServiceId: 'qwen-route:v1:abcdefghijklmnop',
+        modelServiceId: 'hopcode-route:v1:abcdefghijklmnop',
       });
       expect(session.attached).toBe(false);
       expect(setModelCalls).toHaveLength(1);
       expect(setModelCalls[0]?.sessionId).toBe(session.sessionId);
-      expect(setModelCalls[0]?.modelId).toBe('qwen-route:v1:abcdefghijklmnop');
+      expect(setModelCalls[0]?.modelId).toBe('hopcode-route:v1:abcdefghijklmnop');
       const abort = new AbortController();
       const iter = bridge.subscribeEvents(session.sessionId, {
         signal: abort.signal,
@@ -7749,7 +7749,7 @@ describe('createAcpSessionBridge', () => {
       expect(switched.value?.type).toBe('model_switched');
       expect(switched.value?.data).toEqual({
         sessionId: session.sessionId,
-        modelId: 'qwen-route:v1:abcdefghijklmnop',
+        modelId: 'hopcode-route:v1:abcdefghijklmnop',
       });
       const settingsChanged = await it.next();
       expect(settingsChanged.value?.type).toBe('settings_changed');
@@ -9320,14 +9320,14 @@ describe('createAcpSessionBridge', () => {
       });
       await bridge.setSessionModel(session.sessionId, {
         sessionId: session.sessionId,
-        modelId: 'qwen-route:v1:opaque',
+        modelId: 'hopcode-route:v1:opaque',
       });
       const it = iter[Symbol.asyncIterator]();
       const next = await it.next();
       expect(next.value?.type).toBe('model_switched');
       expect(next.value?.data).toEqual({
         sessionId: session.sessionId,
-        modelId: 'qwen-route:v1:opaque',
+        modelId: 'hopcode-route:v1:opaque',
       });
       const settingsChanged = await it.next();
       expect(settingsChanged.value?.type).toBe('settings_changed');

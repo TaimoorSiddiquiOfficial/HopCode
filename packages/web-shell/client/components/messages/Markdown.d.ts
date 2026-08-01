@@ -24,13 +24,13 @@ export declare function isSafeImageSrc(url: string | undefined): boolean;
 /**
  * react-markdown sanitizes every href through `defaultUrlTransform`, which
  * allows only `http(s)`, `irc(s)`, `mailto` and `xmpp` and rewrites everything
- * else to `''`. Without this, `qwen-session://<id>` never reaches
+ * else to `''`. Without this, `hopcode-session://<id>` never reaches
  * {@link MarkdownLink} with its scheme intact, the interception below is dead
  * code, and the link renders as an inert anchor.
  *
  * Letting the scheme through is safe: `MarkdownLink` never puts it in the DOM.
  * It renders `href="#"` and dispatches the id as an event, so nothing navigates
- * to a `qwen-session:` URL — and an unknown scheme is inert in a browser anyway.
+ * to a `hopcode-session:` URL — and an unknown scheme is inert in a browser anyway.
  * Every other href keeps the default sanitizer.
  */
 export declare function markdownUrlTransform(url: string): string;

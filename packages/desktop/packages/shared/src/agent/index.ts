@@ -151,7 +151,7 @@ export {
 } from './base-agent.ts';
 
 // Export backend abstraction - unified interface for AI agents
-// Qwen backend abstraction
+// hopcode backend abstraction
 export {
   // Factory (createAgent is the preferred name, createBackend is kept for backward compat)
   createBackend,

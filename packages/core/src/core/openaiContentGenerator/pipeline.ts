@@ -833,18 +833,18 @@ export class ContentGenerationPipeline {
       // baseRequest.model is built from above), not on the config model. A
       // request-level model override would otherwise desync the gate from
       // what actually ships: a hopcode config with a non-qwen request model
-      // would leak the field, and a non-hopcode config with a qwen request
+      // would leak the field, and a non-hopcode config with a hopcode request
       // model would miss the disable signal (the regression).
       //
       // `coder-model` is the HOPCODE_OAUTH default (DEFAULT_HOPCODE_MODEL in
-      // config/models.ts, aliased to Qwen 3.6 Plus hybrid) — it doesn't
+      // config/models.ts, aliased to hopcode 3.6 Plus hybrid) — it doesn't
       // start with `hopcode` but is the most common hybrid-thinking model
       // for first-time users, so it must be covered.
       //
-      // We also keep the legacy `qwen*` guard so raw qwen model names and
+      // We also keep the legacy `qwen*` guard so raw hopcode model names and
       // existing test fixtures continue to emit the disable signal.
       const model = (context.model ?? '').toLowerCase();
-      if (model.startsWith('qwen') || model === 'coder-model') {
+      if (model.startsWith('hopcode') || model === 'coder-model') {
         if (
           DashScopeOpenAICompatibleProvider.isDashScopeProvider(
             this.contentGeneratorConfig,

@@ -47,7 +47,7 @@ describe('isPreapprovedHost', () => {
 
   it('matches path-scoped entries only within the path prefix', () => {
     expect(isPreapprovedHost('github.com', '/QwenLM')).toBe(true);
-    expect(isPreapprovedHost('github.com', '/QwenLM/qwen-code')).toBe(true);
+    expect(isPreapprovedHost('github.com', '/QwenLM/hopcode')).toBe(true);
     expect(isPreapprovedHost('github.com', '/other-org/repo')).toBe(false);
   });
 
@@ -58,8 +58,8 @@ describe('isPreapprovedHost', () => {
   it('matches path prefixes case-insensitively', () => {
     // GitHub owner names are case-insensitive and unique regardless of case,
     // so /qwenlm/... is the same owner as the /QwenLM entry.
-    expect(isPreapprovedHost('github.com', '/qwenlm/qwen-code')).toBe(true);
-    expect(isPreapprovedHost('github.com', '/QWENLM/qwen-code')).toBe(true);
+    expect(isPreapprovedHost('github.com', '/qwenlm/hopcode')).toBe(true);
+    expect(isPreapprovedHost('github.com', '/QWENLM/hopcode')).toBe(true);
     expect(isPreapprovedHost('github.com', '/qwenlm-evil/malware')).toBe(false);
   });
 });

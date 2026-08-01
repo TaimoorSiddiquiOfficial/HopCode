@@ -10,7 +10,7 @@ of scope here.
 Today `hopcode serve --channel <name>` starts a single channel worker bound to the
 primary workspace. In multi-workspace mode the worker must be grouped by the
 workspace that owns each channel: each registered, trusted workspace gets its
-own worker process bound to that workspace's cwd, `QWEN_DAEMON_WORKSPACE`, and
+own worker process bound to that workspace's cwd, `hopcode_daemon_workspace`, and
 effective env overlay. The pidfile and daemon status grow an additive
 worker-list while preserving the existing single-worker fields. `--channel all`
 stays primary-only in v1. Single-workspace behavior is unchanged.
@@ -94,7 +94,7 @@ ownership.
 
 `CreateChannelWorkerSupervisorOptions` gains an optional `workerBaseEnv`
 (default `process.env`). `createWorkerEnv` uses `workerBaseEnv ?? process.env`
-as the base; everything else is unchanged (`QWEN_DAEMON_WORKSPACE`, token env
+as the base; everything else is unchanged (`hopcode_daemon_workspace`, token env
 scrubbing, daemon token injection). The group manager passes
 `runtime.env.effectiveEnv ?? process.env` — reading the field directly avoids
 importing a private helper from `server.ts`, and a parent-process-mode runtime

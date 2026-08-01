@@ -1,4 +1,4 @@
-﻿# Agent Loop 减轮方案：从 Skill 设计入手
+# Agent Loop 减轮方案：从 Skill 设计入手
 
 > 与 `rt-optimization-design.md` 同目录，互为补充：那份文档讨论**框架机制**层面减轮（D1 跳过末尾总结轮、D2 fast 路由、D4 prevalidate），这份文档主张**减轮的真正杠杆在 skill/tool 设计层**，并提出一条不依赖框架改造、不依赖 cache hit rate 数据的可实施路径。
 
@@ -23,7 +23,7 @@
 
 数据管道与代码改动的正确性 spec — 不依赖任何业务判断或基线数据，开发前就该锁定：
 
-- **qwen-logger 链路通畅**（§4.1.1b）：skill_launch 事件能同时落到 OTLP 和 qwen-logger 两条管道
+- **hopcode-logger 链路通畅**（§4.1.1b）：skill_launch 事件能同时落到 OTLP 和 hopcode-logger 两条管道
 - **`prompt_id` 串联**：单个 user prompt 触发的 `skill_launch` + 后续 `tool_call` 能用同一个 `prompt_id` grep 出完整 trail
 - **`batch_size` 非 undefined**（§4.3.2 方向 A）：单工具 batch 显式设 `batch_size = 1` / `batch_position = 0`
 - **SQL 可跑通**（§4.1.2）：离线 SQL 在真实 telemetry backend 输出非空且能区分高/低 followup_rate skill
@@ -298,20 +298,20 @@ export class SkillLaunchEvent implements BaseTelemetryEvent {
 
 **调用方更新**：`packages/core/src/tools/skill.ts` 的 4 个 `logSkillLaunch` 调用点（L386, L399, L426, L482），传入 `this.params` 拿不到 `prompt_id` — `BaseToolInvocation` 仅持有 `params`，没有 `request.prompt_id` 字段。**实际实现**用鸭子类型方式注入：`SkillToolInvocation` 暴露 `setPromptId(id)` setter + 私有 `promptId` 字段，`CoreToolScheduler.buildInvocation`（`coreToolScheduler.ts:1253`）在 build 后 duck-type 调 `setPromptId(request.prompt_id)`，对齐既有 `setCallId` hook 的 pattern；invocation 在 `execute()` 内的 4 个 `logSkillLaunch` 都传 `this.promptId`。**早期版本的本节描述（"BaseToolInvocation 已有 request.prompt_id"）是错的**，已在 PR #4565 review 后更正。
 
-#### 4.1.1b qwen-logger 链路修复（前置）
+#### 4.1.1b hopcode-logger 链路修复（前置）
 
-补 `prompt_id` 之前要先解决一个 **既存的链路断点**：`packages/core/src/telemetry/qwen-logger/qwen-logger.ts:908` 定义了 `logSkillLaunchEvent(event)` 方法，但**全仓库无任何调用方** —— `loggers.ts:958` 的 `logSkillLaunch` 直接走 `logs.getLogger(SERVICE_NAME).emit()` 这条 OTLP 路径，绕过了 qwen-logger。
+补 `prompt_id` 之前要先解决一个 **既存的链路断点**：`packages/core/src/telemetry/hopcode-logger/hopcode-logger.ts:908` 定义了 `logSkillLaunchEvent(event)` 方法，但**全仓库无任何调用方** —— `loggers.ts:958` 的 `logSkillLaunch` 直接走 `logs.getLogger(SERVICE_NAME).emit()` 这条 OTLP 路径，绕过了 hopcode-logger。
 
 后果：
 
-- OTLP 路径上的 skill_launch 事件能到 OTLP collector（已工作），但 qwen-logger 那条专用上报链路目前是死的
-- 如果 telemetry backend 是从 qwen-logger 消费（而非 OTLP），skill_launch 事件**完全不上报**
+- OTLP 路径上的 skill_launch 事件能到 OTLP collector（已工作），但 hopcode-logger 那条专用上报链路目前是死的
+- 如果 telemetry backend 是从 hopcode-logger 消费（而非 OTLP），skill_launch 事件**完全不上报**
 - §4.1.2 离线 SQL 派生 `SkillFollowupRecord` 依赖 skill_launch 事件落库 —— **必须先验证现在 skill_launch 在 backend 是否可见**
 
 修复方向二选一：
 
 - **A**（推荐）在 `loggers.ts:958` 的 `logSkillLaunch` 里加一行 `QwenLogger.getInstance(config)?.logSkillLaunchEvent(event)`，对齐 `logToolCall` 的 `loggers.ts:230` 写法
-- **B** 确认 backend 只从 OTLP 消费，把 qwen-logger 里的 `logSkillLaunchEvent` 标 `@deprecated` 或删除
+- **B** 确认 backend 只从 OTLP 消费，把 hopcode-logger 里的 `logSkillLaunchEvent` 标 `@deprecated` 或删除
 
 **为什么只补 QwenLogger 一条路径，不对齐 `logToolCall` 的 4 条全路径**：
 
@@ -319,12 +319,12 @@ export class SkillLaunchEvent implements BaseTelemetryEvent {
 
 1. `uiTelemetryService.addEvent(...)` — UI 展示
 2. `config.getChatRecordingService()?.recordUiTelemetryEvent(...)` — 聊天历史
-3. `QwenLogger.getInstance(config)?.logToolCallEvent(...)` — qwen-logger 后端遥测
+3. `QwenLogger.getInstance(config)?.logToolCallEvent(...)` — hopcode-logger 后端遥测
 4. OTLP `logger.emit(...)` — OpenTelemetry
 
 skill_launch 是**纯后端遥测事件**，不需要在 UI 上展示（用户已经看到 SkillTool 的 returnDisplay）、也不需要进 ChatRecording 的 turn 历史（skill 内部的工具调用已经各自被 recordUiTelemetryEvent 记录）。因此只补第 3 条（QwenLogger），保留第 4 条（OTLP），跳过 1/2 是有意的，不是遗漏。
 
-**字段透传细节**：`loggers.ts:961-966` 用 `{ ...event }` spread 自动透传新字段（`prompt_id` 加进 `SkillLaunchEvent` 后这条路自动生效），但 `qwen-logger.ts:908` 的 `logSkillLaunchEvent` 内部如果显式解构 `event.skill_name` / `event.success`，新字段不会自动纳入，需手动同步。
+**字段透传细节**：`loggers.ts:961-966` 用 `{ ...event }` spread 自动透传新字段（`prompt_id` 加进 `SkillLaunchEvent` 后这条路自动生效），但 `hopcode-logger.ts:908` 的 `logSkillLaunchEvent` 内部如果显式解构 `event.skill_name` / `event.success`，新字段不会自动纳入，需手动同步。
 
 工作量：A 路径约 0.5d（含 backend 端确认）；B 路径约 0.2d（删代码 + 文档说明）。
 
@@ -509,7 +509,7 @@ D3（`StreamingState.Summarizing`）是感知层优化，与本方案完全正�
 5. **不适用于子 agent / cron / notification** — 这些路径不走 skill 系统，本方案不覆盖
 6. **基线数据单薄** — 沿用 `rt-optimization-design.md` §1.2 的单次采样，Layer 2 落地前需补 ≥3 类场景基线
 7. **`logSkillLaunch` 字段扩展会破坏既有 telemetry consumer** — 4 个调用点 + 下游 logger 都要同步改
-8. **`qwen-logger.ts:908` `logSkillLaunchEvent` 当前是死代码** — 仓库内无任何调用方，§4.1.1b 已列前置修复
+8. **`hopcode-logger.ts:908` `logSkillLaunchEvent` 当前是死代码** — 仓库内无任何调用方，§4.1.1b 已列前置修复
 
 ### 7.1 与已有框架机制的边界（不在本方案范围）
 
@@ -533,7 +533,7 @@ D3（`StreamingState.Summarizing`）是感知层优化，与本方案完全正�
 | Phase    | 内容                                                                   | 投入                  | 产出                           | spec 锁定动作                           |
 | -------- | ---------------------------------------------------------------------- | --------------------- | ------------------------------ | --------------------------------------- |
 | **P-1**  | spec 前置评审                                                          | 0.5d                  | §0.1 / §0.3 锁定               | **锁定 §0.1 工程层 spec + §0.3 止损线** |
-| **P0**   | qwen-logger 链路修复（§4.1.1b 前置）                                   | 0.5d                  | skill_launch 事件可见性确认    | 验证 §0.1 第 1 条                       |
+| **P0**   | hopcode-logger 链路修复（§4.1.1b 前置）                                   | 0.5d                  | skill_launch 事件可见性确认    | 验证 §0.1 第 1 条                       |
 | **P1**   | Layer 1 telemetry：补 `prompt_id` 字段 + 离线 SQL                      | 1-2d                  | skill ranking 报告             | 验证 §0.1 第 2/3/4 条                   |
 | **P1.5** | 1 周数据收集 + 基线测量（≥3 类场景 × ≥10 次）                          | 1w                    | 决定改哪 2-3 个 skill          | **锁定 §0.2 阈值 + 验证 §0.1 第 5 条**  |
 | **P2**   | Layer 2 改造 top-1 skill（PR + A/B）                                   | 0.5-1d 改造 + 2w 观察 | followup_rate ↓、RT P50 ↓ 验证 | **PR 内声明 §0.4 per-skill spec**       |
@@ -558,9 +558,9 @@ D3（`StreamingState.Summarizing`）是感知层优化，与本方案完全正�
 | `packages/core/src/telemetry/types.ts`                   | `ToolCallEvent`（含 `prompt_id` / `duration_ms`）             | L170                              |
 | `packages/core/src/telemetry/types.ts`                   | `SkillLaunchEvent`（需补 `prompt_id`）                        | L896                              |
 | `packages/core/src/telemetry/loggers.ts`                 | `logToolCall`                                                 | L220                              |
-| `packages/core/src/telemetry/loggers.ts`                 | `logSkillLaunch`（走 OTLP；缺 qwen-logger 转发）              | L958                              |
-| `packages/core/src/telemetry/loggers.ts`                 | `logToolCall`（双路径：OTLP + qwen-logger，作为修复样板）     | L220, L230                        |
-| `packages/core/src/telemetry/qwen-logger/qwen-logger.ts` | `logSkillLaunchEvent`（**当前死代码**，§4.1.1b 前置修复目标） | L908                              |
+| `packages/core/src/telemetry/loggers.ts`                 | `logSkillLaunch`（走 OTLP；缺 hopcode-logger 转发）              | L958                              |
+| `packages/core/src/telemetry/loggers.ts`                 | `logToolCall`（双路径：OTLP + hopcode-logger，作为修复样板）     | L220, L230                        |
+| `packages/core/src/telemetry/hopcode-logger/hopcode-logger.ts` | `logSkillLaunchEvent`（**当前死代码**，§4.1.1b 前置修复目标） | L908                              |
 | `packages/core/src/core/coreToolScheduler.ts`            | `partitionToolCalls`                                          | L775                              |
 | `packages/core/src/core/coreToolScheduler.ts`            | `runConcurrently` / batch 调度                                | L2456, L2473                      |
 | `packages/core/src/core/coreToolScheduler.ts`            | `logToolCall` 调用点（batch_size 状态传递终点）               | L3163                             |

@@ -32,7 +32,7 @@ const formatUpdateInstructions = vi.fn(
         `  ${resolveUpdateCommand(installationInfo.updateCommand, latestVersion)}`,
       ];
     }
-    return ['Manual update required. Please reinstall Qwen Code.'];
+    return ['Manual update required. Please reinstall HopCode.'];
   },
 );
 const performStandaloneUpdate = vi.fn();
@@ -69,7 +69,7 @@ const { updateCommand } = await import('./update.js');
 
 const updateArgs: ArgumentsCamelCase<object> = {
   _: [],
-  $0: 'qwen',
+  $0: 'hopcode',
 };
 
 function settings(enableAutoUpdate?: boolean) {
@@ -118,14 +118,14 @@ describe('update command', () => {
   it('sets a non-zero exit code when a standalone update fails', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
     performStandaloneUpdate.mockRejectedValue(new Error('boom'));
 
     await updateCommand.handler(updateArgs);
 
     expect(performStandaloneUpdate).toHaveBeenCalledWith(
-      '/tmp/qwen-code',
+      '/tmp/hopcode',
       '1.2.3',
     );
     expect(writeStdoutLine).toHaveBeenCalledWith('Downloading update...');
@@ -137,7 +137,7 @@ describe('update command', () => {
     loadSettings.mockReturnValue(settings(false));
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
     performStandaloneUpdate.mockResolvedValue('done');
 
@@ -145,7 +145,7 @@ describe('update command', () => {
 
     expect(getInstallationInfo).toHaveBeenCalledWith(expect.any(String), true);
     expect(performStandaloneUpdate).toHaveBeenCalledWith(
-      '/tmp/qwen-code',
+      '/tmp/hopcode',
       '1.2.3',
     );
     expect(writeStdoutLine).toHaveBeenCalledWith(
@@ -165,7 +165,7 @@ describe('update command', () => {
       'Running via npx, update not applicable.',
     );
     expect(writeStdoutLine).not.toHaveBeenCalledWith(
-      'Manual update required. Please reinstall Qwen Code.',
+      'Manual update required. Please reinstall HopCode.',
     );
   });
 
@@ -185,7 +185,7 @@ describe('update command', () => {
   it('prints success message on standalone update', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
     performStandaloneUpdate.mockResolvedValue('done');
 
@@ -200,7 +200,7 @@ describe('update command', () => {
   it('prints deferred message on standalone update', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
     performStandaloneUpdate.mockResolvedValue('deferred');
 
@@ -221,7 +221,7 @@ describe('update command', () => {
     await updateCommand.handler(updateArgs);
 
     expect(writeStdoutLine).toHaveBeenCalledWith(
-      'Qwen Code 1.0.0 is up to date!',
+      'HopCode 1.0.0 is up to date!',
     );
     expect(getInstallationInfo).not.toHaveBeenCalled();
   });

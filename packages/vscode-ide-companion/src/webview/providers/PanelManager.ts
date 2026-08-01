@@ -338,7 +338,7 @@ export class PanelManager {
                     );
                   } catch (err) {
                     logger.warn(
-                      '[PanelManager] Failed to close empty group after Qwen panel disposed:',
+                      '[PanelManager] Failed to close empty group after hopcode panel disposed:',
                       err,
                     );
                   }
@@ -346,7 +346,7 @@ export class PanelManager {
               }
             } catch (err) {
               logger.warn(
-                '[PanelManager] Error while trying to close empty Qwen group:',
+                '[PanelManager] Error while trying to close empty hopcode group:',
                 err,
               );
             }

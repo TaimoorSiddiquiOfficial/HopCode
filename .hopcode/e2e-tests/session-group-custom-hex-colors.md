@@ -84,7 +84,7 @@ npm run bundle
 Use a unique temporary workspace and session name:
 
 ```bash
-export QWEN_RUNTIME_DIR="$(mktemp -d /tmp/qwen-hex-groups.XXXXXX)"
+export hopcode_runtime_dir="$(mktemp -d /tmp/qwen-hex-groups.XXXXXX)"
 node dist/cli.js serve --web
 ```
 

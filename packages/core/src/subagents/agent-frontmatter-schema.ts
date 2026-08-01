@@ -70,10 +70,10 @@ const PERMISSION_MODE_TO_APPROVAL_MODE = new Map<string, string>([
  * `approvalMode` value. Returns `undefined` for unknown / falsy input.
  *
  * Disambiguated from `packages/core/src/tools/agent/agent.ts`'s internal
- * `permissionModeToApprovalMode`, which maps the qwen `PermissionMode` enum
- * to the qwen `ApprovalMode` enum (different domain entirely). Importing the
+ * `permissionModeToApprovalMode`, which maps the hopcode `PermissionMode` enum
+ * to the hopcode `ApprovalMode` enum (different domain entirely). Importing the
  * wrong symbol via IDE auto-complete would silently return `undefined` for
- * every qwen enum value, hence the longer name.
+ * every hopcode enum value, hence the longer name.
  */
 export function claudePermissionModeToApprovalMode(
   permissionMode: string | undefined,

@@ -408,20 +408,20 @@ function MarkdownFencedCode({ className, children, isStreaming, }) {
 function MarkdownPre({ children }) {
     return _jsx(_Fragment, { children: children });
 }
-/** `qwen-session://<id>` links are intercepted and dispatched as a DOM event
+/** `hopcode-session://<id>` links are intercepted and dispatched as a DOM event
  * (`qwen:open-session`) so the app shell can navigate to the session without
  * the markdown renderer needing to know about session management. */
-const QWEN_SESSION_SCHEME = /^qwen-session:\/\//i;
+const QWEN_SESSION_SCHEME = /^hopcode-session:\/\//i;
 /**
  * react-markdown sanitizes every href through `defaultUrlTransform`, which
  * allows only `http(s)`, `irc(s)`, `mailto` and `xmpp` and rewrites everything
- * else to `''`. Without this, `qwen-session://<id>` never reaches
+ * else to `''`. Without this, `hopcode-session://<id>` never reaches
  * {@link MarkdownLink} with its scheme intact, the interception below is dead
  * code, and the link renders as an inert anchor.
  *
  * Letting the scheme through is safe: `MarkdownLink` never puts it in the DOM.
  * It renders `href="#"` and dispatches the id as an event, so nothing navigates
- * to a `qwen-session:` URL — and an unknown scheme is inert in a browser anyway.
+ * to a `hopcode-session:` URL — and an unknown scheme is inert in a browser anyway.
  * Every other href keeps the default sanitizer.
  */
 export function markdownUrlTransform(url) {

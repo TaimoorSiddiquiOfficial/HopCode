@@ -56,7 +56,7 @@ describe('hopcode-triage tmux workflow', () => {
 
   it('isolates agent state per run', () => {
     const cleanStep = step('Clean stale agent state');
-    const runStep = step('Run Qwen Triage');
+    const runStep = step('Run hopcode Triage');
 
     expect(cleanStep).toContain('HOPCODE_HOME="${RUNNER_TEMP:?}/hopcode-home"');
     expect(cleanStep).toContain('rm -rf "$HOPCODE_HOME"');

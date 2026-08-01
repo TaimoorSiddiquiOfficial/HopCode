@@ -1432,7 +1432,7 @@ describe('REST ↔ /acp equivalence', () => {
       const restRes = await request(app)
         .get('/file?path=README.md')
         .set('Authorization', 'Bearer tok');
-      const acpRes = await acpCall(app, 'qwen/workspace/fs/read', {
+      const acpRes = await acpCall(app, 'hopcode.workspace/fs/read', {
         path: 'README.md',
       });
 
@@ -1445,14 +1445,14 @@ describe('REST ↔ /acp equivalence', () => {
       const res = await request(app)
         .post('/file/write')
         .set('Authorization', 'Bearer tok')
-        .set('X-Qwen-Client-Id', 'unknown-client')
+        .set('X-hopcode-client-id', 'unknown-client')
         .send({ path: 'x.ts', content: 'y' });
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('invalid_client_id');
     });
 
     it('rejects invalid clientId via /acp (JSON-RPC error)', async () => {
-      const res = await acpCall(app, 'qwen/workspace/fs/write', {
+      const res = await acpCall(app, 'hopcode.workspace/fs/write', {
         path: 'x.ts',
         content: 'y',
       });

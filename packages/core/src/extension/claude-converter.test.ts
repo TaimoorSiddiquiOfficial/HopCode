@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -1018,9 +1018,9 @@ describe('convertClaudePluginStandalone', () => {
 
     const result = await convertClaudePluginStandalone(testDir);
 
-    // A qwen-extension.json must exist so the installer can load it.
+    // A hopcode-extension.json must exist so the installer can load it.
     expect(
-      fs.existsSync(path.join(result.convertedDir, 'qwen-extension.json')),
+      fs.existsSync(path.join(result.convertedDir, 'hopcode-extension.json')),
     ).toBe(true);
     expect(result.config.name).toBe('clickhouse');
     expect(result.config.version).toBe('1.0.0');
@@ -1527,7 +1527,7 @@ describe('normalizeClaudeMcpServer', () => {
   });
 
   it('drops a bogus non-sdk type from a websocket (tcp) config', () => {
-    // qwen reserves `type` for 'sdk' and selects websocket via the `tcp` field;
+    // hopcode reserves `type` for 'sdk' and selects websocket via the `tcp` field;
     // any stray non-sdk `type` is meaningless and is removed.
     expect(norm({ type: 'tcp', tcp: 'localhost:8000' })).toEqual({
       tcp: 'localhost:8000',

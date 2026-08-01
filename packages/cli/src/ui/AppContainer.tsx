@@ -1802,7 +1802,7 @@ export const AppContainer = (props: AppContainerProps) => {
     historyManager.addItem(
       {
         type: MessageType.INFO,
-        text: 'Refreshing hierarchical memory (QWEN.md or other context files)...',
+        text: 'Refreshing hierarchical memory (HOPCODE.md or other context files)...',
       },
       Date.now(),
     );
@@ -3500,7 +3500,7 @@ export const AppContainer = (props: AppContainerProps) => {
       const name = entry.meta?.name ?? entry.runId;
       const verb = entry.status === 'failed' ? 'failed' : 'completed';
       sendNotification(
-        { message: `Workflow '${name}' ${verb}`, title: 'Qwen Code' },
+        { message: `Workflow '${name}' ${verb}`, title: 'HopCode' },
         terminal,
         workflowBellEnabled,
       );

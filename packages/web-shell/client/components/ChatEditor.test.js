@@ -134,7 +134,7 @@ function renderChatEditor(props) {
                     ...customization,
                     renderComposerTagTooltip,
                     onComposerTagClick,
-                }, children: _jsx(I18nProvider, { language: "en", children: _jsx(ChatEditor, { onSubmit: () => undefined, commands: [], showChatWidthToggle: false, currentMode: "default", currentModel: "qwen", ...chatEditorProps }) }) }) }));
+                }, children: _jsx(I18nProvider, { language: "en", children: _jsx(ChatEditor, { onSubmit: () => undefined, commands: [], showChatWidthToggle: false, currentMode: "default", currentModel: "hopcode", ...chatEditorProps }) }) }) }));
     });
     return container;
 }
@@ -416,7 +416,7 @@ describe('ChatEditor toolbar popovers', () => {
         expect(onSelectModel).toHaveBeenCalledWith('qwen-max');
     });
     it('displays the model label instead of an opaque route id', () => {
-        const routeId = 'qwen-route:v1:abcdefghijklmnop';
+        const routeId = 'hopcode-route:v1:abcdefghijklmnop';
         const container = renderChatEditor({
             visibleToolbarActions: ['model'],
             currentModel: routeId,

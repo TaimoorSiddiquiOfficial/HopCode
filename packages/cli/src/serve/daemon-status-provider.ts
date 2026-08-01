@@ -131,7 +131,7 @@ async function buildDaemonPreflightCells(
   // Mirrors `defaultSpawnChannelFactory`'s lookup so the preflight cell
   // reflects the path the child would actually be spawned from.
   const cliEntryCell = (): ServePreflightCell => {
-    const cliEntry = env['QWEN_CLI_ENTRY'] || process.argv[1] || '';
+    const cliEntry = env['hopcode_cli_entry'] || process.argv[1] || '';
     if (cliEntry) {
       return {
         kind: 'cli_entry',
@@ -139,7 +139,7 @@ async function buildDaemonPreflightCells(
         locality: 'daemon',
         detail: {
           path: cliEntry,
-          source: env['QWEN_CLI_ENTRY'] ? 'QWEN_CLI_ENTRY' : 'process.argv[1]',
+          source: env['hopcode_cli_entry'] ? 'hopcode_cli_entry' : 'process.argv[1]',
         },
       };
     }

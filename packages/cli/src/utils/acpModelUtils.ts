@@ -12,7 +12,7 @@ import {
 } from '@hoptrendy/hopcode-core';
 import { z } from 'zod';
 
-export const ACP_ROUTE_ID_PREFIX = 'qwen-route:v1:';
+export const ACP_ROUTE_ID_PREFIX = 'hopcode-route:v1:';
 
 function getRouteEndpointIdentity(baseUrl: string | undefined): string | null {
   if (!baseUrl) return null;

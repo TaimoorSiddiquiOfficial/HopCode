@@ -207,7 +207,7 @@ describe('DaemonClient', () => {
                 url: 'http://daemon/session/session%2F1/artifacts',
                 method: 'GET',
                 headers: {
-                    'x-qwen-client-id': 'client-1',
+                    'X-HopCode-Client-Id': 'client-1',
                 },
                 body: null,
             });
@@ -235,7 +235,7 @@ describe('DaemonClient', () => {
                 method: 'POST',
                 headers: {
                     'content-type': 'application/json',
-                    'x-qwen-client-id': 'client-1',
+                    'X-HopCode-Client-Id': 'client-1',
                 },
                 body: JSON.stringify(artifact),
             });
@@ -258,7 +258,7 @@ describe('DaemonClient', () => {
                 url: 'http://daemon/session/session%2F1/artifacts/artifact%2F1',
                 method: 'DELETE',
                 headers: {
-                    'x-qwen-client-id': 'client-1',
+                    'X-HopCode-Client-Id': 'client-1',
                 },
                 body: null,
             });
@@ -411,7 +411,7 @@ describe('DaemonClient', () => {
                 key: 'general.language',
                 value: 'zh-CN',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-9');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-9');
         });
         it('propagates a non-2xx response as a DaemonHttpError', async () => {
             const body = { error: 'invalid scope', code: 'invalid_scope' };
@@ -446,7 +446,7 @@ describe('DaemonClient', () => {
                 modelId: 'gpt-4o',
                 baseUrl: 'https://api.openai.com',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-42');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-42');
         });
         it('propagates a non-2xx response as a DaemonHttpError', async () => {
             const body = { error: 'model not found', code: 'model_not_found' };
@@ -864,7 +864,7 @@ describe('DaemonClient', () => {
         it('GETs the default HTML export and parses attachment metadata', async () => {
             const { fetch, calls } = recordingFetch(() => textResponse(200, '<html>export</html>', {
                 'content-type': 'text/html; charset=utf-8',
-                'content-disposition': 'attachment; filename="qwen-code-export-2026.html"',
+                'content-disposition': 'attachment; filename="hopcode-export-2026.html"',
             }));
             const client = new DaemonClient({
                 baseUrl: 'http://daemon',
@@ -875,7 +875,7 @@ describe('DaemonClient', () => {
             const result = await exportClient.exportSession('with/slash');
             expect(result).toEqual({
                 content: '<html>export</html>',
-                filename: 'qwen-code-export-2026.html',
+                filename: 'hopcode-export-2026.html',
                 mimeType: 'text/html; charset=utf-8',
                 format: 'html',
             });
@@ -960,7 +960,7 @@ describe('DaemonClient', () => {
                 method: 'GET',
                 headers: {
                     authorization: 'Bearer secret',
-                    'x-qwen-client-id': 'client-1',
+                    'X-HopCode-Client-Id': 'client-1',
                 },
                 signal: expect.any(AbortSignal),
             });
@@ -1095,7 +1095,7 @@ describe('DaemonClient', () => {
                 headers: {
                     authorization: 'Bearer secret',
                     'content-type': 'application/json',
-                    'x-qwen-client-id': 'client-1',
+                    'X-HopCode-Client-Id': 'client-1',
                 },
                 signal: expect.any(AbortSignal),
             });
@@ -1131,7 +1131,7 @@ describe('DaemonClient', () => {
                 body: JSON.stringify({ command: 'pwd' }),
                 headers: expect.objectContaining({
                     Authorization: 'Bearer secret',
-                    'X-Qwen-Client-Id': 'client-b',
+                    'X-HopCode-Client-Id': 'client-b',
                 }),
             }));
         });
@@ -1554,7 +1554,7 @@ describe('DaemonClient', () => {
                     clientId: 'client-stale',
                 },
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-stale');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-stale');
         });
         it('releases the local prompt slot after invalid client id responses on blocking prompts', async () => {
             let promptRequests = 0;
@@ -2027,7 +2027,7 @@ describe('DaemonClient', () => {
             const res = await client.unarchiveSessionsData(['s-1', 's-2'], 'client-1');
             expect(res).toEqual(result);
             expect(calls[0]?.url).toBe('http://daemon/sessions/unarchive');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
             expect(JSON.parse(calls[0].body)).toEqual({
                 sessionIds: ['s-1', 's-2'],
             });
@@ -2612,7 +2612,7 @@ describe('DaemonClient', () => {
             expect(calls[0]?.url).toBe('http://daemon/session/s%2F1/generate');
             expect(calls[0]?.method).toBe('POST');
             expect(calls[0]?.headers.accept).toBe('text/event-stream');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
             expect(JSON.parse(calls[0]?.body)).toEqual({
                 prompt: 'Translate this',
             });
@@ -2758,7 +2758,7 @@ describe('DaemonClient', () => {
                 body: JSON.stringify({ enabled: false }),
             });
             expect(calls[0]?.headers['content-type']).toBe('application/json');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
         });
         it('supports the workspace-qualified helper', async () => {
             const { fetch, calls } = recordingFetch(() => jsonResponse(200, response));
@@ -2773,7 +2773,7 @@ describe('DaemonClient', () => {
                 method: 'POST',
                 body: JSON.stringify({ enabled: false }),
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-2');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-2');
         });
         it('passes structured daemon errors through', async () => {
             const { fetch } = recordingFetch(() => jsonResponse(409, {
@@ -2793,7 +2793,7 @@ describe('DaemonClient', () => {
             const response = {
                 skillName: 'demo-skill',
                 scope: 'workspace',
-                installedPath: '/workspace/.qwen/skills/demo-skill/SKILL.md',
+                installedPath: '/workspace/.hopcode/skills/demo-skill/SKILL.md',
             };
             const { fetch, calls } = recordingFetch(() => jsonResponse(200, response));
             const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
@@ -2895,7 +2895,7 @@ describe('DaemonClient', () => {
             });
             expect(calls[0]?.url).toBe('http://daemon/workspace/trust/request');
             expect(calls[0]?.method).toBe('POST');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
             expect(JSON.parse(calls[0].body)).toEqual({
                 desiredState: 'untrusted',
                 reason: 'remote user request',
@@ -3000,7 +3000,7 @@ describe('DaemonClient', () => {
             }));
             const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
             await client.setupGithub({ consent: true }, 'client-1');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
         });
         it('throws DaemonHttpError for setup failures', async () => {
             const { fetch } = recordingFetch(() => jsonResponse(502, {
@@ -3069,7 +3069,7 @@ describe('DaemonClient', () => {
             }));
             const client = new DaemonClient({ baseUrl: 'http://daemon', fetch });
             await client.reloadChannelWorker({ clientId: 'client-9' });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-9');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-9');
         });
         it('rejects on a non-2xx response (channels not enabled)', async () => {
             const { fetch } = recordingFetch(() => jsonResponse(409, {
@@ -3106,7 +3106,7 @@ describe('DaemonClient', () => {
                 url: 'http://daemon/workspace/channel',
                 method: 'GET',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-7');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-7');
         });
         it('PUTs the selection and returns replacement metadata', async () => {
             const result = {
@@ -3132,7 +3132,7 @@ describe('DaemonClient', () => {
             expect(calls[0]?.headers).toMatchObject({
                 authorization: 'Bearer secret',
                 'content-type': 'application/json',
-                'x-qwen-client-id': 'client-8',
+                'X-HopCode-Client-Id': 'client-8',
             });
         });
         it('preserves structured startup failure bodies on 502 responses', async () => {
@@ -3467,7 +3467,7 @@ describe('DaemonClient', () => {
             const result = await client.respondToExtensionInteraction('op/1', 'interaction/1', { cancelled: true }, 'client-1');
             expect(calls[0]?.url).toBe('http://daemon/workspace/extensions/operations/op%2F1/interactions/interaction%2F1');
             expect(calls[0]?.method).toBe('POST');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
             expect(calls[0]?.body).toBe(JSON.stringify({ cancelled: true }));
             expect(result).toEqual({ accepted: true });
         });
@@ -4072,7 +4072,7 @@ describe('DaemonClient', () => {
                 method: 'GET',
                 url: 'http://daemon/workspace/permissions',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
         });
         it('setWorkspacePermissionRules posts scope ruleType and rules', async () => {
             const { fetch, calls } = recordingFetch(() => jsonResponse(200, permissionsStatus));
@@ -4083,7 +4083,7 @@ describe('DaemonClient', () => {
                 url: 'http://daemon/workspace/permissions',
             });
             expect(calls[0]?.headers['content-type']).toContain('application/json');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-2');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-2');
             expect(JSON.parse(calls[0].body)).toEqual({
                 scope: 'workspace',
                 ruleType: 'deny',
@@ -4284,7 +4284,7 @@ describe('DaemonClient', () => {
             })).resolves.toEqual(reply);
             expect(calls[0]?.method).toBe('POST');
             expect(calls[0]?.url).toBe('http://daemon/workspace/memory/remember');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-7');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-7');
             expect(JSON.parse(calls[0].body)).toEqual({
                 content: 'remember this',
                 contextMode: 'clean',
@@ -4312,7 +4312,7 @@ describe('DaemonClient', () => {
                 method: 'GET',
                 url: 'http://daemon/workspace/memory/remember/remember%2Fa%20b',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-7');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-7');
         });
         it('POSTs /workspace/memory/forget and forwards client id', async () => {
             const reply = {
@@ -4328,7 +4328,7 @@ describe('DaemonClient', () => {
             })).resolves.toEqual(reply);
             expect(calls[0]?.method).toBe('POST');
             expect(calls[0]?.url).toBe('http://daemon/workspace/memory/forget');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-7');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-7');
             expect(JSON.parse(calls[0].body)).toEqual({
                 query: 'old preference',
             });
@@ -4355,7 +4355,7 @@ describe('DaemonClient', () => {
                 method: 'GET',
                 url: 'http://daemon/workspace/memory/forget/forget%2Fa%20b',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-7');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-7');
         });
         it('POSTs /workspace/memory/dream and forwards client id', async () => {
             const reply = {
@@ -4369,7 +4369,7 @@ describe('DaemonClient', () => {
             await expect(client.dreamWorkspaceMemory({ clientId: 'client-7' })).resolves.toEqual(reply);
             expect(calls[0]?.method).toBe('POST');
             expect(calls[0]?.url).toBe('http://daemon/workspace/memory/dream');
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-7');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-7');
             expect(JSON.parse(calls[0].body)).toEqual({});
         });
         it('GETs /workspace/memory/dream/:taskId', async () => {
@@ -4393,7 +4393,7 @@ describe('DaemonClient', () => {
                 method: 'GET',
                 url: 'http://daemon/workspace/memory/dream/dream%2Fa%20b',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-7');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-7');
         });
         it('GETs /workspace/agents (list) and /workspace/agents/:id (detail)', async () => {
             const list = {
@@ -4607,9 +4607,9 @@ describe('DaemonClient', () => {
                 name: 'reviewer',
                 scope: 'workspace',
             });
-            expect(calls[1]?.headers['x-qwen-client-id']).toBe('client-1');
-            expect(calls[3]?.headers['x-qwen-client-id']).toBe('client-2');
-            expect(calls[4]?.headers['x-qwen-client-id']).toBe('client-3');
+            expect(calls[1]?.headers['X-HopCode-Client-Id']).toBe('client-1');
+            expect(calls[3]?.headers['X-HopCode-Client-Id']).toBe('client-2');
+            expect(calls[4]?.headers['X-HopCode-Client-Id']).toBe('client-3');
         });
         it('workspace-qualified deleteWorkspaceAgent preserves idempotent structured 404 handling', async () => {
             {
@@ -4657,7 +4657,7 @@ describe('DaemonClient', () => {
                 ['POST', 'http://daemon/workspaces/workspace-id/sessions/archive'],
                 ['POST', 'http://daemon/workspaces/workspace-id/sessions/unarchive'],
             ]);
-            expect(calls.map((c) => c.headers['x-qwen-client-id'])).toEqual([
+            expect(calls.map((c) => c.headers['X-HopCode-Client-Id'])).toEqual([
                 'client-1',
                 'client-2',
                 'client-3',
@@ -4703,7 +4703,7 @@ describe('DaemonClient', () => {
                 method: 'GET',
                 url: 'http://daemon/workspaces/workspace%2Fid/session/session%2F1/transcript?cursor=cur+1&limit=500',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
         });
         it('workspace export uses encoded native REST and parses attachment metadata', async () => {
             const { fetch, calls } = recordingFetch(() => textResponse(200, '# secondary export', {
@@ -4742,7 +4742,7 @@ describe('DaemonClient', () => {
                 url: 'http://daemon/workspaces/%2Ftmp%2Fwork%20space/session/session%2F1/export?format=md',
                 headers: {
                     authorization: 'Bearer secret',
-                    'x-qwen-client-id': 'client-1',
+                    'X-HopCode-Client-Id': 'client-1',
                 },
             });
         });
@@ -4793,7 +4793,7 @@ describe('DaemonClient', () => {
                 url: 'http://daemon/workspaces/%2Ftmp%2Fwork%20space/session/session%2F1/archive/export?format=md',
                 headers: {
                     authorization: 'Bearer secret',
-                    'x-qwen-client-id': 'client-1',
+                    'X-HopCode-Client-Id': 'client-1',
                 },
             });
         });
@@ -4847,7 +4847,7 @@ describe('DaemonClient', () => {
                 groupId: 'group/1',
                 color: 'purple',
             });
-            expect(calls[0]?.headers['x-qwen-client-id']).toBe('client-1');
+            expect(calls[0]?.headers['X-HopCode-Client-Id']).toBe('client-1');
         });
         it('workspaceByCwd encodes the selector when updating session organization', async () => {
             const reply = {

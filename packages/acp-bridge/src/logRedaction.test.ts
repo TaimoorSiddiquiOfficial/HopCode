@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -160,10 +160,10 @@ describe('redactLogCredentials', () => {
     ).toBe(`AWS_SECRET_ACCESS_KEY=${R}`);
   });
 
-  it('redacts QWEN_DAEMON_TOKEN assignments', () => {
+  it('redacts hopcode_daemon_token assignments', () => {
     expect(
-      redactLogCredentials('QWEN_DAEMON_TOKEN=some-long-token-value-here'),
-    ).toBe(`QWEN_DAEMON_TOKEN=${R}`);
+      redactLogCredentials('hopcode_daemon_token=some-long-token-value-here'),
+    ).toBe(`hopcode_daemon_token=${R}`);
   });
 
   it('redacts client_secret assignments', () => {

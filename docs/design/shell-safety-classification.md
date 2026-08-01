@@ -2,7 +2,7 @@
 
 ## Context and scope
 
-Issue [#6949](https://github.com/QwenLM/qwen-code/issues/6949) requires Plan mode to distinguish commands that are proven read-only from commands whose behavior cannot be established statically. A boolean cannot retain that distinction, so this change introduces a three-state fact layer in `shellAstParser.ts` without changing permission routing.
+Issue [#6949](https://github.com/QwenLM/hopcode/issues/6949) requires Plan mode to distinguish commands that are proven read-only from commands whose behavior cannot be established statically. A boolean cannot retain that distinction, so this change introduces a three-state fact layer in `shellAstParser.ts` without changing permission routing.
 
 This change does not modify routing or call-site logic in Shell, Monitor, PermissionManager, speculation, memory-scoped agents, ACP, Plan-mode prompts, or Plan exit behavior. Existing boolean consumers can become more conservative where the classifier is hardened. A follow-up change can route `unknown` commands to one-off approval using the new fact without changing this classifier.
 

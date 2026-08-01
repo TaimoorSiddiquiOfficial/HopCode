@@ -49,7 +49,7 @@ export interface Workspace extends WorkspaceInfo {
 
 /**
  * Authentication type for the built-in AI backend.
- * HopCode auth is handled by the local Qwen CLI, so the app stores no LLM
+ * HopCode auth is handled by the local hopcode CLI, so the app stores no LLM
  * credential here.
  */
 export type AuthType = 'none';

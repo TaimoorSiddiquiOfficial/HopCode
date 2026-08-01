@@ -235,7 +235,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
     testRoot = realpathSync(
       mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-runtime-')),
     );
-    const hopcodeHome = path.join(testRoot, 'qwen-home');
+    const hopcodeHome = path.join(testRoot, 'hopcode-home');
     const runtimeDir = path.join(testRoot, 'runtime');
     const workspace = path.join(testRoot, 'workspace');
     mkdirSync(workspace);
@@ -373,7 +373,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
     testRoot = realpathSync(
       mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-partial-')),
     );
-    const hopcodeHome = path.join(testRoot, 'qwen-home');
+    const hopcodeHome = path.join(testRoot, 'hopcode-home');
     const runtimeDir = path.join(testRoot, 'runtime');
     const workspace = path.join(testRoot, 'workspace');
     mkdirSync(workspace);
@@ -509,7 +509,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
     testRoot = realpathSync(
       mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-failed-')),
     );
-    const hopcodeHome = path.join(testRoot, 'qwen-home');
+    const hopcodeHome = path.join(testRoot, 'hopcode-home');
     const runtimeDir = path.join(testRoot, 'runtime');
     const workspace = path.join(testRoot, 'workspace');
     mkdirSync(workspace);
@@ -619,7 +619,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
     testRoot = realpathSync(
       mkdtempSync(path.join(tmpdir(), 'hopcode-serve-channel-workers-')),
     );
-    const hopcodeHome = path.join(testRoot, 'qwen-home');
+    const hopcodeHome = path.join(testRoot, 'hopcode-home');
     const runtimeDir = path.join(testRoot, 'runtime');
     const primaryWorkspace = path.join(testRoot, 'primary');
     const secondaryWorkspace = path.join(testRoot, 'secondary');

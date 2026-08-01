@@ -33,7 +33,7 @@ function createTestHarness(workspaceId = 'workspace-1') {
     availableCommands: [{ name: 'old:command' }],
     availableSkills: ['old-skill'],
   }));
-  const installQwenSkill = mock(async () => ({
+  const installhopcodeskill = mock(async () => ({
     success: true,
     skill: {
       id: 'bailian-cli',
@@ -43,7 +43,7 @@ function createTestHarness(workspaceId = 'workspace-1') {
     availableCommands: [{ name: 'old:command' }],
     availableSkills: ['old-skill'],
   }));
-  const deleteQwenSkill = mock(async () => ({
+  const deletehopcodeskill = mock(async () => ({
     success: true,
     skill: {
       slug: 'bailian-cli',
@@ -68,8 +68,8 @@ function createTestHarness(workspaceId = 'workspace-1') {
   const deps: HandlerDeps = {
     sessionManager: {
       refreshAvailableCommands,
-      installQwenSkill,
-      deleteQwenSkill,
+      installhopcodeskill,
+      deletehopcodeskill,
     } as unknown as HandlerDeps['sessionManager'],
     oauthFlowStore: {} as HandlerDeps['oauthFlowStore'],
     platform: {
@@ -113,8 +113,8 @@ function createTestHarness(workspaceId = 'workspace-1') {
     listMarketplace,
     installMarketplace,
     deleteSkill,
-    deleteQwenSkill,
-    installQwenSkill,
+    deletehopcodeskill,
+    installhopcodeskill,
     pushCalls,
     refreshAvailableCommands,
   };
@@ -130,7 +130,7 @@ describe('registerSkillsHandlers marketplace', () => {
       ctx,
       listMarketplace,
       installMarketplace,
-      installQwenSkill,
+      installhopcodeskill,
       pushCalls,
     } = createTestHarness('workspace-stale-install');
 
@@ -159,7 +159,7 @@ describe('registerSkillsHandlers marketplace', () => {
       'session-1',
     )) as SkillMarketplaceItem[];
 
-    expect(installQwenSkill).toHaveBeenCalled();
+    expect(installhopcodeskill).toHaveBeenCalled();
     const changed = pushCalls.find(
       (call) => call.channel === RPC_CHANNELS.skills.CHANGED,
     );

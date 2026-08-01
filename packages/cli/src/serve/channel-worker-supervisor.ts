@@ -1,4 +1,4 @@
-﻿import { fork } from 'node:child_process';
+import { fork } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { channelSelectionNames } from './channel-selection.js';
@@ -6,9 +6,9 @@ import type { ServeChannelSelection } from './types.js';
 import {
   CHANNEL_DAEMON_WORKER_SENTINEL,
   CHANNEL_WORKER_HEARTBEAT_INTERVAL_MS,
-  QWEN_DAEMON_TOKEN_ENV,
-  QWEN_DAEMON_URL_ENV,
-  QWEN_DAEMON_WORKSPACE_ENV,
+  hopcode_daemon_token_ENV,
+  hopcode_daemon_url_ENV,
+  hopcode_daemon_workspace_ENV,
   HOPCODE_SERVER_TOKEN_ENV,
 } from './channel-worker-env.js';
 import { sanitizeLogText } from '@hoptrendy/channel-base';
@@ -343,12 +343,12 @@ function createWorkerEnv(opts: {
   const env: NodeJS.ProcessEnv = { ...(opts.baseEnv ?? process.env) };
   env['HOPCODE_CODE_NO_RELAUNCH'] = 'true';
   env[CHANNEL_DAEMON_WORKER_SENTINEL] = randomUUID();
-  env[QWEN_DAEMON_URL_ENV] = opts.daemonUrl;
-  env[QWEN_DAEMON_WORKSPACE_ENV] = opts.workspace;
+  env[hopcode_daemon_url_ENV] = opts.daemonUrl;
+  env[hopcode_daemon_workspace_ENV] = opts.workspace;
   delete env[HOPCODE_SERVER_TOKEN_ENV];
-  delete env[QWEN_DAEMON_TOKEN_ENV];
+  delete env[hopcode_daemon_token_ENV];
   if (opts.daemonToken) {
-    env[QWEN_DAEMON_TOKEN_ENV] = opts.daemonToken;
+    env[hopcode_daemon_token_ENV] = opts.daemonToken;
   }
   return env;
 }

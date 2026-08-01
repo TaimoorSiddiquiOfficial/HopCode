@@ -66,7 +66,7 @@ describe('normalize', () => {
     expect(normalize('gemini-2.0-flash-preview')).toBe('gemini-2.0-flash');
   });
 
-  it('should not remove "-latest" from specific Qwen model names', () => {
+  it('should not remove "-latest" from specific hopcode model names', () => {
     expect(normalize('hopcode-plus-latest')).toBe('hopcode-plus-latest');
     expect(normalize('hopcode-flash-latest')).toBe('hopcode-flash-latest');
     expect(normalize('hopcode-vl-max-latest')).toBe('hopcode-vl-max-latest');
@@ -179,7 +179,7 @@ describe('tokenLimit', () => {
       expect(tokenLimit('hopcode-flash-latest')).toBe(1000000);
     });
 
-    it('should return 256K for Qwen fallback', () => {
+    it('should return 256K for hopcode fallback', () => {
       expect(tokenLimit('hopcode-plus')).toBe(262144);
       expect(tokenLimit('hopcode-turbo')).toBe(262144);
       expect(tokenLimit('qwen2.5')).toBe(262144);
@@ -332,7 +332,7 @@ describe('tokenLimit with output type', () => {
   });
 
   describe('Qwen output limits', () => {
-    it('should return correct output limits for Qwen models', () => {
+    it('should return correct output limits for hopcode models', () => {
       expect(tokenLimit('qwen3.5-plus', 'output')).toBe(65536);
       expect(tokenLimit('qwen3.6-plus', 'output')).toBe(65536);
       expect(tokenLimit('coder-model', 'output')).toBe(65536);

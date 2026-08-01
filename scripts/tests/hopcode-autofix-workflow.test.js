@@ -24,7 +24,7 @@ const sandboxImageResolverScript = readFileSync(
   '.github/scripts/resolve-sandbox-image.mjs',
   'utf8',
 );
-const autofixRunnerScriptPath = '.qwen/skills/autofix/scripts/run-agent.mjs';
+const autofixRunnerScriptPath = '.hopcode/skills/autofix/scripts/run-agent.mjs';
 const checkBotCredentialsStep =
   workflow.match(
     /- name: 'Check bot credentials'[\s\S]*?(?=\n[ ]{6}- name: 'Set up Node.js \(hosted\)')/,
@@ -112,7 +112,7 @@ const installAndBuildSteps =
   ) ?? [];
 
 function readAutofixSkill() {
-  return readFileSync('.qwen/skills/autofix/SKILL.md', 'utf8');
+  return readFileSync('.hopcode/skills/autofix/SKILL.md', 'utf8');
 }
 
 function withRunnerDir(fn) {
@@ -156,7 +156,7 @@ function runAddressReview(dir, stub, extraArgs = []) {
     '1234',
     '--workdir',
     dir,
-    '--qwen-bin',
+    '--hopcode-bin',
     stub,
     ...extraArgs,
   ]);
@@ -170,7 +170,7 @@ function runDevelopIssue(dir, stub) {
     '1234',
     '--workdir',
     dir,
-    '--qwen-bin',
+    '--hopcode-bin',
     stub,
   ]);
 }
@@ -504,7 +504,7 @@ describe('qwen-autofix workflow', () => {
               ...process.env,
               PATH: `${dir}:${process.env.PATH}`,
               PR: '7163',
-              REPO: 'QwenLM/qwen-code',
+              REPO: 'QwenLM/hopcode',
               BRANCH: 'ci/some-branch',
               WATERMARK: '2026-07-18T08:00:00Z',
               ROUND: '2',
@@ -888,7 +888,7 @@ describe('qwen-autofix workflow', () => {
     expect(reviewScanStep).toContain('ic.json');
     // Must exclude known non-actionable bot comments.
     expect(reviewScanStep).toContain('hopcode-triage');
-    expect(reviewScanStep).toContain('qwen-review-suggestion-summary');
+    expect(reviewScanStep).toContain('hopcode-review-suggestion-summary');
     // The "nothing new" gate must check all three feedback sources.
     expect(reviewScanStep).toContain('"${N_ISSUE_COMMENTS}" -eq 0');
     // review-address must also fetch ic.json and render issue-level comments.
@@ -1145,12 +1145,12 @@ describe('qwen-autofix workflow', () => {
     expect(prepareQwenCliSteps).toHaveLength(2);
     for (const step of prepareQwenCliSteps) {
       expect(step).toContain(
-        'qwen_version="$(node -p "require(\'./package.json\').version")"',
+        'hopcode_version="$(node -p "require(\'./package.json\').version")"',
       );
       expect(step).toContain(
         'exec node "${GITHUB_WORKSPACE}/dist/cli.js" "$@"',
       );
-      expect(step).toContain('qwen-bin');
+      expect(step).toContain('hopcode-bin');
       expect(step).not.toContain('current_version="$(qwen --version');
       expect(step).not.toContain('Using pre-installed HopCode');
       expect(step).not.toContain('npm install -g');
@@ -1273,7 +1273,7 @@ describe('qwen-autofix workflow', () => {
     ).toBeLessThan(workflow.indexOf("- name: 'Prepare branch and feedback'"));
   });
 
-  it('runs qwen headless once in each agent step', () => {
+  it('runs hopcode headless once in each agent step', () => {
     const qwenSteps = [
       assessCandidatesStep,
       developFixStep,
@@ -1281,8 +1281,8 @@ describe('qwen-autofix workflow', () => {
     ];
     for (const step of qwenSteps) {
       expect(step.length).toBeGreaterThan(0);
-      expect(step).toContain('node .qwen/skills/autofix/scripts/run-agent.mjs');
-      expect(step).not.toContain('qwen --yolo --prompt "${PROMPT}"');
+      expect(step).toContain('node .hopcode/skills/autofix/scripts/run-agent.mjs');
+      expect(step).not.toContain('qwen --izn --prompt "${PROMPT}"');
       expect(step).not.toContain('AUTOFIX_INVOCATION:');
       expect(step).not.toContain('qwen_status=$?');
       expect(step).not.toMatch(/PROMPT: \|-\n\s+\/autofix /);
@@ -1308,9 +1308,9 @@ describe('qwen-autofix workflow', () => {
       'Do not push, comment, create pull requests',
       'Operate only in the workflow',
       'Run required verification commands before committing',
-      '.qwen/skills/prepare-pr/SKILL.md',
-      '.qwen/skills/bugfix/SKILL.md',
-      '.qwen/skills/e2e-testing/SKILL.md',
+      '.hopcode/skills/prepare-pr/SKILL.md',
+      '.hopcode/skills/bugfix/SKILL.md',
+      '.hopcode/skills/e2e-testing/SKILL.md',
       'decision.json',
       'pr-title.txt',
       'pr-body.md',
@@ -1489,7 +1489,7 @@ describe('qwen-autofix workflow', () => {
     ).toBeLessThan(reviewVerifyGate.indexOf('outcome=noop'));
   });
 
-  it('passes model credentials directly to qwen subprocesses', () => {
+  it('passes model credentials directly to hopcode subprocesses', () => {
     const qwenSteps = [
       assessCandidatesStep,
       developFixStep,
@@ -1501,7 +1501,7 @@ describe('qwen-autofix workflow', () => {
         "OPENAI_API_KEY: '${{ secrets.AUTOFIX_OPENAI_API_KEY }}'",
       );
       expect(step).toContain(
-        'AUTOFIX_OPENAI_API_KEY secret is required for Qwen Autofix.',
+        'AUTOFIX_OPENAI_API_KEY secret is required for HopCode Autofix.',
       );
       expect(step).toContain(
         "OPENAI_BASE_URL: '${{ secrets.AUTOFIX_OPENAI_BASE_URL || secrets.OPENAI_BASE_URL }}'",
@@ -1867,7 +1867,7 @@ describe('qwen-autofix workflow', () => {
     });
   });
 
-  it('does not mark generic qwen subprocess failures for handoff', () => {
+  it('does not mark generic hopcode subprocess failures for handoff', () => {
     withRunnerDir((dir) => {
       writeFileSync(join(dir, 'feedback.md'), 'feedback\n');
       const stub = writeQwenStub(dir, [
@@ -1888,7 +1888,7 @@ describe('qwen-autofix workflow', () => {
     });
   });
 
-  it('preserves agent-written failure details when the qwen subprocess fails', () => {
+  it('preserves agent-written failure details when the hopcode subprocess fails', () => {
     withRunnerDir((dir) => {
       writeFileSync(join(dir, 'candidates.json'), '[]\n');
       writeFileSync(join(dir, 'decision.json'), '{"go":1234}\n');
@@ -1908,7 +1908,7 @@ describe('qwen-autofix workflow', () => {
     });
   });
 
-  it('bounds qwen subprocess runtime', () => {
+  it('bounds hopcode subprocess runtime', () => {
     const runner = readFileSync(autofixRunnerScriptPath, 'utf8');
 
     expect(runner).toContain('50 * 60 * 1000');
@@ -1917,7 +1917,7 @@ describe('qwen-autofix workflow', () => {
     expect(runner).toContain('}, QWEN_TIMEOUT_MS)');
   });
 
-  it('kills qwen subprocess descendants on timeout', () => {
+  it('kills hopcode subprocess descendants on timeout', () => {
     withRunnerDir((dir) => {
       writeFileSync(join(dir, 'feedback.md'), 'feedback\n');
       const stub = writeQwenStub(dir, [
@@ -1940,7 +1940,7 @@ describe('qwen-autofix workflow', () => {
           '1234',
           '--workdir',
           dir,
-          '--qwen-bin',
+          '--hopcode-bin',
           stub,
         ],
         {
@@ -1958,7 +1958,7 @@ describe('qwen-autofix workflow', () => {
     });
   });
 
-  it('reports external qwen subprocess signals without calling them timeouts', () => {
+  it('reports external hopcode subprocess signals without calling them timeouts', () => {
     withRunnerDir((dir) => {
       writeFileSync(join(dir, 'feedback.md'), 'feedback\n');
 

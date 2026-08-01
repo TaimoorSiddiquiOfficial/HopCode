@@ -69,7 +69,7 @@ async function makeHarness(
   const scratch = await fsp.mkdtemp(
     path.join(
       os.tmpdir(),
-      `qwen-workspace-voice-${randomBytes(4).toString('hex')}-`,
+      `hopcode.workspace-voice-${randomBytes(4).toString('hex')}-`,
     ),
   );
   const home = path.join(scratch, 'home');

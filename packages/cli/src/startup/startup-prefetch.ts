@@ -190,7 +190,7 @@ export function startPostRenderPrefetches(
           if (hostUpdateRelaunch === 'false') {
             updateEventEmitter.emit('update-info', {
               message: `${result.info.message}\n${t(
-                'Update Qwen Code on the host, then restart the sandbox.',
+                'Update HopCode on the host, then restart the sandbox.',
               )}`,
             });
             return;

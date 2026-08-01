@@ -21,7 +21,7 @@ These gaps make `hopcode.llm_request` the least informative span in the trace tr
 | ------------------------------------------------------------ | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LLM request span lifecycle                                   | `session-tracing.ts` `startLLMRequestSpan` / `endLLMRequestSpan` | Phase 1 (#4126) established the helpers. We extend the metadata interface, don't restructure                                                                                                                |
 | Active span propagation into provider generators             | `loggingContentGenerator.ts:213,287`                             | Phase 1 (#4126) replaced `withSpan('api.*')` with native helpers; the active context already reaches the stream wrapper                                                                                     |
-| `ContentRetryEvent` schema + consumers                       | `types.ts:626`, `qwen-logger.ts:947`, `loggers.ts:717`           | Existing event keeps its shape and downstreams; we add a sibling event class for the `retryWithBackoff` path                                                                                                |
+| `ContentRetryEvent` schema + consumers                       | `types.ts:626`, `hopcode-logger.ts:947`, `loggers.ts:717`           | Existing event keeps its shape and downstreams; we add a sibling event class for the `retryWithBackoff` path                                                                                                |
 | `LogToSpanProcessor` log-bridge spans                        | `log-to-span-processor.ts`                                       | ContentRetryEvent's existing bridge continues to nest under the active LLM span. Phase 4 does not change this                                                                                               |
 | `ApiRequestPhase` enum                                       | `metrics.ts:330-334`                                             | Public surface (4 values). We populate 3 of the 4 from production code; leave the enum unchanged for backward compatibility                                                                                 |
 | Per-provider chunk normalization → `GenerateContentResponse` | `loggingContentGenerator.ts:286-393`                             | Each provider already normalizes to Google's `GenerateContentResponse` shape before LoggingContentGenerator sees the stream. TTFT detection runs centrally over this normalized shape; no per-provider code |
@@ -36,7 +36,7 @@ These gaps make `hopcode.llm_request` the least informative span in the trace tr
 - **Sampling phase as a dedicated child span.** Computable from `duration_ms - ttft_ms - request_setup_ms`; child span adds nothing for OTel-only backends (claude-code uses one for Perfetto only). Stored as a span attribute instead — see D6.
 - **Persistent retry mode (`HOPCODE_CODE_UNATTENDED_RETRY`) event-level rate limiting.** A single LLM request can produce 50+ `ContentRetryEvent` / `ApiRetryEvent` records under persistent retry. Capping emission is a follow-up — Phase 4 emits all events; if production volumes prove unbearable, add a per-span emission cap with a "+N more attempts (truncated)" summary event in a follow-up PR.
 - **`TOKEN_PROCESSING` breakdown phase.** Enum value exists but hopcode has no real post-stream local processing worth measuring (<10ms typical). Skipped in production callers; enum value retained for future use or for callers we don't control.
-- **Migrating `ContentRetryEvent` onto LLM span as span events.** Same reasoning as Phase 3's `subagent_execution` LogRecord: existing consumers (qwen-logger RUM, future metrics) are tightly coupled to the LogRecord. Bridge-span coverage is good enough.
+- **Migrating `ContentRetryEvent` onto LLM span as span events.** Same reasoning as Phase 3's `subagent_execution` LogRecord: existing consumers (hopcode-logger RUM, future metrics) are tightly coupled to the LogRecord. Bridge-span coverage is good enough.
 
 ## References (decision evidence)
 
@@ -180,7 +180,7 @@ export class ApiRetryEvent implements BaseTelemetryEvent {
 
 **Why a new event class, not extending `ContentRetryEvent`**:
 
-- `ContentRetryEvent` has 2 downstream consumers (qwen-logger, log-record export). Changing its payload risks breaking them.
+- `ContentRetryEvent` has 2 downstream consumers (hopcode-logger, log-record export). Changing its payload risks breaking them.
 - The naming "content retry" semantically refers to content-recovery retries (invalid stream, schema repair) — extending it to cover rate-limit retries would muddy the schema.
 - New event is additive; no consumer surprise.
 
@@ -272,7 +272,7 @@ Fields with no GenAI semconv equivalent — `request_setup_ms`, `sampling_ms`, `
 
 **Why "private authoritative, semconv as compat"**:
 
-- Internal dashboards, SLOs, debugLogger output, qwen-logger RUM, ARMS queries — all reference `ttft_ms` etc. Treating those as canonical avoids a flag-day migration.
+- Internal dashboards, SLOs, debugLogger output, hopcode-logger RUM, ARMS queries — all reference `ttft_ms` etc. Treating those as canonical avoids a flag-day migration.
 - The Experimental GenAI semconv may rename `gen_ai.server.time_to_first_token` before reaching Stable. If/when it does, we update the semconv emission; the hopcode names don't move.
 - Future spec-aware backends (Datadog AI views, Honeycomb AI, ARMS GenAI dashboards) auto-pick up the `gen_ai.*` attributes without our involvement.
 
@@ -454,7 +454,7 @@ Per-call locals never overlap. Stream chunks are detected against the local `att
 | `packages/core/src/telemetry/constants.ts`                                       | Add `EVENT_API_RETRY` constant                                                                                                                                                                                                            | +2      |
 | `packages/core/src/telemetry/types.ts`                                           | Add `ApiRetryEvent` class + union member                                                                                                                                                                                                  | +40     |
 | `packages/core/src/telemetry/loggers.ts`                                         | Add `logApiRetry()` function                                                                                                                                                                                                              | +20     |
-| `packages/core/src/telemetry/qwen-logger/qwen-logger.ts`                         | Add `logApiRetryEvent()` for RUM downstream consistency                                                                                                                                                                                   | +20     |
+| `packages/core/src/telemetry/hopcode-logger/hopcode-logger.ts`                         | Add `logApiRetryEvent()` for RUM downstream consistency                                                                                                                                                                                   | +20     |
 | `packages/core/src/telemetry/session-tracing.ts`                                 | Extend `LLMRequestMetadata` (ttftMs, requestSetupMs, attempt, retryTotalDelayMs); extend `endLLMRequestSpan` to set new attrs + breakdown metric + dual-emit gen_ai.\*                                                                    | +60     |
 | `packages/core/src/telemetry/metrics.ts`                                         | Wire `recordApiRequestBreakdown` callsite inside `endLLMRequestSpan` (no change to the existing recorder)                                                                                                                                 | 0       |
 | `packages/core/src/utils/retry.ts`                                               | Add `onRetry?: (info: RetryAttemptInfo) => void` to RetryOptions; export `RetryAttemptInfo`; invoke callback in the existing logRetryAttempt site                                                                                         | +25     |

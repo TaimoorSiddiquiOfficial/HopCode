@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript ESM, Vitest, `@hoptrendy/hopcode-core` cron utilities, channel packages, CLI channel start command.
 
-**Issue:** https://github.com/QwenLM/qwen-code/issues/6068
+**Issue:** https://github.com/QwenLM/hopcode/issues/6068
 
 ---
 
@@ -864,10 +864,10 @@ Run:
 git add packages/channels/base packages/channels/telegram packages/channels/feishu packages/cli packages/core .hopcode/pr-drafts docs/superpowers/plans/2026-06-30-channel-loop.md
 git commit -m "feat(channel): add channel loop support"
 git push -u origin feat/channel-loop
-gh pr create --repo QwenLM/qwen-code --draft --title "feat(channel): add channel loop support" --body-file .hopcode/pr-drafts/channel-loop.md
+gh pr create --repo QwenLM/hopcode --draft --title "feat(channel): add channel loop support" --body-file .hopcode/pr-drafts/channel-loop.md
 ```
 
-Expected: draft PR opened against `QwenLM/qwen-code:main`.
+Expected: draft PR opened against `QwenLM/hopcode:main`.
 
 ## Self-Review
 

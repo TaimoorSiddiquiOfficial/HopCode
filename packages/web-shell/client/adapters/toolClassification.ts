@@ -34,10 +34,10 @@ export function isBackgroundSubAgentToolCall(tool: ACPToolCall): boolean {
   const rawOutput = getRecord(tool.rawOutput);
   const name = tool.toolName.toLowerCase();
   const args = tool.args;
-  const isTopLevelQwenAgent =
+  const isTopLevelhopcodeagent =
     name === 'agent' && tool.parentToolCallId === undefined;
   const defaultsToBackground =
-    isTopLevelQwenAgent &&
+    isTopLevelhopcodeagent &&
     args?.run_in_background === undefined &&
     args?.working_dir === undefined &&
     args?.name === undefined &&
@@ -48,7 +48,7 @@ export function isBackgroundSubAgentToolCall(tool: ACPToolCall): boolean {
       args.subagent_type.toLowerCase() !== 'fork');
   const explicitlyBackground =
     args?.run_in_background === true &&
-    (name !== 'agent' || isTopLevelQwenAgent);
+    (name !== 'agent' || isTopLevelhopcodeagent);
   return (
     rawOutput?.['status'] === 'background' ||
     explicitlyBackground ||

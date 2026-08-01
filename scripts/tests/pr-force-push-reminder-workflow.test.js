@@ -29,7 +29,7 @@ describe('pr force-push reminder workflow', () => {
   });
 
   it('only runs on the upstream repo', () => {
-    expect(workflow).toContain("github.repository == 'QwenLM/qwen-code'");
+    expect(workflow).toContain("github.repository == 'QwenLM/hopcode'");
   });
 
   it('grants the permissions the comment endpoints need', () => {

@@ -57,7 +57,7 @@ describe('TrustedHooksManager', () => {
     });
   });
 
-  it('trustHooks writes the configPath under the global qwen dir', () => {
+  it('trustHooks writes the configPath under the global hopcode dir', () => {
     const manager = new TrustedHooksManager();
     manager.trustHooks('/project/a', {
       PreToolUse: [

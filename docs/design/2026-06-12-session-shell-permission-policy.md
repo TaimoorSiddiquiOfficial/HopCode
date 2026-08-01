@@ -53,7 +53,7 @@ mutation gating and shell capability advertisement.
 The REST route uses `mutate({ strict: true })`. On a tokenless loopback daemon,
 the strict gate returns `401 token_required` before the handler runs. When a
 token is configured, the handler rejects disabled shell with
-`session_shell_disabled`, then requires `X-Qwen-Client-Id`, then validates the
+`session_shell_disabled`, then requires `X-hopcode-client-id`, then validates the
 command body, and finally delegates to the bridge.
 
 The ACP dispatcher keeps `_hopcode/session/shell` dispatchable for old clients, but

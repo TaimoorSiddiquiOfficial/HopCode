@@ -24,7 +24,7 @@ describe('ExtensionStore', () => {
   let enablementPath: string;
 
   beforeEach(async () => {
-    root = await fsp.mkdtemp(path.join(os.tmpdir(), 'qwen-extension-store-'));
+    root = await fsp.mkdtemp(path.join(os.tmpdir(), 'hopcode-extension-store-'));
     extensionsDir = path.join(root, 'extensions');
     storeDir = path.join(root, 'extension-store');
     enablementPath = path.join(extensionsDir, 'extension-enablement.json');
@@ -185,7 +185,7 @@ describe('ExtensionStore', () => {
     });
   });
 
-  it('serializes mutations from two Node processes sharing QWEN_HOME', async () => {
+  it('serializes mutations from two Node processes sharing hopcode_home', async () => {
     const id = 'd2'.repeat(32);
     const store = makeStore();
     await store.ensureInitialized([{ id, name: 'demo' }]);
@@ -659,7 +659,7 @@ describe('ExtensionStore', () => {
     const store = makeStore();
     const identity = { id: 'f'.repeat(64), name: 'demo' };
     const staging = await store.createStagingDirectory();
-    await fsp.writeFile(path.join(staging, 'qwen-extension.json'), '{}');
+    await fsp.writeFile(path.join(staging, 'hopcode-extension.json'), '{}');
 
     const snapshot = await store.commitArtifact({
       operation: 'install',
@@ -680,7 +680,7 @@ describe('ExtensionStore', () => {
     });
     await expect(
       fsp.readFile(
-        path.join(extensionsDir, 'demo', 'qwen-extension.json'),
+        path.join(extensionsDir, 'demo', 'hopcode-extension.json'),
         'utf8',
       ),
     ).resolves.toBe('{}');
@@ -692,7 +692,7 @@ describe('ExtensionStore', () => {
     const identity = { id: 'fa'.repeat(32), name: 'demo' };
     await store.ensureInitialized([]);
     const staging = await store.createStagingDirectory();
-    await fsp.writeFile(path.join(staging, 'qwen-extension.json'), '{}');
+    await fsp.writeFile(path.join(staging, 'hopcode-extension.json'), '{}');
     const primaryError = new Error('state write failed');
     const rollbackError = new Error('rollback failed');
     const internals = store as unknown as {

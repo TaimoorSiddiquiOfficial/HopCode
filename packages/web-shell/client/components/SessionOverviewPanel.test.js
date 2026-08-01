@@ -171,7 +171,7 @@ describe('deriveSessionCards', () => {
     it('does not expose opaque route ids as model names', () => {
         const cards = deriveSessionCards([session('s')], [
             statusSession('s', {
-                currentModelId: 'qwen-route:v1:abcdefghijklmnop',
+                currentModelId: 'hopcode-route:v1:abcdefghijklmnop',
             }),
         ], undefined);
         expect(cards[0].model).toBeUndefined();

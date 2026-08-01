@@ -58,7 +58,7 @@ describe('resolveBackendRuntimePaths', () => {
     }
   });
 
-  it('prefers the current checkout Qwen CLI source entry in dev mode', () => {
+  it('prefers the current checkout hopcode CLI source entry in dev mode', () => {
     const root = makeRuntimeFixture();
     const appRoot = join(
       root,
@@ -82,7 +82,7 @@ describe('resolveBackendRuntimePaths', () => {
     }
   });
 
-  it('falls back to the current checkout Qwen CLI bundle when source dev entry is absent', () => {
+  it('falls back to the current checkout hopcode CLI bundle when source dev entry is absent', () => {
     const root = makeRuntimeFixture();
     const appRoot = join(
       root,
@@ -107,7 +107,7 @@ describe('resolveBackendRuntimePaths', () => {
     }
   });
 
-  it('does not silently fall back to an unrelated Qwen CLI from a source checkout', () => {
+  it('does not silently fall back to an unrelated hopcode CLI from a source checkout', () => {
     const root = mkdtempSync(join(tmpdir(), 'craft-runtime-'));
     const appRoot = join(
       root,

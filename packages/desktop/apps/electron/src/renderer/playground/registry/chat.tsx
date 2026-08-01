@@ -358,7 +358,7 @@ const nestedActivitiesCompleted: ActivityItem[] = [
   },
 ]
 
-/** Qwen CLI agent tool naming (lowercase agent) with nested child tools */
+/** hopcode CLI agent tool naming (lowercase agent) with nested child tools */
 const HopCodeAgentActivities: ActivityItem[] = [
   {
     id: 'agent-1',
@@ -1267,7 +1267,7 @@ export const chatComponents: ComponentEntry[] = [
     id: 'turn-card-sub-agent-qwen',
     name: 'TurnCard (Sub-Agent - Qwen)',
     category: 'Turn Cards',
-    description: 'TurnCard showing the Qwen CLI lowercase agent tool grouped as a sub-agent',
+    description: 'TurnCard showing the hopcode CLI lowercase agent tool grouped as a sub-agent',
     component: TurnCard,
     props: [],
     variants: [

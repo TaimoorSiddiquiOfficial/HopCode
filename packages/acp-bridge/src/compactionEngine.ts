@@ -572,7 +572,7 @@ function extractSourceRecordIdsFromMeta(
   meta: unknown,
 ): readonly string[] | undefined {
   if (typeof meta !== 'object' || meta === null) return undefined;
-  const transcript = (meta as Record<string, unknown>)['qwenTranscript'];
+  const transcript = (meta as Record<string, unknown>)['hopcodetranscript'];
   if (typeof transcript !== 'object' || transcript === null) return undefined;
   const ids = (transcript as Record<string, unknown>)['sourceRecordIds'];
   if (!Array.isArray(ids)) return undefined;
@@ -663,7 +663,7 @@ function mergeTranscriptUpdateMeta(
     ...(existingRecord ?? {}),
     ...(incomingRecord ?? {}),
     ...(sourceRecordIds.length > 0
-      ? { qwenTranscript: { sourceRecordIds } }
+      ? { hopcodetranscript: { sourceRecordIds } }
       : {}),
   };
 }

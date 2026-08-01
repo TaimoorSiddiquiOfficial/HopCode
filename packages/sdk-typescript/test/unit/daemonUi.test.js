@@ -4006,7 +4006,7 @@ describe('transcriptBlockToTerminalText (wenshao review — coverage)', () => {
         createdAt: 1,
         updatedAt: 1,
     };
-    it('renders user block with qwen label', async () => {
+    it('renders user block with hopcode label', async () => {
         const { transcriptBlockToTerminalText } = await import('../../src/daemon/ui/index.js');
         const out = transcriptBlockToTerminalText({
             ...baseFields,

@@ -675,7 +675,7 @@ export async function main() {
             ...new Set([
                 ...(config.isSafeMode()
                     ? [
-                        '⚠ SAFE MODE — all customizations disabled (hooks, extensions, skills, MCP servers, QWEN.md). Restart without --safe-mode to resume normal operation.',
+                        '⚠ SAFE MODE — all customizations disabled (hooks, extensions, skills, MCP servers, HOPCODE.md). Restart without --safe-mode to resume normal operation.',
                     ]
                     : []),
                 ...(await getStartupWarnings()),

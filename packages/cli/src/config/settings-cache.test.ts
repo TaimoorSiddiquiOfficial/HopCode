@@ -77,7 +77,7 @@ describe('loadSettingsCached', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'settings-cache-test-')),
     );
     homeDir = path.join(tmpRoot, 'home');
-    hopcodeHome = path.join(tmpRoot, 'qwen-home');
+    hopcodeHome = path.join(tmpRoot, 'hopcode-home');
     workspaceDir = path.join(tmpRoot, 'project', 'app');
     fs.mkdirSync(homeDir, { recursive: true });
     fs.mkdirSync(hopcodeHome, { recursive: true });
@@ -188,7 +188,7 @@ describe('loadSettingsCached', () => {
     const first = loadSettingsCached(workspaceDir);
     expect(first.merged.model?.name).toBe('home-one');
 
-    const otherhopcodeHome = path.join(tmpRoot, 'qwen-home-2');
+    const otherhopcodeHome = path.join(tmpRoot, 'hopcode-home-2');
     writeJson(
       path.join(otherhopcodeHome, 'settings.json'),
       versioned({ model: { name: 'home-two' } }),

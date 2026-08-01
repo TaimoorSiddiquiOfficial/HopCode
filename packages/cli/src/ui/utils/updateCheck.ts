@@ -147,7 +147,7 @@ export async function checkForUpdatesDetailed(): Promise<UpdateCheckResult> {
           status: 'update',
           info: {
             message: t(
-              'A new version of Qwen Code is available! {{current}} → {{latest}}',
+              'A new version of HopCode is available! {{current}} → {{latest}}',
               { current: version, latest: bestUpdate.latest },
             ),
             update: { ...bestUpdate, current: version },
@@ -169,7 +169,7 @@ export async function checkForUpdatesDetailed(): Promise<UpdateCheckResult> {
         return {
           status: 'update',
           info: {
-            message: t('Qwen Code update available! {{current}} → {{latest}}', {
+            message: t('HopCode update available! {{current}} → {{latest}}', {
               current: version,
               latest: updateInfo.latest,
             }),

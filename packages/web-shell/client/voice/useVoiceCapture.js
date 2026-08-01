@@ -16,16 +16,16 @@ function toWebSocketUrl(baseUrl) {
 }
 /**
  * Browsers can't set an `Authorization` header on a WebSocket, so the bearer
- * token rides in `Sec-WebSocket-Protocol` as `qwen-bearer.<base64url(token)>`.
+ * token rides in `Sec-WebSocket-Protocol` as `hopcode-bearer.<base64url(token)>`.
  * The daemon's ACP upgrade listener decodes it (serve/acp-http/index.ts) — keep
  * this prefix in sync with `WS_BEARER_SUBPROTOCOL_PREFIX` there.
  */
-const WS_BEARER_SUBPROTOCOL_PREFIX = 'qwen-bearer.';
+const WS_BEARER_SUBPROTOCOL_PREFIX = 'hopcode-bearer.';
 // Non-secret marker offered alongside the bearer subprotocol. The daemon
 // completes the handshake by selecting THIS (never echoing the secret), which
 // also satisfies WS clients that require the server to pick an offered
 // subprotocol when any were requested. Must not start with the bearer prefix.
-const WS_AUTH_SUBPROTOCOL = 'qwen-ws';
+const WS_AUTH_SUBPROTOCOL = 'hopcode-ws';
 function bearerSubprotocol(token) {
     const bytes = new TextEncoder().encode(token);
     let binary = '';

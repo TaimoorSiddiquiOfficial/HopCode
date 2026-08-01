@@ -151,7 +151,7 @@ describe('extensionSettings', () => {
         ],
       };
       const keychain = new KeychainTokenStorage(
-        'Qwen Code Extensions test-ext 12345',
+        'HopCode Extensions test-ext 12345',
       );
 
       const commit = await maybePromptForSettings(
@@ -232,7 +232,7 @@ describe('extensionSettings', () => {
         ),
       ) as { bundleKey: string };
       expect(firstSelector.bundleKey).not.toBe(secondSelector.bundleKey);
-      const storage = mockKeychainData['Qwen Code Extensions test-ext 12345'];
+      const storage = mockKeychainData['HopCode Extensions test-ext 12345'];
       expect(JSON.parse(storage![firstSelector.bundleKey]!)).toEqual({
         API_KEY: 'first-secret',
       });
@@ -271,7 +271,7 @@ describe('extensionSettings', () => {
           'utf8',
         ),
       ) as { bundleKey: string };
-      const storage = mockKeychainData['Qwen Code Extensions test-ext 12345']!;
+      const storage = mockKeychainData['HopCode Extensions test-ext 12345']!;
       expect(storage[selector.bundleKey]).toBeDefined();
 
       await prepared?.discard();
@@ -307,7 +307,7 @@ describe('extensionSettings', () => {
           'utf8',
         ),
       ) as { bundleKey: string };
-      const storage = mockKeychainData['Qwen Code Extensions test-ext 12345']!;
+      const storage = mockKeychainData['HopCode Extensions test-ext 12345']!;
       storage[`${oldSelector.bundleKey}:override:API_KEY`] = 'old-override';
 
       const stagingDir = path.join(tempWorkspaceDir, 'replacement');
@@ -374,7 +374,7 @@ describe('extensionSettings', () => {
           'utf8',
         ),
       ) as { bundleKey: string };
-      const storage = mockKeychainData['Qwen Code Extensions test-ext 12345']!;
+      const storage = mockKeychainData['HopCode Extensions test-ext 12345']!;
       storage['API_KEY'] = 'stale-secret';
       delete storage[selector.bundleKey];
 
@@ -397,7 +397,7 @@ describe('extensionSettings', () => {
         ],
       };
       const keychain = new KeychainTokenStorage(
-        'Qwen Code Extensions test-ext 12345',
+        'HopCode Extensions test-ext 12345',
       );
       await keychain.setSecret('API_KEY', 'old-secret');
 

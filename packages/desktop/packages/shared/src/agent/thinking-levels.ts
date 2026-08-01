@@ -11,7 +11,7 @@
  *
  * Session-level setting with workspace defaults.
  *
- * Qwen receives these values as provider reasoning effort where supported.
+ * hopcode receives these values as provider reasoning effort where supported.
  */
 
 /**

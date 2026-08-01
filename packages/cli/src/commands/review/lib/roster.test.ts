@@ -23,7 +23,7 @@ import { requiredAgents, reviewMode, isTerritoryFanOut } from './roster.js';
 const PR = {
   diffPathAbsolute: '/d.txt',
   prNumber: '6766',
-  ownerRepo: 'QwenLM/qwen-code',
+  ownerRepo: 'QwenLM/hopcode',
   worktreePath: '.hopcode/tmp/review-pr-6766',
   files: [{ path: 'a.ts', kind: 'source', removedLines: 0, heavy: false }],
   chunks: [{ id: 1, startLine: 1, endLine: 100 }],

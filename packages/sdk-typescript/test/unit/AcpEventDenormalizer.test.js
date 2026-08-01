@@ -104,10 +104,10 @@ describe('denormalizeAcpNotification', () => {
         expect(event.type).toBe('workspace_initialized');
         expect(event.data).toEqual({ cwd: '/tmp' });
     });
-    it('converts a _qwen/notify tagged with `kind` (as the daemon sends it)', () => {
+    it('converts a _hopcode/notify tagged with `kind` (as the daemon sends it)', () => {
         const notification = {
             jsonrpc: '2.0',
-            method: '_qwen/notify',
+            method: '_hopcode/notify',
             params: {
                 kind: 'state_resync_required',
                 data: { reason: 'ring_evicted' },
@@ -119,7 +119,7 @@ describe('denormalizeAcpNotification', () => {
     it('falls back to `kind` when `type` is an empty string, not dropping the event (M3w6i)', () => {
         const notification = {
             jsonrpc: '2.0',
-            method: '_qwen/notify',
+            method: '_hopcode/notify',
             params: { type: '', kind: 'replay_complete', data: {} },
         };
         const event = denormalizeAcpNotification(notification);

@@ -46,7 +46,7 @@ export function reviewBranch(prNumber: string | number): string {
  * A `target` reduced to a single safe filename component.
  *
  * `target` is a file-path review's own path — `src/foo.ts` — or a PR/local
- * label. Interpolated raw, `src/foo.ts` becomes `qwen-review-src/foo.ts-diff.txt`,
+ * label. Interpolated raw, `src/foo.ts` becomes `hopcode-review-src/foo.ts-diff.txt`,
  * a nested path whose parent nobody created (ENOENT), and a crafted `../../evil`
  * escapes `.hopcode/tmp` and lets `writeFileSync` land anywhere. Flatten every
  * separator and dot-segment to a single component so the file always sits
@@ -68,10 +68,10 @@ function safeTarget(target: string): string {
  * and so they're scoped to the project rather than the user's whole machine.
  */
 export function tmpFile(target: string, suffix: string): string {
-  return join(REVIEW_TMP_DIR, `qwen-review-${safeTarget(target)}-${suffix}`);
+  return join(REVIEW_TMP_DIR, `hopcode-review-${safeTarget(target)}-${suffix}`);
 }
 
 /** Filename prefix used by `tmpFile`; useful for cleanup globbing. */
 export function tmpPrefix(target: string): string {
-  return `qwen-review-${safeTarget(target)}-`;
+  return `hopcode-review-${safeTarget(target)}-`;
 }

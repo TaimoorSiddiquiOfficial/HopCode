@@ -1,8 +1,8 @@
 /**
  * Resolve the ASR endpoint + credentials for desktop voice dictation.
  *
- * The desktop drives Qwen over ACP and stores no DashScope baseUrl/apiKey of its
- * own — the real credentials live in the qwen CLI's config (`~/.hopcode`). We resolve
+ * The desktop drives hopcode over ACP and stores no DashScope baseUrl/apiKey of its
+ * own — the real credentials live in the hopcode CLI's config (`~/.hopcode`). We resolve
  * them from, in order:
  *   1. OAuth login        — `~/.hopcode/oauth_creds.json` (access_token + resource_url)
  *   2. API-key login      — `~/.hopcode/settings.json` (a DashScope compatible-mode
@@ -23,7 +23,7 @@ import type { VoiceConfig } from './transcribe';
 const DEFAULT_DASHSCOPE_BASE_URL =
   'https://dashscope.aliyuncs.com/compatible-mode/v1';
 const NO_CREDENTIALS_ERROR =
-  'Voice dictation needs Qwen credentials. Sign in to HopCode (or set a DashScope API key), then try again.';
+  'Voice dictation needs hopcode credentials. Sign in to HopCode (or set a DashScope API key), then try again.';
 
 interface ResolvedCredentials {
   baseUrl: string;
@@ -31,7 +31,7 @@ interface ResolvedCredentials {
 }
 
 interface ResolveDesktopVoiceConfigDeps {
-  readQwenJson?: <T>(file: string) => Promise<T | undefined>;
+  readhopcodejson?: <T>(file: string) => Promise<T | undefined>;
   getVoiceModel?: () => string;
   env?: NodeJS.ProcessEnv;
   now?: () => number;
@@ -70,7 +70,7 @@ export function normalizeBaseUrl(raw: string): string {
 /**
  * Resolve the global hopcode config dir, mirroring core's
  * `Storage.getGlobalhopcodeDir()` so desktop voice reads the SAME `~/.hopcode`
- * credentials the qwen CLI writes. QWEN_HOME is normalized exactly as core does:
+ * credentials the hopcode CLI writes. hopcode_home is normalized exactly as core does:
  * a leading `~`/`~/` expands to homedir() and a relative value resolves to an
  * absolute path; an unset/empty value falls back to `~/.hopcode`. Reading the raw
  * env value would point voice at a different dir than the rest of Qwen.
@@ -97,7 +97,7 @@ export function gethopcodeConfigDir(): string {
   return home ? join(home, '.hopcode') : join(tmpdir(), '.hopcode');
 }
 
-async function readQwenJsonFromDisk<T>(file: string): Promise<T | undefined> {
+async function readhopcodejsonFromDisk<T>(file: string): Promise<T | undefined> {
   try {
     return JSON.parse(
       await readFile(join(gethopcodeConfigDir(), file), 'utf-8'),
@@ -112,11 +112,11 @@ async function getStoredVoiceModel(): Promise<string> {
   return getVoiceModel();
 }
 
-/** 1) Qwen OAuth device-flow credentials. */
+/** 1) hopcode OAuth device-flow credentials. */
 async function fromOAuth(
-  deps: Required<Pick<ResolveDesktopVoiceConfigDeps, 'readQwenJson' | 'now'>>,
+  deps: Required<Pick<ResolveDesktopVoiceConfigDeps, 'readhopcodejson' | 'now'>>,
 ): Promise<ResolvedCredentials | undefined> {
-  const creds = await deps.readQwenJson<{
+  const creds = await deps.readhopcodejson<{
     access_token?: string;
     resource_url?: string;
     expiry_date?: number;
@@ -163,9 +163,9 @@ export function isDashscopeCompatible(url: string): boolean {
 
 /** 2) API-key login: a DashScope compatible-mode provider in settings.json. */
 async function fromQwenSettings(
-  deps: Required<Pick<ResolveDesktopVoiceConfigDeps, 'readQwenJson' | 'env'>>,
+  deps: Required<Pick<ResolveDesktopVoiceConfigDeps, 'readhopcodejson' | 'env'>>,
 ): Promise<ResolvedCredentials | undefined> {
-  const settings = await deps.readQwenJson<QwenSettings>('settings.json');
+  const settings = await deps.readhopcodejson<QwenSettings>('settings.json');
   if (!settings) return undefined;
   const env = settings.env ?? {};
   const keyFor = (p: QwenProvider): string | undefined => {
@@ -212,7 +212,7 @@ export async function resolveDesktopVoiceConfig(
   deps: ResolveDesktopVoiceConfigDeps = {},
 ): Promise<VoiceConfig> {
   const resolvedDeps = {
-    readQwenJson: deps.readQwenJson ?? readQwenJsonFromDisk,
+    readhopcodejson: deps.readhopcodejson ?? readhopcodejsonFromDisk,
     env: deps.env ?? process.env,
     now: deps.now ?? Date.now,
   };

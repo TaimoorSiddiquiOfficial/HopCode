@@ -26,12 +26,12 @@ function makeTlsError(): Error {
 
 describe('formatFetchErrorForUser', () => {
   const saved = {
-    QWEN_TLS_INSECURE: process.env['QWEN_TLS_INSECURE'],
+    hopcode_tls_insecure: process.env['hopcode_tls_insecure'],
     NODE_TLS_REJECT_UNAUTHORIZED: process.env['NODE_TLS_REJECT_UNAUTHORIZED'],
   };
 
   beforeEach(() => {
-    delete process.env['QWEN_TLS_INSECURE'];
+    delete process.env['hopcode_tls_insecure'];
     delete process.env['NODE_TLS_REJECT_UNAUTHORIZED'];
   });
 
@@ -66,7 +66,7 @@ describe('formatFetchErrorForUser', () => {
   });
 
   it('omits the --insecure hint when verification is already disabled', () => {
-    process.env['QWEN_TLS_INSECURE'] = '1';
+    process.env['hopcode_tls_insecure'] = '1';
     const message = formatFetchErrorForUser(makeTlsError());
 
     expect(message).toContain('already disabled');

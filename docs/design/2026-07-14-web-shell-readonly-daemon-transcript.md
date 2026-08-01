@@ -45,7 +45,7 @@ In this design, “read-only” means **not reading or modifying daemon/session 
 | Local viewing                | Copy, collapse, expand, virtual scroll, timeline, table sort/filter      | Yes                                 |
 | Host-customized presentation | Markdown/code-block renderer, message-content renderer                   | Yes; the host owns any side effects |
 | Ordinary external links      | New-window navigation after browser-safe URL transformation              | Yes                                 |
-| WebShell semantic navigation | `qwen-session://` dispatches the global `qwen:open-session` event        | No; render as non-interactive text  |
+| WebShell semantic navigation | `hopcode-session://` dispatches the global `qwen:open-session` event        | No; render as non-interactive text  |
 | Session mutation             | Send prompt, cancel, retry, branch, rewind, switch model/mode            | No                                  |
 | Permission mutation          | Approve/reject tool, submit/ignore `AskUserQuestion`                     | No                                  |
 | External data loading        | Component-initiated session attach or transcript/artifact/task/MCP fetch | No                                  |
@@ -219,7 +219,7 @@ Passing only `pendingApproval=null` to `MessageList` does not fully guarantee re
 
 Add a package-internal transcript render-mode context in `client/transcriptRenderMode.ts` with a default value of `interactive`. Existing `App` and `ChatPane` need no new provider, so their behavior remains unchanged. `WebShellTranscript` sets the value to `readonly`. Read-only mode applies only these restrictions:
 
-- Preserve the text and style of `qwen-session://` links, but do not dispatch `qwen:open-session`.
+- Preserve the text and style of `hopcode-session://` links, but do not dispatch `qwen:open-session`.
 - `GoalStatusMessage` does not dispatch `GOAL_STATUS_ACTIVE_EVENT`.
 - Do not intercept ordinary HTTPS links or local viewing interactions such as copy, collapse, and sorting.
 

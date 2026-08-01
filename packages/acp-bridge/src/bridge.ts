@@ -2148,7 +2148,7 @@ export function createAcpSessionBridge(opts: BridgeOptions): AcpSessionBridge {
                 clientCapabilities: {
                   fs: { readTextFile: true, writeTextFile: true },
                 },
-                clientInfo: { name: 'qwen-serve-bridge', version: '0' },
+                clientInfo: { name: 'hopcode-serve-bridge', version: '0' },
               }),
               initTimeoutMs,
               'initialize',

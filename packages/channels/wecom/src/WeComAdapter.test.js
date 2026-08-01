@@ -1158,8 +1158,8 @@ describe('WeComChannel', () => {
         expect(channel.envelopes[0]?.attachments?.[0]?.fileName).toBe('secret.png');
     });
     it('logs sanitized payloads only when debug payload logging is enabled', async () => {
-        const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-        process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = 'bot';
+        const oldDebugPayload = process.env['hopcode_channel_debug_payload'];
+        process.env['hopcode_channel_debug_payload'] = 'bot';
         const channel = new TestWeComChannel('bot', makeConfig(), makeBridge());
         const writeSpy = vi
             .spyOn(process.stderr, 'write')
@@ -1186,10 +1186,10 @@ describe('WeComChannel', () => {
         }
         finally {
             if (oldDebugPayload === undefined) {
-                delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+                delete process.env['hopcode_channel_debug_payload'];
             }
             else {
-                process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+                process.env['hopcode_channel_debug_payload'] = oldDebugPayload;
             }
             writeSpy.mockRestore();
         }

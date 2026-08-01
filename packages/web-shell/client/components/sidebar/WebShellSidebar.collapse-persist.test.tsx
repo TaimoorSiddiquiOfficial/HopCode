@@ -30,7 +30,7 @@ const { connection, workspace, workspaceActions, active, pinned, archived } =
         workspaceCwd: '/tmp/project',
         capabilities: undefined as
           | {
-              qwenCodeVersion: string;
+              hopcodeversion: string;
               features: string[];
             }
           | undefined,
@@ -38,7 +38,7 @@ const { connection, workspace, workspaceActions, active, pinned, archived } =
       workspace: {
         capabilities: undefined as
           | {
-              qwenCodeVersion: string;
+              hopcodeversion: string;
               features: string[];
             }
           | undefined,
@@ -134,7 +134,7 @@ function makeSession(
 }
 
 const organizationCapabilities = {
-  qwenCodeVersion: '1.2.3',
+  hopcodeversion: '1.2.3',
   features: ['session_organization'],
 };
 
@@ -234,7 +234,7 @@ afterEach(() => {
 });
 
 describe('WebShellSidebar collapsed session group persistence', () => {
-  it('writes collapsed section ids with the qwen-code-web-shell-* key', async () => {
+  it('writes collapsed section ids with the hopcode-web-shell-* key', async () => {
     renderSidebar();
     await flushSidebar();
 

@@ -16,7 +16,7 @@
 //      diff stats, cross-repo flag).
 //   4. `git worktree add` to create an ephemeral worktree at
 //      `.hopcode/tmp/review-pr-<n>` so subsequent steps can run in isolation.
-//   5. Capture the review diff to `.hopcode/tmp/qwen-review-pr-<n>-diff.txt` and
+//   5. Capture the review diff to `.hopcode/tmp/hopcode-review-pr-<n>-diff.txt` and
 //      partition it into chunks. Review agents `read_file` a chunk's line
 //      range instead of running `git diff` themselves: shell output is capped
 //      at 30 000 chars (head 1/5 + tail 4/5), which on a large PR hides most

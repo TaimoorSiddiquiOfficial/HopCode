@@ -25,13 +25,13 @@ export type Runtime = 'node' | 'bun' | 'unknown';
  * outbound API connections.
  *
  * This is an opt-in escape hatch for self-hosted / lab environments that use
- * self-signed certificates. Because Qwen Code installs its own undici
+ * self-signed certificates. Because HopCode installs its own undici
  * dispatcher (to control timeouts), Node's global `NODE_TLS_REJECT_UNAUTHORIZED`
  * is not automatically honored by that dispatcher — this helper feeds the
  * setting back into the dispatcher's TLS connect options.
  *
  * Sources (any one enables it):
- * - `QWEN_TLS_INSECURE` env var (`1`/`true`/`yes`/`on`, case-insensitive).
+ * - `hopcode_tls_insecure` env var (`1`/`true`/`yes`/`on`, case-insensitive).
  *   The `--insecure` CLI flag sets this.
  * - `NODE_TLS_REJECT_UNAUTHORIZED=0` (Node convention, for parity)
  *
@@ -41,7 +41,7 @@ export type Runtime = 'node' | 'bun' | 'unknown';
  * @returns true when certificate verification should be skipped
  */
 export function isTlsVerificationDisabled(): boolean {
-  const flag = process.env['QWEN_TLS_INSECURE'];
+  const flag = process.env['hopcode_tls_insecure'];
   if (flag !== undefined && /^(1|true|yes|on)$/i.test(flag.trim())) {
     return true;
   }

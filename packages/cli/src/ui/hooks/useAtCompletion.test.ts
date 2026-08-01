@@ -415,7 +415,7 @@ describe('useAtCompletion', () => {
       ]);
     });
 
-    it('should respect configured custom qwen ignore files', async () => {
+    it('should respect configured custom hopcode ignore files', async () => {
       const structure: FileSystemStructure = {
         '.cursorignore': 'cursor-secret.txt',
         '.agentignore': 'agent-secret.txt',

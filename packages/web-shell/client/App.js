@@ -175,9 +175,9 @@ const EMPTY_BOTTOM_STATUS_ITEMS = [];
 const DEFAULT_CHAT_MAX_WIDTH = 1000;
 const BOTTOM_PANEL_GAP_PX = 6;
 const BOTTOM_PANEL_FALLBACK_INSET_PX = 40;
-const CHAT_WIDTH_STORAGE_KEY = 'qwen-code-web-shell-chat-width';
+const CHAT_WIDTH_STORAGE_KEY = 'hopcode-web-shell-chat-width';
 const CHAT_SHELL_HORIZONTAL_PADDING = 40;
-const SIDEBAR_COLLAPSED_STORAGE_KEY = 'qwen-code-web-shell-sidebar-collapsed';
+const SIDEBAR_COLLAPSED_STORAGE_KEY = 'hopcode-web-shell-sidebar-collapsed';
 function resolveSidebarOptions(sidebar) {
     if (sidebar === true) {
         return { enabled: true, defaultCollapsed: false, showCompactToggle: true };
@@ -315,7 +315,7 @@ function getModelSwitchSummary(result) {
     const meta = result._meta;
     if (!isRecord(meta))
         return null;
-    const summary = meta.qwenModelSwitch;
+    const summary = meta.hopcodeModelSwitch;
     if (!isRecord(summary))
         return null;
     const authType = summary.authType;
@@ -3019,7 +3019,7 @@ export function App({ onSessionIdChange, onSessionCreated, theme: providedTheme,
         });
     }, [loadSidebarSession, reportError]);
     // Listen for `qwen:open-session` events dispatched by the markdown renderer
-    // when a `qwen-session://<id>` link is clicked. Navigate to the session.
+    // when a `hopcode-session://<id>` link is clicked. Navigate to the session.
     useEffect(() => {
         const handler = (e) => {
             const sessionId = e.detail;
@@ -4012,7 +4012,7 @@ export function App({ onSessionIdChange, onSessionCreated, theme: providedTheme,
                                 .filter(([, v]) => v)
                                 .map(([k, v]) => `${k}: ${v}`)
                                 .join('\n');
-                            const url = `https://github.com/QwenLM/qwen-code/issues/new?template=bug_report.yml` +
+                            const url = `https://github.com/QwenLM/hopcode/issues/new?template=bug_report.yml` +
                                 `&title=${encodeURIComponent(bugTitle)}` +
                                 `&info=${encodeURIComponent('\n' + fields + '\n')}`;
                             const win = window.open(url, '_blank');

@@ -92,7 +92,7 @@ if (!Element.prototype.scrollIntoView) {
     Element.prototype.scrollIntoView = () => { };
 }
 const capabilities = {
-    qwenCodeVersion: '1.2.3',
+    hopcodeversion: '1.2.3',
     features: [
         'multi_workspace_sessions',
         'workspace_runtime_removal',

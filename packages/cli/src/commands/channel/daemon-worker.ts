@@ -29,9 +29,9 @@ import { normalizeServeChannelSelection } from '../../serve/channel-selection.js
 import {
   CHANNEL_DAEMON_WORKER_SENTINEL,
   CHANNEL_WORKER_HEARTBEAT_INTERVAL_MS,
-  QWEN_DAEMON_TOKEN_ENV,
-  QWEN_DAEMON_URL_ENV,
-  QWEN_DAEMON_WORKSPACE_ENV,
+  hopcode_daemon_token_ENV,
+  hopcode_daemon_url_ENV,
+  hopcode_daemon_workspace_ENV,
   HOPCODE_SERVER_TOKEN_ENV,
 } from '../../serve/channel-worker-env.js';
 import {
@@ -275,10 +275,10 @@ function validateDaemonWorkerUrl(daemonUrl: string): void {
   try {
     parsed = new URL(daemonUrl);
   } catch {
-    throw new Error(`${QWEN_DAEMON_URL_ENV} must be a valid URL.`);
+    throw new Error(`${hopcode_daemon_url_ENV} must be a valid URL.`);
   }
   if (parsed.protocol !== 'http:' || !isLoopbackBind(parsed.hostname)) {
-    throw new Error(`${QWEN_DAEMON_URL_ENV} must use an http loopback URL.`);
+    throw new Error(`${hopcode_daemon_url_ENV} must use an http loopback URL.`);
   }
 }
 
@@ -654,9 +654,9 @@ function readRequiredEnv(name: string): string {
 
 function scrubDaemonWorkerEnv(): void {
   delete process.env[CHANNEL_DAEMON_WORKER_SENTINEL];
-  delete process.env[QWEN_DAEMON_TOKEN_ENV];
-  delete process.env[QWEN_DAEMON_URL_ENV];
-  delete process.env[QWEN_DAEMON_WORKSPACE_ENV];
+  delete process.env[hopcode_daemon_token_ENV];
+  delete process.env[hopcode_daemon_url_ENV];
+  delete process.env[hopcode_daemon_workspace_ENV];
   delete process.env[HOPCODE_SERVER_TOKEN_ENV];
 }
 
@@ -665,12 +665,12 @@ function readDaemonWorkerEnv(): {
   daemonUrl: string;
   workspace: string;
 } {
-  const daemonToken = process.env[QWEN_DAEMON_TOKEN_ENV];
+  const daemonToken = process.env[hopcode_daemon_token_ENV];
   try {
     return {
       daemonToken,
-      daemonUrl: readRequiredEnv(QWEN_DAEMON_URL_ENV),
-      workspace: readRequiredEnv(QWEN_DAEMON_WORKSPACE_ENV),
+      daemonUrl: readRequiredEnv(hopcode_daemon_url_ENV),
+      workspace: readRequiredEnv(hopcode_daemon_workspace_ENV),
     };
   } finally {
     scrubDaemonWorkerEnv();

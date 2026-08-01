@@ -21,7 +21,7 @@ const debugLogger = createDebugLogger('EXTENSION_FILE_WATCHER');
 const TOP_LEVEL_FILES = new Set(['extension-enablement.json']);
 
 const EXTENSION_FILES = new Set([
-  'qwen-extension.json',
+  'hopcode-extension.json',
   '.hopcode-extension-install.json',
 ]);
 
@@ -166,7 +166,7 @@ export class ExtensionFileWatcher {
       const configured = extension.config.contextFileName;
       const names =
         configured === undefined
-          ? ['QWEN.md']
+          ? ['HOPCODE.md']
           : Array.isArray(configured)
             ? configured
             : [configured];
@@ -272,7 +272,7 @@ export class ExtensionFileWatcher {
     }
     if (
       !fs.existsSync(
-        path.join(this.extensionsDir, parts[0], 'qwen-extension.json'),
+        path.join(this.extensionsDir, parts[0], 'hopcode-extension.json'),
       )
     ) {
       return 'stale';

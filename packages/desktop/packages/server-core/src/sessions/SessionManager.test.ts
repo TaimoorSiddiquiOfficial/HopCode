@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import type { Message } from '@craft-agent/core/types'
 import type { Workspace } from '@craft-agent/shared/config'
 import { createManagedSession, SessionManager } from './SessionManager.ts'
@@ -22,7 +22,7 @@ function addSession(
   ).sessions.set(managed.id, managed)
 }
 
-describe('SessionManager Qwen canonical mirror filtering', () => {
+describe('SessionManager hopcode canonical mirror filtering', () => {
   it('hides empty placeholder mirrors even when they have timestamps', () => {
     const manager = new SessionManager()
     const sessionId = '8390af4d-5db6-4e4c-b7e8-040d002690c7'

@@ -264,7 +264,7 @@ describe('languageUtils', () => {
         .calls[0][1] as string;
       expect(writtenContent).toContain('# Output language preference: auto');
       expect(writtenContent).toContain(
-        '<!-- qwen-code:llm-output-language: auto -->',
+        '<!-- hopcode:llm-output-language: auto -->',
       );
       expect(writtenContent).toContain(
         "Respond in the same language as the user's input.",
@@ -490,7 +490,7 @@ describe('languageUtils', () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue(
         `# Output language preference: Chinese
-<!-- qwen-code:llm-output-language: Chinese -->
+<!-- hopcode:llm-output-language: Chinese -->
 
 ## Custom
 Always use formal tone.

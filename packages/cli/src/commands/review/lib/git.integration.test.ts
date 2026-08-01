@@ -125,15 +125,15 @@ describe('releaseWorktree', () => {
     // The other half of the deadlock: `cleanStale` deletes the review branch
     // after freeing the worktree, and `branch -D` fails while the phantom
     // registration claims it.
-    git('worktree', 'add', '-q', 'wt', '-b', 'qwen-review/pr-1');
+    git('worktree', 'add', '-q', 'wt', '-b', 'hopcode-review/pr-1');
     rmSync(join(repo, 'wt'), { recursive: true, force: true });
 
-    expect(() => git('branch', '-D', 'qwen-review/pr-1')).toThrow(
+    expect(() => git('branch', '-D', 'hopcode-review/pr-1')).toThrow(
       /used by worktree|checked out/,
     );
 
     releaseWorktree(join(repo, 'wt'));
-    expect(() => git('branch', '-D', 'qwen-review/pr-1')).not.toThrow();
+    expect(() => git('branch', '-D', 'hopcode-review/pr-1')).not.toThrow();
   });
 
   it('is a no-op when there is nothing registered', () => {

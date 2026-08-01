@@ -1,4 +1,4 @@
-﻿# Rebrand Tracker — HopCode fork from QwenLM/qwen-code
+# Rebrand Tracker — HopCode fork from QwenLM/hopcode
 
 ## Completed
 

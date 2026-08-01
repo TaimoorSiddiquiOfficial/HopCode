@@ -26,7 +26,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 const ALPHA = `---
 name: run-e2e-headless
-description: Run the Qwen CLI headlessly against a mock model and inspect API traffic.
+description: Run the hopcode CLI headlessly against a mock model and inspect API traffic.
 ---
 
 # Run E2E headless
@@ -114,7 +114,7 @@ async function renderGlobalBefore(skills) {
         encoding: 'utf-8',
     }).trim();
     const packageRoot = process.env['QWEN_GLOBAL_PACKAGE_ROOT'] ??
-        path.join(npmRoot, '@hoptrendy', 'qwen-code');
+        path.join(npmRoot, '@hoptrendy', 'hopcode');
     const packageJson = JSON.parse(await fs.readFile(path.join(packageRoot, 'package.json'), 'utf-8'));
     const chunksDir = path.join(packageRoot, 'chunks');
     const { content } = await findGlobalInteractiveChunk(chunksDir);
@@ -134,7 +134,7 @@ async function renderGlobalBefore(skills) {
             '};',
         ].join('\n'));
         if (patched === content) {
-            throw new Error('Could not patch global qwen bundle exports');
+            throw new Error('Could not patch global hopcode bundle exports');
         }
         const patchedPath = path.join(tmp, 'startInteractiveUI-before-export.js');
         await fs.writeFile(patchedPath, patched);
@@ -166,7 +166,7 @@ async function renderGlobalBefore(skills) {
         instance.unmount();
         instance.cleanup?.();
         if (!frame)
-            throw new Error('Global qwen before render produced no frame');
+            throw new Error('Global hopcode before render produced no frame');
         return { frame, version: packageJson.version ?? 'unknown' };
     }
     finally {
@@ -221,7 +221,7 @@ async function main() {
         const skills = [
             {
                 name: 'run-e2e-headless',
-                description: 'Run the Qwen CLI headlessly against a mock model and inspect API traffic.',
+                description: 'Run the hopcode CLI headlessly against a mock model and inspect API traffic.',
                 stagedManifestPath: alphaPath,
             },
             {
@@ -234,15 +234,15 @@ async function main() {
         if (shouldPrint('before')) {
             try {
                 const before = await renderGlobalBefore(skills);
-                banner(`BEFORE — global qwen ${before.version} dialog (name + description only)`);
+                banner(`BEFORE — global hopcode ${before.version} dialog (name + description only)`);
                 console.log(before.frame);
             }
             catch (err) {
-                // The baseline must come from the globally installed qwen or not at
+                // The baseline must come from the globally installed hopcode or not at
                 // all — a hand-maintained pre-change fixture can silently drift from
                 // what actually shipped, so there is deliberately no local fallback.
                 const reason = err instanceof Error ? err.message : String(err);
-                banner('BEFORE — unavailable: could not render the global qwen dialog');
+                banner('BEFORE — unavailable: could not render the global hopcode dialog');
                 console.log(`${reason}\nInstall it first: npm install -g @hoptrendy/hopcode`);
                 if (mode === 'before')
                     throw err;

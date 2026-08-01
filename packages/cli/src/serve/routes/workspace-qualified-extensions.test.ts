@@ -113,7 +113,7 @@ async function makeHarness(opts?: {
   singleWorkspace?: boolean;
 }) {
   const scratch = await fsp.mkdtemp(
-    path.join(os.tmpdir(), 'qwen-extension-management-v2-'),
+    path.join(os.tmpdir(), 'hopcode-extension-management-v2-'),
   );
   const primaryCwd = path.join(scratch, 'primary');
   const secondaryCwd = path.join(scratch, 'secondary');

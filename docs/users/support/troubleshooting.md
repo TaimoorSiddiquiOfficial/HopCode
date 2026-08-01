@@ -22,7 +22,7 @@ This guide provides solutions to common issues and debugging tips, including top
 
 - **Error: `Connection error. (cause: fetch failed)` against a self-signed endpoint**
   - **Cause:** You are pointing HopCode at a self-hosted server (for example a local model behind `https://`) whose TLS certificate is self-signed, so Node.js rejects it.
-  - **Solution:** Prefer trusting the certificate via `NODE_EXTRA_CA_CERTS` (above). If that is not practical in a trusted lab/private network, skip verification with the `--insecure` flag (or `QWEN_TLS_INSECURE=1`):
+  - **Solution:** Prefer trusting the certificate via `NODE_EXTRA_CA_CERTS` (above). If that is not practical in a trusted lab/private network, skip verification with the `--insecure` flag (or `hopcode_tls_insecure=1`):
     - Example: `qwen --insecure --openaiBaseUrl https://192.168.1.10:8080 ...`
     - **Warning:** Disabling verification removes protection against man-in-the-middle attacks. Only use it for endpoints you fully trust.
 

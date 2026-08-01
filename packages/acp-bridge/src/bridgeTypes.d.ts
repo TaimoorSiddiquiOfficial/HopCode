@@ -401,7 +401,7 @@ export interface BridgeClientRequestContext {
  * Returned from `recordHeartbeat`. `lastSeenAt` is the server-side
  * `Date.now()` epoch (ms) the bridge stored for this session/client
  * pair. `clientId` is echoed only when the caller provided a trusted
- * one through `X-Qwen-Client-Id`; anonymous heartbeats omit it but
+ * one through `X-hopcode-client-id`; anonymous heartbeats omit it but
  * still bump the per-session timestamp.
  */
 export interface BridgeHeartbeatResult {
@@ -717,7 +717,7 @@ export interface AcpSessionBridge {
     publishWorkspaceEvent(event: Omit<BridgeEvent, 'id' | 'v'>): void;
     /**
      * Union of every live session's `clientIds`. Used by workspace-level
-     * mutation routes to validate the optional `X-Qwen-Client-Id` header.
+     * mutation routes to validate the optional `X-hopcode-client-id` header.
      * Returns a snapshot — callers must not mutate.
      */
     knownClientIds(): ReadonlySet<string>;

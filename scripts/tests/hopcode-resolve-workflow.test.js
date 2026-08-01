@@ -192,9 +192,9 @@ describe('hopcode resolve workflow', () => {
     expect(fallbackStep).toContain(
       'This run already used the maximum 240 minute timeout.',
     );
-    expect(fallbackStep).toContain('**Qwen Code review timed out.**');
+    expect(fallbackStep).toContain('**HopCode review timed out.**');
     expect(fallbackStep).not.toContain(
-      '_Qwen Code review did not complete successfully:',
+      '_HopCode review did not complete successfully:',
     );
   });
 

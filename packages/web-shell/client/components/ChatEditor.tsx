@@ -1595,7 +1595,7 @@ export const ChatEditor = memo(
 
     const currentModelLabel = currentModel
       ? (availableModels.find((model) => model.id === currentModel)?.label ??
-        (currentModel.startsWith('qwen-route:')
+        (currentModel.startsWith('hopcode-route:')
           ? ''
           : getModelDisplayName(currentModel)))
       : '';

@@ -82,7 +82,7 @@ With those in place:
 - **One agent per room, summoned by mention.** `GroupGate` enforces `requireMention` (default `true`, `GroupGate.ts:49`), so the agent stays silent until `@`-mentioned or it is a reply to the bot (`GroupGate.ts:51`). The multiplayer key is `sessionScope: 'thread'`, mapping to `channel:(threadId||chatId)` (`SessionRouter.ts:50-53`), so every member reuses the same `sessionId` regardless of sender.
 - **Real multi-stage work with tools.** Inbound messages become prompts via `ChannelBase.handleInbound()`, which builds `promptText` from message text, reply-quote context, attachment file paths, and (once per session) `config.instructions` (`ChannelBase.ts:316-347`), then dispatches via `bridge.prompt(sessionId, promptText, { imageBase64, imageMimeType })` (`ChannelBase.ts:425` — `promptText` is a positional arg; the options object carries only the image fields).
 - **Streams its work back into the room.** Adapters render incremental output as platform-native cards (Feishu create/update/finalize, `markdown.ts`; DingTalk markdown chunking, `DingtalkAdapter.ts:144-169`).
-- **Remembers the channel.** `SessionRouter.persist()` / `restoreSessions()` durably store `sessionId`, target, and `cwd` and rehydrate via `bridge.loadSession()` across restarts (`SessionRouter.ts:168-244`); workspace memory (`QWEN.md` / `~/.hopcode/QWEN.md`) is read/written through `GET` / `POST /workspace/memory` (`workspace-memory.ts`). This memory is workspace/global-scoped, not per-room — see Build Area 3.
+- **Remembers the channel.** `SessionRouter.persist()` / `restoreSessions()` durably store `sessionId`, target, and `cwd` and rehydrate via `bridge.loadSession()` across restarts (`SessionRouter.ts:168-244`); workspace memory (`HOPCODE.md` / `~/.hopcode/HOPCODE.md`) is read/written through `GET` / `POST /workspace/memory` (`workspace-memory.ts`). This memory is workspace/global-scoped, not per-room — see Build Area 3.
 - **Can act proactively / on a schedule.** This is the half that does _not_ yet exist end-to-end and is the heart of Phase 1.
 
 ---
@@ -135,7 +135,7 @@ The four build areas, developed in detail in §6:
 - **NG4 — Feishu is secondary, not co-primary.** DingTalk is the reference implementation and the source of all worked examples.
 - **NG5 — Slack and other Western platforms are out of scope.** The registered channel types are `telegram`, `weixin`, `dingtalk`, `feishu`, and `qq` (`channel-registry.ts:10-14`); no Slack adapter exists.
 - **NG6 — Not changing the ACP one-prompt-per-session invariant.** A scheduled/proactive prompt is just another entry in the channel `sessionQueues`; it cannot run concurrently with a user turn on the same session, and cannot cancel one.
-- **NG7 — No new chat-scoped memory store engine.** Channel-resident memory (G4) layers _namespacing_ on the existing file-backed `QWEN.md`/`AGENTS.md` files; no vector DB or per-room database.
+- **NG7 — No new chat-scoped memory store engine.** Channel-resident memory (G4) layers _namespacing_ on the existing file-backed `HOPCODE.md`/`AGENTS.md` files; no vector DB or per-room database.
 
 ---
 
@@ -598,7 +598,7 @@ A tag must _remember the group over time_ without leaking into a sibling group. 
 
 #### Current state: two scopes, neither per-conversation
 
-`POST /workspace/memory` accepts `scope: 'workspace' | 'global'` only (`workspace-memory.ts:118-125`), resolving through `resolveContextFilePath()` (`writeContextFile.ts:223-240`): `workspace → <root>/QWEN.md`, `global → ~/.hopcode/QWEN.md`. Append mode folds under `## hopcode Added Memories` (`MEMORY_SECTION_HEADER`, `const.ts:29`); a per-file mutex with 30s deadline serializes writes (`writeContextFile.ts:48-57,159-162`); the writer refuses an existing file > 16 MB on append (`MAX_EXISTING_FILE_BYTES`, `:255`). The route is **strict-auth** (`deps.mutate({ strict: true })`, `:114`) — it refuses even on loopback with no token. Consequence: every group on one workspace shares one `QWEN.md`.
+`POST /workspace/memory` accepts `scope: 'workspace' | 'global'` only (`workspace-memory.ts:118-125`), resolving through `resolveContextFilePath()` (`writeContextFile.ts:223-240`): `workspace → <root>/HOPCODE.md`, `global → ~/.hopcode/HOPCODE.md`. Append mode folds under `## hopcode Added Memories` (`MEMORY_SECTION_HEADER`, `const.ts:29`); a per-file mutex with 30s deadline serializes writes (`writeContextFile.ts:48-57,159-162`); the writer refuses an existing file > 16 MB on append (`MAX_EXISTING_FILE_BYTES`, `:255`). The route is **strict-auth** (`deps.mutate({ strict: true })`, `:114`) — it refuses even on loopback with no token. Consequence: every group on one workspace shares one `HOPCODE.md`.
 
 #### Design: a `channel` memory scope keyed by `(channelName, chatId)`
 
@@ -612,11 +612,11 @@ The unit of isolation is the **routing target**, not the session (sessions reap 
   memory/
     <channelName>/                  # sanitize: reject /, .., NUL
       <hash(chatId)>/               # sha256(chatId).slice(0,16) — path-safe, no collision/escape
-        QWEN.md                     # group-scoped "learning over time"
+        HOPCODE.md                     # group-scoped "learning over time"
         meta.json                   # { channelName, chatId, displayName?, createdAt, lastWriteAt }
 ```
 
-Filename honors `getCurrentGeminiMdFilename()` (`const.ts:49`). This keeps channel memory out of the working tree, out of the bound workspace, and off the hierarchical `QWEN.md` discovery path (so it never leaks across groups).
+Filename honors `getCurrentGeminiMdFilename()` (`const.ts:49`). This keeps channel memory out of the working tree, out of the bound workspace, and off the hierarchical `HOPCODE.md` discovery path (so it never leaks across groups).
 
 #### Write path (extend the core helper, don't fork it)
 
@@ -700,7 +700,7 @@ if (!this.instructedSessions.has(sessionId)) {
 | `SessionRouter` persist  | `key → { sessionId, target, cwd }` (`:5-9,224-244`) | Across bridge restart, via `loadSession()` | `SessionRouter` (`sessions.json`) |
 | **Channel memory (new)** | Distilled durable facts about the group             | Indefinite                                 | `~/.hopcode/channels/memory/`        |
 
-When `restoreSessions()` fails to reload a session (`:196`), the transcript is lost but the group `QWEN.md` is intact — the bootstrap read re-hydrates the agent's knowledge on the next message. **Channel memory is the recovery floor for the transcript.** "Learning over time" is a _distillation_ loop, not raw transcript persistence: the agent (or a triggered job) periodically summarizes salient facts into the group `QWEN.md` in append mode.
+When `restoreSessions()` fails to reload a session (`:196`), the transcript is lost but the group `HOPCODE.md` is intact — the bootstrap read re-hydrates the agent's knowledge on the next message. **Channel memory is the recovery floor for the transcript.** "Learning over time" is a _distillation_ loop, not raw transcript persistence: the agent (or a triggered job) periodically summarizes salient facts into the group `HOPCODE.md` in append mode.
 
 #### Isolation, size, and phasing
 
@@ -952,7 +952,7 @@ Notes tied to ground truth: `requireMention` defaults `true` (`GroupGate.ts:49`)
 
 ### Phase 2 — Channel Memory + Token Budgets + Audit Log
 
-**2.1 — Channel-scoped memory** (§6.3): add `'channel'` scope + `channelKey` to `writeContextFile.ts` (`WriteContextFileScope` `:80`, `WriteContextFileOptions` `:83-97`, `resolveContextFilePath` `:223-240`); ship `~/.hopcode/channels/memory/<channelName>/<hash(chatId)>/QWEN.md`; wire the CLI-layer `readChannelMemory`/`writeChannelMemory` callbacks via `ChannelBaseOptions` + bootstrap read reusing `instructedSessions`. Phase-2 daemon route `POST /channel/:sessionId/memory` only under the daemon topology.
+**2.1 — Channel-scoped memory** (§6.3): add `'channel'` scope + `channelKey` to `writeContextFile.ts` (`WriteContextFileScope` `:80`, `WriteContextFileOptions` `:83-97`, `resolveContextFilePath` `:223-240`); ship `~/.hopcode/channels/memory/<channelName>/<hash(chatId)>/HOPCODE.md`; wire the CLI-layer `readChannelMemory`/`writeChannelMemory` callbacks via `ChannelBaseOptions` + bootstrap read reusing `instructedSessions`. Phase-2 daemon route `POST /channel/:sessionId/memory` only under the daemon topology.
 
 **2.2 — Per-channel token budgets** (§6.4): `BudgetLedger.ts` keyed by channel, **advisory (WARN-only) on the channel-side estimate, hard-decline only on real daemon usage** (Fix #6/OD-9); per-process org rollup + per-channel windows, strictest-wins, fixed daily window; 75%/95% alerts (proactive-send dependency).
 
@@ -962,7 +962,7 @@ Notes tied to ground truth: `requireMention` defaults `true` (`GroupGate.ts:49`)
 
 **Acceptance criteria.**
 
-- [ ] `scope: 'channel'` writes to `~/.hopcode/channels/memory/<channel>/<hash(chatId)>/QWEN.md`; two groups get **independent** files; the shared workspace `QWEN.md` is untouched; the write goes through the injected callback (no `channel-base → core` dependency).
+- [ ] `scope: 'channel'` writes to `~/.hopcode/channels/memory/<channel>/<hash(chatId)>/HOPCODE.md`; two groups get **independent** files; the shared workspace `HOPCODE.md` is untouched; the write goes through the injected callback (no `channel-base → core` dependency).
 - [ ] Channel memory append is idempotent under concurrency (per-file mutex) and emits `memory_changed` only on real mutation (daemon path; subscriber-side filtering).
 - [ ] On the **daemon** path, after a channel exceeds its real-usage window cap, the next inbound prompt is declined (not truncated) and proactive jobs pause; counters reset at daily window roll-over; budgets are per-channel independent. On an **estimate-only** path the budget WARNs but never hard-declines (Fix #6).
 - [ ] A tool-call/permission raised while sender A's queued turn executes is attributed to **A**, even if B enqueued later under `followup` (Fix #7).
@@ -984,7 +984,7 @@ Claude Tag is a hosted, multi-tenant agent: Anthropic operates the runtime, iden
 - **Open / self-hosted, data stays internal.** The agent runs locally — over stdio in Phase 0 (`AcpBridge.start()` runs `node <cli> --acp`), in-process under `hopcode serve` from Phase 1 — never a vendor API. Repo contents, model traffic, and transcripts stay on operator hosts. Claude Tag cannot make this claim.
 - **MCP / any-tool.** Strict superset of a closed hosted agent's tool surface.
 - **Per-action permission voting — _a Phase-1+ capability once daemon-hosted_.** hopcode ships `MultiClientPermissionMediator` (four policies, consensus quorum `floor(M/2)+1`, separate audit ring). Genuinely a differentiator — **unreachable on the Phase-0 `AcpBridge` path** (`requestPermission` auto-approves, `:108-118`), reachable once Phase 1 hosts channels in the daemon; even there, votes key by `clientId` and a channel is a _single_ client until the OD-3 roster lands. The dead `ChannelConfig.approvalMode` field (`types.ts:36`) confirms planned-but-absent.
-- **Durable, inspectable state.** `SessionRouter` persistence, plain `QWEN.md`/`AGENTS.md` files, and (daemon, Phase 1+) a Last-Event-ID replay ring. Nothing opaque.
+- **Durable, inspectable state.** `SessionRouter` persistence, plain `HOPCODE.md`/`AGENTS.md` files, and (daemon, Phase 1+) a Last-Event-ID replay ring. Nothing opaque.
 
 ### Where it diverges and must compensate
 
@@ -1091,7 +1091,7 @@ Each risk maps to a phase: R1/R3/R4 are Phase 0–1, R5/R6/R11/R12 are Phase 1, 
 - `eventBus.ts` — `BridgeEvent.data` free-form (`:51`), `originatorClientId` (`:60`), hysteresis thresholds (`:101-103`), replay ring (`:92`).
 - `permissionMediator.ts` — four policies + consensus quorum (`:348,621-637`).
 - `permission-audit.ts` — `PermissionAuditRing` FIFO 512 (`:128-172`), closed entry union (`:57-104`), header doc anticipating a GET surface (`:22-25`).
-- `rate-limit.ts` — per-`(clientId|ip)` token buckets; `X-Qwen-Client-Id` (`:110`).
+- `rate-limit.ts` — per-`(clientId|ip)` token buckets; `X-hopcode-client-id` (`:110`).
 - `auth.ts` — global bearer token (`:259-266`), `createMutationGate` strict (`:356`).
 - `workspace-memory.ts` — scopes `workspace|global` (`:118-125`), strict-auth mutate (`:114`), per-write cap `MAX_MEMORY_CONTENT_BYTES` (`:79`), fixed `projectRoot` forward (`:185-190`).
 

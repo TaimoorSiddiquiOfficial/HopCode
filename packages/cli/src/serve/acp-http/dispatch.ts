@@ -3975,7 +3975,7 @@ export class AcpDispatcher {
       }
       default: {
         // client_evicted / slow_client_warning / state_resync_required /
-        // model_switched / approval_mode_changed / … → opaque qwen notify.
+        // model_switched / approval_mode_changed / … → opaque hopcode notify.
         // `event.id` is undefined for the synthetic control frames (no SSE
         // `id:` line, so they don't burn a slot in the resume sequence) and
         // set for ring-backed daemon events.

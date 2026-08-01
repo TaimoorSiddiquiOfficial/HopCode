@@ -15,7 +15,7 @@ describe('resolveDesktopVoiceConfig', () => {
       getVoiceModel: () => 'qwen3-asr-flash',
       now: () => 1_700_000_000_000,
       env: { DASHSCOPE_API_KEY: 'env-key' },
-      readQwenJson: async <T,>(file: string) =>
+      readhopcodejson: async <T,>(file: string) =>
         (file === 'oauth_creds.json'
           ? {
               access_token: 'oauth-token',
@@ -47,7 +47,7 @@ describe('resolveDesktopVoiceConfig', () => {
       getVoiceModel: () => 'qwen3-asr-flash',
       now: () => 1_700_000_000_000,
       env: { DASHSCOPE_API_KEY: 'env-key' },
-      readQwenJson: async <T,>(file: string) =>
+      readhopcodejson: async <T,>(file: string) =>
         (file === 'oauth_creds.json'
           ? { access_token: 'expired', expiry_date: 1 }
           : {
@@ -72,15 +72,15 @@ describe('resolveDesktopVoiceConfig', () => {
       resolveDesktopVoiceConfig({
         getVoiceModel: () => 'qwen3-asr-flash',
         env: {},
-        readQwenJson: async () => undefined,
+        readhopcodejson: async () => undefined,
       }),
-    ).rejects.toThrow('Voice dictation needs Qwen credentials')
+    ).rejects.toThrow('Voice dictation needs hopcode credentials')
 
     await expect(
       resolveDesktopVoiceConfig({
         getVoiceModel: () => 'qwen3-asr-flash',
         env: { OPENAI_API_KEY: 'key', OPENAI_BASE_URL: 'http://api.example' },
-        readQwenJson: async () => undefined,
+        readhopcodejson: async () => undefined,
       }),
     ).rejects.toThrow('https baseUrl')
   })
@@ -90,7 +90,7 @@ describe('resolveDesktopVoiceConfig', () => {
       resolveDesktopVoiceConfig({
         getVoiceModel: () => 'qwen3-asr-flash',
         env: { OPENAI_API_KEY: 'openai-key' },
-        readQwenJson: async () => undefined,
+        readhopcodejson: async () => undefined,
       }),
     ).rejects.toThrow('Set OPENAI_BASE_URL')
 
@@ -100,7 +100,7 @@ describe('resolveDesktopVoiceConfig', () => {
         OPENAI_API_KEY: 'openai-key',
         OPENAI_BASE_URL: 'https://proxy.example.com/openai',
       },
-      readQwenJson: async () => undefined,
+      readhopcodejson: async () => undefined,
     })
 
     expect(config.apiKey).toBe('openai-key')
@@ -114,7 +114,7 @@ describe('resolveDesktopVoiceConfig', () => {
         DASHSCOPE_API_KEY: 'dashscope-key',
         OPENAI_BASE_URL: 'https://proxy.example.com/openai',
       },
-      readQwenJson: async () => undefined,
+      readhopcodejson: async () => undefined,
     })
 
     expect(config.apiKey).toBe('dashscope-key')
@@ -130,7 +130,7 @@ describe('resolveDesktopVoiceConfig', () => {
         DASHSCOPE_API_KEY: 'dashscope-key',
         DASHSCOPE_PROXY_BASE_URL: 'https://dashscope-proxy.example.com/asr',
       },
-      readQwenJson: async () => undefined,
+      readhopcodejson: async () => undefined,
     })
 
     expect(config.baseUrl).toBe('https://dashscope-proxy.example.com/asr/v1')
@@ -145,8 +145,8 @@ describe('gethopcodeConfigDir', () => {
     else process.env.hopcode_HOME = original
   })
 
-  // QWEN_HOME must be normalized the same way core's Storage.getGlobalhopcodeDir
-  // does, so desktop voice reads the same dir the qwen CLI writes to.
+  // hopcode_home must be normalized the same way core's Storage.getGlobalhopcodeDir
+  // does, so desktop voice reads the same dir the hopcode CLI writes to.
   it('expands a leading ~ to the home directory', () => {
     process.env.hopcode_HOME = '~/custom-qwen'
     expect(gethopcodeConfigDir()).toBe(join(homedir(), 'custom-qwen'))
@@ -157,19 +157,19 @@ describe('gethopcodeConfigDir', () => {
     expect(gethopcodeConfigDir()).toBe(resolve('relative/config'))
   })
 
-  it('falls back to ~/.hopcode when QWEN_HOME is empty', () => {
+  it('falls back to ~/.hopcode when hopcode_home is empty', () => {
     process.env.hopcode_HOME = ''
     expect(gethopcodeConfigDir()).toBe(join(homedir(), '.hopcode'))
   })
 
-  it('falls back to ~/.hopcode when QWEN_HOME is unset', () => {
+  it('falls back to ~/.hopcode when hopcode_home is unset', () => {
     delete process.env.hopcode_HOME
     expect(gethopcodeConfigDir()).toBe(join(homedir(), '.hopcode'))
   })
 
-  it('passes an absolute QWEN_HOME through unchanged', () => {
-    process.env.hopcode_HOME = '/opt/qwen-home'
-    expect(gethopcodeConfigDir()).toBe('/opt/qwen-home')
+  it('passes an absolute hopcode_home through unchanged', () => {
+    process.env.hopcode_HOME = '/opt/hopcode-home'
+    expect(gethopcodeConfigDir()).toBe('/opt/hopcode-home')
   })
 })
 

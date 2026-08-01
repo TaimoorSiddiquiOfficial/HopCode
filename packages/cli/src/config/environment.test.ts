@@ -24,7 +24,7 @@ const TRACKED_ENV = [
   'NODE_OPTIONS',
   'HOPCODE_HOME',
   'HOPCODE_RUNTIME_DIR',
-  'QWEN_SERVER_TOKEN',
+  'hopcode_server_token',
 ] as const;
 
 let tmpDirs: string[] = [];
@@ -77,8 +77,8 @@ describe('buildRuntimeEnvironment', () => {
         'RUNTIME_SETTINGS=dotenv-wins',
         'RUNTIME_EXCLUDED=excluded',
         'NODE_OPTIONS=--require ./bad.js',
-        'QWEN_SERVER_TOKEN=dotenv-token',
-        'HOPCODE_HOME=/tmp/ignored-qwen-home',
+        'hopcode_server_token=dotenv-token',
+        'HOPCODE_HOME=/tmp/ignored-hopcode-home',
         '',
       ].join('\n'),
     );
@@ -115,7 +115,7 @@ describe('buildRuntimeEnvironment', () => {
     expect(snapshot.effectiveEnv['RUNTIME_SETTINGS_EXCLUDED']).toBeUndefined();
     expect(snapshot.effectiveEnv['NODE_OPTIONS']).toBeUndefined();
     expect(snapshot.effectiveEnv['BASH_ENV']).toBeUndefined();
-    expect(snapshot.effectiveEnv['QWEN_SERVER_TOKEN']).toBeUndefined();
+    expect(snapshot.effectiveEnv['hopcode_server_token']).toBeUndefined();
     expect(snapshot.effectiveEnv['HOPCODE_HOME']).toBeUndefined();
     expect(snapshot.effectiveEnv['HOPCODE_RUNTIME_DIR']).toBeUndefined();
     expect(snapshot.overlayKeys).toEqual([
@@ -178,7 +178,7 @@ describe('loadEnvironment', () => {
           RUNTIME_SETTINGS_ONLY: 'from-settings',
           BASH_ENV: '/tmp/bad-profile',
           NODE_OPTIONS: '--require ./bad.js',
-          QWEN_SERVER_TOKEN: 'bad-token',
+          hopcode_server_token: 'bad-token',
         },
       }),
       workspace,
@@ -187,6 +187,6 @@ describe('loadEnvironment', () => {
     expect(process.env['RUNTIME_SETTINGS_ONLY']).toBe('from-settings');
     expect(process.env['BASH_ENV']).toBeUndefined();
     expect(process.env['NODE_OPTIONS']).toBeUndefined();
-    expect(process.env['QWEN_SERVER_TOKEN']).toBeUndefined();
+    expect(process.env['hopcode_server_token']).toBeUndefined();
   });
 });

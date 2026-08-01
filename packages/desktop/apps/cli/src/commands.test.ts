@@ -243,7 +243,7 @@ describe('resolveApiKey', () => {
 })
 
 describe('shouldSetupLlmConnection', () => {
-  it('sets up Qwen when no connection exists', () => {
+  it('sets up hopcode when no connection exists', () => {
     expect(shouldSetupLlmConnection(0, { provider: 'hopcode', baseUrl: '' })).toBe(true)
   })
 

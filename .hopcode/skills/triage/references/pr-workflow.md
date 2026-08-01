@@ -40,7 +40,7 @@ PR). Only update issue comments, not PR reviews.
 ```bash
 # Check for existing terminal-exit review before re-submitting
 EXISTING=$(gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" \
-  --jq '[.[] | select(.user.login=="qwen-code-ci-bot" and .state=="CHANGES_REQUESTED")] | length')
+  --jq '[.[] | select(.user.login=="hopcode-ci-bot" and .state=="CHANGES_REQUESTED")] | length')
 # Only submit if no existing terminal review
 if [ "$EXISTING" -eq 0 ]; then gh pr review ... ; fi
 ```
@@ -60,7 +60,7 @@ Every staged comment (Stage 1 gate-pass, Stage 2, Stage 3) ends with the signatu
 ```
 — _Qwen Code · qwen3.7-max_
 
-<sub>Reviewed at `<HEAD_SHA>` · re-run with `@qwen-code /triage`</sub>
+<sub>Reviewed at `<HEAD_SHA>` · re-run with `@hopcode /triage`</sub>
 ```
 
 **If `HEAD_SHA` comes back empty** (API failure or a null `headRefOid`): **fail closed.** Do not PATCH an existing staged comment — the update rewrites the whole body, so a dropped footer erases the previously valid `Reviewed at` line just as an empty-backtick footer would. Retry the capture, or leave the prior comment (with its footer) untouched until a full OID is available; only a brand-new post that never had a footer may go out without one. Terminal-gate reviews (Stage 1a/1b/1c, submitted via `gh pr review --request-changes`) use the signature only — no footer; they reject before a real review pass.
@@ -236,7 +236,7 @@ Approach: <state your honest assessment — the scope feels right / feels like i
 
 — _Qwen Code · qwen3.7-max_
 
-<sub>Reviewed at `<HEAD_SHA>` · re-run with `@qwen-code /triage`</sub>
+<sub>Reviewed at `<HEAD_SHA>` · re-run with `@hopcode /triage`</sub>
 ```
 
 Save this comment's ID. Terminal exits — stop here if any applies:
@@ -387,7 +387,7 @@ Close with the signature then the footer, and save this comment's ID — on an e
 ```markdown
 — _Qwen Code · qwen3.7-max_
 
-<sub>Reviewed at `<HEAD_SHA>` · re-run with `@qwen-code /triage`</sub>
+<sub>Reviewed at `<HEAD_SHA>` · re-run with `@hopcode /triage`</sub>
 ```
 
 ### Stage 3: Reflect
@@ -438,7 +438,7 @@ If `GUARD` is `block`: do **not** run `gh pr review --approve` no matter how cle
 
 If Stage 0 escalated the PR for maintainer awareness, do **not** approve automatically; use the "Genuinely unsure" path below.
 
-**Re-runs (manually triggered via `@qwen-code /triage`):** hygiene concerns (scope mismatch, undocumented changes, naming) that don't block the PR are not a valid reason to defer. Note them in the comment and approve. Only defer if you have genuine blocking uncertainty — something you cannot resolve from the diff, tests, and PR description.
+**Re-runs (manually triggered via `@hopcode /triage`):** hygiene concerns (scope mismatch, undocumented changes, naming) that don't block the PR are not a valid reason to defer. Note them in the comment and approve. Only defer if you have genuine blocking uncertainty — something you cannot resolve from the diff, tests, and PR description.
 
 All stages genuinely clean, `GUARD` is `ok`, and no Stage 0 maintainer escalation remains — approve:
 

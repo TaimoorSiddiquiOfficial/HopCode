@@ -79,7 +79,7 @@ export interface AppShellContextType {
   onMarketplaceSkillInstallStart?: (skillId: string) => void
   /** Mark a marketplace skill install as finished. */
   onMarketplaceSkillInstallFinish?: (skillId: string) => void
-  /** Provider-advertised Qwen commands/skills cached by workspace and working directory. */
+  /** Provider-advertised hopcode commands/skills cached by workspace and working directory. */
   getHopCodeCapabilitySnapshot?: (
     workspaceId?: string | null,
     workingDirectory?: string | null,

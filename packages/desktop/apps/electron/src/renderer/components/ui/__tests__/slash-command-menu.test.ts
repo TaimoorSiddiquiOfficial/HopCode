@@ -34,7 +34,7 @@ describe('createQwenSlashSections', () => {
     })
   })
 
-  it('falls back to common Qwen commands before provider data arrives', () => {
+  it('falls back to common hopcode commands before provider data arrives', () => {
     const sections = createQwenSlashSections({ enabled: true })
     const labels = sections.flatMap(section => section.items.map(item => item.label))
 
@@ -44,7 +44,7 @@ describe('createQwenSlashSections', () => {
     expect(labels).not.toContain('/skills')
   })
 
-  it('hides Qwen commands that cannot execute reliably', () => {
+  it('hides hopcode commands that cannot execute reliably', () => {
     const sections = createQwenSlashSections({
       availableCommands: [
         { name: 'model', description: 'Switch model' },
@@ -69,7 +69,7 @@ describe('createQwenSlashSections', () => {
     expect(sections.map(section => section.id)).toEqual(['qwen-commands'])
     expect(sections[0]?.items.map(item => item.label)).toEqual(['/review', '/commit'])
     expect(sections[0]?.items[1]).toMatchObject({
-      id: 'qwen-skill:commit',
+      id: 'hopcode-skill:commit',
       insertText: '/commit ',
     })
   })

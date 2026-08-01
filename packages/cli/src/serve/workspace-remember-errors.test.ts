@@ -305,10 +305,10 @@ describe('extractRememberErrorDetails', () => {
 
   it('redacts env secret assignments split by credential separators', () => {
     const details = extractRememberErrorDetails(
-      new Error('QWEN_DAEMON_TOKEN=AAAAAAAAAA\u00a0BBBBBBBB'),
+      new Error('hopcode_daemon_token=AAAAAAAAAA\u00a0BBBBBBBB'),
     );
 
-    expect(details).toBe('QWEN_DAEMON_TOKEN=<redacted>');
+    expect(details).toBe('hopcode_daemon_token=<redacted>');
     expect(details).not.toContain('AAAAAAAAAA');
     expect(details).not.toContain('BBBBBBBB');
   });

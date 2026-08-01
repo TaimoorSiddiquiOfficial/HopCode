@@ -196,7 +196,7 @@ export class WebViewProvider {
 
         if (authSettingsChanged && !this.isSyncingToVSCode) {
           logger.log(
-            '[WebViewProvider] Auth-related qwen-code settings changed by user, syncing...',
+            '[WebViewProvider] Auth-related hopcode settings changed by user, syncing...',
           );
           const synced = await this.syncVSCodeSettingsToHopCodeConfig();
           if (synced && this.agentInitialized) {
@@ -1337,7 +1337,7 @@ export class WebViewProvider {
         const errorMsg = getErrorMessage(_error);
         logger.error('[WebViewProvider] Agent connection error:', _error);
         vscode.window.showWarningMessage(
-          `Failed to connect to Qwen CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
+          `Failed to connect to hopcode CLI: ${errorMsg}\nYou can still use the chat UI, but messages won't be sent to AI.`,
         );
         // Fallback to empty conversation
         await this.initializeEmptyConversation();
@@ -1525,7 +1525,7 @@ export class WebViewProvider {
       type: 'agentConnectionError',
       data: {
         message:
-          'Lost connection to Qwen agent and auto-reconnect failed. Please use the refresh button to try again.',
+          'Lost connection to hopcode agent and auto-reconnect failed. Please use the refresh button to try again.',
       },
     });
   }

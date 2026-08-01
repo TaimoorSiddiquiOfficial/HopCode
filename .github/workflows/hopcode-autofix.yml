@@ -412,17 +412,17 @@ jobs:
 
       - name: 'Prepare HopCode CLI'
         run: |-
-          qwen_version="$(node -p "require('./package.json').version")"
-          echo "Using checked-out Qwen Code bundle ${qwen_version}"
-          qwen_bin="${RUNNER_TEMP}/qwen-bin"
-          mkdir -p "${qwen_bin}"
-          cat > "${qwen_bin}/qwen" <<'EOF'
+          hopcode_version="$(node -p "require('./package.json').version")"
+          echo "Using checked-out HopCode bundle ${hopcode_version}"
+          hopcode_bin="${RUNNER_TEMP}/hopcode-bin"
+          mkdir -p "${hopcode_bin}"
+          cat > "${hopcode_bin}/qwen" <<'EOF'
           #!/usr/bin/env bash
           exec node "${GITHUB_WORKSPACE}/dist/cli.js" "$@"
           EOF
-          chmod +x "${qwen_bin}/qwen"
-          echo "${qwen_bin}" >> "${GITHUB_PATH}"
-          PATH="${qwen_bin}:${PATH}"
+          chmod +x "${hopcode_bin}/qwen"
+          echo "${hopcode_bin}" >> "${GITHUB_PATH}"
+          PATH="${hopcode_bin}:${PATH}"
           hopcode --version
 
       - name: 'Find candidate issues'
@@ -604,14 +604,14 @@ jobs:
             }
         run: |-
           rm -rf "${HOPCODE_HOME}"
-          mkdir -p .qwen "${HOPCODE_HOME}"
+          mkdir -p  .hopcode "${HOPCODE_HOME}"
           if [[ -z "${OPENAI_API_KEY:-}" ]]; then
-            echo '::error::AUTOFIX_OPENAI_API_KEY secret is required for Qwen Autofix.'
+            echo '::error::AUTOFIX_OPENAI_API_KEY secret is required for HopCode Autofix.'
             exit 1
           fi
-          printf '%s\n' "${SETTINGS_JSON}" > .qwen/settings.json
+          printf '%s\n' "${SETTINGS_JSON}" > .hopcode/settings.json
           rm -f "${WORKDIR}/decision.json" "${WORKDIR}/failure.md"
-          node .qwen/skills/autofix/scripts/run-agent.mjs \
+          node .hopcode/skills/autofix/scripts/run-agent.mjs \
             --mode assess-candidates \
             --workdir "${WORKDIR}"
 
@@ -1161,7 +1161,7 @@ jobs:
             HAS_PENDING_CHECKS="$(jq -r --arg cut "${PENDING_CUTOFF}" '
               [ .[]
                 | select((.status // .state // "") | IN("QUEUED", "IN_PROGRESS", "PENDING", "WAITING", "REQUESTED"))
-                | select(((.workflowName // "") != "Qwen Autofix") or (((.name // "") | startswith("review-address"))))
+                | select(((.workflowName // "") != "HopCode Autofix") or (((.name // "") | startswith("review-address"))))
                 | select((.startedAt // $cut) > $cut) ]
               | length > 0
             ' <<< "${CHECKS_JSON}")"
@@ -1218,7 +1218,7 @@ jobs:
             N_FAILED_CHECKS="$(jq --arg wm "${EFF_WM}" '
               [ .[]
                 | select((.conclusion // .state // "") | IN("FAILURE", "FAILED", "ERROR", "TIMED_OUT", "ACTION_REQUIRED", "CANCELLED"))
-                | select(((.workflowName // "") != "Qwen Autofix") or (((.name // "") | startswith("review-address"))))
+                | select(((.workflowName // "") != "HopCode Autofix") or (((.name // "") | startswith("review-address"))))
                 | select((.completedAt // .updatedAt // "") > $wm) ]
               | length
             ' <<< "${CHECKS_JSON}")"
@@ -1253,7 +1253,7 @@ jobs:
             # bot's own eval markers, and known non-actionable bot comments
             # (triage stages, coverage reports, legacy suggestion summaries,
             # force-push reminders).
-            BOT_COMMENT_FILTER='<!-- (autofix-eval|hopcode-triage|qwen-review-suggestion-summary|pr-force-push|hopcode-review-ack) '
+            BOT_COMMENT_FILTER='<!-- (autofix-eval|hopcode-triage|hopcode-review-suggestion-summary|pr-force-push|hopcode-review-ack) '
             N_ISSUE_COMMENTS="$(jq --arg wm "${EFF_WM}" --arg rb "${REVIEW_BOT}" --arg ab "${AUTOFIX_BOT}" \
               --argjson trust "${TRUSTED_ASSOC}" --arg bf "${BOT_COMMENT_FILTER}" '
               [ .[]
@@ -1410,17 +1410,17 @@ jobs:
 
       - name: 'Prepare HopCode CLI'
         run: |-
-          qwen_version="$(node -p "require('./package.json').version")"
-          echo "Using checked-out Qwen Code bundle ${qwen_version}"
-          qwen_bin="${RUNNER_TEMP}/qwen-bin"
-          mkdir -p "${qwen_bin}"
-          cat > "${qwen_bin}/qwen" <<'EOF'
+          hopcode_version="$(node -p "require('./package.json').version")"
+          echo "Using checked-out HopCode bundle ${hopcode_version}"
+          hopcode_bin="${RUNNER_TEMP}/hopcode-bin"
+          mkdir -p "${hopcode_bin}"
+          cat > "${hopcode_bin}/qwen" <<'EOF'
           #!/usr/bin/env bash
           exec node "${GITHUB_WORKSPACE}/dist/cli.js" "$@"
           EOF
-          chmod +x "${qwen_bin}/qwen"
-          echo "${qwen_bin}" >> "${GITHUB_PATH}"
-          PATH="${qwen_bin}:${PATH}"
+          chmod +x "${hopcode_bin}/qwen"
+          echo "${hopcode_bin}" >> "${GITHUB_PATH}"
+          PATH="${hopcode_bin}:${PATH}"
           hopcode --version
 
       - name: 'Resolve sandbox image'
@@ -1518,9 +1518,9 @@ jobs:
             + (.[2] | map(select((.created_at // "") > $wm)
               | select((.user.login // "") != $ab)
               | select(((.author_association // "") | IN($trust[])) or (.user.login // "") == $rb)
-              | select((.body // "") | test("<!-- (autofix-eval|hopcode-triage|qwen-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not) | .created_at))
+              | select((.body // "") | test("<!-- (autofix-eval|hopcode-triage|hopcode-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not) | .created_at))
             + (.[3] | map(select((.conclusion // .state // "") | IN("FAILURE", "FAILED", "ERROR", "TIMED_OUT", "ACTION_REQUIRED", "CANCELLED"))
-              | select(((.workflowName // "") != "Qwen Autofix") or (((.name // "") | startswith("review-address"))))
+              | select(((.workflowName // "") != "HopCode Autofix") or (((.name // "") | startswith("review-address"))))
               | select((.completedAt // .updatedAt // "") > $wm)
               | (.completedAt // .updatedAt // "")))
             | max // ""' "${WORKDIR}/rv.json" "${WORKDIR}/rc.json" "${WORKDIR}/ic.json" "${WORKDIR}/checks.json")"
@@ -1563,9 +1563,9 @@ jobs:
               + (.[2] | map(select((.created_at // "") > $wm)
                 | select((.user.login // "") != $ab)
                 | select(((.author_association // "") | IN($trust[])) or (.user.login // "") == $rb)
-                | select((.body // "") | test("<!-- (autofix-eval|hopcode-triage|qwen-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not)) | length)
+                | select((.body // "") | test("<!-- (autofix-eval|hopcode-triage|hopcode-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not)) | length)
               + (.[3] | map(select((.conclusion // .state // "") | IN("FAILURE", "FAILED", "ERROR", "TIMED_OUT", "ACTION_REQUIRED", "CANCELLED"))
-                | select(((.workflowName // "") != "Qwen Autofix") or (((.name // "") | startswith("review-address"))))
+                | select(((.workflowName // "") != "HopCode Autofix") or (((.name // "") | startswith("review-address"))))
                 | select((.completedAt // .updatedAt // "") > $wm)) | length)' \
               "${WORKDIR}/rv.json" "${WORKDIR}/rc.json" "${WORKDIR}/ic.json" "${WORKDIR}/checks.json")"
             if [[ "${LIVE_NEW}" == "0" ]]; then
@@ -1639,7 +1639,7 @@ jobs:
               | select((.created_at // "") > $wm)
               | select((.user.login // "") != $ab)
               | select(((.author_association // "") | IN($trust[])) or (.user.login // "") == $rb)
-              | select((.body // "") | test("<!-- (autofix-eval|hopcode-triage|qwen-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not)
+              | select((.body // "") | test("<!-- (autofix-eval|hopcode-triage|hopcode-review-suggestion-summary|pr-force-push|hopcode-review-ack) ") | not)
               | "- @\(.user.login): \(.body // "" | gsub("\r"; ""))"' \
               "${WORKDIR}/ic.json"
             echo
@@ -1647,7 +1647,7 @@ jobs:
             jq -r --arg wm "${WATERMARK}" '
               .[]
               | select((.conclusion // .state // "") | IN("FAILURE", "FAILED", "ERROR", "TIMED_OUT", "ACTION_REQUIRED", "CANCELLED"))
-              | select(((.workflowName // "") != "Qwen Autofix") or (((.name // "") | startswith("review-address"))))
+              | select(((.workflowName // "") != "HopCode Autofix") or (((.name // "") | startswith("review-address"))))
               | select((.completedAt // .updatedAt // "") > $wm)
               | "- \(((.name // .workflowName) // "external check") | gsub("[^A-Za-z0-9 _./()-]"; "") | .[0:80]): \(.conclusion // .state // "?")"' \
               "${WORKDIR}/checks.json"

@@ -6,7 +6,7 @@ import { writeStderrLine, writeStdoutLine } from '../../utils/stdioHelpers.js';
 import { readServiceInfo } from './pidfile.js';
 import type { SessionTarget } from '@hoptrendy/channel-base';
 import {
-  QWEN_DAEMON_TOKEN_ENV,
+  hopcode_daemon_token_ENV,
   HOPCODE_SERVER_TOKEN_ENV,
 } from '../../serve/channel-worker-env.js';
 import {
@@ -58,7 +58,7 @@ export const statusCommand: CommandModule<unknown, StatusArgs> = {
       const token =
         argv.token ??
         process.env[HOPCODE_SERVER_TOKEN_ENV] ??
-        process.env[QWEN_DAEMON_TOKEN_ENV];
+        process.env[hopcode_daemon_token_ENV];
       try {
         const sdk = (await import('@hoptrendy/sdk/daemon')) as unknown as {
           DaemonClient: new (opts: { baseUrl: string; token?: string }) => {

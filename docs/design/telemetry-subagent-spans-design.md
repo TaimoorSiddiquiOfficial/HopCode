@@ -133,7 +133,7 @@ On TTL expiry, subagent spans get stamped:
 | Consumer                                                                           | Position                                          | Action                                                                                  |
 | ---------------------------------------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | OTel LogRecord → `LogToSpanProcessor` → bridge span `hopcode.subagent_execution` | `loggers.ts:773` → `log-to-span-processor.ts:346` | **Skip this bridge** for the subagent event — new `hopcode.subagent` span replaces it |
-| QwenLogger RUM ingestion (Aliyun internal stats)                                   | `qwen-logger.ts:573-574`                          | Keep — RUM doesn't see OTel spans, only LogRecords                                      |
+| QwenLogger RUM ingestion (Aliyun internal stats)                                   | `hopcode-logger.ts:573-574`                          | Keep — RUM doesn't see OTel spans, only LogRecords                                      |
 | `recordSubagentExecutionMetrics` Counter                                           | `metrics.ts:829`                                  | Keep — metric consumer is independent of trace bridge                                   |
 
 **Bridge skip** (the only change to LogToSpanProcessor):

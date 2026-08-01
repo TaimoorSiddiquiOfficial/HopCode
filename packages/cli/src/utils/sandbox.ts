@@ -501,7 +501,7 @@ export async function start_sandbox(
   args.push('--env', `HOPCODE_HOME=${userSettingsDirContainerPath}`);
 
   // Mount the runtime base dir and pass HOPCODE_RUNTIME_DIR when it diverges
-  // from the global qwen dir; otherwise the existing user-settings mount
+  // from the global hopcode dir; otherwise the existing user-settings mount
   // already covers it.
   if (!runtimeCoveredByUserSettings) {
     args.push(
@@ -809,7 +809,7 @@ export async function start_sandbox(
 
     // Instead of passing --user to the main sandbox container, we let it
     // start as root, then create a user with the host's UID/GID, and
-    // finally switch to that user to run the qwen process. This is
+    // finally switch to that user to run the hopcode process. This is
     // necessary on Linux to ensure the user exists within the
     // container's /etc/passwd file, which is required by os.userInfo().
     const username = 'hopcode';

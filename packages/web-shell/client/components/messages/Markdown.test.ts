@@ -123,12 +123,12 @@ describe('isSafeImageSrc', () => {
 });
 
 describe('markdownUrlTransform', () => {
-  it('lets the qwen-session scheme through untouched', () => {
-    expect(markdownUrlTransform('qwen-session://abc-123')).toBe(
-      'qwen-session://abc-123',
+  it('lets the hopcode-session scheme through untouched', () => {
+    expect(markdownUrlTransform('hopcode-session://abc-123')).toBe(
+      'hopcode-session://abc-123',
     );
-    expect(markdownUrlTransform('  qwen-session://abc-123  ')).toBe(
-      '  qwen-session://abc-123  ',
+    expect(markdownUrlTransform('  hopcode-session://abc-123  ')).toBe(
+      '  hopcode-session://abc-123  ',
     );
   });
 
@@ -143,7 +143,7 @@ describe('markdownUrlTransform', () => {
   });
 });
 
-describe('qwen-session:// links', () => {
+describe('hopcode-session:// links', () => {
   function renderMd(content: string): HTMLDivElement {
     const container = document.createElement('div');
     document.body.appendChild(container);
@@ -166,7 +166,7 @@ describe('qwen-session:// links', () => {
     // Without `urlTransform`, react-markdown rewrites every non-http(s)/mailto
     // href to '' before `components.a` runs, so the interception branch never
     // fires and the link renders as an inert anchor.
-    const c = renderMd('[🧵 abc12345](qwen-session://abc12345-full-id)');
+    const c = renderMd('[🧵 abc12345](hopcode-session://abc12345-full-id)');
     const a = c.querySelector('a')!;
     expect(a).toBeTruthy();
     expect(a.getAttribute('role')).toBe('button');
@@ -178,7 +178,7 @@ describe('qwen-session:// links', () => {
     const seen: unknown[] = [];
     const handler = (e: Event) => seen.push((e as CustomEvent).detail);
     window.addEventListener('qwen:open-session', handler);
-    const c = renderMd('[🧵 abc12345](qwen-session://abc12345-full-id)');
+    const c = renderMd('[🧵 abc12345](hopcode-session://abc12345-full-id)');
     act(() => {
       c.querySelector('a')!.dispatchEvent(
         new MouseEvent('click', { bubbles: true, cancelable: true }),
@@ -204,7 +204,7 @@ describe('qwen-session:// links', () => {
           TranscriptRenderModeProvider,
           { value: 'readonly' },
           createElement(Markdown, {
-            content: '[child](qwen-session://child-session)',
+            content: '[child](hopcode-session://child-session)',
           }),
         ),
       );

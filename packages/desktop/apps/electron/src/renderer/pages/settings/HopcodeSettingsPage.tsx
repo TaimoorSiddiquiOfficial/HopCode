@@ -369,32 +369,32 @@ async function runSharedhopcodeSettingsCommand(
   switch (command.type) {
     case 'getHopCodeCoreSettings':
       return window.electronAPI.getHopCodeCoreSettings();
-    case 'setQwenCoreSetting':
-      return window.electronAPI.setQwenCoreSetting(
+    case 'sethopcodecoreSetting':
+      return window.electronAPI.sethopcodecoreSetting(
         command.scope,
         command.key,
         command.value,
       );
-    case 'setQwenMcpServer':
-      return window.electronAPI.setQwenMcpServer(
+    case 'sethopcodemcpserver':
+      return window.electronAPI.sethopcodemcpserver(
         command.scope,
         command.name,
         command.server,
       );
-    case 'removeQwenMcpServer':
-      return window.electronAPI.removeQwenMcpServer(
+    case 'removehopcodemcpserver':
+      return window.electronAPI.removehopcodemcpserver(
         command.scope,
         command.name,
       );
-    case 'setQwenHook':
-      return window.electronAPI.setQwenHook(
+    case 'sethopcodehook':
+      return window.electronAPI.sethopcodehook(
         command.scope,
         command.event,
         command.index,
         command.hook,
       );
-    case 'removeQwenHook':
-      return window.electronAPI.removeQwenHook(
+    case 'removehopcodehook':
+      return window.electronAPI.removehopcodehook(
         command.scope,
         command.event,
         command.index,
@@ -463,7 +463,7 @@ export default function HopCodeSettingsPage({ tab }: { tab: hopcodeSettingsTab }
     ) => {
       try {
         const result = await runCommand({
-          type: 'setQwenCoreSetting',
+          type: 'sethopcodecoreSetting',
           scope,
           key,
           value,
@@ -751,7 +751,7 @@ function McpServersTab({
   const save = async () => {
     if (!draft.name.trim() || !draft.commandOrUrl.trim()) return;
     const result = await runCommand({
-      type: 'setQwenMcpServer',
+      type: 'sethopcodemcpserver',
       scope: draft.scope,
       name: draft.name.trim(),
       server: draftToServer(draft),
@@ -766,7 +766,7 @@ function McpServersTab({
   const remove = async (entry: HopCodeMcpServerEntry) => {
     if (entry.scope !== 'user' && entry.scope !== 'workspace') return;
     const result = await runCommand({
-      type: 'removeQwenMcpServer',
+      type: 'removehopcodemcpserver',
       scope: entry.scope,
       name: entry.name,
     });
@@ -1059,7 +1059,7 @@ function HooksTab({
   const save = async () => {
     if (!draft.commandOrUrl.trim()) return;
     const result = await runCommand({
-      type: 'setQwenHook',
+      type: 'sethopcodehook',
       scope: draft.scope,
       event: draft.event,
       index: draft.index,
@@ -1075,7 +1075,7 @@ function HooksTab({
   const remove = async (entry: HopCodeHookEntry) => {
     if (entry.scope !== 'user' && entry.scope !== 'workspace') return;
     const result = await runCommand({
-      type: 'removeQwenHook',
+      type: 'removehopcodehook',
       scope: entry.scope,
       event: entry.event,
       index: entry.index,

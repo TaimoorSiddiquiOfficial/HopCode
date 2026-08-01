@@ -16,7 +16,7 @@ describe('findSlashCommandMatches', () => {
     expect(findSlashCommandMatches('/unknown ', ['status'])).toEqual([])
   })
 
-  it('matches namespaced Qwen custom commands', () => {
+  it('matches namespaced hopcode custom commands', () => {
     expect(findSlashCommandMatches('/git:commit ', ['git:commit'])).toEqual([
       { type: 'command', id: 'git:commit', fullMatch: '/git:commit', startIndex: 0 },
     ])
@@ -25,7 +25,7 @@ describe('findSlashCommandMatches', () => {
     ])
   })
 
-  it('hides unsupported Qwen commands', () => {
+  it('hides unsupported hopcode commands', () => {
     expect(findSlashCommandMatches('/model ', ['model'])).toEqual([])
     expect(findSlashCommandMatches('/skills ', ['skills'])).toEqual([])
   })

@@ -643,7 +643,7 @@ type QwenMemoryPaths = {
   autoMemoryDir: string;
 };
 
-type QwenSkillInstallRequest = {
+type hopcodeskillInstallRequest = {
   id: string;
   slug: string;
   name: string;
@@ -652,12 +652,12 @@ type QwenSkillInstallRequest = {
   scope: 'global';
 };
 
-type QwenSkillDeleteRequest = {
+type hopcodeskillDeleteRequest = {
   slug: string;
   scope: 'global';
 };
 
-type QwenSkillSetEnabledRequest = {
+type hopcodeskillSetEnabledRequest = {
   slug: string;
   enabled: boolean;
   scope: 'global' | 'project';
@@ -692,9 +692,9 @@ type GitHubBlobSkillUrl = {
 type QwenSettingsScope = 'user' | 'workspace';
 type QwenSettingValue = string | number | boolean | string[] | undefined;
 type QwenMcpTransport = 'stdio' | 'http' | 'sse';
-type QwenHookEvent = HookEventName;
+type hopcodehookEvent = HookEventName;
 
-type QwenCoreSettingKey =
+type hopcodecoreSettingKey =
   | 'model.name'
   | 'fastModel'
   | 'general.outputLanguage'
@@ -720,7 +720,7 @@ type QwenCoreSettingKey =
   | 'memory.enableTeamMemorySync'
   | 'disableAllHooks';
 
-type QwenMcpServerConfig = {
+type hopcodemcpserverConfig = {
   transport: QwenMcpTransport;
   command?: string;
   args?: string[];
@@ -737,7 +737,7 @@ type QwenMcpServerConfig = {
   extensionName?: string;
 };
 
-type QwenHookConfig = {
+type hopcodehookConfig = {
   type: 'command' | 'http';
   command?: string;
   url?: string;
@@ -753,10 +753,10 @@ type QwenHookConfig = {
   shell?: 'bash' | 'powershell';
 };
 
-type QwenHookDefinition = {
+type hopcodehookDefinition = {
   matcher?: string;
   sequential?: boolean;
-  hooks: QwenHookConfig[];
+  hooks: hopcodehookConfig[];
 };
 
 const HOPCODE_CORE_SETTING_DEFINITIONS = {
@@ -794,7 +794,7 @@ const HOPCODE_CORE_SETTING_DEFINITIONS = {
   'memory.enableTeamMemorySync': { type: 'boolean' },
   disableAllHooks: { type: 'boolean' },
 } as const satisfies Record<
-  QwenCoreSettingKey,
+  hopcodecoreSettingKey,
   {
     type: 'string' | 'number' | 'boolean' | 'enum';
     min?: number;
@@ -804,9 +804,9 @@ const HOPCODE_CORE_SETTING_DEFINITIONS = {
 
 const HOPCODE_CORE_SETTING_KEYS = Object.keys(
   HOPCODE_CORE_SETTING_DEFINITIONS,
-) as QwenCoreSettingKey[];
+) as hopcodecoreSettingKey[];
 
-const HOPCODE_HOOK_EVENTS = Object.values(HookEventName) as QwenHookEvent[];
+const HOPCODE_HOOK_EVENTS = Object.values(HookEventName) as hopcodehookEvent[];
 
 const DEFAULT_HOPCODE_MEMORY_SETTINGS: QwenMemorySettings = {
   enableManagedAutoMemory: true,
@@ -911,7 +911,7 @@ function validateSkillSlug(slug: string): void {
 
 function readSkillInstallRequest(
   params: Record<string, unknown>,
-): QwenSkillInstallRequest {
+): hopcodeskillInstallRequest {
   const skillParams = toRecord(params['skill']);
   const input = Object.keys(skillParams).length > 0 ? skillParams : params;
   const slug = readRequiredString(input['slug'], 'skill.slug');
@@ -941,7 +941,7 @@ function readSkillInstallRequest(
 
 function readSkillSlugRequest(
   params: Record<string, unknown>,
-): QwenSkillDeleteRequest {
+): hopcodeskillDeleteRequest {
   const skillParams = toRecord(params['skill']);
   const input = Object.keys(skillParams).length > 0 ? skillParams : params;
   const slug = readRequiredString(input['slug'], 'skill.slug');
@@ -960,7 +960,7 @@ function readSkillSlugRequest(
 
 function readSkillSetEnabledRequest(
   params: Record<string, unknown>,
-): QwenSkillSetEnabledRequest {
+): hopcodeskillSetEnabledRequest {
   const skillParams = toRecord(params['skill']);
   const input = Object.keys(skillParams).length > 0 ? skillParams : params;
   const slug = readRequiredString(input['slug'], 'skill.slug');
@@ -1935,7 +1935,7 @@ function readProviderConnectScope(value: unknown): SettingScope | undefined {
 
 function getNestedSettingValue(
   source: Record<string, unknown>,
-  key: QwenCoreSettingKey,
+  key: hopcodecoreSettingKey,
 ): QwenSettingValue {
   let current: unknown = source;
   for (const segment of key.split('.')) {
@@ -1957,8 +1957,8 @@ function getNestedSettingValue(
 
 function readCoreSettingValues(
   source: Record<string, unknown>,
-): Partial<Record<QwenCoreSettingKey, QwenSettingValue>> {
-  const values: Partial<Record<QwenCoreSettingKey, QwenSettingValue>> = {};
+): Partial<Record<hopcodecoreSettingKey, QwenSettingValue>> {
+  const values: Partial<Record<hopcodecoreSettingKey, QwenSettingValue>> = {};
   for (const key of HOPCODE_CORE_SETTING_KEYS) {
     const value = getNestedSettingValue(source, key);
     if (value !== undefined) {
@@ -1969,7 +1969,7 @@ function readCoreSettingValues(
 }
 
 export function normalizeCoreSettingValue(
-  key: QwenCoreSettingKey,
+  key: hopcodecoreSettingKey,
   value: unknown,
 ): QwenSettingValue {
   const definition = HOPCODE_CORE_SETTING_DEFINITIONS[key];
@@ -2068,7 +2068,7 @@ function normalizeOptionalNumber(value: unknown): number | undefined {
   return numberValue;
 }
 
-function normalizeMcpServerConfig(value: unknown): QwenMcpServerConfig {
+function normalizeMcpServerConfig(value: unknown): hopcodemcpserverConfig {
   const input = toRecord(value);
   const transport = input['transport'];
   if (transport !== 'stdio' && transport !== 'http' && transport !== 'sse') {
@@ -2078,7 +2078,7 @@ function normalizeMcpServerConfig(value: unknown): QwenMcpServerConfig {
     );
   }
 
-  const server: QwenMcpServerConfig = { transport };
+  const server: hopcodemcpserverConfig = { transport };
   const description = input['description'];
   if (typeof description === 'string' && description.trim()) {
     server.description = description.trim();
@@ -2120,7 +2120,7 @@ function normalizeMcpServerConfig(value: unknown): QwenMcpServerConfig {
 }
 
 function toStoredMcpServerConfig(
-  server: QwenMcpServerConfig,
+  server: hopcodemcpserverConfig,
 ): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   for (const key of [
@@ -2147,7 +2147,7 @@ function toStoredMcpServerConfig(
   return result;
 }
 
-function toMcpServerConfig(value: unknown): QwenMcpServerConfig | undefined {
+function toMcpServerConfig(value: unknown): hopcodemcpserverConfig | undefined {
   const server = toRecord(value);
   if (typeof server['httpUrl'] === 'string') {
     return {
@@ -2242,7 +2242,7 @@ function restoreSecretRecord(
 // Hooks carry the same secret classes as MCP servers — command-hook `env`
 // (tokens passed to scripts) and http-hook `headers` (auth). Mask them in the
 // settings response and restore them on write, mirroring the MCP scheme.
-function redactHookSecrets(hook: QwenHookDefinition): QwenHookDefinition {
+function redactHookSecrets(hook: hopcodehookDefinition): hopcodehookDefinition {
   return {
     ...hook,
     hooks: hook.hooks.map((config) => ({
@@ -2256,9 +2256,9 @@ function redactHookSecrets(hook: QwenHookDefinition): QwenHookDefinition {
 }
 
 function restoreRedactedHookSecrets(
-  hook: QwenHookDefinition,
+  hook: hopcodehookDefinition,
   prior: Record<string, unknown>,
-): QwenHookDefinition {
+): hopcodehookDefinition {
   const priorHooks = Array.isArray(prior['hooks'])
     ? (prior['hooks'] as unknown[])
     : [];
@@ -2290,7 +2290,7 @@ function readMcpServers(
 ): Array<{
   name: string;
   scope: QwenSettingsScope | 'extension';
-  server: QwenMcpServerConfig;
+  server: hopcodemcpserverConfig;
 }> {
   const servers = toRecord(source['mcpServers']);
   return Object.entries(servers)
@@ -2316,19 +2316,19 @@ function readMcpServers(
       ): entry is {
         name: string;
         scope: QwenSettingsScope | 'extension';
-        server: QwenMcpServerConfig;
+        server: hopcodemcpserverConfig;
       } => !!entry,
     );
 }
 
-function isHookEvent(value: unknown): value is QwenHookEvent {
+function isHookEvent(value: unknown): value is hopcodehookEvent {
   return (
     typeof value === 'string' &&
-    HOPCODE_HOOK_EVENTS.includes(value as QwenHookEvent)
+    HOPCODE_HOOK_EVENTS.includes(value as hopcodehookEvent)
   );
 }
 
-function normalizeHookConfig(value: unknown): QwenHookConfig {
+function normalizeHookConfig(value: unknown): hopcodehookConfig {
   const input = toRecord(value);
   const type = input['type'];
   if (type !== 'command' && type !== 'http') {
@@ -2337,7 +2337,7 @@ function normalizeHookConfig(value: unknown): QwenHookConfig {
       'Hook type must be command or http',
     );
   }
-  const config: QwenHookConfig = { type };
+  const config: hopcodehookConfig = { type };
   if (type === 'command') {
     const command = input['command'];
     if (typeof command !== 'string' || !command.trim()) {
@@ -2372,7 +2372,7 @@ function normalizeHookConfig(value: unknown): QwenHookConfig {
   return config;
 }
 
-function normalizeHookDefinition(value: unknown): QwenHookDefinition {
+function normalizeHookDefinition(value: unknown): hopcodehookDefinition {
   const input = toRecord(value);
   const hooks = input['hooks'];
   if (!Array.isArray(hooks) || hooks.length === 0) {
@@ -2381,7 +2381,7 @@ function normalizeHookDefinition(value: unknown): QwenHookDefinition {
       'Hook definition requires at least one hook',
     );
   }
-  const definition: QwenHookDefinition = {
+  const definition: hopcodehookDefinition = {
     hooks: hooks.map(normalizeHookConfig),
   };
   if (typeof input['matcher'] === 'string') {
@@ -2398,18 +2398,18 @@ function readHooks(
   scope: QwenSettingsScope | 'extension',
   extensionName?: string,
 ): Array<{
-  event: QwenHookEvent;
+  event: hopcodehookEvent;
   scope: QwenSettingsScope | 'extension';
   index: number;
-  hook: QwenHookDefinition;
+  hook: hopcodehookDefinition;
   extensionName?: string;
 }> {
   const hooksRoot = toRecord(source['hooks']);
   const entries: Array<{
-    event: QwenHookEvent;
+    event: hopcodehookEvent;
     scope: QwenSettingsScope | 'extension';
     index: number;
-    hook: QwenHookDefinition;
+    hook: hopcodehookDefinition;
     extensionName?: string;
   }> = [];
   for (const event of HOPCODE_HOOK_EVENTS) {
@@ -2579,7 +2579,7 @@ export async function runAcpAgent(
     },
   });
 
-  let agentInstance: QwenAgent | undefined;
+  let agentInstance: hopcodeagent | undefined;
   let connection: AgentSideConnection;
   markAcpStartup('transportSetupStart');
   try {
@@ -2595,7 +2595,7 @@ export async function runAcpAgent(
     const stream = ndJsonStream(stdout, stdin);
     connection = new AgentSideConnection((conn) => {
       acpConnection = conn;
-      agentInstance = new QwenAgent(config, settings, argv, conn);
+      agentInstance = new hopcodeagent(config, settings, argv, conn);
       return agentInstance;
     }, stream);
     markAcpStartup('transportSetupEnd');
@@ -2880,7 +2880,7 @@ interface PendingMcpAuthentication {
   }>;
 }
 
-class QwenAgent implements Agent {
+class hopcodeagent implements Agent {
   private sessions: Map<string, Session> = new Map();
   private workspaceMcpDiscoveryConfig: Config | undefined;
   private workspaceMcpDiscoveryPromise: Promise<void> | undefined;
@@ -3334,7 +3334,7 @@ class QwenAgent implements Agent {
    * fire-and-forget.
    */
   private broadcastBudgetEvent(event: McpBudgetEvent): void {
-    // The QwenAgent's `this.connection` is the single ACP channel to
+    // The hopcodeagent's `this.connection` is the single ACP channel to
     // the daemon. The daemon's bridge `bridgeClient.extNotification`
     // resolves the per-session SSE bus from the `sessionId` field of
     // each notification — so we send N notifications (one per active
@@ -5832,7 +5832,7 @@ class QwenAgent implements Agent {
   }
 
   private async installSkillFromUrl(
-    request: QwenSkillInstallRequest,
+    request: hopcodeskillInstallRequest,
   ): Promise<Record<string, unknown>> {
     const skillManager = this.config.getSkillManager();
     if (!skillManager) {
@@ -5896,7 +5896,7 @@ class QwenAgent implements Agent {
   }
 
   private async deleteGlobalSkill(
-    request: QwenSkillDeleteRequest,
+    request: hopcodeskillDeleteRequest,
   ): Promise<Record<string, unknown>> {
     const skillManager = this.config.getSkillManager();
     if (!skillManager) {
@@ -5922,7 +5922,7 @@ class QwenAgent implements Agent {
     // Guard the recursive delete: readManagedSkillFile's generic fallback can
     // resolve skillDir from listSkills() to an arbitrary path. Only ever remove
     // the directory that directly contains the SKILL.md we just validated, and
-    // never a filesystem root or the global Qwen dir itself, so a malformed
+    // never a filesystem root or the global hopcode dir itself, so a malformed
     // skill entry can't trigger a destructive rm of a shared/parent directory.
     const resolvedSkillDir = path.resolve(skillDir);
     const resolvedSkillFile = path.resolve(skillFile);
@@ -5950,7 +5950,7 @@ class QwenAgent implements Agent {
 
   private async readManagedSkillFile(
     slug: string,
-    scope: QwenSkillSetEnabledRequest['scope'],
+    scope: hopcodeskillSetEnabledRequest['scope'],
     skillManager: NonNullable<ReturnType<Config['getSkillManager']>>,
     cwd?: string,
   ): Promise<QwenManagedSkillFile> {
@@ -6035,7 +6035,7 @@ class QwenAgent implements Agent {
   }
 
   private async setGlobalSkillEnabled(
-    request: QwenSkillSetEnabledRequest,
+    request: hopcodeskillSetEnabledRequest,
     cwd?: string,
   ): Promise<Record<string, unknown>> {
     const skillManager = this.config.getSkillManager();
@@ -8835,15 +8835,15 @@ class QwenAgent implements Agent {
         const key = params['key'];
         if (
           typeof key !== 'string' ||
-          !HOPCODE_CORE_SETTING_KEYS.includes(key as QwenCoreSettingKey)
+          !HOPCODE_CORE_SETTING_KEYS.includes(key as hopcodecoreSettingKey)
         ) {
           throw RequestError.invalidParams(
             undefined,
-            'Unsupported Qwen setting key',
+            'Unsupported hopcode setting key',
           );
         }
         const settings = loadSettings(cwd);
-        const settingKey = key as QwenCoreSettingKey;
+        const settingKey = key as hopcodecoreSettingKey;
         const normalizedValue = normalizeCoreSettingValue(
           settingKey,
           params['value'],
@@ -9591,7 +9591,7 @@ class QwenAgent implements Agent {
     if (!selectedType) {
       throw RequestError.authRequired(
         { authMethods: pickAuthMethodsForAuthRequired() },
-        'Use Qwen Code CLI to authenticate first.',
+        'Use HopCode CLI to authenticate first.',
       );
     }
 

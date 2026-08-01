@@ -1,4 +1,4 @@
-﻿import { describe, expect, it, mock } from 'bun:test'
+import { describe, expect, it, mock } from 'bun:test'
 import type { SocketLike } from './voice-stream-session'
 
 mock.module('../runtime/platform', () => ({
@@ -29,7 +29,7 @@ function makeCapturingLogger() {
   }
 }
 
-const { deriveQwenRealtimeUrl, openQwenAsrRealtimeStream } = await import(
+const { deriveQwenRealtimeUrl, openhopcodeasrrealtimestream } = await import(
   './qwen-asr-realtime-session'
 )
 
@@ -63,11 +63,11 @@ class FakeSocket implements SocketLike {
   }
 }
 
-describe('openQwenAsrRealtimeStream', () => {
-  it('opens a Qwen realtime session and returns committed transcripts', async () => {
+describe('openhopcodeasrrealtimestream', () => {
+  it('opens a hopcode realtime session and returns committed transcripts', async () => {
     const socket = new FakeSocket()
     const interimTexts: string[] = []
-    const streamPromise = openQwenAsrRealtimeStream(
+    const streamPromise = openhopcodeasrrealtimestream(
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         model: 'qwen3-asr-flash-realtime',
@@ -141,7 +141,7 @@ describe('openQwenAsrRealtimeStream', () => {
 
   it('sanitizes realtime server errors before rejecting', async () => {
     const socket = new FakeSocket()
-    const streamPromise = openQwenAsrRealtimeStream(
+    const streamPromise = openhopcodeasrrealtimestream(
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         model: 'qwen3-asr-flash-realtime',
@@ -170,7 +170,7 @@ describe('openQwenAsrRealtimeStream', () => {
 
   it('redacts credentials from realtime server errors', async () => {
     const socket = new FakeSocket()
-    const streamPromise = openQwenAsrRealtimeStream(
+    const streamPromise = openhopcodeasrrealtimestream(
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         model: 'qwen3-asr-flash-realtime',
@@ -202,7 +202,7 @@ describe('openQwenAsrRealtimeStream', () => {
 
   it('keeps trailing partial text in the final transcript', async () => {
     const socket = new FakeSocket()
-    const streamPromise = openQwenAsrRealtimeStream(
+    const streamPromise = openhopcodeasrrealtimestream(
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         model: 'qwen3-asr-flash-realtime',
@@ -232,7 +232,7 @@ describe('openQwenAsrRealtimeStream', () => {
   it('does not double-fire onError when a close is followed by another terminal event', async () => {
     const socket = new FakeSocket()
     const errors: Error[] = []
-    const streamPromise = openQwenAsrRealtimeStream(
+    const streamPromise = openhopcodeasrrealtimestream(
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         model: 'qwen3-asr-flash-realtime',
@@ -257,7 +257,7 @@ describe('openQwenAsrRealtimeStream', () => {
   it('counts dropped frames and reports the cumulative total once when a dropping session ends', async () => {
     const socket = new FakeSocket()
     const { warnCalls, logger } = makeCapturingLogger()
-    const streamPromise = openQwenAsrRealtimeStream(
+    const streamPromise = openhopcodeasrrealtimestream(
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         model: 'qwen3-asr-flash-realtime',
@@ -279,7 +279,7 @@ describe('openQwenAsrRealtimeStream', () => {
 
     // Dropped, not forwarded, and surfaced once on entering backpressure.
     expect(socket.sent).toHaveLength(0)
-    const dropWarn = warnCalls.find((m) => m.includes('dropping Qwen ASR'))
+    const dropWarn = warnCalls.find((m) => m.includes('dropping hopcode ASR'))
     expect(dropWarn).toBeDefined()
 
     // End the session normally; the cumulative loss must be surfaced once.
@@ -296,7 +296,7 @@ describe('openQwenAsrRealtimeStream', () => {
   it('reports the cumulative dropped total exactly once across multiple terminal paths', async () => {
     const socket = new FakeSocket()
     const { warnCalls, logger } = makeCapturingLogger()
-    const streamPromise = openQwenAsrRealtimeStream(
+    const streamPromise = openhopcodeasrrealtimestream(
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         model: 'qwen3-asr-flash-realtime',
@@ -327,7 +327,7 @@ describe('openQwenAsrRealtimeStream', () => {
   it('does not report a dropped total when no frames were dropped', async () => {
     const socket = new FakeSocket()
     const { warnCalls, logger } = makeCapturingLogger()
-    const streamPromise = openQwenAsrRealtimeStream(
+    const streamPromise = openhopcodeasrrealtimestream(
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         model: 'qwen3-asr-flash-realtime',

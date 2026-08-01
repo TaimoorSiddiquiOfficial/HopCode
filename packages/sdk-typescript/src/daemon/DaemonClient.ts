@@ -355,8 +355,8 @@ function stripTrailingSlashes(url: string): string {
 
 /**
  * SDK env fallback for the daemon bearer token. Mirrors the daemon-side
- * `--token` CLI fallback to `QWEN_SERVER_TOKEN` so a developer with
- * `export QWEN_SERVER_TOKEN=...` in their shell never has to thread the
+ * `--token` CLI fallback to `hopcode_server_token` so a developer with
+ * `export hopcode_server_token=...` in their shell never has to thread the
  * value through every `DaemonClient` construction.
  *
  * Defensive on three axes:
@@ -370,7 +370,7 @@ function stripTrailingSlashes(url: string): string {
  *      section â€” handy for `$(cat token.txt)` that produces a trailing
  *      newline.
  *   3. **Empty / whitespace-only treated as unset**: a stale
- *      `export QWEN_SERVER_TOKEN=""` would otherwise let the
+ *      `export hopcode_server_token=""` would otherwise let the
  *      Authorization header through as `Bearer ` (no token), which
  *      the daemon rejects but is confusing to debug. Returning
  *      `undefined` here means the constructor's `?? readTokenFromEnv()`
@@ -384,7 +384,7 @@ function readTokenFromEnv(): string | undefined {
         process?: { env?: Record<string, string | undefined> };
       }
     ).process;
-    const raw = proc?.env?.['QWEN_SERVER_TOKEN'];
+    const raw = proc?.env?.['hopcode_server_token'];
     if (typeof raw !== 'string') return undefined;
     const trimmed = raw.trim();
     return trimmed.length === 0 ? undefined : trimmed;
@@ -557,8 +557,8 @@ export class DaemonClient {
   constructor(opts: DaemonClientOptions) {
     this.baseUrl = stripTrailingSlashes(opts.baseUrl);
     // When no explicit token is passed, fall back to
-    // QWEN_SERVER_TOKEN env var so clients with
-    // `export QWEN_SERVER_TOKEN=...` in their shell don't have to
+    // hopcode_server_token env var so clients with
+    // `export hopcode_server_token=...` in their shell don't have to
     // thread the value through every construction. See
     // `readTokenFromEnv` above for browser-safety + trim semantics.
     this.token = opts.token ?? readTokenFromEnv();
@@ -1608,7 +1608,7 @@ export class DaemonClient {
   // -- Workspace memory (workspace memory/agents) ------------------------------
 
   /**
-   * Fetch the daemon's `QWEN.md` / `AGENTS.md` snapshot. Read-only;
+   * Fetch the daemon's `HOPCODE.md` / `AGENTS.md` snapshot. Read-only;
    * pre-flight `caps.features.workspace_memory` before calling
    * against an unknown daemon. Returns `initialized: false` and an
    * empty `files` array when no memory files exist at the bound
@@ -1635,7 +1635,7 @@ export class DaemonClient {
   }
 
   /**
-   * Append to or replace `QWEN.md` at workspace or global scope.
+   * Append to or replace `HOPCODE.md` at workspace or global scope.
    * Strict mutation gate (`token_required` on no-token loopback
    * defaults). When the daemon advertises `workspace_memory`, expect
    * 200 with `{ ok, filePath, bytesWritten, mode }`; older daemons
@@ -3353,7 +3353,7 @@ export class DaemonClient {
   }
 
   /**
-   * Scaffold a `QWEN.md` at the daemon's bound
+   * Scaffold a `HOPCODE.md` at the daemon's bound
    * workspace root. Mechanical only â€” does NOT invoke the LLM. The
    * daemon writes an empty file; clients that want AI-driven content
    * fill should follow up with `POST /session/:id/prompt`.

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, jest } from 'bun:test';
 
 import type { RequestPermissionResponse } from '@agentclientprotocol/sdk';
 import type { PermissionCallback } from '../backend/types.ts';
-import { QwenAgent } from '../qwen-agent.ts';
+import { hopcodeagent } from '../hopcode-agent.ts';
 import {
   createMockBackendConfig,
   createMockSession,
@@ -16,13 +16,13 @@ type QwenPermissionInternals = {
   pendingPermissions: Map<string, unknown>;
 };
 
-function createAgent(permissionMode: 'ask' | 'allow-all' = 'ask'): QwenAgent {
-  const agent = new QwenAgent(
+function createAgent(permissionMode: 'ask' | 'allow-all' = 'ask'): hopcodeagent {
+  const agent = new hopcodeagent(
     createMockBackendConfig({
       workspace: createMockWorkspace({
         id: 'workspace-qwen',
-        name: 'Qwen Workspace',
-        slug: 'qwen-workspace',
+        name: 'hopcode.workspace',
+        slug: 'hopcode.workspace',
         rootPath: '/tmp/qwen-permission-tests',
       }),
       session: createMockSession({
@@ -56,7 +56,7 @@ function permissionRequest(): unknown {
   };
 }
 
-function internals(agent: QwenAgent): QwenPermissionInternals {
+function internals(agent: hopcodeagent): QwenPermissionInternals {
   return agent as unknown as QwenPermissionInternals;
 }
 
@@ -64,7 +64,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-describe('QwenAgent pending permission lifecycle', () => {
+describe('hopcodeagent pending permission lifecycle', () => {
   it('resolves an answered request once and clears its timeout', async () => {
     jest.useFakeTimers();
     const agent = createAgent();

@@ -593,7 +593,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       expect(lastMessage.content).toBe('Hello!');
     });
 
-    it('sends enable_thinking:true on a qwen model when a reasoning effort is set', () => {
+    it('sends enable_thinking:true on a hopcode model when a reasoning effort is set', () => {
       const generator = new DashScopeOpenAICompatibleProvider(
         {
           ...mockContentGeneratorConfig,
@@ -608,9 +608,9 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       expect(result['enable_thinking']).toBe(true);
     });
 
-    it('strips the pipeline-injected nested reasoning when enable_thinking is added on a qwen model', () => {
+    it('strips the pipeline-injected nested reasoning when enable_thinking is added on a hopcode model', () => {
       // The pipeline injects a nested `reasoning: { effort }` object for
-      // OpenAI-compatible endpoints. qwen drives thinking via `enable_thinking`,
+      // OpenAI-compatible endpoints. hopcode drives thinking via `enable_thinking`,
       // so shipping both would send two competing knobs — the nested form must
       // be dropped (mirrors deepseek.ts / zai.ts).
       const generator = new DashScopeOpenAICompatibleProvider(

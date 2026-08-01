@@ -181,7 +181,7 @@ const ERROR_DEFINITIONS: Record<ErrorCode, Omit<AgentError, 'code' | 'originalEr
   },
   model_no_tool_support: {
     title: 'Model Does Not Support Tools',
-    message: 'The selected model does not support tool/function calling, which is required for HopCode. Please choose a Qwen model with tool support.',
+    message: 'The selected model does not support tool/function calling, which is required for HopCode. Please choose a hopcode model with tool support.',
     actions: [
       { key: 's', label: 'Change model', command: '/settings', action: 'settings' },
     ],

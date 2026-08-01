@@ -803,7 +803,7 @@ app.whenReady().then(async () => {
       moduleClientResolver = resolveClientId
 
       // Voice dictation: a separate loopback WS server (raw PCM, no RPC envelope)
-      // with a voice-scoped token that transcribes via the qwen credentials.
+      // with a voice-scoped token that transcribes via the hopcode credentials.
       try {
         const voiceToken = randomBytes(32).toString('hex')
         voiceServer = await startVoiceServer({

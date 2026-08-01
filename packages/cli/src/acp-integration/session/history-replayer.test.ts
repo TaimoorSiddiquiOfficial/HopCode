@@ -70,7 +70,7 @@ describe('HistoryReplayer', () => {
   ) => ({
     ...extra,
     timestamp: toEpochMs(record.timestamp),
-    qwenTranscript: { sourceRecordIds: [record.uuid] },
+    hopcodetranscript: { sourceRecordIds: [record.uuid] },
   });
   const sentUpdates = () =>
     sendUpdateSpy.mock.calls.map(
@@ -310,7 +310,7 @@ describe('HistoryReplayer', () => {
       expect(sendUpdateSpy).toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({
-          toolCallId: 'qwen-replay-tool:assistant-uuid:0',
+          toolCallId: 'hopcode-replay-tool:assistant-uuid:0',
           status: 'failed',
         }),
       );
@@ -573,7 +573,7 @@ describe('HistoryReplayer', () => {
         status: 'completed',
       });
       expect(updates[2]).toMatchObject({
-        toolCallId: 'qwen-replay-tool:assistant-uuid:0',
+        toolCallId: 'hopcode-replay-tool:assistant-uuid:0',
         status: 'failed',
       });
     });
@@ -962,7 +962,7 @@ describe('HistoryReplayer', () => {
               apiTimeMs: 0,
             },
           }),
-          qwenTranscript: {
+          hopcodetranscript: {
             sourceRecordIds: [record.uuid],
             planToolCallId: 'call-123',
           },
@@ -987,7 +987,7 @@ describe('HistoryReplayer', () => {
 
       expect(sendUpdateSpy).toHaveBeenCalledWith(
         expect.objectContaining({
-          toolCallId: 'qwen-replay-tool:fallback-uuid:result',
+          toolCallId: 'hopcode-replay-tool:fallback-uuid:result',
         }),
       );
     });
@@ -1498,7 +1498,7 @@ describe('HistoryReplayer', () => {
         content: { type: 'text', text: '' },
         _meta: {
           timestamp: toEpochMs(record.timestamp),
-          qwenTranscript: { sourceRecordIds: [record.uuid] },
+          hopcodetranscript: { sourceRecordIds: [record.uuid] },
           usage: {
             inputTokens: 100,
             outputTokens: 50,

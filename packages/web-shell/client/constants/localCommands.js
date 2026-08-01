@@ -152,8 +152,8 @@ const BUILTIN_COMMAND_DESCRIPTION_KEYS = {
     workflows: 'local.workflows',
 };
 /**
- * Skills whose author-written descriptions ship in English — the Qwen Code
- * bundled skills plus this repo's `.qwen/skills` project skills. We re-localize
+ * Skills whose author-written descriptions ship in English — the HopCode
+ * bundled skills plus this repo's `.hopcode/skills` project skills. We re-localize
  * their menu descriptions by name so a zh-CN slash menu isn't a mix of languages.
  * Keyed by skill name because a skill only carries a reliable `source` once a
  * session exists; the skill-tagging step keys off `connection.skills` instead, so
@@ -162,7 +162,7 @@ const BUILTIN_COMMAND_DESCRIPTION_KEYS = {
  * own skills, newly added ones) fall back to their authored description.
  */
 const SKILL_DESCRIPTION_KEYS = {
-    // Bundled with Qwen Code (packages/core/src/skills/bundled).
+    // Bundled with HopCode (packages/core/src/skills/bundled).
     batch: 'skilldesc.batch',
     dataviz: 'skilldesc.dataviz',
     'extension-creator': 'skilldesc.extensionCreator',
@@ -172,7 +172,7 @@ const SKILL_DESCRIPTION_KEYS = {
     review: 'skilldesc.review',
     simplify: 'skilldesc.simplify',
     stuck: 'skilldesc.stuck',
-    // This repo's project skills (.qwen/skills).
+    // This repo's project skills (.hopcode/skills).
     'agent-reproduce-align': 'skilldesc.agentReproduceAlign',
     'agent-reproduce-feature': 'skilldesc.agentReproduceFeature',
     autofix: 'skilldesc.autofix',
@@ -187,7 +187,7 @@ const SKILL_DESCRIPTION_KEYS = {
     'memory-leak-debug': 'skilldesc.memoryLeakDebug',
     'openwork-desktop-sync': 'skilldesc.openworkDesktopSync',
     'prepare-pr': 'skilldesc.preparePr',
-    'qwen-code-claw': 'skilldesc.qwenCodeClaw',
+    'hopcode-claw': 'skilldesc.qwenCodeClaw',
     'structured-debugging': 'skilldesc.structuredDebugging',
     'terminal-capture': 'skilldesc.terminalCapture',
     'tmux-real-user-testing': 'skilldesc.tmuxRealUserTesting',

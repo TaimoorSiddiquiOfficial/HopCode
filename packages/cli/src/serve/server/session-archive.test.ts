@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -36,7 +36,7 @@ describe('assertSessionLoadable', () => {
 
   beforeEach(() => {
     runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-archive-test-'));
-    workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-workspace-'));
+    workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode.workspace-'));
     Storage.setRuntimeBaseDir(runtimeDir);
   });
 
@@ -196,7 +196,7 @@ describe('archiveDaemonSessions', () => {
 
   beforeEach(() => {
     runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-archive-test-'));
-    workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-workspace-'));
+    workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode.workspace-'));
     Storage.setRuntimeBaseDir(runtimeDir);
   });
 
@@ -306,7 +306,7 @@ describe('unarchiveDaemonSessions', () => {
 
   beforeEach(() => {
     runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-archive-test-'));
-    workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-workspace-'));
+    workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode.workspace-'));
     Storage.setRuntimeBaseDir(runtimeDir);
   });
 
@@ -442,7 +442,7 @@ describe('deleteDaemonSessions', () => {
 
   beforeEach(() => {
     runtimeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-archive-test-'));
-    workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-workspace-'));
+    workspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode.workspace-'));
     Storage.setRuntimeBaseDir(runtimeDir);
   });
 

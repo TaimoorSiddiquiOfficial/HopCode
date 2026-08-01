@@ -135,10 +135,10 @@ describe('extension tests', () => {
   let savedHopcodeHome: string | undefined;
 
   beforeEach(() => {
-    savedHopcodeHome = process.env['QWEN_HOME'];
-    delete process.env['QWEN_HOME'];
+    savedHopcodeHome = process.env['hopcode_home'];
+    delete process.env['hopcode_home'];
     tempHomeDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'qwen-code-test-home-'),
+      path.join(os.tmpdir(), 'hopcode-test-home-'),
     );
     tempWorkspaceDir = fs.mkdtempSync(
       path.join(tempHomeDir, 'hopcode-test-workspace-'),
@@ -156,9 +156,9 @@ describe('extension tests', () => {
   afterEach(() => {
     fs.rmSync(tempHomeDir, { recursive: true, force: true });
     if (savedHopcodeHome === undefined) {
-      delete process.env['QWEN_HOME'];
+      delete process.env['hopcode_home'];
     } else {
-      process.env['QWEN_HOME'] = savedHopcodeHome;
+      process.env['hopcode_home'] = savedHopcodeHome;
     }
     vi.restoreAllMocks();
   });
@@ -1030,7 +1030,7 @@ describe('extension tests', () => {
       await extensionStore.ensureInitialized([identity]);
       const destination = path.join(userExtensionsDir, identity.name);
       fs.mkdirSync(destination, { recursive: true });
-      fs.writeFileSync(path.join(destination, 'qwen-extension.json'), '{');
+      fs.writeFileSync(path.join(destination, 'hopcode-extension.json'), '{');
       const manager = createExtensionManager({ extensionStore });
 
       const snapshot = await manager.uninstallExtensionById(identity.id, true);

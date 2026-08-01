@@ -74,7 +74,7 @@ export function currentSessionId(): string {
  * Directory holding this session's skill-args files.
  *
  * The session scope lives in the **directory**, not the filename, so the file is
- * always `qwen-skill-args-<skill>.txt` — a stable name the skill prompt and the
+ * always `hopcode-skill-args-<skill>.txt` — a stable name the skill prompt and the
  * cleanup step can reference without knowing the session id. A concurrent review
  * in another session writes into a different directory, so the two do not race,
  * and a stale file from an earlier session sits under that session's directory
@@ -100,7 +100,7 @@ export function skillArgsPath(
 ): string {
   return join(
     skillArgsDir(sessionId),
-    `qwen-skill-args-${safe(skillName)}.txt`,
+    `hopcode-skill-args-${safe(skillName)}.txt`,
   );
 }
 
@@ -121,7 +121,7 @@ export function writeSkillArgs(skillName: string, args: string): string | null {
     mkdirSync(dir, { recursive: true });
     // `O_NOFOLLOW` protects the final filename, but not the parent: a symlinked
     // `s-<session>` directory — `s-attacker -> victim/` — redirects the write
-    // into `victim/qwen-skill-args-review.txt`, truncating an arbitrary
+    // into `victim/hopcode-skill-args-review.txt`, truncating an arbitrary
     // user-writable file and leaving its 0644 mode to expose the raw arguments.
     // Refuse a session directory that is a symlink; `mkdirSync(recursive)` above
     // is a no-op on an existing one, so this is the only place to catch it.

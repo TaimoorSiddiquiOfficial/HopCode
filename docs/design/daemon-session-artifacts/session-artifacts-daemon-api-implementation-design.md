@@ -1,8 +1,8 @@
-# Qwen-Code Daemon Session Artifacts API 可实施设计
+# hopcode Daemon Session Artifacts API 可实施设计
 
 > 输入资料：session artifacts daemon API 初版草案与 artifact design v1 草案。
 >
-> 源码基线：当前 qwen-code 代码。  
+> 源码基线：当前 hopcode 代码。  
 > 目标：基于现有 Daemon / ACP / SSE / SDK / hooks / extension 能力，设计一套可实施、可验证、边界清楚的 session artifacts API。
 
 ## 1. 设计结论
@@ -615,7 +615,7 @@ export interface SessionArtifactInput extends ToolArtifact {
 ### 5.4 字段约束
 
 - `workspacePath` 只对 workspace 内文件对外展示，且必须是 workspace-relative path。
-- `managedId` 是 daemon/qwen-home 托管产物引用，不能是本机绝对路径。
+- `managedId` 是 daemon/hopcode-home 托管产物引用，不能是本机绝对路径。
 - `url` 只接受明确登记的 URL 或 ArtifactTool 发布 URL。
 - `workspacePath`、`managedId`、`url` 必须且只能存在一个 primary locator；V1 拒绝普通输入同时携带多个 primary locator，避免同一逻辑资源按不同字段生成多个 identity。
 - 唯一例外是可信 `storage: 'published'`：`url` 是 primary locator，`managedId` 可作为可选 managed reference 一起返回，用于未来下载/预览；此时 identity 只按 `url` 计算，`managedId` 不参与 identity。该例外只接受 `trustedPublisher: true` 的内部输入。
@@ -817,11 +817,11 @@ return {
 - `packages/core/src/core/coreToolScheduler.ts` 必须纳入实现计划，因为它是 `firePostToolBatchHook()` 的调用点，也有独立的 `firePostToolUseHook()` 路径。
 - 抽取共享 `collectHookArtifacts()` 或等价 helper，供 `coreToolScheduler.ts` 与 ACP `Session.ts` 两条 PostToolUse 路径复用同一 extraction / validation 前置逻辑，避免两处行为漂移。
 - `Session.runTool()` 收集 tool result artifacts 与 hook artifacts，但二者使用不同传输：tool result artifacts 只来自成功返回的 tool result；hook artifacts 不依赖工具成功，失败路径也可以进入 store。
-- ACP `Session.runTool()` 中，成功工具结果携带的 artifacts 继续附着到 `tool_call_update._meta.artifacts`；PostToolUse / PostToolUseFailure hook 返回的 artifacts 统一通过 `client.extNotification('qwen/notify/session/artifact-event', payload)` 单独发送。该 notification 必须在 hook artifacts 收集完成后同步 await；发送失败只记录 warning，不改变原工具失败/成功结果；这批 hook artifacts 不进入 daemon store，V1 不做持久重试。
+- ACP `Session.runTool()` 中，成功工具结果携带的 artifacts 继续附着到 `tool_call_update._meta.artifacts`；PostToolUse / PostToolUseFailure hook 返回的 artifacts 统一通过 `client.extNotification('hopcode/notify/session/artifact-event', payload)` 单独发送。该 notification 必须在 hook artifacts 收集完成后同步 await；发送失败只记录 warning，不改变原工具失败/成功结果；这批 hook artifacts 不进入 daemon store，V1 不做持久重试。
 - hook artifacts 与 `record_artifact` / client POST 走同一套 validation：URL scheme、workspace path containment、metadata size/type。
-- batch-level artifacts 没有单一 tool call 时，只有在该运行时已经能向 bridge 发送 ACP `extNotification` 的情况下，才可使用 `qwen/notify/session/artifact-event`。
+- batch-level artifacts 没有单一 tool call 时，只有在该运行时已经能向 bridge 发送 ACP `extNotification` 的情况下，才可使用 `hopcode/notify/session/artifact-event`。
 
-`qwen/notify/session/artifact-event` payload：
+`hopcode/notify/session/artifact-event` payload：
 
 ```json
 {
@@ -843,13 +843,13 @@ return {
 
 Transport 约定：
 
-- `qwen/notify/session/artifact-event` 是 ACP `extNotification`，不是 SSE event，也不是 client-facing HTTP route。
-- wire format 复用现有 `qwen/notify/session/*` 通知约定；例如 bridge 已有的 session notification demux 模式。
+- `hopcode/notify/session/artifact-event` 是 ACP `extNotification`，不是 SSE event，也不是 client-facing HTTP route。
+- wire format 复用现有 `hopcode/notify/session/*` 通知约定；例如 bridge 已有的 session notification demux 模式。
 - 发送方只能是已经处在 ACP session 通道内、且有能力发送 `extNotification` 的运行时或 extension bridge。ACP `Session.ts` 可以发送该通知；`coreToolScheduler.ts` 本身不能直接向 daemon 主会话发送该通知。
-- `BridgeClient` 在现有 `extNotification` 处理分支按 notification name demux：命中 `qwen/notify/session/artifact-event` 后读取 payload，转换为 `SessionArtifactInput[]`，再进入统一 ingest pipeline。
+- `BridgeClient` 在现有 `extNotification` 处理分支按 notification name demux：命中 `hopcode/notify/session/artifact-event` 后读取 payload，转换为 `SessionArtifactInput[]`，再进入统一 ingest pipeline。
 - Bridge 必须从 notification transport context 派生 `source: 'hook'`，payload 中的 `source` 只能作为兼容性提示；如果 payload source 与 transport context 不一致，bridge 覆盖为 `hook` 并记录 debug/warning。Notification payload 不能设置 `trustedPublisher`；如果携带 `storage: 'published'`，按普通 untrusted input 校验失败处理。
 
-注意：`qwen/notify/session/artifact-event` 只是 explicit artifacts 的传输 envelope，不应形成第二套 store/validation/dedupe 管道。BridgeClient 必须把 `_meta.artifacts`、hook artifacts 与 `artifact-event.artifacts` 都转换为同一个 `SessionArtifactInput[]`，调用同一个 `ingestArtifacts()` / `SessionArtifactStore.upsertMany()`，复用同一套 validation、normalization、enrichment、eviction 和 `artifact_changed` 发布逻辑。ACP 主会话当前没有 PostToolBatch callsite，不能把 `coreToolScheduler.ts` 的 batch hook 当成 daemon artifacts 面板的默认来源；若后续要支持 daemon 主会话 batch artifacts，必须先增加真实调用点和测试。非 ACP 运行时如果没有 artifact notification sink，不能声明 daemon hook artifacts 支持。
+注意：`hopcode/notify/session/artifact-event` 只是 explicit artifacts 的传输 envelope，不应形成第二套 store/validation/dedupe 管道。BridgeClient 必须把 `_meta.artifacts`、hook artifacts 与 `artifact-event.artifacts` 都转换为同一个 `SessionArtifactInput[]`，调用同一个 `ingestArtifacts()` / `SessionArtifactStore.upsertMany()`，复用同一套 validation、normalization、enrichment、eviction 和 `artifact_changed` 发布逻辑。ACP 主会话当前没有 PostToolBatch callsite，不能把 `coreToolScheduler.ts` 的 batch hook 当成 daemon artifacts 面板的默认来源；若后续要支持 daemon 主会话 batch artifacts，必须先增加真实调用点和测试。非 ACP 运行时如果没有 artifact notification sink，不能声明 daemon hook artifacts 支持。
 
 ### 6.5 Client / Extension 直接插入
 
@@ -1048,7 +1048,7 @@ removeSessionArtifact(
 BridgeClient：
 
 - 从 `session_update/tool_call_update._meta.artifacts` 提取 artifacts。
-- 从 `qwen/notify/session/artifact-event` 提取 explicit notification artifacts。
+- 从 `hopcode/notify/session/artifact-event` 提取 explicit notification artifacts。
 - 所有输入都转换为同一个 `SessionArtifactInput[]`。
 - 基于 transport context 分配 `source`、`receivedSeq`。`trustedPublisher` 只由 completed `ArtifactTool` session update 的 bridge-side ingest option 分配；BridgeClient 不得根据 artifact payload 字段或普通 `_meta.artifacts` 内容推断。
 - 统一调用 `ingestArtifacts()` / `SessionArtifactStore.upsertMany()`，不要为 notification artifacts 建第二套 validation 或 dedupe。
@@ -1131,8 +1131,8 @@ SDK singular add 映射到 bridge plural mutation：`addSessionArtifact(a)` 包�
   - 覆盖 ACP session 的 PostToolUse artifacts 传播路径。
 - 两条 PostToolUse 路径复用同一个 hook artifact collection helper。
 - ACP session V1 不声明 PostToolBatch artifacts 支持；如果产品要求 daemon 主会话 batch artifacts，必须在 ACP Session 增加真实 PostToolBatch callsite，而不是依赖 `coreToolScheduler.ts` 的非 daemon 主会话路径。
-- 其他运行时如已有 batch-level artifact notification，可通过 `qwen/notify/session/artifact-event` 发给 bridge。
-- BridgeClient 从 `qwen/notify/session/artifact-event` 提取 batch-level artifacts，走同一套 validation 和 upsert。
+- 其他运行时如已有 batch-level artifact notification，可通过 `hopcode/notify/session/artifact-event` 发给 bridge。
+- BridgeClient 从 `hopcode/notify/session/artifact-event` 提取 batch-level artifacts，走同一套 validation 和 upsert。
 
 ### 8.8 Phase F: client POST / SDK add explicit registration
 
@@ -1259,7 +1259,7 @@ V1 提供 `record_artifact` 后，skill 或 agent.md 可以写：
 
 ## 12. Hook / Extension 使用方式
 
-V1 提供 hook artifacts 后，extension 可在 `qwen-extension.json` 或 `hooks/hooks.json` 中提供 PostToolUse hook：
+V1 提供 hook artifacts 后，extension 可在 `hopcode-extension.json` 或 `hooks/hooks.json` 中提供 PostToolUse hook：
 
 ```json
 {
@@ -1279,7 +1279,7 @@ V1 提供 hook artifacts 后，extension 可在 `qwen-extension.json` 或 `hooks
 }
 ```
 
-当前 qwen-code extension/hook 变量替换仍支持 `${CLAUDE_PLUGIN_ROOT}`；如果后续引入新的 qwen-specific root 变量，示例可随实现同步迁移。
+当前 hopcode extension/hook 变量替换仍支持 `${CLAUDE_PLUGIN_ROOT}`；如果后续引入新的 qwen-specific root 变量，示例可随实现同步迁移。
 
 脚本 stdout：
 
@@ -1438,8 +1438,8 @@ hook artifacts：
 - `coreToolScheduler.ts` 和 ACP `Session.ts` 两条路径都能传播 PostToolUse artifacts。
 - 两条 PostToolUse 路径复用共享 hook artifact collection helper。
 - ACP main session 不声明 PostToolBatch artifacts；如后续增加真实 callsite，需要单测覆盖。
-- PostToolUse / PostToolUseFailure hook artifacts 通过 `qwen/notify/session/artifact-event` extNotification 单独进入 bridge，不依赖成功 tool result `_meta.artifacts`。
-- 已有 batch notification 的运行时可通过 `qwen/notify/session/artifact-event` 被写入 store。
+- PostToolUse / PostToolUseFailure hook artifacts 通过 `hopcode/notify/session/artifact-event` extNotification 单独进入 bridge，不依赖成功 tool result `_meta.artifacts`。
+- 已有 batch notification 的运行时可通过 `hopcode/notify/session/artifact-event` 被写入 store。
 - hook artifacts 与其他入口经过同一 validation。
 - hook payload `source` 由 bridge 按 transport context 派生，不能伪造 tool source 或 trusted publisher。
 - 工具失败时 hook 返回的 error/dashboard artifact 仍能进入 store。
@@ -1540,7 +1540,7 @@ V1 内部建议按以下顺序实现；这是工程排期，不是能力拆分�
 8. SDK list/event 类型
 9. `RecordArtifactTool`
 10. hook output artifacts
-11. `qwen/notify/session/artifact-event`
+11. `hopcode/notify/session/artifact-event`
 12. `POST /session/:id/artifacts`
 13. SDK addArtifact
 14. managed / published storage 引用补齐

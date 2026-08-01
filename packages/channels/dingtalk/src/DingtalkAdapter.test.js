@@ -647,8 +647,8 @@ describe('DingtalkChannel parsed-message logging', () => {
         }));
     });
     it('logs debug payloads when enabled for the channel', () => {
-        const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-        process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = 'test-dingtalk';
+        const oldDebugPayload = process.env['hopcode_channel_debug_payload'];
+        process.env['hopcode_channel_debug_payload'] = 'test-dingtalk';
         const channel = createChannel();
         const downstream = {
             data: JSON.stringify({
@@ -674,10 +674,10 @@ describe('DingtalkChannel parsed-message logging', () => {
         }
         finally {
             if (oldDebugPayload === undefined) {
-                delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+                delete process.env['hopcode_channel_debug_payload'];
             }
             else {
-                process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+                process.env['hopcode_channel_debug_payload'] = oldDebugPayload;
             }
             writeSpy.mockRestore();
         }

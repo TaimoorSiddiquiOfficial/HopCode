@@ -4795,7 +4795,7 @@ describe('useGeminiStream', () => {
       // instead of leaking code as prose.
       const pendingText = result.current.pendingHistoryItems[0]?.text ?? '';
       expect(pendingText.startsWith('```ts')).toBe(true);
-      expect(pendingText).toContain('qwen-code:start-line=');
+      expect(pendingText).toContain('hopcode:start-line=');
 
       act(() => {
         result.current.cancelOngoingRequest();

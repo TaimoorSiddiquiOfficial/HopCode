@@ -277,7 +277,7 @@ describe('WebShellTranscript DOM integration', () => {
                 block({
                     id: 'assistant',
                     kind: 'assistant',
-                    text: '[Open child](qwen-session://child-session)',
+                    text: '[Open child](hopcode-session://child-session)',
                 }),
                 block({
                     id: 'goal',

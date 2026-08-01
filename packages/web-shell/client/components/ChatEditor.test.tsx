@@ -187,7 +187,7 @@ function renderChatEditor(props: {
               commands={[]}
               showChatWidthToggle={false}
               currentMode="default"
-              currentModel="qwen"
+              currentModel="hopcode"
               {...chatEditorProps}
             />
           </I18nProvider>
@@ -591,7 +591,7 @@ describe('ChatEditor toolbar popovers', () => {
   });
 
   it('displays the model label instead of an opaque route id', () => {
-    const routeId = 'qwen-route:v1:abcdefghijklmnop';
+    const routeId = 'hopcode-route:v1:abcdefghijklmnop';
     const container = renderChatEditor({
       visibleToolbarActions: ['model'],
       currentModel: routeId,

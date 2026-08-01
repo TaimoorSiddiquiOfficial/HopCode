@@ -7,7 +7,7 @@
  * - Primary catalog: `group:<id>`, `recent`, `color:<name>`
  * - Workspace-scoped: `ws:<workspaceId>|group:<id>`, `ws:<workspaceId>|ungrouped`
  */
-export const COLLAPSED_SESSION_SECTIONS_STORAGE_KEY = 'qwen-code-web-shell-collapsed-session-groups';
+export const COLLAPSED_SESSION_SECTIONS_STORAGE_KEY = 'hopcode-web-shell-collapsed-session-groups';
 const WORKSPACE_SECTION_PREFIX = 'ws:';
 export function isPrimaryCollapsedSectionId(id) {
     return !id.startsWith(WORKSPACE_SECTION_PREFIX);

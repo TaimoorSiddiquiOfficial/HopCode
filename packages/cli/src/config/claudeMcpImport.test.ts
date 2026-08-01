@@ -123,7 +123,7 @@ describe('claude MCP import', () => {
     );
   });
 
-  it('normalizes Claude transport types into Qwen URL fields', () => {
+  it('normalizes Claude transport types into hopcode URL fields', () => {
     writeJson(path.join(homeDir, '.claude.json'), {
       mcpServers: {
         httpServer: { type: 'http', url: 'https://example.com/mcp' },

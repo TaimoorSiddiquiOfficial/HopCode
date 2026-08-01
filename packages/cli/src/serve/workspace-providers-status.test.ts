@@ -209,8 +209,8 @@ describe('createWorkspaceProvidersStatusProvider', () => {
       (m) => m.baseUrl === 'https://api-two.example/v1',
     );
 
-    expect(first?.modelId).toMatch(/^qwen-route:v1:/);
-    expect(second?.modelId).toMatch(/^qwen-route:v1:/);
+    expect(first?.modelId).toMatch(/^hopcode-route:v1:/);
+    expect(second?.modelId).toMatch(/^hopcode-route:v1:/);
     expect(first?.modelId).not.toBe(second?.modelId);
     expect(result.current?.modelId).toBe(second?.modelId);
     expect(first?.isCurrent).toBe(false);

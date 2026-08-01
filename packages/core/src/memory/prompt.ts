@@ -156,7 +156,7 @@ export const CONDENSED_DO_NOT_SAVE_SECTION: readonly string[] = [
   '- Debugging solutions or fix recipes (the fix is in the code; the commit message has context)',
   '- MCP tool names, schemas, field mappings, guessed tool-call formats, or failed call transcripts (save only confirmed durable workarounds, warnings, owner, or escalation path)',
   '- Ephemeral task state or current conversation context',
-  '- Content already in QWEN.md or AGENTS.md',
+  '- Content already in HOPCODE.md or AGENTS.md',
   '',
   'These exclusions apply even when the user explicitly asks you to save.',
   'If the user asks you to save a PR list or activity summary, ask what was *surprising* or *non-obvious* about it — that is the part worth keeping.',

@@ -11,7 +11,7 @@ const mockEnvHttpProxyAgent = vi.hoisted(() =>
 );
 const mockNormalizeProxyUrl = vi.hoisted(() => vi.fn((url?: string) => url));
 const mockStorageGetGlobalhopcodeDir = vi.hoisted(() =>
-  vi.fn(() => '/tmp/qwen-home'),
+  vi.fn(() => '/tmp/hopcode-home'),
 );
 const mockReadChannelMemory = vi.hoisted(() => vi.fn());
 const mockGetChannelMemoryRevision = vi.hoisted(() => vi.fn());
@@ -211,7 +211,7 @@ beforeEach(() => {
   mockReadServiceInfo.mockReturnValue(null);
   mockRouterGetTarget.mockReturnValue(undefined);
   mockRouterRestoreSessions.mockResolvedValue({ failed: 0, restored: 0 });
-  mockStorageGetGlobalhopcodeDir.mockReturnValue('/tmp/qwen-home');
+  mockStorageGetGlobalhopcodeDir.mockReturnValue('/tmp/hopcode-home');
   mockChannelLoopStoreCreate.mockResolvedValue({ id: 'job-1' });
   mockChannelLoopStoreCreateForTarget.mockResolvedValue({ id: 'job-1' });
   mockChannelLoopStoreListForTarget.mockResolvedValue([]);

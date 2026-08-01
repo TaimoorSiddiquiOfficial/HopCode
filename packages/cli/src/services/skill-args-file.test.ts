@@ -128,19 +128,19 @@ describe('writeSkillArgs', () => {
 
   it('refuses to write through a symlinked session directory', () => {
     // O_NOFOLLOW guards the file, not the parent. `s-<session> -> victim/` would
-    // otherwise truncate victim/qwen-skill-args-review.txt at mode 0644.
+    // otherwise truncate victim/hopcode-skill-args-review.txt at mode 0644.
     const prev = process.env['HOPCODE_CODE_SESSION_ID'];
     process.env['HOPCODE_CODE_SESSION_ID'] = 'attacker';
     try {
       const victim = join(dir, 'victim');
       mkdirSync(victim, { recursive: true });
-      writeFileSync(join(victim, 'qwen-skill-args-review.txt'), 'precious');
+      writeFileSync(join(victim, 'hopcode-skill-args-review.txt'), 'precious');
       mkdirSync(join(dir, '.hopcode', 'tmp'), { recursive: true });
       symlinkSync(victim, join(dir, '.hopcode', 'tmp', 's-attacker'));
 
       expect(writeSkillArgs('review', '6771 --comment')).toBeNull();
       expect(
-        readFileSync(join(victim, 'qwen-skill-args-review.txt'), 'utf8'),
+        readFileSync(join(victim, 'hopcode-skill-args-review.txt'), 'utf8'),
       ).toBe('precious');
     } finally {
       if (prev === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
@@ -176,7 +176,7 @@ describe('writeSkillArgs', () => {
     try {
       const p = skillArgsPath('review');
       expect(p).toContain('s-sess-A');
-      expect(p.endsWith('qwen-skill-args-review.txt')).toBe(true);
+      expect(p.endsWith('hopcode-skill-args-review.txt')).toBe(true);
     } finally {
       if (prev === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
       else process.env['HOPCODE_CODE_SESSION_ID'] = prev;

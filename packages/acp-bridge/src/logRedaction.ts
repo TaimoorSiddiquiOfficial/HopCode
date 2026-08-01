@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -59,7 +59,7 @@ const CREDENTIAL_PATTERNS: Array<{ pattern: RegExp; replacement: string }> = [
     replacement: `$1${REDACTED}`,
   },
   // Compound env-var keys ending in _KEY, _TOKEN, _SECRET, or _PASSWORD
-  // (e.g. AWS_SECRET_ACCESS_KEY=, QWEN_DAEMON_TOKEN=).
+  // (e.g. AWS_SECRET_ACCESS_KEY=, hopcode_daemon_token=).
   // Segment lengths are capped to prevent quadratic backtracking on long
   // all-uppercase input.
   {

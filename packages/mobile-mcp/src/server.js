@@ -110,7 +110,7 @@ const createMcpServer = () => {
         }));
     };
     const posthog = async (event, properties) => {
-        // Telemetry disabled in @qwen-code/mobile-mcp fork.
+        // Telemetry disabled in @hoptrendy/mobile-mcp fork.
         // Set MOBILEMCP_ENABLE_TELEMETRY=1 to re-enable upstream PostHog reporting.
         if (!process.env.MOBILEMCP_ENABLE_TELEMETRY) {
             return;

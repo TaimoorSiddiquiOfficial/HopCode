@@ -22,7 +22,7 @@ type ReloadHandler = NonNullable<typeof reloadCommand.handler>;
 async function runHandler(argv: Record<string, unknown>): Promise<void> {
   await (reloadCommand.handler as ReloadHandler)({
     _: [],
-    $0: 'qwen',
+    $0: 'hopcode',
     ...argv,
   } as never);
 }
@@ -31,9 +31,9 @@ describe('channel reload command', () => {
   beforeEach(() => {
     vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
     vi.unstubAllEnvs();
-    vi.stubEnv('QWEN_DAEMON_URL', undefined);
-    vi.stubEnv('QWEN_SERVER_TOKEN', undefined);
-    vi.stubEnv('QWEN_DAEMON_TOKEN', undefined);
+    vi.stubEnv('hopcode_daemon_url', undefined);
+    vi.stubEnv('hopcode_server_token', undefined);
+    vi.stubEnv('hopcode_daemon_token', undefined);
   });
 
   afterEach(() => {
@@ -86,9 +86,9 @@ describe('channel reload command', () => {
     });
   });
 
-  it('falls back to QWEN_DAEMON_URL and QWEN_SERVER_TOKEN from the environment', async () => {
-    vi.stubEnv('QWEN_DAEMON_URL', 'http://env-daemon:5');
-    vi.stubEnv('QWEN_SERVER_TOKEN', 'env-token');
+  it('falls back to hopcode_daemon_url and hopcode_server_token from the environment', async () => {
+    vi.stubEnv('hopcode_daemon_url', 'http://env-daemon:5');
+    vi.stubEnv('hopcode_server_token', 'env-token');
     mockReloadChannelWorker.mockResolvedValue({
       reloaded: true,
       worker: { enabled: true, state: 'running', channels: [] },

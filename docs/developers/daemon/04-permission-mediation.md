@@ -302,7 +302,7 @@ The connection stores the mapping in `conn.pending: Map<jsonRpcId, PendingClient
 
 3. **Unknown-request guard** — when `peekSessionFor` returns `undefined` (request timed out, LRU-evicted, or never existed), the vote is rejected (returns `false` / 404) **before** any `clientId` validation. This prevents an oracle attack: without it, a probe with a fabricated `clientId` could distinguish "session has this client" (passes validation → 404) from "client unknown" (`InvalidClientIdError` → 400).
 
-4. **Client identity validation** — `resolveTrustedClientId(entry, context?.clientId)` verifies the supplied `X-Qwen-Client-Id` (REST) or bridge-stamped `clientId` (ACP) is registered on the session's `clientIds` map. Anonymous votes (`clientId === undefined`) pass through — policy dispatch handles them. Unregistered ids throw `InvalidClientIdError` (mapped to 400 by route handlers).
+4. **Client identity validation** — `resolveTrustedClientId(entry, context?.clientId)` verifies the supplied `X-hopcode-client-id` (REST) or bridge-stamped `clientId` (ACP) is registered on the session's `clientIds` map. Anonymous votes (`clientId === undefined`) pass through — policy dispatch handles them. Unregistered ids throw `InvalidClientIdError` (mapped to 400 by route handlers).
 
 5. **Cancel sentinel enforcement** — a wire vote of `{ outcome: "selected", optionId: "__cancelled__" }` is rejected with `InvalidPermissionOptionError` to prevent sentinel injection.
 

@@ -88,7 +88,7 @@ export function getMcpOAuthDialogInstruction(
   return [
     `In interactive HopCode sessions, open the /mcp dialog to ${action}`,
     `with MCP server '${mcpServerName}'.`,
-    `For headless or SDK usage, configure MCP OAuth with qwen mcp add --oauth-*`,
+    `For headless or SDK usage, configure MCP OAuth with hopcode mcp add --oauth-*`,
     `or settings.json, then ${action} once in an interactive session before connecting.`,
   ].join(' ');
 }

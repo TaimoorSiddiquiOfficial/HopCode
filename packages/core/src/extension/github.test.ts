@@ -767,7 +767,7 @@ describe('git extension helpers', () => {
         path.join(os.tmpdir(), 'local-archive-update-test-'),
       );
       try {
-        const archivePath = path.join(tempDir, 'qwen-extension.zip');
+        const archivePath = path.join(tempDir, 'hopcode-extension.zip');
         const archive = await createZipBuffer(tempDir, [
           {
             name: EXTENSIONS_CONFIG_FILENAME,
@@ -808,7 +808,7 @@ describe('git extension helpers', () => {
         path.join(os.tmpdir(), 'local-archive-abort-test-'),
       );
       try {
-        const archivePath = path.join(tempDir, 'qwen-extension.zip');
+        const archivePath = path.join(tempDir, 'hopcode-extension.zip');
         const archive = await createZipBuffer(tempDir, [
           {
             name: EXTENSIONS_CONFIG_FILENAME,

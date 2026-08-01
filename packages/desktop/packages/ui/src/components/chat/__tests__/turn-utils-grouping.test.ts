@@ -210,7 +210,7 @@ describe('groupActivitiesByParent', () => {
       expect(group.children[1]!.id).toBe(child2.id)
     })
 
-    it('groups child activities under lowercase Qwen agent parent', () => {
+    it('groups child activities under lowercase hopcode agent parent', () => {
       resetCounters()
       const agentActivity = createActivity({
         toolName: 'agent',

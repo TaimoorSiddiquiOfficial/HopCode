@@ -29,7 +29,7 @@ request ID and registers a bounded request-scoped queue before dispatching
 resolution, creates the matching content generator through
 `BaseLlmClient.resolveForModel`, and consumes
 `generateContentStream`. Chunks return through
-`qwen/notify/session/generation/event` and are routed only to the registered
+`hopcode/notify/session/generation/event` and are routed only to the registered
 request queue. They are not published to the session EventBus or replay ring.
 
 Client disconnect sends `qwen/control/session/generation/cancel`; the child

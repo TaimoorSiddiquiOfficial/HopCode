@@ -22,7 +22,7 @@ export const BUILT_IN_PETS: PetDescriptor[] = [
   {
     id: 'hopcode',
     displayName: 'hopcode',
-    description: 'Your Qwen capybara companion.',
+    description: 'Your hopcode capybara companion.',
     spritesheetUrl: hopcodeSpritesheet,
   },
 ];

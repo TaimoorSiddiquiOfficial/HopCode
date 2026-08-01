@@ -454,7 +454,7 @@ export async function loadServerHierarchicalMemory(
   //   * Deep cwd in a non-git workspace turns the slot into a per-cwd
   //     file, breaking the "single fixed slot" invariant.
   //   * `cwd === homedir` resolves the slot path to `~/.hopcode/HOPCODE.local.md`,
-  //     colliding with the global Qwen directory.
+  //     colliding with the global hopcode directory.
   if (implicitDiscoveryEnabled && folderTrust && foundRoot) {
     const localContextPath = path.join(
       foundRoot,

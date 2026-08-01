@@ -87,7 +87,7 @@ export function createStderrForwarder(opts) {
 export function createSpawnChannelFactory(options = {}) {
     return async (workspaceCwd, childEnvOverrides) => {
         const sourceEnv = options.sourceEnv ?? process.env;
-        const cliEntry = sourceEnv['QWEN_CLI_ENTRY'] || process.argv[1];
+        const cliEntry = sourceEnv['hopcode_cli_entry'] || process.argv[1];
         if (!cliEntry) {
             throw new MissingCliEntryError();
         }

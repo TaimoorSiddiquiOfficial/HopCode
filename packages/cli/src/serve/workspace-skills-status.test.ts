@@ -84,7 +84,7 @@ describe('createWorkspaceSkillsStatusProvider', () => {
       },
     ]);
     const workspace = await fsp.mkdtemp(
-      path.join(os.tmpdir(), 'qwen-skills-disabled-'),
+      path.join(os.tmpdir(), 'hopcode-skills-disabled-'),
     );
     await fsp.mkdir(path.join(workspace, '.hopcode'), { recursive: true });
     await fsp.writeFile(

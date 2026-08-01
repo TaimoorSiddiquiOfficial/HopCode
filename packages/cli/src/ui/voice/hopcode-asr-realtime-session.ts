@@ -49,7 +49,7 @@ function formatServerErrorMessage(raw: unknown): string {
   return escapeAnsiCtrlCodes(text).slice(0, MAX_SERVER_ERROR_MESSAGE_LENGTH);
 }
 
-export function openQwenAsrRealtimeStream(
+export function openhopcodeasrrealtimestream(
   config: VoiceStreamConfig,
   callbacks: VoiceStreamCallbacks = {},
   deps: QwenRealtimeDeps = {},
@@ -188,7 +188,7 @@ export function openQwenAsrRealtimeStream(
         msg = JSON.parse(String(data));
       } catch (error) {
         debugLogger.warn(
-          '[voice] failed to parse Qwen ASR realtime message:',
+          '[voice] failed to parse hopcode ASR realtime message:',
           error,
         );
         return;
@@ -209,7 +209,7 @@ export function openQwenAsrRealtimeStream(
                 if (!backpressureWarned) {
                   backpressureWarned = true;
                   debugLogger.warn(
-                    '[voice] dropping Qwen ASR realtime audio due to socket backpressure.',
+                    '[voice] dropping hopcode ASR realtime audio due to socket backpressure.',
                   );
                 }
                 return;

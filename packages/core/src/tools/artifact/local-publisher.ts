@@ -15,7 +15,7 @@ import type {
 } from './publisher.js';
 
 /**
- * Option B: writes the artifact to the local Qwen home and returns a file://
+ * Option B: writes the artifact to the local hopcode home and returns a file://
  * URL. No network, no sharing — the page opens directly in the browser. Keyed
  * by id under `~/.hopcode/artifacts/{id}/index.html`, so redeploys overwrite in
  * place and keep the same URL.

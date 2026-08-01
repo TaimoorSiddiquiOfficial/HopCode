@@ -459,14 +459,14 @@ describe('handleInstall', () => {
     });
     mockInstallExtension.mockRejectedValue(
       new Error(
-        'Extension archive is missing a supported extension manifest. Expected qwen-extension.json, gemini-extension.json, .claude-plugin/marketplace.json, or .claude-plugin/plugin.json at the archive root, or inside a single top-level extension directory.',
+        'Extension archive is missing a supported extension manifest. Expected hopcode-extension.json, gemini-extension.json, .claude-plugin/marketplace.json, or .claude-plugin/plugin.json at the archive root, or inside a single top-level extension directory.',
       ),
     );
 
     await handleInstall({ source: 'owner/repo' });
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      'Extension archive is missing a supported extension manifest. Expected qwen-extension.json, gemini-extension.json, .claude-plugin/marketplace.json, or .claude-plugin/plugin.json at the archive root, or inside a single top-level extension directory.',
+      'Extension archive is missing a supported extension manifest. Expected hopcode-extension.json, gemini-extension.json, .claude-plugin/marketplace.json, or .claude-plugin/plugin.json at the archive root, or inside a single top-level extension directory.',
     );
     expect(processSpy).toHaveBeenCalledWith(1);
 

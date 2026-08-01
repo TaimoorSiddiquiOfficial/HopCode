@@ -63,8 +63,8 @@ function createAgent(
     provider: 'hopcode',
     workspace: {
       id: 'workspace-qwen',
-      name: 'Qwen Workspace',
-      slug: 'qwen-workspace',
+      name: 'hopcode.workspace',
+      slug: 'hopcode.workspace',
       rootPath: cwd,
       createdAt: Date.now(),
     },
@@ -295,7 +295,7 @@ describe('HopCodeAgent model metadata', () => {
     expect(usage).toBeNull();
   });
 
-  it('extracts latest replay usage for loaded Qwen native history', () => {
+  it('extracts latest replay usage for loaded hopcode native history', () => {
     const cwd = mkdtempSync(join(tmpdir(), 'qwen-cwd-'));
     const agent = createAgent(cwd, () => {});
 

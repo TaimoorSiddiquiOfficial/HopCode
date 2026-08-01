@@ -62,12 +62,12 @@ describe('createSpawnChannelFactory env policy', () => {
     beforeEach(() => {
         mockSpawn.mockReset();
         originalSimple = process.env['HOPCODE_SIMPLE'];
-        originalServerToken = process.env['QWEN_SERVER_TOKEN'];
-        originalCliEntry = process.env['QWEN_CLI_ENTRY'];
+        originalServerToken = process.env['hopcode_server_token'];
+        originalCliEntry = process.env['hopcode_cli_entry'];
         originalRuntimeOnlyForTest = process.env['RUNTIME_ONLY_FOR_TEST'];
         process.argv[1] = '/tmp/qwen.js';
         process.env['HOPCODE_SIMPLE'] = '1';
-        process.env['QWEN_SERVER_TOKEN'] = 'secret';
+        process.env['hopcode_server_token'] = 'secret';
     });
     afterEach(() => {
         process.argv[1] = originalArgv1;
@@ -90,10 +90,10 @@ describe('createSpawnChannelFactory env policy', () => {
             process.env['HOPCODE_CLI_ENTRY'] = originalCliEntry;
         }
         if (originalCliEntry === undefined) {
-            delete process.env['QWEN_CLI_ENTRY'];
+            delete process.env['hopcode_cli_entry'];
         }
         else {
-            process.env['QWEN_CLI_ENTRY'] = originalCliEntry;
+            process.env['hopcode_cli_entry'] = originalCliEntry;
         }
         if (originalRuntimeOnlyForTest === undefined) {
             delete process.env['RUNTIME_ONLY_FOR_TEST'];
@@ -132,13 +132,13 @@ describe('createSpawnChannelFactory env policy', () => {
     });
     it('builds child env and cli entry from sourceEnv when provided', async () => {
         mockSpawn.mockReturnValue(createFakeChildProcess());
-        process.env['QWEN_CLI_ENTRY'] = '/process/qwen.js';
+        process.env['hopcode_cli_entry'] = '/process/qwen.js';
         process.env['RUNTIME_ONLY_FOR_TEST'] = 'from-process';
         const factory = createSpawnChannelFactory({
             sourceEnv: {
-                QWEN_CLI_ENTRY: '/runtime/qwen.js',
+                hopcode_cli_entry: '/runtime/qwen.js',
                 RUNTIME_ONLY_FOR_TEST: 'from-runtime',
-                QWEN_SERVER_TOKEN: 'runtime-secret',
+                hopcode_server_token: 'runtime-secret',
             },
         });
         await factory('/tmp/project');
@@ -147,7 +147,7 @@ describe('createSpawnChannelFactory env policy', () => {
         expect(args).toContain('/runtime/qwen.js');
         expect(args).not.toContain('/process/qwen.js');
         expect(spawnOptions?.env?.['RUNTIME_ONLY_FOR_TEST']).toBe('from-runtime');
-        expect(spawnOptions?.env).not.toHaveProperty('QWEN_SERVER_TOKEN');
+        expect(spawnOptions?.env).not.toHaveProperty('hopcode_server_token');
     });
     it('threads NDJSON pipe hooks through daemon-side spawned channels', async () => {
         const child = createFakeChildProcess();

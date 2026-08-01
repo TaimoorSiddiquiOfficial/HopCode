@@ -26,7 +26,7 @@ import {
   renderReleaseNotes,
 } from '../generate-release-notes.js';
 
-const PR = (number) => `https://github.com/QwenLM/qwen-code/pull/${number}`;
+const PR = (number) => `https://github.com/QwenLM/hopcode/pull/${number}`;
 
 const entry = (number, title, labels = []) => ({
   number,
@@ -49,7 +49,7 @@ describe('parseGeneratedEntries', () => {
       `* fix(core): preserve tool results by @bob in ${PR(8)}`,
       `* fix(ci): retry publishing by @carol with @Copilot in ${PR(6574)}`,
       '',
-      '**Full Changelog**: https://github.com/QwenLM/qwen-code/compare/v1...v2',
+      '**Full Changelog**: https://github.com/QwenLM/hopcode/compare/v1...v2',
     ].join('\n');
 
     expect(parseGeneratedEntries(body)).toEqual([
@@ -174,7 +174,7 @@ describe('renderReleaseNotes', () => {
       ],
       previousTag: 'v1.0.0',
       tag: 'v1.1.0',
-      repo: 'QwenLM/qwen-code',
+      repo: 'QwenLM/hopcode',
     });
 
     expect(markdown).toContain('<!-- hopcode-release-notes:v1 -->');
@@ -195,7 +195,7 @@ describe('renderReleaseNotes', () => {
       );
     }
     expect(markdown).toContain(
-      '**Full Changelog**: https://github.com/QwenLM/qwen-code/compare/v1.0.0...v1.1.0',
+      '**Full Changelog**: https://github.com/QwenLM/hopcode/compare/v1.0.0...v1.1.0',
     );
   });
 });
@@ -423,7 +423,7 @@ describe('generateReleaseNotes', () => {
       },
       previousTag: 'v1.0.0',
       tag: 'v1.0.1',
-      repo: 'QwenLM/qwen-code',
+      repo: 'QwenLM/hopcode',
     });
 
     expect(result.markdown).toBe(generatedBody);
@@ -445,7 +445,7 @@ describe('generateReleaseNotes', () => {
       complete: null,
       previousTag: 'v1.0.0',
       tag: 'v1.1.0',
-      repo: 'QwenLM/qwen-code',
+      repo: 'QwenLM/hopcode',
     });
 
     expect(result.markdown).toContain('### Features');
@@ -470,8 +470,8 @@ describe('generateReleaseNotes', () => {
         [
           '#!/usr/bin/env node',
           'const args = process.argv.slice(2);',
-          "if (args[0] === 'api' && args.includes('repos/QwenLM/qwen-code/releases/generate-notes')) {",
-          "  process.stdout.write([\"## What's Changed\", '* feat: add cli path by @alice in https://github.com/QwenLM/qwen-code/pull/1'].join('\\n'));",
+          "if (args[0] === 'api' && args.includes('repos/QwenLM/hopcode/releases/generate-notes')) {",
+          "  process.stdout.write([\"## What's Changed\", '* feat: add cli path by @alice in https://github.com/QwenLM/hopcode/pull/1'].join('\\n'));",
           '  process.exit(0);',
           '}',
           "if (args[0] === 'api' && args[1] === 'graphql') {",
@@ -495,7 +495,7 @@ describe('generateReleaseNotes', () => {
           env: {
             ...process.env,
             PATH: `${dir}:${process.env.PATH}`,
-            GITHUB_REPOSITORY: 'QwenLM/qwen-code',
+            GITHUB_REPOSITORY: 'QwenLM/hopcode',
             OPENAI_API_KEY: '',
             OPENAI_BASE_URL: '',
             OPENAI_MODEL: '',

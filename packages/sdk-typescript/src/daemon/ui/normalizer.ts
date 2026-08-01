@@ -804,7 +804,7 @@ function extractUpdateMeta(
 ): Record<string, unknown> | undefined {
   const meta = isRecord(update['_meta']) ? update['_meta'] : undefined;
   if (!meta) return undefined;
-  const { qwenTranscript: _qwenTranscript, ...displayMeta } = meta;
+  const { hopcodetranscript: _hopcodetranscript, ...displayMeta } = meta;
   return Object.keys(displayMeta).length > 0 ? displayMeta : undefined;
 }
 
@@ -816,8 +816,8 @@ function extractSourceRecordIds(
   const meta =
     update && isRecord(update['_meta']) ? update['_meta'] : undefined;
   const transcript =
-    meta && isRecord(meta['qwenTranscript'])
-      ? meta['qwenTranscript']
+    meta && isRecord(meta['hopcodetranscript'])
+      ? meta['hopcodetranscript']
       : undefined;
   const values = transcript?.['sourceRecordIds'];
   if (!Array.isArray(values)) return undefined;
@@ -953,8 +953,8 @@ function normalizePlanUpdate(
   const contentText = capDetails(formatPlanEntries(entries));
   const meta = isRecord(update['_meta']) ? update['_meta'] : undefined;
   const transcript =
-    meta && isRecord(meta['qwenTranscript'])
-      ? meta['qwenTranscript']
+    meta && isRecord(meta['hopcodetranscript'])
+      ? meta['hopcodetranscript']
       : undefined;
   const planCallId =
     getString(transcript, 'planToolCallId') ??

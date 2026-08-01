@@ -33,7 +33,7 @@ const formatUpdateInstructions = vi.fn(
         `  ${resolveUpdateCommand(installationInfo.updateCommand, latestVersion)}`,
       ];
     }
-    return ['Manual update required. Please reinstall Qwen Code.'];
+    return ['Manual update required. Please reinstall HopCode.'];
   },
 );
 vi.mock('../utils/updateCheck.js', () => ({ checkForUpdatesDetailed }));
@@ -133,7 +133,7 @@ describe('updateCommand', () => {
   it('does not update standalone installs in interactive mode when auto-update is disabled', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
 
     const result = await updateCommand.action!(
@@ -145,7 +145,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nManual update required. Please reinstall Qwen Code.',
+        'Update available: 1.2.3\nManual update required. Please reinstall HopCode.',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
     expect(performStandaloneUpdate).not.toHaveBeenCalled();
@@ -154,7 +154,7 @@ describe('updateCommand', () => {
   it('hands standalone updates off to the parent process', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
     const commandContext = context('interactive');
 
@@ -189,7 +189,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nManual update required. Please reinstall Qwen Code.',
+        'Update available: 1.2.3\nManual update required. Please reinstall HopCode.',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
   });
@@ -216,7 +216,7 @@ describe('updateCommand', () => {
         type: 'message',
         messageType: 'info',
         content:
-          'Update available: 1.2.3\nThis session uses the custom sandbox image example.com/custom-qwen:1.0.0. Update that image and restart Qwen Code.',
+          'Update available: 1.2.3\nThis session uses the custom sandbox image example.com/custom-qwen:1.0.0. Update that image and restart HopCode.',
       });
       expect(relaunchForUpdate).not.toHaveBeenCalled();
     } finally {
@@ -245,7 +245,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nUpdate Qwen Code on the host, then restart the sandbox.',
+        'Update available: 1.2.3\nUpdate HopCode on the host, then restart the sandbox.',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
   });
@@ -259,7 +259,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nUpdate Qwen Code on the host, then restart the sandbox.',
+        'Update available: 1.2.3\nUpdate HopCode on the host, then restart the sandbox.',
     });
     expect(relaunchForUpdate).not.toHaveBeenCalled();
   });
@@ -283,14 +283,14 @@ describe('updateCommand', () => {
   it('updates standalone installs in non-interactive mode', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
     performStandaloneUpdate.mockResolvedValue('done');
 
     const result = await updateCommand.action!(context('non_interactive'), '');
 
     expect(performStandaloneUpdate).toHaveBeenCalledWith(
-      '/tmp/qwen-code',
+      '/tmp/hopcode',
       '1.2.3',
     );
     expect(result).toEqual({
@@ -304,7 +304,7 @@ describe('updateCommand', () => {
   it('returns deferred message when standalone update is not yet active', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
     performStandaloneUpdate.mockResolvedValue('deferred');
 
@@ -321,7 +321,7 @@ describe('updateCommand', () => {
   it('returns an error when standalone update fails in non-interactive mode', async () => {
     getInstallationInfo.mockReturnValue({
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
     performStandaloneUpdate.mockRejectedValue(new Error('boom'));
 
@@ -345,7 +345,7 @@ describe('updateCommand', () => {
       type: 'message',
       messageType: 'info',
       content:
-        'Update available: 1.2.3\nManual update required. Please reinstall Qwen Code.',
+        'Update available: 1.2.3\nManual update required. Please reinstall HopCode.',
     });
   });
 
@@ -360,7 +360,7 @@ describe('updateCommand', () => {
     expect(result).toEqual({
       type: 'message',
       messageType: 'info',
-      content: 'Qwen Code 1.0.0 is up to date!',
+      content: 'HopCode 1.0.0 is up to date!',
     });
   });
 

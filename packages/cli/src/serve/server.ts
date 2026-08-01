@@ -873,7 +873,7 @@ export function createServeApp(
     deps.workspace ??
     createDaemonWorkspaceService({
       boundWorkspace,
-      contextFilename: deps.contextFilename ?? 'QWEN.md',
+      contextFilename: deps.contextFilename ?? 'HOPCODE.md',
       statusProvider,
       workspaceProvidersStatusProvider: createWorkspaceProvidersStatusProvider(
         primaryEffectiveEnv ? { env: primaryEffectiveEnv } : {},

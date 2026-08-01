@@ -21,11 +21,11 @@ Learn how to enable and setup OpenTelemetry for HopCode.
 
 ## Migration Notes
 
-- `tool_output_truncated` was renamed to `qwen-code.tool_output_truncated` for namespace consistency — downstream consumers filtering on the old name should update their queries.
+- `tool_output_truncated` was renamed to `hopcode.tool_output_truncated` for namespace consistency — downstream consumers filtering on the old name should update their queries.
 
 - The `tool.call.latency` histogram documentation previously listed a `decision` attribute — this was never set on the histogram (only `function_name` is recorded). The `tool.call.count` counter continues to include `decision`.
 
-- The `qwen-code.file_operation` log event and `file.operation.count` metric documentation previously listed diff-stat attributes (`model_added_lines`, `model_removed_lines`, `user_added_lines`, `user_removed_lines`) — these were never set on either. Diff-stat data is available via the `tool_call` log event's `metadata` attribute.
+- The `hopcode.file_operation` log event and `file.operation.count` metric documentation previously listed diff-stat attributes (`model_added_lines`, `model_removed_lines`, `user_added_lines`, `user_removed_lines`) — these were never set on either. Diff-stat data is available via the `tool_call` log event's `metadata` attribute.
 
 ## Key Benefits
 

@@ -1327,7 +1327,7 @@ describe('AgentTool', () => {
       // returns false (the default '/test/project' mock does not exist on CI,
       // where simple-git throws at construction).
       const nonRepo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-nested-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-nested-')),
       );
       try {
         vi.mocked(config.getProjectRoot).mockReturnValue(nonRepo);
@@ -1441,7 +1441,7 @@ describe('AgentTool', () => {
 
     it('passes custom ignore files into worktree isolation file service', async () => {
       vi.useRealTimers();
-      const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wt-'));
+      const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wt-'));
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
         execFileSync('git', ['config', 'user.email', 't@e.com'], {
@@ -1502,7 +1502,7 @@ describe('AgentTool', () => {
     it('pins the sub-agent to a caller-owned worktree via working_dir and leaves it in place', async () => {
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1582,7 +1582,7 @@ describe('AgentTool', () => {
       // working_dir exclusion is caught here, not only in the UI classifiers.
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-fg-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-fg-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1638,7 +1638,7 @@ describe('AgentTool', () => {
     it('rejects working_dir that is not a registered worktree of this repo', async () => {
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-bad-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-bad-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1685,7 +1685,7 @@ describe('AgentTool', () => {
     it('resolves a repo-relative working_dir against the parent cwd (the /review production form)', async () => {
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-rel-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-rel-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1743,7 +1743,7 @@ describe('AgentTool', () => {
     it('rejects working_dir pointing at the repository main working tree', async () => {
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-main-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-main-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1786,7 +1786,7 @@ describe('AgentTool', () => {
     it('rejects working_dir when the parent directory is not a git repository', async () => {
       vi.useRealTimers();
       const nonRepo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-nogit-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-nogit-')),
       );
       try {
         vi.mocked(config.getProjectRoot).mockReturnValue(nonRepo);
@@ -1819,7 +1819,7 @@ describe('AgentTool', () => {
     it('accepts a registered worktree in detached HEAD state (no branch)', async () => {
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-detached-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-detached-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1871,7 +1871,7 @@ describe('AgentTool', () => {
     it('leaves the caller-owned worktree in place when the sub-agent fails', async () => {
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-failpath-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-failpath-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1928,7 +1928,7 @@ describe('AgentTool', () => {
     it('re-anchors validation at the repo root when launched from a monorepo subdirectory', async () => {
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-mono-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-mono-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });
@@ -1985,7 +1985,7 @@ describe('AgentTool', () => {
     it('resolves a repo-relative working_dir against the subdirectory cwd, not the repo root (monorepo)', async () => {
       vi.useRealTimers();
       const repo = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-agent-wd-monorel-')),
+        fs.mkdtempSync(path.join(os.tmpdir(), 'hopcode-agent-wd-monorel-')),
       );
       try {
         execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repo });

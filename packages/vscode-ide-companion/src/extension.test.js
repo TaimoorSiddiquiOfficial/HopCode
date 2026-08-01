@@ -109,16 +109,16 @@ describe('activate', () => {
         await activate(context);
         expect(showInformationMessageMock).toHaveBeenCalledWith('HopCode Companion extension successfully installed.');
     });
-    it('writes production logs to the Qwen Code Companion output channel', async () => {
+    it('writes production logs to the HopCode Companion output channel', async () => {
         const appendLine = vi.fn();
         vi.mocked(vscode.window.createOutputChannel).mockReturnValue({
             appendLine,
         });
         await activate(context);
-        expect(vscode.window.createOutputChannel).toHaveBeenCalledWith('Qwen Code Companion');
+        expect(vscode.window.createOutputChannel).toHaveBeenCalledWith('HopCode Companion');
         expect(appendLine).toHaveBeenCalledWith('[INFO] Extension activated');
     });
-    it('launches Qwen Code with the full multi-root workspace env', async () => {
+    it('launches HopCode with the full multi-root workspace env', async () => {
         vi.mocked(context.globalState.get).mockReturnValue(true);
         const first = {
             name: 'first',
@@ -138,7 +138,7 @@ describe('activate', () => {
         await activate(context);
         const command = vi
             .mocked(vscode.commands.registerCommand)
-            .mock.calls.find(([id]) => id === 'qwen-code.runQwenCode')?.[1];
+            .mock.calls.find(([id]) => id === 'hopcode.runQwenCode')?.[1];
         expect(command).toBeDefined();
         await command();
         expect(vscode.window.createTerminal).toHaveBeenCalledWith(expect.objectContaining({

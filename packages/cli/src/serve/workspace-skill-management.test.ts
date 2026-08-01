@@ -54,8 +54,8 @@ afterEach(async () => {
 
 describe('workspace Skill management', () => {
   it('installs folder files into the workspace and deletes them', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const source = await temporaryDirectory('qwen-skill-source-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const source = await temporaryDirectory('hopcode-skill-source-');
     await fs.mkdir(path.join(source, 'references'));
     await fs.writeFile(
       path.join(source, 'SKILL.md'),
@@ -101,8 +101,8 @@ describe('workspace Skill management', () => {
   });
 
   it('installs a ZIP into the global Skill directory', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const globalDirectory = await temporaryDirectory('qwen-skill-global-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const globalDirectory = await temporaryDirectory('hopcode-skill-global-');
     vi.spyOn(Storage, 'getGlobalhopcodeDir').mockReturnValue(globalDirectory);
 
     const result = await installWorkspaceSkill(workspace, {
@@ -128,7 +128,7 @@ describe('workspace Skill management', () => {
   });
 
   it('installs a Skill from a GitHub SKILL.md URL', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
     vi.stubGlobal(
       'fetch',
       vi
@@ -181,7 +181,7 @@ describe('workspace Skill management', () => {
   });
 
   it('explains when a GitHub Skill path does not exist', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(new Response(null, { status: 404 })),
@@ -204,7 +204,7 @@ describe('workspace Skill management', () => {
   });
 
   it('explains when GitHub denies access to a Skill file', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
     vi.stubGlobal(
       'fetch',
       vi
@@ -248,7 +248,7 @@ describe('workspace Skill management', () => {
   ])(
     'explains GitHub Skill file HTTP %i failures',
     async (status, expectedMessage) => {
-      const workspace = await temporaryDirectory('qwen-skill-workspace-');
+      const workspace = await temporaryDirectory('hopcode-skill-workspace-');
       vi.stubGlobal(
         'fetch',
         vi
@@ -288,8 +288,8 @@ describe('workspace Skill management', () => {
   );
 
   it('rejects an oversized Skill name before reading its source', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const source = await temporaryDirectory('qwen-skill-source-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const source = await temporaryDirectory('hopcode-skill-source-');
     await fs.writeFile(path.join(source, 'SKILL.md'), skillMarkdown('demo'));
 
     await expect(
@@ -302,7 +302,7 @@ describe('workspace Skill management', () => {
   });
 
   it('rejects relative folder paths before reading files', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
 
     await expect(
       installWorkspaceSkill(workspace, {
@@ -314,7 +314,7 @@ describe('workspace Skill management', () => {
   });
 
   it('reports malformed GitHub URLs as invalid sources', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
 
     await expect(
       installWorkspaceSkill(workspace, {
@@ -328,7 +328,7 @@ describe('workspace Skill management', () => {
   it.each(['--upload-pack', 'main%20--upload-pack'])(
     'rejects unsafe GitHub ref %s before making a request',
     async (ref) => {
-      const workspace = await temporaryDirectory('qwen-skill-workspace-');
+      const workspace = await temporaryDirectory('hopcode-skill-workspace-');
       const fetchMock = vi.fn();
       vi.stubGlobal('fetch', fetchMock);
 
@@ -347,7 +347,7 @@ describe('workspace Skill management', () => {
   );
 
   it('rejects traversal in a GitHub Skill path before making a request', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
 
@@ -365,7 +365,7 @@ describe('workspace Skill management', () => {
   });
 
   it('stops reading an oversized GitHub Skill file', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
     const oversizedBody = new ReadableStream<Uint8Array>({
       start(controller) {
         controller.enqueue(new Uint8Array(2 * 1024 * 1024));
@@ -410,8 +410,8 @@ describe('workspace Skill management', () => {
   });
 
   it('rejects a symbolic link as the source folder', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const source = await temporaryDirectory('qwen-skill-source-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const source = await temporaryDirectory('hopcode-skill-source-');
     const sourceLink = path.join(workspace, 'source-link');
     await fs.writeFile(path.join(source, 'SKILL.md'), skillMarkdown('linked'));
     await fs.symlink(source, sourceLink);
@@ -426,7 +426,7 @@ describe('workspace Skill management', () => {
   });
 
   it('reports an expanded ZIP entry over the limit as too large', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
 
     await expect(
       installWorkspaceSkill(workspace, {
@@ -447,7 +447,7 @@ describe('workspace Skill management', () => {
   });
 
   it('reports a ZIP whose total expanded content is over the limit', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
     const largeFile = 'x'.repeat(1_600_000);
 
     await expect(
@@ -472,9 +472,9 @@ describe('workspace Skill management', () => {
   });
 
   it('keeps the existing Skill when replacement validation fails', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const source = await temporaryDirectory('qwen-skill-source-');
-    const invalidSource = await temporaryDirectory('qwen-skill-source-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const source = await temporaryDirectory('hopcode-skill-source-');
+    const invalidSource = await temporaryDirectory('hopcode-skill-source-');
     await fs.writeFile(
       path.join(source, 'SKILL.md'),
       skillMarkdown('stable-skill'),
@@ -502,9 +502,9 @@ describe('workspace Skill management', () => {
   });
 
   it('keeps a committed replacement when backup cleanup fails', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const source = await temporaryDirectory('qwen-skill-source-');
-    const replacement = await temporaryDirectory('qwen-skill-source-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const source = await temporaryDirectory('hopcode-skill-source-');
+    const replacement = await temporaryDirectory('hopcode-skill-source-');
     await fs.writeFile(
       path.join(source, 'SKILL.md'),
       skillMarkdown('stable-skill'),
@@ -535,8 +535,8 @@ describe('workspace Skill management', () => {
   });
 
   it('preserves the install error when staging cleanup fails', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const source = await temporaryDirectory('qwen-skill-source-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const source = await temporaryDirectory('hopcode-skill-source-');
     await fs.writeFile(
       path.join(source, 'SKILL.md'),
       skillMarkdown('different-name'),
@@ -556,8 +556,8 @@ describe('workspace Skill management', () => {
   });
 
   it('removes legacy install artifacts before installing', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const source = await temporaryDirectory('qwen-skill-source-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const source = await temporaryDirectory('hopcode-skill-source-');
     const baseDir = path.join(workspace, '.hopcode', 'skills');
     const legacyBackup = path.join(baseDir, '.stable-skill.backup-legacy');
     const staleBackup = path.join(
@@ -586,9 +586,9 @@ describe('workspace Skill management', () => {
   });
 
   it('restores the existing Skill when committing a replacement fails', async () => {
-    const workspace = await temporaryDirectory('qwen-skill-workspace-');
-    const source = await temporaryDirectory('qwen-skill-source-');
-    const replacement = await temporaryDirectory('qwen-skill-source-');
+    const workspace = await temporaryDirectory('hopcode-skill-workspace-');
+    const source = await temporaryDirectory('hopcode-skill-source-');
+    const replacement = await temporaryDirectory('hopcode-skill-source-');
     await fs.writeFile(
       path.join(source, 'SKILL.md'),
       skillMarkdown('stable-skill'),

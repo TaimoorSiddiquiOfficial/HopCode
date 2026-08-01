@@ -223,7 +223,7 @@ export interface DaemonWorkspaceService {
     scope: WorkspaceSkillScope,
   ): Promise<WorkspaceSkillMutationResult>;
 
-  /** Scaffold (init) a QWEN.md file in the workspace. */
+  /** Scaffold (init) a HOPCODE.md file in the workspace. */
   initWorkspace(
     ctx: WorkspaceRequestContext,
     opts: { force?: boolean },
@@ -412,7 +412,7 @@ export interface DaemonWorkspaceServiceDeps {
   /** Canonical absolute path of the bound workspace. */
   boundWorkspace: string;
 
-  /** Context filename (e.g. 'QWEN.md') from workspace settings. */
+  /** Context filename (e.g. 'HOPCODE.md') from workspace settings. */
   contextFilename: string;
 
   /**

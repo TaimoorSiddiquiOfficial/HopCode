@@ -158,7 +158,7 @@ describe('serve fast-path bundle check', () => {
     ]);
   });
 
-  it('checks fast-path modules that run before runQwenServe listens', () => {
+  it('checks fast-path modules that run before runHopCodeServe listens', () => {
     const metafile = makeMetafile({
       'dist/chunks/fast-path.js': output({
         inputs: ['packages/cli/src/serve/fast-path.ts'],

@@ -610,7 +610,7 @@ describe('ContentGenerationPipeline', () => {
       // Arrange — provider injects enable_thinking: true via extra_body
       // (e.g. user configured `enableThinking: true` via setup wizard,
       // see provider-config.ts), but request explicitly disables thinking.
-      // DashScope hostname + qwen model name are both required: the gate
+      // DashScope hostname + hopcode model name are both required: the gate
       // is hostname + model-name to avoid leaking the qwen-specific
       // `enable_thinking` field to non-qwen routings (off-DashScope, or
       // GLM/DeepSeek on the same DashScope hostname).
@@ -993,7 +993,7 @@ describe('ContentGenerationPipeline', () => {
     it('emits enable_thinking:false on HOPCODE_OAUTH with the default coder-model', async () => {
       // HOPCODE_OAUTH is the default auth flow for first-time users and
       // ships with `model: 'coder-model'` (DEFAULT_HOPCODE_MODEL in
-      // config/models.ts — aliased to Qwen 3.6 Plus hybrid). The string
+      // config/models.ts — aliased to hopcode 3.6 Plus hybrid). The string
       // doesn't start with `hopcode`, so the gate must special-case it;
       // otherwise the exact regression that #4501 fixes (side-queries
       // burning reasoning tokens on the default flow) remains live.
@@ -1114,10 +1114,10 @@ describe('ContentGenerationPipeline', () => {
       expect(apiCall.enable_thinking).toBeUndefined();
     });
 
-    it('disables qwen thinking via chat_template_kwargs on a non-DashScope endpoint (vLLM/SGLang)', async () => {
+    it('disables hopcode thinking via chat_template_kwargs on a non-DashScope endpoint (vLLM/SGLang)', async () => {
       // Self-hosted OpenAI-compatible servers render the chat template
       // server-side and read the thinking switch from `chat_template_kwargs`,
-      // silently ignoring a top-level `enable_thinking`. A qwen model on such
+      // silently ignoring a top-level `enable_thinking`. A hopcode model on such
       // an endpoint must therefore get the switch nested, not top-level — and
       // any top-level `enable_thinking: true` a provider preset injected via
       // extra_body must be stripped so it can't contradict the opt-out.
@@ -1292,7 +1292,7 @@ describe('ContentGenerationPipeline', () => {
 
     it('gates on the wire model, not config: hopcode config + non-qwen request.model does NOT emit', async () => {
       // buildRequest ships `context.model` (= request.model || config.model).
-      // A qwen *config* with a non-qwen *request* model must gate on the
+      // A hopcode *config* with a non-qwen *request* model must gate on the
       // request model — otherwise the qwen-only field leaks to the non-qwen
       // routing that is actually on the wire (e.g. GLM rejecting it upstream).
       mockContentGeneratorConfig = {
@@ -1330,9 +1330,9 @@ describe('ContentGenerationPipeline', () => {
       expect(apiCall.enable_thinking).toBeUndefined();
     });
 
-    it('gates on the wire model, not config: non-hopcode config + qwen request.model emits false', async () => {
-      // The mirror direction: a non-qwen *config* with a qwen *request* model
-      // must still emit the disable signal, since the wire model is qwen and
+    it('gates on the wire model, not config: non-hopcode config + hopcode request.model emits false', async () => {
+      // The mirror direction: a non-qwen *config* with a hopcode *request* model
+      // must still emit the disable signal, since the wire model is hopcode and
       // would otherwise keep thinking-on (the #4501 regression).
       mockContentGeneratorConfig = {
         ...mockContentGeneratorConfig,
@@ -1346,7 +1346,7 @@ describe('ContentGenerationPipeline', () => {
       pipeline = new ContentGenerationPipeline(mockConfig);
 
       const request: GenerateContentParameters = {
-        model: 'qwen3.5-flash', // request-level override to a qwen wire model
+        model: 'qwen3.5-flash', // request-level override to a hopcode wire model
         contents: [{ parts: [{ text: 'Summarize' }], role: 'user' }],
         config: { thinkingConfig: { includeThoughts: false } },
       };

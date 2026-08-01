@@ -624,7 +624,7 @@ describe('GlobTool', () => {
       expect(result.llmContent).not.toContain('b.aiignored.txt');
     });
 
-    it('should respect configured custom qwen ignore files', async () => {
+    it('should respect configured custom hopcode ignore files', async () => {
       await fs.writeFile(
         path.join(tempRootDir, '.cursorignore'),
         '*.cursorignored.txt',

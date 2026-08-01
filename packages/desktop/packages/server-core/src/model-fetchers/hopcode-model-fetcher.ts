@@ -1,5 +1,5 @@
 /**
- * Qwen Model Fetcher
+ * hopcode Model Fetcher
  *
  * HopCode exposes its selectable models through ACP session/new.
  */
@@ -10,7 +10,7 @@ import { fetchBackendModels } from '@craft-agent/shared/agent/backend'
 import { getHostRuntime } from './runtime'
 
 export class HopCodeModelFetcher implements ModelFetcher {
-  /** Qwen models are read on demand/startup from the local HopCode CLI. */
+  /** hopcode models are read on demand/startup from the local HopCode CLI. */
   readonly refreshIntervalMs = 0
 
   async fetchModels(

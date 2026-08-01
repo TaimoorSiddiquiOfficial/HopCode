@@ -2,7 +2,7 @@
 
 ## Overview
 
-`McpTransportPool` (`packages/core/src/tools/mcp-transport-pool.ts`) is the F2 (#4175 commit 5) workspace-scoped pool: multiple ACP sessions inside one runtime share one transport per unique `(serverName + configFingerprint)` tuple, instead of each spawning its own MCP child process. When pool mode is enabled, every started ACP child owns an independent pool (`QwenAgent.mcpPool`). Production attempts to preheat the primary child and retries on first use after failure; a trusted secondary starts its child on demand, while an untrusted secondary starts neither. The pool is constructed once at agent startup with the runtime's bootstrap `Config` and survives session lifecycles. Entries reference-count session attaches and close after a configurable grace period when the reference count reaches zero.
+`McpTransportPool` (`packages/core/src/tools/mcp-transport-pool.ts`) is the F2 (#4175 commit 5) workspace-scoped pool: multiple ACP sessions inside one runtime share one transport per unique `(serverName + configFingerprint)` tuple, instead of each spawning its own MCP child process. When pool mode is enabled, every started ACP child owns an independent pool (`hopcodeagent.mcpPool`). Production attempts to preheat the primary child and retries on first use after failure; a trusted secondary starts its child on demand, while an untrusted secondary starts neither. The pool is constructed once at agent startup with the runtime's bootstrap `Config` and survives session lifecycles. Entries reference-count session attaches and close after a configurable grace period when the reference count reaches zero.
 
 It is the main mechanism that prevents a multi-session daemon from forking one copy of every MCP server per session.
 
@@ -241,7 +241,7 @@ sequenceDiagram
 
 | Source                        | Knob                                                            | Effect                                                                                                    |
 | ----------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Env                           | `HOPCODE_SERVE_NO_MCP_POOL=1`                                   | Kill switch — `QwenAgent.mcpPool` stays undefined; per-session `McpClientManager` enforces (pre-F2 path). |
+| Env                           | `HOPCODE_SERVE_NO_MCP_POOL=1`                                   | Kill switch — `hopcodeagent.mcpPool` stays undefined; per-session `McpClientManager` enforces (pre-F2 path). |
 | Flag                          | `--mcp-client-budget=N`, `--mcp-budget-mode={off,warn,enforce}` | Forwarded to ACP child via `childEnvOverrides`; child constructs `WorkspaceMcpBudget` and passes to pool. |
 | Capability tags (conditional) | `mcp_workspace_pool`, `mcp_pool_restart`                        | Advertised together when pool is on. SDK pre-flights both to branch on pool-aware response shapes.        |
 

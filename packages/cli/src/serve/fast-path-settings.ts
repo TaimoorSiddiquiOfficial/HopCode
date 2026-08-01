@@ -198,12 +198,12 @@ function findEnvFilesFastPath(
       pushHomeCandidates();
       return found;
     } else {
-      const qwenEnvPath = path.join(
+      const hopcodeenvpath = path.join(
         currentDir,
         SETTINGS_DIRECTORY_NAME,
         '.env',
       );
-      if (pushCandidate(qwenEnvPath)) {
+      if (pushCandidate(hopcodeenvpath)) {
         pushHomeCandidates();
         return found;
       }

@@ -5,7 +5,7 @@
  */
 import { CHANNEL_STARTUP_PROFILE_META_KEY, CHANNEL_STARTUP_PROFILE_VERSION, } from './bridgeTypes.js';
 const MAX_PROFILE_DURATION_MS = 600_000;
-const ATTRIBUTE_PREFIX = 'qwen-code.daemon.acp_startup';
+const ATTRIBUTE_PREFIX = 'hopcode.daemon.acp_startup';
 function isRecord(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
 }

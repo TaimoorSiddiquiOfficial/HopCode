@@ -768,12 +768,12 @@ export function ensureBinWrapper(
       }
     } else {
       assertSafeForSingleQuotedShellPath(standaloneDir, 'standaloneDir');
-      const wrapperPath = path.join(binDir, 'qwen');
+      const wrapperPath = path.join(binDir, 'hopcode');
       artifacts.wrapperPath = wrapperPath;
       // Match install-qwen-standalone.sh's write_unix_wrapper:
       // uses /usr/bin/env sh for portability, and single-quoted paths.
       const quotedQwenBin = shellQuoteForSh(
-        path.join(standaloneDir, 'bin', 'qwen'),
+        path.join(standaloneDir, 'bin', 'hopcode'),
       );
       const content = `#!/usr/bin/env sh\nexec ${quotedQwenBin} "$@"\n`;
       try {
@@ -847,9 +847,9 @@ export function ensurePathInShellRc(binDir: string): ShellPathUpdate {
     // Use begin/end block markers matching install-qwen-standalone.sh's
     // maybe_update_shell_path, so the update codepath is idempotent with the
     // install script and does not produce duplicate PATH entries.
-    const beginMarker = '# Qwen Code PATH block begin';
-    const endMarker = '# Qwen Code PATH block end';
-    const legacyMarker = '# Added by Qwen Code standalone installer';
+    const beginMarker = '# HopCode PATH block begin';
+    const endMarker = '# HopCode PATH block end';
+    const legacyMarker = '# Added by HopCode standalone installer';
     if (content.includes(beginMarker) && content.includes(endMarker)) {
       return { rcFile, blockAdded: false };
     }
@@ -897,7 +897,7 @@ function cleanupShellPathBlock(rcFile: string): void {
     if (!fs.existsSync(rcFile)) return;
     const content = fs.readFileSync(rcFile, 'utf-8');
     const blockPattern =
-      /\n?# Qwen Code PATH block begin\n(?:.|\n)*?\n# Qwen Code PATH block end\n?/;
+      /\n?# HopCode PATH block begin\n(?:.|\n)*?\n# HopCode PATH block end\n?/;
     const nextContent = content.replace(blockPattern, '');
     if (nextContent !== content) {
       fs.writeFileSync(rcFile, nextContent);

@@ -45,8 +45,8 @@ describe('acpModelUtils', () => {
     const options = buildAcpModelOptions(models);
     const [first, second, unique] = options;
 
-    expect(first?.modelId).toMatch(/^qwen-route:v1:/);
-    expect(second?.modelId).toMatch(/^qwen-route:v1:/);
+    expect(first?.modelId).toMatch(/^hopcode-route:v1:/);
+    expect(second?.modelId).toMatch(/^hopcode-route:v1:/);
     expect(first?.modelId).not.toBe(second?.modelId);
     expect(unique?.modelId).toBe(`unique-model(${AuthType.USE_OPENAI})`);
     expect(options.map((option) => option.modelId).join(' ')).not.toContain(

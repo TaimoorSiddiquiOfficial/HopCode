@@ -24,9 +24,9 @@ describe('SessionOrganizationService', () => {
   const sessionIdB = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
 
   beforeEach(async () => {
-    previousRuntimeDir = process.env['QWEN_RUNTIME_DIR'];
+    previousRuntimeDir = process.env['hopcode_runtime_dir'];
     runtimeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-org-'));
-    process.env['QWEN_RUNTIME_DIR'] = runtimeDir;
+    process.env['hopcode_runtime_dir'] = runtimeDir;
     warnings = [];
     service = new SessionOrganizationService(cwd, (warning) => {
       warnings.push(warning);
@@ -35,9 +35,9 @@ describe('SessionOrganizationService', () => {
 
   afterEach(async () => {
     if (previousRuntimeDir === undefined) {
-      delete process.env['QWEN_RUNTIME_DIR'];
+      delete process.env['hopcode_runtime_dir'];
     } else {
-      process.env['QWEN_RUNTIME_DIR'] = previousRuntimeDir;
+      process.env['hopcode_runtime_dir'] = previousRuntimeDir;
     }
     await fs.rm(runtimeDir, { recursive: true, force: true });
   });

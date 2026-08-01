@@ -355,22 +355,22 @@ describe('ProcessTransport', () => {
 
     it('should pass forkSession through --fork-session', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         forkSession: true,
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--fork-session']),
         expect.any(Object),
       );
@@ -378,22 +378,22 @@ describe('ProcessTransport', () => {
 
     it('should pass maxToolCalls through --max-tool-calls', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         maxToolCalls: 25,
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--max-tool-calls', '25']),
         expect.any(Object),
       );
@@ -401,22 +401,22 @@ describe('ProcessTransport', () => {
 
     it('should pass maxSubagentDepth through --max-subagent-depth', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         maxSubagentDepth: 5,
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--max-subagent-depth', '5']),
         expect.any(Object),
       );
@@ -424,22 +424,22 @@ describe('ProcessTransport', () => {
 
     it('should pass includeDirectories through --include-directories', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         includeDirectories: ['/tmp/a', '/tmp/b'],
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--include-directories', '/tmp/a,/tmp/b']),
         expect.any(Object),
       );
@@ -447,22 +447,22 @@ describe('ProcessTransport', () => {
 
     it('should pass extraArgs directly', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         extraArgs: ['--verbose', '--some-flag'],
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--verbose', '--some-flag']),
         expect.any(Object),
       );
@@ -470,22 +470,22 @@ describe('ProcessTransport', () => {
 
     it('should pass extensions through --extensions', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         extensions: ['ext1', 'ext2'],
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--extensions', 'ext1,ext2']),
         expect.any(Object),
       );
@@ -493,22 +493,22 @@ describe('ProcessTransport', () => {
 
     it('should pass fallbackModel through --fallback-model', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         fallbackModel: ['model-a', 'model-b'],
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--fallback-model', 'model-a,model-b']),
         expect.any(Object),
       );
@@ -516,22 +516,22 @@ describe('ProcessTransport', () => {
 
     it('should pass proxy through --proxy', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         proxy: 'http://localhost:8080',
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--proxy', 'http://localhost:8080']),
         expect.any(Object),
       );
@@ -539,15 +539,15 @@ describe('ProcessTransport', () => {
 
     it('should pass boolean flags through (sandbox, safeMode, insecure, worktree)', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         sandbox: true,
         safeMode: true,
         insecure: true,
@@ -557,7 +557,7 @@ describe('ProcessTransport', () => {
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining([
           '--sandbox',
           '--safe-mode',
@@ -570,22 +570,22 @@ describe('ProcessTransport', () => {
 
     it('should pass disabledSlashCommands through --disabled-slash-commands', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         disabledSlashCommands: ['cmd1', 'cmd2'],
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining(['--disabled-slash-commands', 'cmd1,cmd2']),
         expect.any(Object),
       );
@@ -593,22 +593,22 @@ describe('ProcessTransport', () => {
 
     it('should pass allowedMcpServerNames through --allowed-mcp-server-names', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         allowedMcpServerNames: ['server1', 'server2'],
       };
 
       new ProcessTransport(options);
 
       expect(mockSpawn).toHaveBeenCalledWith(
-        'qwen',
+        'hopcode',
         expect.arrayContaining([
           '--allowed-mcp-server-names',
           'server1,server2',
@@ -619,15 +619,15 @@ describe('ProcessTransport', () => {
 
     it('should not emit optional flags when options are unset', () => {
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const options: TransportOptions = {
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
       };
 
       new ProcessTransport(options);
@@ -838,10 +838,10 @@ describe('ProcessTransport', () => {
       vi.useFakeTimers();
 
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
 
       mockChildProcess.kill = vi.fn((signal?: NodeJS.Signals | number) => {
@@ -854,7 +854,7 @@ describe('ProcessTransport', () => {
 
       const abortController = new AbortController();
       new ProcessTransport({
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         abortController,
       });
 
@@ -871,10 +871,10 @@ describe('ProcessTransport', () => {
       vi.useFakeTimers();
 
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
 
       mockChildProcess.kill = vi.fn((signal?: NodeJS.Signals | number) => {
@@ -886,7 +886,7 @@ describe('ProcessTransport', () => {
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const transport = new ProcessTransport({
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
       });
 
       await transport.close();
@@ -902,16 +902,16 @@ describe('ProcessTransport', () => {
       vi.useFakeTimers();
 
       mockPrepareSpawnInfo.mockReturnValue({
-        command: 'qwen',
+        command: 'hopcode',
         args: [],
         type: 'native',
-        originalInput: 'qwen',
+        originalInput: 'hopcode',
       });
       mockSpawn.mockReturnValue(mockChildProcess);
 
       const abortController = new AbortController();
       new ProcessTransport({
-        pathToQwenExecutable: 'qwen',
+        pathTohopcodeexecutable: 'hopcode',
         abortController,
       });
 

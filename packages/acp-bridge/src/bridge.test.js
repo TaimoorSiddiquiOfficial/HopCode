@@ -102,7 +102,7 @@ describe('createAcpSessionBridge', () => {
             params: { serverName: 'aone' },
         });
         expect(handle.killed).toBe(true);
-        await expect(bridge.invokeWorkspaceCommand('qwen/control/workspace/other')).rejects.toBeInstanceOf(SessionNotFoundError);
+        await expect(bridge.invokeWorkspaceCommand('hopcode/control/workspace/other')).rejects.toBeInstanceOf(SessionNotFoundError);
         expect(channelFactory).toHaveBeenCalledTimes(1);
         await bridge.shutdown();
     });
@@ -662,13 +662,13 @@ describe('createAcpSessionBridge', () => {
                 events.push('inject');
                 const meta = request._meta ?? {};
                 const sanitizedMeta = { ...meta };
-                delete sanitizedMeta['qwen.telemetry.traceparent'];
-                delete sanitizedMeta['qwen.telemetry.tracestate'];
+                delete sanitizedMeta['hopcode.telemetry.traceparent'];
+                delete sanitizedMeta['hopcode.telemetry.tracestate'];
                 return {
                     ...request,
                     _meta: {
                         ...sanitizedMeta,
-                        'qwen.telemetry.traceparent': 'daemon-traceparent',
+                        'hopcode.telemetry.traceparent': 'daemon-traceparent',
                     },
                 };
             },
@@ -683,8 +683,8 @@ describe('createAcpSessionBridge', () => {
             prompt: [{ type: 'text', text: 'hello' }],
             _meta: {
                 keep: 'value',
-                'qwen.telemetry.traceparent': 'client-spoof',
-                'qwen.telemetry.tracestate': 'client-state',
+                'hopcode.telemetry.traceparent': 'client-spoof',
+                'hopcode.telemetry.tracestate': 'client-state',
             },
         }, undefined, { clientId: session.clientId });
         expect(operations).toEqual(expect.arrayContaining([
@@ -700,9 +700,9 @@ describe('createAcpSessionBridge', () => {
             },
         });
         expect(activeSpanAttributes).toContainEqual(expect.objectContaining({
-            'qwen-code.daemon.acp_startup.profile.version': 1,
-            'qwen-code.daemon.acp_startup.profile.complete': false,
-            'qwen-code.daemon.acp_startup.child.process_to_response_ms': 10,
+            'hopcode.daemon.acp_startup.profile.version': 1,
+            'hopcode.daemon.acp_startup.profile.complete': false,
+            'hopcode.daemon.acp_startup.child.process_to_response_ms': 10,
         }));
         expect(events.slice(-4)).toEqual([
             'run:true',
@@ -714,30 +714,30 @@ describe('createAcpSessionBridge', () => {
             keep: 'value',
             'hopcode.telemetry.traceparent': 'daemon-traceparent',
         });
-        expect(handle.agent.promptCalls[0]._meta).not.toHaveProperty('qwen.telemetry.tracestate');
+        expect(handle.agent.promptCalls[0]._meta).not.toHaveProperty('hopcode.telemetry.tracestate');
         expect(handle.agent.newSessionCalls[0]._meta).toMatchObject({
-            'qwen.telemetry.traceparent': 'daemon-traceparent',
+            'hopcode.telemetry.traceparent': 'daemon-traceparent',
         });
-        expect(handle.agent.newSessionCalls[0]._meta).not.toHaveProperty('qwen.telemetry.tracestate');
+        expect(handle.agent.newSessionCalls[0]._meta).not.toHaveProperty('hopcode.telemetry.tracestate');
         expect(session.clientId).toBeDefined();
         expect(spanAttributes.get('prompt.dispatch')).toMatchObject({
             'hopcode.client_id': session.clientId,
         });
-        const channelId = spanAttributes.get('channel.spawn')?.['qwen-code.daemon.acp_channel.id'];
+        const channelId = spanAttributes.get('channel.spawn')?.['hopcode.daemon.acp_channel.id'];
         expect(channelId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
         expect(spanAttributes.get('channel.initialize')).toMatchObject({
-            'qwen-code.daemon.acp_channel.id': channelId,
+            'hopcode.daemon.acp_channel.id': channelId,
         });
         expect(spanAttributes.get('channel.wait')).toMatchObject({
-            'qwen-code.daemon.channel.path': 'spawned_on_request',
+            'hopcode.daemon.channel.path': 'spawned_on_request',
         });
         expect(spanAttributes.get('session.new')).toMatchObject({
-            'qwen-code.daemon.acp_channel.id': channelId,
-            'qwen-code.daemon.channel.path': 'spawned_on_request',
+            'hopcode.daemon.acp_channel.id': channelId,
+            'hopcode.daemon.channel.path': 'spawned_on_request',
         });
         expect(eventAttributes.get('session.new.completed')).toMatchObject({
             'session.id': session.sessionId,
-            'qwen-code.daemon.acp_channel.id': channelId,
+            'hopcode.daemon.acp_channel.id': channelId,
         });
     });
     it('does not fail initialization when span enrichment throws', async () => {
@@ -805,7 +805,7 @@ describe('createAcpSessionBridge', () => {
         await bridge.spawnOrAttach({ workspaceCwd: WS_A });
         expect(spans
             .filter(({ operation }) => operation === 'channel.wait')
-            .map(({ attributes }) => attributes['qwen-code.daemon.channel.path'])).toEqual(['joined', 'reused']);
+            .map(({ attributes }) => attributes['hopcode.daemon.channel.path'])).toEqual(['joined', 'reused']);
         expect(spans.some(({ operation }) => operation === 'channel.preheat')).toBe(true);
         await bridge.shutdown();
     });
@@ -951,7 +951,7 @@ describe('createAcpSessionBridge', () => {
                                 tasks: [],
                             };
                         }
-                        if (method === 'qwen/status/session/lsp') {
+                        if (method === 'hopcode.status/session/lsp') {
                             return {
                                 v: 1,
                                 sessionId: params['sessionId'],
@@ -1071,7 +1071,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: (method, params) => {
-                        if (method === 'qwen/control/workspace/memory/remember') {
+                        if (method === 'hopcode/control/workspace/memory/remember') {
                             return {
                                 summary: 'saved',
                                 filesTouched: ['/mem/MEMORY.md'],
@@ -1099,7 +1099,7 @@ describe('createAcpSessionBridge', () => {
         expect(handles).toHaveLength(1);
         expect(handles[0]?.agent.extMethodCalls).toEqual([
             {
-                method: 'qwen/control/workspace/memory/remember',
+                method: 'hopcode/control/workspace/memory/remember',
                 params: {
                     cwd: WS_A,
                     content: 'Remember the workspace uses vitest.',
@@ -1120,7 +1120,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: (method) => {
-                        if (method === 'qwen/control/workspace/memory/remember') {
+                        if (method === 'hopcode/control/workspace/memory/remember') {
                             return {
                                 summary: 'saved',
                                 filesTouched: ['/mem/MEMORY.md'],
@@ -1148,7 +1148,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: (method, params) => {
-                        if (method === 'qwen/control/workspace/memory/forget') {
+                        if (method === 'hopcode/control/workspace/memory/forget') {
                             return {
                                 summary: 'forgot',
                                 removedEntries: [
@@ -1187,7 +1187,7 @@ describe('createAcpSessionBridge', () => {
         });
         expect(handles[0]?.agent.extMethodCalls).toEqual([
             {
-                method: 'qwen/control/workspace/memory/forget',
+                method: 'hopcode/control/workspace/memory/forget',
                 params: { cwd: WS_A, query: 'old preference' },
             },
         ]);
@@ -1204,7 +1204,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: (method) => {
-                        if (method === 'qwen/control/workspace/memory/forget') {
+                        if (method === 'hopcode/control/workspace/memory/forget') {
                             return {
                                 summary: 'forgot',
                                 removedEntries: [],
@@ -1233,7 +1233,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: (method) => {
-                        if (method === 'qwen/control/workspace/memory/forget') {
+                        if (method === 'hopcode/control/workspace/memory/forget') {
                             return {
                                 summary: 'forgot',
                                 removedEntries: [
@@ -1267,7 +1267,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: (method) => {
-                        if (method === 'qwen/control/workspace/memory/dream') {
+                        if (method === 'hopcode/control/workspace/memory/dream') {
                             return {
                                 summary: 'dreamed',
                                 touchedTopics: ['project'],
@@ -1289,7 +1289,7 @@ describe('createAcpSessionBridge', () => {
         });
         expect(handles[0]?.agent.extMethodCalls).toEqual([
             {
-                method: 'qwen/control/workspace/memory/dream',
+                method: 'hopcode/control/workspace/memory/dream',
                 params: { cwd: WS_A },
             },
         ]);
@@ -1425,7 +1425,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: (method) => {
-                        if (method === 'qwen/control/workspace/memory/dream') {
+                        if (method === 'hopcode/control/workspace/memory/dream') {
                             return {
                                 summary: 'dreamed',
                                 touchedTopics: ['project'],
@@ -1452,7 +1452,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: async (method) => {
-                        if (method === 'qwen/control/workspace/memory/remember') {
+                        if (method === 'hopcode/control/workspace/memory/remember') {
                             await rememberRelease.promise;
                             return {
                                 summary: 'saved',
@@ -1460,7 +1460,7 @@ describe('createAcpSessionBridge', () => {
                                 touchedScopes: ['project'],
                             };
                         }
-                        if (method === 'qwen/control/workspace/memory/remember/availability') {
+                        if (method === 'hopcode/control/workspace/memory/remember/availability') {
                             return { available: true };
                         }
                         throw new Error(`unexpected extMethod ${method}`);
@@ -1495,7 +1495,7 @@ describe('createAcpSessionBridge', () => {
                         return { sessionId: `sess:${params.cwd}` };
                     },
                     extMethodImpl: (method) => {
-                        if (method === 'qwen/control/workspace/memory/remember/availability') {
+                        if (method === 'hopcode/control/workspace/memory/remember/availability') {
                             return { available: true };
                         }
                         throw new Error(`unexpected extMethod ${method}`);
@@ -1522,7 +1522,7 @@ describe('createAcpSessionBridge', () => {
             channelFactory: async () => {
                 const h = makeChannel({
                     extMethodImpl: (method, params) => {
-                        if (method === 'qwen/control/workspace/extensions/refresh' &&
+                        if (method === 'hopcode/control/workspace/extensions/refresh' &&
                             String(params['sessionId']).endsWith('#2')) {
                             throw new Error('refresh failed');
                         }
@@ -1553,11 +1553,11 @@ describe('createAcpSessionBridge', () => {
         expect(result).toEqual({ refreshed: 1, failed: 1 });
         expect(handles[0]?.agent.extMethodCalls).toEqual([
             {
-                method: 'qwen/control/workspace/extensions/refresh',
+                method: 'hopcode/control/workspace/extensions/refresh',
                 params: { sessionId: first.sessionId },
             },
             {
-                method: 'qwen/control/workspace/extensions/refresh',
+                method: 'hopcode/control/workspace/extensions/refresh',
                 params: { sessionId: second.sessionId },
             },
         ]);
@@ -1644,7 +1644,7 @@ describe('createAcpSessionBridge', () => {
             refreshed: 0,
             failed: 0,
         });
-        expect(handles[0]?.agent.extMethodCalls.filter((call) => call.method === 'qwen/control/workspace/extensions/refresh')).toEqual([]);
+        expect(handles[0]?.agent.extMethodCalls.filter((call) => call.method === 'hopcode/control/workspace/extensions/refresh')).toEqual([]);
         releaseKill?.();
         await killPromise;
         await bridge.shutdown();
@@ -1935,13 +1935,13 @@ describe('createAcpSessionBridge', () => {
         const bridge = makeBridge({
             channelFactory: async () => makeChannel({
                 extMethodImpl: (method, params) => {
-                    if (method === 'qwen/control/session/artifacts/persist') {
+                    if (method === 'hopcode/control/session/artifacts/persist') {
                         if (params['kind'] === 'snapshot') {
                             persistedSnapshots.push(params['payload']);
                         }
                         return {};
                     }
-                    expect(method).toBe('qwen/control/session/rewind');
+                    expect(method).toBe('hopcode/control/session/rewind');
                     return {
                         targetTurnIndex: 0,
                         filesChanged: [],
@@ -1995,13 +1995,13 @@ describe('createAcpSessionBridge', () => {
         const bridge = makeBridge({
             channelFactory: async () => makeChannel({
                 extMethodImpl: (method, params) => {
-                    if (method === 'qwen/control/session/artifacts/persist') {
+                    if (method === 'hopcode/control/session/artifacts/persist') {
                         if (params['kind'] === 'snapshot') {
                             persistedSnapshots.push(params['payload']);
                         }
                         return {};
                     }
-                    expect(method).toBe('qwen/control/session/rewind');
+                    expect(method).toBe('hopcode/control/session/rewind');
                     return {
                         targetTurnIndex: 0,
                         filesChanged: [],
@@ -2033,13 +2033,13 @@ describe('createAcpSessionBridge', () => {
         const bridge = makeBridge({
             channelFactory: async () => makeChannel({
                 extMethodImpl: (method, params) => {
-                    if (method === 'qwen/control/session/artifacts/persist') {
+                    if (method === 'hopcode/control/session/artifacts/persist') {
                         if (params['kind'] === 'snapshot') {
                             persistedSnapshots.push(params['payload']);
                         }
                         return {};
                     }
-                    expect(method).toBe('qwen/control/session/rewind');
+                    expect(method).toBe('hopcode/control/session/rewind');
                     return {
                         targetTurnIndex: 0,
                         filesChanged: [],
@@ -2075,13 +2075,13 @@ describe('createAcpSessionBridge', () => {
         const bridge = makeBridge({
             channelFactory: async () => makeChannel({
                 extMethodImpl: (method, params) => {
-                    if (method === 'qwen/control/session/artifacts/persist') {
+                    if (method === 'hopcode/control/session/artifacts/persist') {
                         if (params['kind'] === 'snapshot') {
                             persistedSnapshots.push(params['payload']);
                         }
                         return {};
                     }
-                    expect(method).toBe('qwen/control/session/rewind');
+                    expect(method).toBe('hopcode/control/session/rewind');
                     return {
                         targetTurnIndex: 0,
                         filesChanged: [],
@@ -2201,13 +2201,13 @@ describe('createAcpSessionBridge', () => {
         const bridge = makeBridge({
             channelFactory: async () => makeChannel({
                 extMethodImpl: (method, params) => {
-                    if (method === 'qwen/control/session/artifacts/persist') {
+                    if (method === 'hopcode/control/session/artifacts/persist') {
                         if (params['kind'] === 'snapshot') {
                             throw new Error('disk full');
                         }
                         return {};
                     }
-                    expect(method).toBe('qwen/control/session/rewind');
+                    expect(method).toBe('hopcode/control/session/rewind');
                     return {
                         targetTurnIndex: 0,
                         filesChanged: [],
@@ -2519,7 +2519,7 @@ describe('createAcpSessionBridge', () => {
             const { clientStream, agentStream } = createInMemoryChannel();
             const fakeAgent = new FakeAgent({
                 loadSessionImpl: async (p) => {
-                    void capturedConn.extNotification('qwen/notify/session/mcp-budget-event', {
+                    void capturedConn.extNotification('hopcode/notify/session/mcp-budget-event', {
                         v: 1,
                         sessionId: p.sessionId,
                         kind: 'budget_warning',
@@ -3914,7 +3914,7 @@ describe('createAcpSessionBridge', () => {
                 retry: true,
             });
             expect(handle.agent.promptCalls[0]).not.toHaveProperty('retry');
-            expect(handle.agent.promptCalls[0]?._meta?.['qwen.daemon.retry']).toBe(undefined);
+            expect(handle.agent.promptCalls[0]?._meta?.['hopcode.daemon.retry']).toBe(undefined);
             await bridge.shutdown();
         });
         it('strips client-spoofed retry metadata without a turn_error', async () => {
@@ -3924,9 +3924,9 @@ describe('createAcpSessionBridge', () => {
             await bridge.sendPrompt(session.sessionId, {
                 sessionId: session.sessionId,
                 prompt: [{ type: 'text', text: 'spoof retry meta' }],
-                _meta: { 'qwen.daemon.retry': true },
+                _meta: { 'hopcode.daemon.retry': true },
             });
-            expect(handle.agent.promptCalls[0]?._meta?.['qwen.daemon.retry']).toBe(undefined);
+            expect(handle.agent.promptCalls[0]?._meta?.['hopcode.daemon.retry']).toBe(undefined);
             await bridge.shutdown();
         });
         it('strips a client-spoofed continue meta key (only continueSession may set it)', async () => {
@@ -3936,9 +3936,9 @@ describe('createAcpSessionBridge', () => {
             await bridge.sendPrompt(session.sessionId, {
                 sessionId: session.sessionId,
                 prompt: [{ type: 'text', text: 'spoof continue' }],
-                _meta: { 'qwen.daemon.continueLastTurn': true },
+                _meta: { 'hopcode.daemon.continueLastTurn': true },
             });
-            expect(handle.agent.promptCalls[0]?._meta?.['qwen.daemon.continueLastTurn']).toBe(undefined);
+            expect(handle.agent.promptCalls[0]?._meta?.['hopcode.daemon.continueLastTurn']).toBe(undefined);
             await bridge.shutdown();
         });
         it('strips both spoofed retry and continue meta keys from one prompt', async () => {
@@ -3949,12 +3949,12 @@ describe('createAcpSessionBridge', () => {
                 sessionId: session.sessionId,
                 prompt: [{ type: 'text', text: 'spoof both' }],
                 _meta: {
-                    'qwen.daemon.retry': true,
-                    'qwen.daemon.continueLastTurn': true,
+                    'hopcode.daemon.retry': true,
+                    'hopcode.daemon.continueLastTurn': true,
                 },
             });
-            expect(handle.agent.promptCalls[0]?._meta?.['qwen.daemon.retry']).toBe(undefined);
-            expect(handle.agent.promptCalls[0]?._meta?.['qwen.daemon.continueLastTurn']).toBe(undefined);
+            expect(handle.agent.promptCalls[0]?._meta?.['hopcode.daemon.retry']).toBe(undefined);
+            expect(handle.agent.promptCalls[0]?._meta?.['hopcode.daemon.continueLastTurn']).toBe(undefined);
             await bridge.shutdown();
         });
         it('rejects continueSession for a nonexistent session', async () => {
@@ -3969,7 +3969,7 @@ describe('createAcpSessionBridge', () => {
                     throw new Error('continuation turn blew up');
                 },
                 extMethodImpl: (method) => {
-                    if (method === 'qwen/control/session/continue') {
+                    if (method === 'hopcode/control/session/continue') {
                         return { accepted: true, interruption: 'interrupted_prompt' };
                     }
                     throw new Error(`unexpected extMethod ${method}`);
@@ -3991,7 +3991,7 @@ describe('createAcpSessionBridge', () => {
             const handle = makeChannel({
                 promptImpl: () => ({ stopReason: 'end_turn' }),
                 extMethodImpl: (method) => {
-                    if (method === 'qwen/control/session/continue') {
+                    if (method === 'hopcode/control/session/continue') {
                         return { accepted: true, interruption: 'interrupted_prompt' };
                     }
                     throw new Error(`unexpected extMethod ${method}`);
@@ -4016,14 +4016,14 @@ describe('createAcpSessionBridge', () => {
                 expect(handle.agent.promptCalls).toHaveLength(1);
             });
             expect(handle.agent.promptCalls[0]?.prompt).toEqual([]);
-            expect(handle.agent.promptCalls[0]?._meta?.['qwen.daemon.continueLastTurn']).toBe(true);
+            expect(handle.agent.promptCalls[0]?._meta?.['hopcode.daemon.continueLastTurn']).toBe(true);
             await bridge.shutdown();
         });
         it('does not dispatch a continuation turn when continueSession is rejected', async () => {
             const handle = makeChannel({
                 promptImpl: () => ({ stopReason: 'end_turn' }),
                 extMethodImpl: (method) => {
-                    if (method === 'qwen/control/session/continue') {
+                    if (method === 'hopcode/control/session/continue') {
                         return { accepted: false, interruption: 'none' };
                     }
                     throw new Error(`unexpected extMethod ${method}`);
@@ -4043,7 +4043,7 @@ describe('createAcpSessionBridge', () => {
         it('rejects continueSession with an unregistered client id before running the pre-check', async () => {
             const handle = makeChannel({
                 extMethodImpl: (method) => {
-                    if (method === 'qwen/control/session/continue') {
+                    if (method === 'hopcode/control/session/continue') {
                         return { accepted: true, interruption: 'interrupted_prompt' };
                     }
                     throw new Error(`unexpected extMethod ${method}`);
@@ -4079,7 +4079,7 @@ describe('createAcpSessionBridge', () => {
                     return { stopReason: 'end_turn' };
                 },
                 extMethodImpl: (method) => {
-                    if (method === 'qwen/control/session/continue') {
+                    if (method === 'hopcode/control/session/continue') {
                         return { accepted: true, interruption: 'interrupted_prompt' };
                     }
                     throw new Error(`unexpected extMethod ${method}`);
@@ -4153,14 +4153,14 @@ describe('createAcpSessionBridge', () => {
                 prompt: [{ type: 'text', text: 'retry' }],
                 retry: true,
             });
-            expect(handle.agent.promptCalls[1]?._meta).toHaveProperty('qwen.daemon.retry', true);
+            expect(handle.agent.promptCalls[1]?._meta).toHaveProperty('hopcode.daemon.retry', true);
             await bridge.sendPrompt(session.sessionId, {
                 sessionId: session.sessionId,
                 prompt: [{ type: 'text', text: 'second spoof' }],
                 retry: true,
             });
             expect(handle.agent.promptCalls[2]).not.toHaveProperty('retry');
-            expect(handle.agent.promptCalls[2]?._meta?.['qwen.daemon.retry']).toBe(undefined);
+            expect(handle.agent.promptCalls[2]?._meta?.['hopcode.daemon.retry']).toBe(undefined);
             abort.abort();
             await bridge.shutdown();
         });
@@ -4861,7 +4861,7 @@ describe('createAcpSessionBridge', () => {
         it('publishes session_branched only on the new session stream', async () => {
             const factory = async () => makeChannel({
                 extMethodImpl: async (method) => {
-                    if (method !== 'qwen/control/session/branch')
+                    if (method !== 'hopcode/control/session/branch')
                         return {};
                     return { newSessionId: 'branch-1', title: 'Branch 1' };
                 },
@@ -4960,7 +4960,7 @@ describe('createAcpSessionBridge', () => {
             });
             await vi.waitFor(() => expect(releasePrompt).toBeDefined());
             await expect(bridge.launchSessionForkAgent(session.sessionId, 'review this')).rejects.toBeInstanceOf(SessionBusyError);
-            expect(handle.agent.extMethodCalls.some((call) => call.method === 'qwen/control/session/fork_agent')).toBe(false);
+            expect(handle.agent.extMethodCalls.some((call) => call.method === 'hopcode/control/session/fork_agent')).toBe(false);
             releasePrompt();
             await expect(active).resolves.toEqual({ stopReason: 'end_turn' });
             await bridge.shutdown();
@@ -6130,17 +6130,17 @@ describe('createAcpSessionBridge', () => {
         it('applies modelServiceId via unstable_setSessionModel after newSession', async () => {
             const { bridge, setModelCalls } = setup({
                 setModelResult: {
-                    _meta: { qwenModelSwitch: { modelId: 'qwen3-coder-canonical' } },
+                    _meta: { hopcodeModelSwitch: { modelId: 'qwen3-coder-canonical' } },
                 },
             });
             const session = await bridge.spawnOrAttach({
                 workspaceCwd: WS_A,
-                modelServiceId: 'qwen-route:v1:abcdefghijklmnop',
+                modelServiceId: 'hopcode-route:v1:abcdefghijklmnop',
             });
             expect(session.attached).toBe(false);
             expect(setModelCalls).toHaveLength(1);
             expect(setModelCalls[0]?.sessionId).toBe(session.sessionId);
-            expect(setModelCalls[0]?.modelId).toBe('qwen-route:v1:abcdefghijklmnop');
+            expect(setModelCalls[0]?.modelId).toBe('hopcode-route:v1:abcdefghijklmnop');
             const abort = new AbortController();
             const iter = bridge.subscribeEvents(session.sessionId, {
                 signal: abort.signal,
@@ -6151,7 +6151,7 @@ describe('createAcpSessionBridge', () => {
             expect(switched.value?.type).toBe('model_switched');
             expect(switched.value?.data).toEqual({
                 sessionId: session.sessionId,
-                modelId: 'qwen-route:v1:abcdefghijklmnop',
+                modelId: 'hopcode-route:v1:abcdefghijklmnop',
             });
             const settingsChanged = await it.next();
             expect(settingsChanged.value?.type).toBe('settings_changed');
@@ -7407,7 +7407,7 @@ describe('createAcpSessionBridge', () => {
         });
         it('publishes a model_switched event on success', async () => {
             const { bridge, session } = await setup({
-                _meta: { qwenModelSwitch: { modelId: 'qwen3-coder' } },
+                _meta: { hopcodeModelSwitch: { modelId: 'qwen3-coder' } },
             });
             const abort = new AbortController();
             const iter = bridge.subscribeEvents(session.sessionId, {
@@ -7415,14 +7415,14 @@ describe('createAcpSessionBridge', () => {
             });
             await bridge.setSessionModel(session.sessionId, {
                 sessionId: session.sessionId,
-                modelId: 'qwen-route:v1:opaque',
+                modelId: 'hopcode-route:v1:opaque',
             });
             const it = iter[Symbol.asyncIterator]();
             const next = await it.next();
             expect(next.value?.type).toBe('model_switched');
             expect(next.value?.data).toEqual({
                 sessionId: session.sessionId,
-                modelId: 'qwen-route:v1:opaque',
+                modelId: 'hopcode-route:v1:opaque',
             });
             const settingsChanged = await it.next();
             expect(settingsChanged.value?.type).toBe('settings_changed');
@@ -7605,7 +7605,7 @@ describe('createAcpSessionBridge', () => {
                 const { clientStream, agentStream } = createInMemoryChannel();
                 const agent = new FakeAgent({
                     extMethodImpl: (method) => {
-                        if (method === 'qwen/control/session/approval_mode') {
+                        if (method === 'hopcode/control/session/approval_mode') {
                             return Promise.reject(Object.assign(new Error('trust gate rejected'), {
                                 data: { errorKind: 'trust_gate' },
                             }));
@@ -7633,7 +7633,7 @@ describe('createAcpSessionBridge', () => {
                     const { clientStream, agentStream } = createInMemoryChannel();
                     const agent = new FakeAgent({
                         extMethodImpl: (method) => {
-                            if (method !== 'qwen/control/session/approval_mode') {
+                            if (method !== 'hopcode/control/session/approval_mode') {
                                 return Promise.resolve({});
                             }
                             return new Promise((_resolve, reject) => {
@@ -8683,7 +8683,7 @@ describe('createAcpSessionBridge', () => {
             await vi.waitFor(() => {
                 expect(releasePrompt).toBeTypeOf('function');
             });
-            void capturedConn.extNotification('qwen/notify/session/terminal-sequence', {
+            void capturedConn.extNotification('hopcode/notify/session/terminal-sequence', {
                 v: 1,
                 sessionId: session.sessionId,
                 terminalSequence: '\x07',
@@ -9458,7 +9458,7 @@ describe('createAcpSessionBridge', () => {
                 channelFactory: recordingFactory((c) => (capturedConn = c)),
             });
             const session = await bridge.spawnOrAttach({ workspaceCwd: WS_A });
-            void capturedConn.extNotification('qwen/notify/session/recording-degraded', {
+            void capturedConn.extNotification('hopcode/notify/session/recording-degraded', {
                 v: 1,
                 sessionId: session.sessionId,
                 reason: 'write_failed',
@@ -9501,7 +9501,7 @@ describe('createAcpSessionBridge', () => {
                 { v: 1, sessionId: '', reason: 'write_failed' },
                 { v: 1, sessionId: session.sessionId, reason: 'disk_full' },
             ]) {
-                void capturedConn.extNotification('qwen/notify/session/recording-degraded', params);
+                void capturedConn.extNotification('hopcode/notify/session/recording-degraded', params);
             }
             await new Promise((resolve) => setTimeout(resolve, 20));
             const abort = new AbortController();
@@ -9541,7 +9541,7 @@ describe('createAcpSessionBridge', () => {
             });
             await bridge.spawnOrAttach({ workspaceCwd: WS_A });
             const futureSessionId = `recording-buffer:${WS_A}#2`;
-            void capturedConn.extNotification('qwen/notify/session/recording-degraded', { v: 1, sessionId: futureSessionId, reason: 'write_failed' });
+            void capturedConn.extNotification('hopcode/notify/session/recording-degraded', { v: 1, sessionId: futureSessionId, reason: 'write_failed' });
             await new Promise((resolve) => setTimeout(resolve, 20));
             const target = await bridge.spawnOrAttach({ workspaceCwd: WS_A });
             expect(target.sessionId).toBe(futureSessionId);
@@ -10005,7 +10005,7 @@ describe('createAcpSessionBridge', () => {
             const bridge = makeBridge({
                 channelFactory: async () => makeChannel({
                     extMethodImpl: (method) => {
-                        if (method !== 'qwen/control/session/branch')
+                        if (method !== 'hopcode/control/session/branch')
                             return {};
                         branchExtMethodSawReservation =
                             contexts.at(-1)?.operation === 'branch';
@@ -10044,7 +10044,7 @@ describe('createAcpSessionBridge', () => {
             const bridge = makeBridge({
                 channelFactory: async () => makeChannel({
                     extMethodImpl: (method) => {
-                        if (method === 'qwen/control/session/branch') {
+                        if (method === 'hopcode/control/session/branch') {
                             throw new Error('branch failed');
                         }
                         return {};
@@ -10182,7 +10182,7 @@ describe('createAcpSessionBridge', () => {
             let failClose = true;
             const handle = makeChannel({
                 extMethodImpl: (method) => {
-                    if (method === 'qwen/control/session/close' && failClose) {
+                    if (method === 'hopcode/control/session/close' && failClose) {
                         failClose = false;
                         throw new Error('flush failed');
                     }
@@ -10198,7 +10198,7 @@ describe('createAcpSessionBridge', () => {
             })).rejects.toThrow();
             expect(handle.agent.extMethodCalls).toHaveLength(1);
             expect(handle.agent.extMethodCalls[0]).toEqual({
-                method: 'qwen/control/session/close',
+                method: 'hopcode/control/session/close',
                 params: { sessionId: session.sessionId, requireFlush: true },
             });
             expect(bridge.sessionCount).toBe(1);
@@ -10979,7 +10979,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
                         return { stopReason: 'end_turn' };
                     },
                     extMethodImpl: (method, params) => {
-                        if (method === 'qwen/control/session/approval_mode') {
+                        if (method === 'hopcode/control/session/approval_mode') {
                             return Promise.resolve({
                                 previous: 'default',
                                 current: params.mode,

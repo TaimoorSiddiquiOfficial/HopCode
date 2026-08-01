@@ -29,7 +29,7 @@ import { ensureAuthenticated, gh, ghApiAll, setGhHost } from './lib/gh.js';
  * "Already discussed" section — otherwise a stale table of suggestions would
  * read as settled discussion and suppress still-open findings.
  */
-export const SUMMARY_MARKER = '<!-- qwen-review-suggestion-summary -->';
+export const SUMMARY_MARKER = '<!-- hopcode-review-suggestion-summary -->';
 
 export interface PrMetadata {
   title: string;
@@ -404,7 +404,7 @@ function findRootId(startId: number, byId: Map<number, RawComment>): number {
 }
 
 /**
- * The exact "no issues found, LGTM" template the qwen-review pipeline
+ * The exact "no issues found, LGTM" template the hopcode-review pipeline
  * auto-emits, optionally followed by its model footer — and NOTHING else.
  * Anchored to the end of the body on purpose: a legacy malformed review can
  * OPEN with the LGTM line and carry a relocated `**[Critical]**` blocker
@@ -412,14 +412,14 @@ function findRootId(startId: number, byId: Map<number, RawComment>): number {
  * file, letting the re-check approve past the blocker.
  */
 const CANONICAL_LGTM_RE =
-  /^No issues found\.?\s*LGTM!?\s*(?:✅\s*)?(?:_— [^\n]{0,200} via Qwen Code \/review_\s*)?$/i;
+  /^No issues found\.?\s*LGTM!?\s*(?:✅\s*)?(?:_— [^\n]{0,200} via HopCode \/review_\s*)?$/i;
 
 /**
  * Should this review-level summary be shown to agents?
  *
  * Filters out empty bodies (`COMMENTED` reviews submitted alongside inline
  * comments often have body=""), and the canonical "no issues found, LGTM"
- * template the qwen-review pipeline auto-emits — those carry no review
+ * template the hopcode-review pipeline auto-emits — those carry no review
  * content beyond their state, which the agent doesn't need re-told. Only
  * the whole-body template is filtered; any body with more in it is shown.
  */

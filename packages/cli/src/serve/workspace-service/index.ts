@@ -552,7 +552,7 @@ export function createDaemonWorkspaceService(
       const key = `permissions.${request.ruleType}`;
       try {
         const result = await invokeWorkspaceCommand(
-          'qwen/permissions/setRules',
+          'hopcode/permissions/setRules',
           {
             cwd: boundWorkspace,
             scope: request.scope,

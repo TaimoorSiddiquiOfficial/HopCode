@@ -2,33 +2,33 @@
 
 Cross-platform background computer-use driver for AI agents. Speaks MCP over stdio; drives native apps without stealing focus.
 
-Based on [trycua/cua](https://github.com/trycua/cua) with Qwen-specific extensions: relative-coordinate normalization (0–1000 space for Qwen-VL models), vendored patches, and qwen-code integration.
+Based on [trycua/cua](https://github.com/trycua/cua) with Qwen-specific extensions: relative-coordinate normalization (0–1000 space for Qwen-VL models), vendored patches, and hopcode integration.
 
 ## Installation
 
 ### macOS / Linux
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/QwenLM/qwen-code/main/packages/cua-driver/scripts/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/QwenLM/hopcode/main/packages/cua-driver/scripts/install.sh)"
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/QwenLM/qwen-code/main/packages/cua-driver/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/QwenLM/hopcode/main/packages/cua-driver/scripts/install.ps1 | iex
 ```
 
 ### Pin a specific version
 
 ```bash
 # macOS / Linux
-CUA_DRIVER_RS_VERSION=0.7.2 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/QwenLM/qwen-code/main/packages/cua-driver/scripts/install.sh)"
+CUA_DRIVER_RS_VERSION=0.7.2 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/QwenLM/hopcode/main/packages/cua-driver/scripts/install.sh)"
 ```
 
 ```powershell
 # Windows
 $env:CUA_DRIVER_RS_VERSION = "0.7.2"
-irm https://raw.githubusercontent.com/QwenLM/qwen-code/main/packages/cua-driver/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/QwenLM/hopcode/main/packages/cua-driver/scripts/install.ps1 | iex
 ```
 
 > **Note:** After installation, restart your terminal or IDE for PATH changes to take effect.
@@ -36,7 +36,7 @@ irm https://raw.githubusercontent.com/QwenLM/qwen-code/main/packages/cua-driver/
 ## Verify installation
 
 ```bash
-qwen-cua-driver --version
+hopcode-cua-driver --version
 # Expected: cua-driver 0.7.2
 ```
 
@@ -46,20 +46,20 @@ macOS requires Accessibility and Screen Recording permissions:
 
 ```bash
 # Grant permissions (launches the driver so the dialog attributes correctly)
-qwen-cua-driver permissions grant
+hopcode-cua-driver permissions grant
 
 # Check status
-qwen-cua-driver permissions status
+hopcode-cua-driver permissions status
 ```
 
 ### Quick functional test
 
 ```bash
 # List running apps
-qwen-cua-driver call list_apps '{}'
+hopcode-cua-driver call list_apps '{}'
 
 # List available tools
-qwen-cua-driver list-tools
+hopcode-cua-driver list-tools
 ```
 
 ## MCP Configuration
@@ -67,13 +67,13 @@ qwen-cua-driver list-tools
 ### HopCode
 
 ```bash
-qwen mcp add --transport stdio cua-driver -- qwen-cua-driver mcp
+qwen mcp add --transport stdio cua-driver -- hopcode-cua-driver mcp
 ```
 
 With relative-coordinate normalization (recommended for Qwen-VL models):
 
 ```bash
-qwen mcp add-json --scope user cua-computer-use '{"command":"qwen-cua-driver","args":["mcp"],"env":{"CUA_DRIVER_RS_COORDINATE_SPACE":"1"}}'
+qwen mcp add-json --scope user cua-computer-use '{"command":"hopcode-cua-driver","args":["mcp"],"env":{"CUA_DRIVER_RS_COORDINATE_SPACE":"1"}}'
 ```
 
 Or add to `.hopcode/settings.json`:
@@ -82,7 +82,7 @@ Or add to `.hopcode/settings.json`:
 {
   "mcpServers": {
     "cua-computer-use": {
-      "command": "qwen-cua-driver",
+      "command": "hopcode-cua-driver",
       "args": ["mcp"],
       "env": {
         "CUA_DRIVER_RS_COORDINATE_SPACE": "1"
@@ -108,25 +108,25 @@ Or add to `.hopcode/settings.json`:
 Standard registration:
 
 ```bash
-claude mcp add --transport stdio cua-driver -- qwen-cua-driver mcp
+claude mcp add --transport stdio cua-driver -- hopcode-cua-driver mcp
 ```
 
 Computer-use compatibility mode (grounds Claude Code's vision flow on cua-driver screenshots):
 
 ```bash
-claude mcp add --transport stdio cua-computer-use -- qwen-cua-driver mcp --claude-code-computer-use-compat
+claude mcp add --transport stdio cua-computer-use -- hopcode-cua-driver mcp --claude-code-computer-use-compat
 ```
 
 Or via JSON (recommended for Windows where arg parsing can lose flags):
 
 ```bash
-claude mcp add-json --scope user cua-computer-use '{"command":"qwen-cua-driver","args":["mcp","--claude-code-computer-use-compat"]}'
+claude mcp add-json --scope user cua-computer-use '{"command":"hopcode-cua-driver","args":["mcp","--claude-code-computer-use-compat"]}'
 ```
 
 ### Codex (OpenAI)
 
 ```bash
-codex mcp add cua-driver -- qwen-cua-driver mcp
+codex mcp add cua-driver -- hopcode-cua-driver mcp
 ```
 
 ### Other clients (Cursor, OpenCode, Hermes, etc.)
@@ -134,15 +134,15 @@ codex mcp add cua-driver -- qwen-cua-driver mcp
 Generate a client-specific config snippet:
 
 ```bash
-qwen-cua-driver mcp-config --client cursor
-qwen-cua-driver mcp-config --client opencode
-qwen-cua-driver mcp-config --client hermes
+hopcode-cua-driver mcp-config --client cursor
+hopcode-cua-driver mcp-config --client opencode
+hopcode-cua-driver mcp-config --client hermes
 ```
 
 Or get the generic `mcpServers` JSON shape:
 
 ```bash
-qwen-cua-driver mcp-config
+hopcode-cua-driver mcp-config
 ```
 
 ## Relative-coordinate mode
@@ -168,13 +168,13 @@ When enabled:
 ### macOS / Linux
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/QwenLM/qwen-code/main/packages/cua-driver/scripts/uninstall.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/QwenLM/hopcode/main/packages/cua-driver/scripts/uninstall.sh)"
 ```
 
 ### Windows
 
 ```powershell
-irm https://raw.githubusercontent.com/QwenLM/qwen-code/main/packages/cua-driver/scripts/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/QwenLM/hopcode/main/packages/cua-driver/scripts/uninstall.ps1 | iex
 ```
 
 ## Platform support

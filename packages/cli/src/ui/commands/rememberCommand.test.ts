@@ -63,7 +63,7 @@ describe('rememberCommand', () => {
       type: 'submit_prompt',
       content: expect.stringContaining('some fact'),
     });
-    expect((result as { content: string }).content).toContain('QWEN.md');
+    expect((result as { content: string }).content).toContain('HOPCODE.md');
   });
 
   it('declares acp in supportedModes', () => {

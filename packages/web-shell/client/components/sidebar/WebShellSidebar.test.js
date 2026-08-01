@@ -24,7 +24,7 @@ const { mockConnection, mockUseSessions, mockActive, mockArchived, renameSession
             status: 'connected',
             sessionId: null,
             workspaceCwd: '/tmp/project',
-            capabilities: { qwenCodeVersion: '1.2.3', features: [] },
+            capabilities: { hopcodeversion: '1.2.3', features: [] },
         },
         mockUseSessions,
         mockActive,
@@ -82,7 +82,7 @@ function renderSidebar(collapsed, overrides = {}) {
 beforeEach(() => {
     mockUseSessions.mockClear();
     mockConnection.sessionId = null;
-    mockConnection.capabilities = { qwenCodeVersion: '1.2.3', features: [] };
+    mockConnection.capabilities = { hopcodeversion: '1.2.3', features: [] };
     for (const store of [mockActive, mockArchived]) {
         store.sessions = [];
         store.loading = false;
@@ -122,14 +122,14 @@ afterEach(() => {
     vi.unstubAllGlobals();
 });
 describe('WebShellSidebar — version footer', () => {
-    it('shows the qwen-code version in the footer when expanded', () => {
+    it('shows the hopcode version in the footer when expanded', () => {
         const { container } = renderSidebar(false);
         const badge = container.querySelector('[title="HopCode v1.2.3"]');
         expect(badge).not.toBeNull();
         expect(badge?.textContent).toBe('v1.2.3');
     });
     it('renders a non-semver fallback (e.g. "unknown") without a bogus "v" prefix', () => {
-        mockConnection.capabilities = { qwenCodeVersion: 'unknown' };
+        mockConnection.capabilities = { hopcodeversion: 'unknown' };
         const { container } = renderSidebar(false);
         const badge = container.querySelector('[title="HopCode unknown"]');
         expect(badge).not.toBeNull();
@@ -196,7 +196,7 @@ describe('WebShellSidebar — session organization', () => {
             container.remove();
         }
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockWorkspaceActions.listSessionGroups.mockReturnValue(new Promise(() => undefined));
@@ -212,7 +212,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('creates session groups from an in-app dialog form', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockWorkspaceActions.createSessionGroup.mockResolvedValue({
@@ -276,7 +276,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('uses a themed group menu and assigns the selected group', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockWorkspaceActions.listSessionGroups.mockResolvedValue({
@@ -342,7 +342,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('offers the six color quick-picks and assigns the chosen color', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockWorkspaceActions.updateSessionOrganization.mockResolvedValue({
@@ -391,7 +391,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('groups sessions into color sections ahead of the recent bucket', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockActive.sessions = [
@@ -412,7 +412,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('renders organized sessions as collapsible group sections', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockWorkspaceActions.listSessionGroups.mockResolvedValue({
@@ -456,7 +456,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('reloads sessions after deleting a group', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockWorkspaceActions.listSessionGroups.mockResolvedValue({
@@ -501,7 +501,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('toggles pin state from the session action button', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockWorkspaceActions.updateSessionOrganization.mockResolvedValue({
@@ -532,7 +532,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('does not drop organization actions for another session while one is busy', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         let resolveFirst;
@@ -580,7 +580,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('keeps new session available while a session organization update is busy', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         let resolveUpdate;
@@ -618,7 +618,7 @@ describe('WebShellSidebar — session organization', () => {
     });
     it('does not report organization failure when post-mutation reload fails', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_organization'],
         };
         mockWorkspaceActions.updateSessionOrganization.mockResolvedValueOnce({
@@ -653,7 +653,7 @@ describe('WebShellSidebar — session export', () => {
     });
     it('downloads an HTML export when export action is clicked', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_export'],
         };
         mockActive.sessions = [makeSession('session-1')];
@@ -681,7 +681,7 @@ describe('WebShellSidebar — session export', () => {
     });
     it('does not block switching sessions while an export is running', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_export'],
         };
         mockActive.sessions = [makeSession('session-1'), makeSession('session-2')];
@@ -718,7 +718,7 @@ describe('WebShellSidebar — session export', () => {
     });
     it('reports export failures through onError', async () => {
         mockConnection.capabilities = {
-            qwenCodeVersion: '1.2.3',
+            hopcodeversion: '1.2.3',
             features: ['session_export'],
         };
         mockActive.sessions = [makeSession('session-1')];

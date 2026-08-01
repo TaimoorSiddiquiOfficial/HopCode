@@ -271,7 +271,7 @@ describe('startupPrefetch', () => {
     mockGetInstallationInfo.mockReturnValue({
       updateCommand: 'standalone update',
       isStandalone: true,
-      standaloneDir: '/tmp/qwen-code',
+      standaloneDir: '/tmp/hopcode',
     });
 
     startPostRenderPrefetches(config, makeSettings());
@@ -320,7 +320,7 @@ describe('startupPrefetch', () => {
     expect(mockHandleAutoUpdate).not.toHaveBeenCalled();
     expect(mockUpdateEventEmit).toHaveBeenCalledWith('update-info', {
       message:
-        'Update available\nUpdate Qwen Code on the host, then restart the sandbox.',
+        'Update available\nUpdate HopCode on the host, then restart the sandbox.',
     });
   });
 

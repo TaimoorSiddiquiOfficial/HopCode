@@ -153,7 +153,7 @@ function replayContext(
       const meta = isObjectRecord(record['_meta']) ? record['_meta'] : {};
       updates.push({
         ...record,
-        _meta: { ...meta, 'qwen.session.recordId': activeRecordId },
+        _meta: { ...meta, 'hopcode.session.recordId': activeRecordId },
       } as unknown as SessionUpdate);
     },
     setActiveRecordId: (recordId: string | null) => {

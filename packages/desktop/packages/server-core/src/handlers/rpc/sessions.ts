@@ -497,37 +497,37 @@ export function registerSessionsHandlers(
             command.rules,
           );
         case 'getHopCodeCoreSettings':
-          return sessionManager.getSessionQwenCoreSettings(sessionId);
-        case 'setQwenCoreSetting':
-          return sessionManager.setSessionQwenCoreSetting(
+          return sessionManager.getSessionhopcodecoreSettings(sessionId);
+        case 'sethopcodecoreSetting':
+          return sessionManager.setSessionhopcodecoreSetting(
             sessionId,
             command.scope,
             command.key,
             command.value,
           );
-        case 'setQwenMcpServer':
-          return sessionManager.setSessionQwenMcpServer(
+        case 'sethopcodemcpserver':
+          return sessionManager.setSessionhopcodemcpserver(
             sessionId,
             command.scope,
             command.name,
             command.server,
           );
-        case 'removeQwenMcpServer':
-          return sessionManager.removeSessionQwenMcpServer(
+        case 'removehopcodemcpserver':
+          return sessionManager.removeSessionhopcodemcpserver(
             sessionId,
             command.scope,
             command.name,
           );
-        case 'setQwenHook':
-          return sessionManager.setSessionQwenHook(
+        case 'sethopcodehook':
+          return sessionManager.setSessionhopcodehook(
             sessionId,
             command.scope,
             command.event,
             command.index,
             command.hook,
           );
-        case 'removeQwenHook':
-          return sessionManager.removeSessionQwenHook(
+        case 'removehopcodehook':
+          return sessionManager.removeSessionhopcodehook(
             sessionId,
             command.scope,
             command.event,

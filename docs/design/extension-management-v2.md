@@ -9,7 +9,7 @@ available as a primary-workspace compatibility adapter.
 
 ## Resource model
 
-An installed extension is one user-level artifact in `QWEN_HOME/extensions`.
+An installed extension is one user-level artifact in `hopcode_home/extensions`.
 Activation is policy, not a second copy of that artifact:
 
 1. An exact workspace override (`enabled` or `disabled`).
@@ -74,7 +74,7 @@ If hashes differ, modification order decides the recovery direction: an older
 projection is repaired from authoritative V2 state; a projection modified after
 V2 state is treated as a sequential write by a downgraded binary and is
 re-imported with a new generation. Concurrent V1 and V2 writers sharing one
-`QWEN_HOME` are intentionally unsupported.
+`hopcode_home` are intentionally unsupported.
 
 Clearing a public workspace override normally deletes the exact record. If an
 older path rule would then change the effective value, the store writes an
@@ -219,5 +219,5 @@ workspace capability implies this API. The abandoned
 - Per-workspace artifact copies.
 - A daemon registry or remote acknowledgement protocol.
 - User cancellation of accepted operations.
-- Concurrent old-binary and V2-aware writes to one `QWEN_HOME`.
+- Concurrent old-binary and V2-aware writes to one `hopcode_home`.
 - Removing the V1 adapter before a future protocol-v2 migration.

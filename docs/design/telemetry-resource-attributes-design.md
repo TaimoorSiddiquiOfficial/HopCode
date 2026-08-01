@@ -97,7 +97,7 @@ telemetry: {
 
 ### 2.5 不在本设计范围的代码路径
 
-`packages/core/src/telemetry/qwen-logger/qwen-logger.ts` 是 hopcode 的**第一方使用上报通道**（基于阿里 RUM 内部协议 `RumResourceEvent`），与 OTel SDK 完全独立。它有自己的 endpoint、proxy 和数据模型，**不受本设计影响**。详见第 3 节。
+`packages/core/src/telemetry/hopcode-logger/hopcode-logger.ts` 是 hopcode 的**第一方使用上报通道**（基于阿里 RUM 内部协议 `RumResourceEvent`），与 OTel SDK 完全独立。它有自己的 endpoint、proxy 和数据模型，**不受本设计影响**。详见第 3 节。
 
 ### 2.6 已支持 / 未支持的 `OTEL_*` 环境变量
 
@@ -125,7 +125,7 @@ telemetry: {
 
 ### 3.2 非目标
 
-- **`qwen-logger` 第一方上报**：完全独立的 RUM 通道，不在本设计范围。其上报字段（device id、user agent 等）由 RUM 协议决定，不应被用户 resource attribute 干扰。若未来要给 `qwen-logger` 增加自定义维度，是另一条独立的设计。
+- **`hopcode-logger` 第一方上报**：完全独立的 RUM 通道，不在本设计范围。其上报字段（device id、user agent 等）由 RUM 协议决定，不应被用户 resource attribute 干扰。若未来要给 `hopcode-logger` 增加自定义维度，是另一条独立的设计。
 - **Per-span 动态 attribute hook**：让用户写代码 / hook 给每个 span 计算 attribute。claude-code 也没解决这块，复杂度高、收益低。
 - **`service.version` cardinality 控制**：版本变化频率有限（月级），time series 增长可控。需要时走 v2，引入 OTel View API。
 - **Agent SDK 形态的 per-query resource attrs**：hopcode 目前没有 SDK 调用场景。
@@ -739,7 +739,7 @@ HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true hopcode "投资分析"
 | 多租户 `account_uuid`      | 有                                               | ❌ 无                                            | hopcode metric 里没有此 attr                       |
 | Agent SDK `options.env`    | 有                                               | ❌ 无                                            | hopcode 没有等价模式                               |
 | 保留键策略                 | 不允许覆盖 built-in id                           | ✅ 一致                                          | 遥测可信度                                         |
-| 第一方上报通道             | claude-code 也有独立第一方通道（与 OTel 隔离）   | ✅ qwen-logger 同样隔离                          | 第一方与第三方通道职责分离                         |
+| 第一方上报通道             | claude-code 也有独立第一方通道（与 OTel 隔离）   | ✅ hopcode-logger 同样隔离                          | 第一方与第三方通道职责分离                         |
 
 **最值得借的两点**：
 
@@ -750,7 +750,7 @@ HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID=true hopcode "投资分析"
 
 - settings.json 支持：claude-code 完全靠 env var，对企业 fleet 场景不友好
 - 明确的保留键策略（`service.version` 不可覆盖）：减少遥测被污染的可能
-- 第一方上报隔离：qwen-logger 走独立通道，与用户 OTLP 设置完全解耦
+- 第一方上报隔离：hopcode-logger 走独立通道，与用户 OTLP 设置完全解耦
 
 ## 12. 未来工作（v2 + 候选）
 

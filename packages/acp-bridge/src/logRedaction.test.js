@@ -102,8 +102,8 @@ describe('redactLogCredentials', () => {
     it('redacts compound key names like AWS_SECRET_ACCESS_KEY', () => {
         expect(redactLogCredentials('AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCY')).toBe(`AWS_SECRET_ACCESS_KEY=${R}`);
     });
-    it('redacts QWEN_DAEMON_TOKEN assignments', () => {
-        expect(redactLogCredentials('QWEN_DAEMON_TOKEN=some-long-token-value-here')).toBe(`QWEN_DAEMON_TOKEN=${R}`);
+    it('redacts hopcode_daemon_token assignments', () => {
+        expect(redactLogCredentials('hopcode_daemon_token=some-long-token-value-here')).toBe(`hopcode_daemon_token=${R}`);
     });
     it('redacts client_secret assignments', () => {
         expect(redactLogCredentials('client_secret: abcdef1234567890xxxx')).toBe(`client_secret: ${R}`);

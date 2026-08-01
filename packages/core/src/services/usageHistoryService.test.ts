@@ -584,7 +584,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
     const sessionId = 'sess-readonly';
     plantChatJsonl(sessionId, 1600);
     const usagePath = path.join(
-      process.env['QWEN_HOME']!,
+      process.env['hopcode_home']!,
       'usage_record.jsonl',
     );
 
@@ -635,7 +635,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
   // are counted. See issue: Web Shell "today" undercounted ~20x.
   function planted(sessionId: string): string {
     return path.join(
-      process.env['QWEN_HOME']!,
+      process.env['hopcode_home']!,
       'projects',
       'repro-project',
       'chats',
@@ -644,7 +644,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
   }
   function seedPersisted(records: UsageSummaryRecord[]) {
     fs.writeFileSync(
-      path.join(process.env['QWEN_HOME']!, 'usage_record.jsonl'),
+      path.join(process.env['hopcode_home']!, 'usage_record.jsonl'),
       records.map((r) => JSON.stringify(r)).join('\n') + '\n',
     );
   }
@@ -691,7 +691,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
     // Read-only: the persisted file must still hold only the original record.
     const lines = fs
       .readFileSync(
-        path.join(process.env['QWEN_HOME']!, 'usage_record.jsonl'),
+        path.join(process.env['hopcode_home']!, 'usage_record.jsonl'),
         'utf8',
       )
       .trim()
@@ -744,7 +744,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
   it('withLive: read-only rebuild — never writes usage_record.jsonl', async () => {
     plantChatJsonl('sess-daemon-only', 1600);
     const usagePath = path.join(
-      process.env['QWEN_HOME']!,
+      process.env['hopcode_home']!,
       'usage_record.jsonl',
     );
 
@@ -767,7 +767,7 @@ describe('loadUsageHistory + persistSessionUsage (issue #4994 regression)', () =
     // No usable persisted base (garbage file) — the loader must still surface
     // the daemon transcript rather than returning nothing.
     fs.writeFileSync(
-      path.join(process.env['QWEN_HOME']!, 'usage_record.jsonl'),
+      path.join(process.env['hopcode_home']!, 'usage_record.jsonl'),
       '{ this is not valid json\nalso broken}\n',
     );
     plantChatJsonl('sess-daemon', 1600);

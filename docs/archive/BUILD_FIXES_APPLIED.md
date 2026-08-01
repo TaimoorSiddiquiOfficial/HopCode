@@ -102,7 +102,7 @@ The authentication type `HOPCODE_OAUTH` refers to the actual Alibaba Cloud HopCo
 - `packages/core/src/hopcode/qwenContentGenerator.test.ts` (12 errors)
 - `packages/core/src/hopcode/qwenContentGenerator.ts` (5 errors)
 - `packages/core/src/services/fileDiscoveryService.ts` (4 errors)
-- `packages/core/src/telemetry/qwen-logger/qwen-logger.test.ts` (1 error)
+- `packages/core/src/telemetry/hopcode-logger/hopcode-logger.test.ts` (1 error)
 - `packages/core/src/utils/retry.test.ts` (7 errors)
 - `packages/core/src/utils/retry.ts` (1 error)
 

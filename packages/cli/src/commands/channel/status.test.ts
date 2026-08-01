@@ -40,7 +40,7 @@ import { statusCommand } from './status.js';
 async function invokeStatus(argv: Record<string, unknown> = {}): Promise<void> {
   const handler = statusCommand.handler;
   if (!handler) throw new Error('status handler missing');
-  await handler({ _: [], $0: 'qwen', ...argv } as never);
+  await handler({ _: [], $0: 'hopcode', ...argv } as never);
 }
 
 beforeEach(() => {

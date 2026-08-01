@@ -294,21 +294,21 @@ describe('getOrCreateSharedDispatcher', () => {
 
 describe('TLS verification opt-out (insecure)', () => {
   const savedEnv = {
-    QWEN_TLS_INSECURE: process.env['QWEN_TLS_INSECURE'],
+    hopcode_tls_insecure: process.env['hopcode_tls_insecure'],
     NODE_TLS_REJECT_UNAUTHORIZED: process.env['NODE_TLS_REJECT_UNAUTHORIZED'],
   };
 
   beforeEach(() => {
     resetDispatcherCache();
-    delete process.env['QWEN_TLS_INSECURE'];
+    delete process.env['hopcode_tls_insecure'];
     delete process.env['NODE_TLS_REJECT_UNAUTHORIZED'];
   });
 
   afterEach(() => {
     if (savedEnv.hopcode_TLS_INSECURE === undefined) {
-      delete process.env['QWEN_TLS_INSECURE'];
+      delete process.env['hopcode_tls_insecure'];
     } else {
-      process.env['QWEN_TLS_INSECURE'] = savedEnv.hopcode_TLS_INSECURE;
+      process.env['hopcode_tls_insecure'] = savedEnv.hopcode_TLS_INSECURE;
     }
     if (savedEnv.NODE_TLS_REJECT_UNAUTHORIZED === undefined) {
       delete process.env['NODE_TLS_REJECT_UNAUTHORIZED'];
@@ -330,8 +330,8 @@ describe('TLS verification opt-out (insecure)', () => {
     expect(options?.['connect']).toBeUndefined();
   });
 
-  it('disables verification on the no-proxy Agent via QWEN_TLS_INSECURE', () => {
-    process.env['QWEN_TLS_INSECURE'] = '1';
+  it('disables verification on the no-proxy Agent via hopcode_tls_insecure', () => {
+    process.env['hopcode_tls_insecure'] = '1';
     const options = getDispatcherOptions(buildRuntimeFetchOptions('openai'));
     expect(options?.['connect']).toEqual({ rejectUnauthorized: false });
   });
@@ -342,14 +342,14 @@ describe('TLS verification opt-out (insecure)', () => {
     expect(options?.['connect']).toEqual({ rejectUnauthorized: false });
   });
 
-  it('ignores falsy QWEN_TLS_INSECURE values', () => {
-    process.env['QWEN_TLS_INSECURE'] = '0';
+  it('ignores falsy hopcode_tls_insecure values', () => {
+    process.env['hopcode_tls_insecure'] = '0';
     const options = getDispatcherOptions(buildRuntimeFetchOptions('openai'));
     expect(options?.['connect']).toBeUndefined();
   });
 
   it('configures TLS opt-out for direct and proxied requests', () => {
-    process.env['QWEN_TLS_INSECURE'] = '1';
+    process.env['hopcode_tls_insecure'] = '1';
     const dispatcher = getOrCreateSharedDispatcher(
       'http://proxy.local',
     ) as unknown as { options: UndiciOptions };
@@ -366,24 +366,24 @@ describe('TLS verification opt-out (insecure)', () => {
 
   it('keeps secure and insecure dispatchers in separate cache entries', () => {
     const secure = getOrCreateSharedDispatcher('http://proxy.local');
-    process.env['QWEN_TLS_INSECURE'] = '1';
+    process.env['hopcode_tls_insecure'] = '1';
     const insecure = getOrCreateSharedDispatcher('http://proxy.local');
     expect(secure).not.toBe(insecure);
   });
 
   describe('isTlsVerificationDisabled', () => {
     it.each(['1', 'true', 'TRUE', 'Yes', 'on', '  1  '])(
-      'treats QWEN_TLS_INSECURE=%j as enabled',
+      'treats hopcode_tls_insecure=%j as enabled',
       (value) => {
-        process.env['QWEN_TLS_INSECURE'] = value;
+        process.env['hopcode_tls_insecure'] = value;
         expect(isTlsVerificationDisabled()).toBe(true);
       },
     );
 
     it.each(['0', 'false', 'no', 'off', '', 'enabled'])(
-      'treats QWEN_TLS_INSECURE=%j as disabled',
+      'treats hopcode_tls_insecure=%j as disabled',
       (value) => {
-        process.env['QWEN_TLS_INSECURE'] = value;
+        process.env['hopcode_tls_insecure'] = value;
         expect(isTlsVerificationDisabled()).toBe(false);
       },
     );

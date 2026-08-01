@@ -32,7 +32,7 @@ import type {
   BridgeDaemonStatusSnapshot,
   HttpAcpBridge,
 } from '@hoptrendy/acp-bridge/bridgeTypes';
-import * as qwenCore from '@hoptrendy/hopcode-core';
+import * as hopcodecore from '@hoptrendy/hopcode-core';
 import * as serverModule from './server.js';
 import * as settingsRuntime from '../config/settings.js';
 import * as environmentRuntime from '../config/environment.js';
@@ -235,7 +235,7 @@ describe('workspace skill settings persistence', () => {
 /**
  * #4297 fold-in 7 (deepseek S1, addresses #3262690842). Lock the
  * `context.fileName` extraction logic so a regression doesn't
- * silently re-enable the P2-1 bug (init writes default `QWEN.md`
+ * silently re-enable the P2-1 bug (init writes default `HOPCODE.md`
  * even when the workspace configured `AGENTS.md` etc.). The four
  * branches the suggestion called out are exercised explicitly here;
  * the runHopCodeServe boot path itself stays integration-tested
@@ -551,7 +551,7 @@ describe('runHopCodeServe telemetry validation', () => {
       maxSessions: 1,
     });
 
-    await expect(run).rejects.toThrow(qwenCore.FatalConfigError);
+    await expect(run).rejects.toThrow(hopcodecore.FatalConfigError);
     await expect(run).rejects.toThrow(/Invalid telemetry configuration:/);
   });
 
@@ -561,7 +561,7 @@ describe('runHopCodeServe telemetry validation', () => {
     const secondary = path.join(tmpDir, 'secondary');
     fs.mkdirSync(primary);
     fs.mkdirSync(secondary);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -646,7 +646,7 @@ describe('runHopCodeServe telemetry validation', () => {
     );
     const workspace = path.join(tmpDir, 'workspace');
     fs.mkdirSync(workspace);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -724,7 +724,7 @@ describe('runHopCodeServe telemetry validation', () => {
     const secondary = path.join(tmpDir, 'secondary');
     fs.mkdirSync(primary);
     fs.mkdirSync(secondary);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -875,7 +875,7 @@ describe('runHopCodeServe telemetry validation', () => {
     const secondary = path.join(tmpDir, 'secondary');
     fs.mkdirSync(primary);
     fs.mkdirSync(secondary);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -964,7 +964,7 @@ describe('runHopCodeServe telemetry validation', () => {
       .mockReturnValueOnce(
         secondaryBridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
       );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -1046,7 +1046,7 @@ describe('runHopCodeServe telemetry validation', () => {
           typeof acpBridge.createAcpSessionBridge
         >,
       );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -1107,7 +1107,7 @@ describe('runHopCodeServe telemetry validation', () => {
     tmpDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'qws-ws-')));
     const primary = path.join(tmpDir, 'primary');
     fs.mkdirSync(primary);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -1140,9 +1140,9 @@ describe('runHopCodeServe telemetry validation', () => {
   it('uses a daemon-scoped telemetry service instance id', async () => {
     tmpDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'qws-tv-')));
     const initializeTelemetry = vi
-      .spyOn(qwenCore, 'initializeTelemetry')
+      .spyOn(hopcodecore, 'initializeTelemetry')
       .mockImplementation(() => {});
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -1485,16 +1485,16 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-fail-')),
     );
     const originalClientMcpOverWs =
-      process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
+      process.env['hopcode_serve_client_mcp_over_ws'];
     const originalCdpTunnelOverWs =
-      process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
+      process.env['hopcode_serve_cdp_tunnel_over_ws'];
     const originalCdpMcpCommand = process.env['HOPCODE_CDP_MCP_COMMAND'];
     if (raw === undefined) {
-      delete process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
-      delete process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
+      delete process.env['hopcode_serve_client_mcp_over_ws'];
+      delete process.env['hopcode_serve_cdp_tunnel_over_ws'];
     } else {
-      process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'] = raw;
-      process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'] = raw;
+      process.env['hopcode_serve_client_mcp_over_ws'] = raw;
+      process.env['hopcode_serve_cdp_tunnel_over_ws'] = raw;
     }
     if (cdpMcpCommand === undefined) {
       delete process.env['HOPCODE_CDP_MCP_COMMAND'];
@@ -1528,14 +1528,14 @@ describe('runHopCodeServe runtime startup failures', () => {
         .features;
     } finally {
       if (originalClientMcpOverWs === undefined) {
-        delete process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
+        delete process.env['hopcode_serve_client_mcp_over_ws'];
       } else {
-        process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'] = originalClientMcpOverWs;
+        process.env['hopcode_serve_client_mcp_over_ws'] = originalClientMcpOverWs;
       }
       if (originalCdpTunnelOverWs === undefined) {
-        delete process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
+        delete process.env['hopcode_serve_cdp_tunnel_over_ws'];
       } else {
-        process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'] = originalCdpTunnelOverWs;
+        process.env['hopcode_serve_cdp_tunnel_over_ws'] = originalCdpTunnelOverWs;
       }
       if (originalCdpMcpCommand === undefined) {
         delete process.env['HOPCODE_CDP_MCP_COMMAND'];
@@ -1664,11 +1664,11 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-child-env-')),
     );
     const originalClientMcpOverWs =
-      process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
+      process.env['hopcode_serve_client_mcp_over_ws'];
     const originalCdpTunnelOverWs =
-      process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
-    delete process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
-    delete process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
+      process.env['hopcode_serve_cdp_tunnel_over_ws'];
+    delete process.env['hopcode_serve_client_mcp_over_ws'];
+    delete process.env['hopcode_serve_cdp_tunnel_over_ws'];
     const bridge = makeRuntimeBridge();
     const createBridge = vi
       .spyOn(acpBridge, 'createAcpSessionBridge')
@@ -1695,18 +1695,18 @@ describe('runHopCodeServe runtime startup failures', () => {
         | { childEnvOverrides?: Record<string, string | undefined> }
         | undefined;
       expect(bridgeOptions?.childEnvOverrides).toMatchObject({
-        QWEN_SERVE_CDP_TUNNEL_OVER_WS: '1',
+        hopcode_serve_cdp_tunnel_over_ws: '1',
       });
     } finally {
       if (originalClientMcpOverWs === undefined) {
-        delete process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
+        delete process.env['hopcode_serve_client_mcp_over_ws'];
       } else {
-        process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'] = originalClientMcpOverWs;
+        process.env['hopcode_serve_client_mcp_over_ws'] = originalClientMcpOverWs;
       }
       if (originalCdpTunnelOverWs === undefined) {
-        delete process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
+        delete process.env['hopcode_serve_cdp_tunnel_over_ws'];
       } else {
-        process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'] = originalCdpTunnelOverWs;
+        process.env['hopcode_serve_cdp_tunnel_over_ws'] = originalCdpTunnelOverWs;
       }
       await handle.close();
     }
@@ -1723,7 +1723,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     process.env['QWEN_TEST_REMOVED_FROM_DOTENV'] = 'stale';
     delete process.env['QWEN_TEST_RELOAD_LEAK'];
 
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -1838,7 +1838,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-env-fallback-')),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -1967,7 +1967,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     const secondary = path.join(tmpDir, 'secondary');
     fs.mkdirSync(primary);
     fs.mkdirSync(secondary);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2083,7 +2083,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     const stderrWrite = vi
       .spyOn(process.stderr, 'write')
       .mockImplementation(() => true);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2195,7 +2195,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     const stderrWrite = vi
       .spyOn(process.stderr, 'write')
       .mockImplementation(() => true);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2272,7 +2272,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     const stderrWrite = vi
       .spyOn(process.stderr, 'write')
       .mockImplementation(() => true);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2347,7 +2347,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       canonicalizeWorkspace(root),
     );
     const bridgeFsBoundWorkspaces: string[][] = [];
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2420,7 +2420,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       process.env['HOPCODE_CODE_IDE_WORKSPACE_PATH'];
     process.env['HOPCODE_CODE_IDE_WORKSPACE_PATH'] = JSON.stringify(roots);
     const bridgeFsBoundWorkspaces: string[][] = [];
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2488,7 +2488,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       canonicalizeWorkspace(root),
     );
     const pathLocks: unknown[] = [];
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2551,7 +2551,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       canonicalizeWorkspace(root),
     );
     const bridgeFsBoundWorkspaces: string[][] = [];
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2693,14 +2693,14 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-starting-route-')),
     );
     let resolveTelemetry:
-      | ((settings: qwenCore.ResolvedTelemetrySettings) => void)
+      | ((settings: hopcodecore.ResolvedTelemetrySettings) => void)
       | undefined;
-    const telemetryPromise = new Promise<qwenCore.ResolvedTelemetrySettings>(
+    const telemetryPromise = new Promise<hopcodecore.ResolvedTelemetrySettings>(
       (resolve) => {
         resolveTelemetry = resolve;
       },
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockReturnValue(
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockReturnValue(
       telemetryPromise,
     );
     const bridge = makeRuntimeBridge();
@@ -2745,14 +2745,14 @@ describe('runHopCodeServe runtime startup failures', () => {
     fs.mkdirSync(primary);
     fs.mkdirSync(secondary);
     let resolveTelemetry:
-      | ((settings: qwenCore.ResolvedTelemetrySettings) => void)
+      | ((settings: hopcodecore.ResolvedTelemetrySettings) => void)
       | undefined;
-    const telemetryPromise = new Promise<qwenCore.ResolvedTelemetrySettings>(
+    const telemetryPromise = new Promise<hopcodecore.ResolvedTelemetrySettings>(
       (resolve) => {
         resolveTelemetry = resolve;
       },
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockReturnValue(
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockReturnValue(
       telemetryPromise,
     );
     const createBridge = vi
@@ -2816,7 +2816,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     );
     const logBaseDir = path.join(tmpDir, 'debug');
     const resolveTelemetrySettings = vi
-      .spyOn(qwenCore, 'resolveTelemetrySettings')
+      .spyOn(hopcodecore, 'resolveTelemetrySettings')
       .mockResolvedValue({
         enabled: false,
         sensitiveSpanAttributeMaxLength: 1024 * 1024,
@@ -2885,7 +2885,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-health-deep-first-')),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2943,7 +2943,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-health-dedupe-')),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -2997,15 +2997,15 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-route-start-')),
     );
     let resolveTelemetry:
-      | ((settings: qwenCore.ResolvedTelemetrySettings) => void)
+      | ((settings: hopcodecore.ResolvedTelemetrySettings) => void)
       | undefined;
-    const telemetryPromise = new Promise<qwenCore.ResolvedTelemetrySettings>(
+    const telemetryPromise = new Promise<hopcodecore.ResolvedTelemetrySettings>(
       (resolve) => {
         resolveTelemetry = resolve;
       },
     );
     const resolveTelemetrySettings = vi
-      .spyOn(qwenCore, 'resolveTelemetrySettings')
+      .spyOn(hopcodecore, 'resolveTelemetrySettings')
       .mockReturnValue(telemetryPromise);
     const bridge = makeRuntimeBridge();
     const createBridge = vi
@@ -3187,7 +3187,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       }),
       'utf8',
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -3266,7 +3266,7 @@ describe('runHopCodeServe runtime startup failures', () => {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
-            'x-qwen-webhook-secret': 'workspace-secret',
+            'x-hopcode-webhook-secret': 'workspace-secret',
           },
           body: JSON.stringify({
             eventType: 'ci_failed',
@@ -3376,7 +3376,7 @@ describe('runHopCodeServe runtime startup failures', () => {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
-            'x-qwen-webhook-secret': 'wrong',
+            'x-hopcode-webhook-secret': 'wrong',
           },
           body: JSON.stringify({
             eventType: 'ci_failed',
@@ -3492,7 +3492,7 @@ describe('runHopCodeServe runtime startup failures', () => {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
-            'x-qwen-webhook-secret': 'webhook-secret',
+            'x-hopcode-webhook-secret': 'webhook-secret',
           },
           body: JSON.stringify({ eventType: 'ci_failed' }),
         },
@@ -3617,14 +3617,14 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-bootstrap-trailing-')),
     );
     let resolveTelemetry:
-      | ((settings: qwenCore.ResolvedTelemetrySettings) => void)
+      | ((settings: hopcodecore.ResolvedTelemetrySettings) => void)
       | undefined;
-    const telemetryPromise = new Promise<qwenCore.ResolvedTelemetrySettings>(
+    const telemetryPromise = new Promise<hopcodecore.ResolvedTelemetrySettings>(
       (resolve) => {
         resolveTelemetry = resolve;
       },
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockReturnValue(
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockReturnValue(
       telemetryPromise,
     );
     const bridge = makeRuntimeBridge();
@@ -3676,7 +3676,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-route-fail-')),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -3805,7 +3805,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-health-close-after-')),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -3849,7 +3849,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-health-reconciler-close-')),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -3900,15 +3900,15 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-health-close-running-')),
     );
     let resolveTelemetry:
-      | ((settings: qwenCore.ResolvedTelemetrySettings) => void)
+      | ((settings: hopcodecore.ResolvedTelemetrySettings) => void)
       | undefined;
-    const telemetryPromise = new Promise<qwenCore.ResolvedTelemetrySettings>(
+    const telemetryPromise = new Promise<hopcodecore.ResolvedTelemetrySettings>(
       (resolve) => {
         resolveTelemetry = resolve;
       },
     );
     const resolveTelemetrySettings = vi
-      .spyOn(qwenCore, 'resolveTelemetrySettings')
+      .spyOn(hopcodecore, 'resolveTelemetrySettings')
       .mockReturnValue(telemetryPromise);
     const bridge = makeRuntimeBridge();
     const createBridge = vi
@@ -3959,15 +3959,15 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-health-close-late-app-')),
     );
     let resolveTelemetry:
-      | ((settings: qwenCore.ResolvedTelemetrySettings) => void)
+      | ((settings: hopcodecore.ResolvedTelemetrySettings) => void)
       | undefined;
-    const telemetryPromise = new Promise<qwenCore.ResolvedTelemetrySettings>(
+    const telemetryPromise = new Promise<hopcodecore.ResolvedTelemetrySettings>(
       (resolve) => {
         resolveTelemetry = resolve;
       },
     );
     const resolveTelemetrySettings = vi
-      .spyOn(qwenCore, 'resolveTelemetrySettings')
+      .spyOn(hopcodecore, 'resolveTelemetrySettings')
       .mockReturnValue(telemetryPromise);
     const bridge = makeRuntimeBridge();
     vi.spyOn(acpBridge, 'createAcpSessionBridge').mockReturnValue(
@@ -3980,7 +3980,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     const stopWorkspaceGitState = vi.fn();
     const stopSubSession = vi.fn();
     const disposeEventLoopMonitor = vi.fn();
-    vi.spyOn(qwenCore, 'startEventLoopLagMonitor').mockReturnValueOnce({
+    vi.spyOn(hopcodecore, 'startEventLoopLagMonitor').mockReturnValueOnce({
       snapshot: () => ({
         meanMs: 0,
         p50Ms: 0,
@@ -4076,7 +4076,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-health-fail-once-')),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -4174,7 +4174,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-flush-pending-')),
     );
-    const forceFlushMetrics = vi.spyOn(qwenCore, 'forceFlushMetrics');
+    const forceFlushMetrics = vi.spyOn(hopcodecore, 'forceFlushMetrics');
     forceFlushMetrics.mockReturnValue(new Promise<void>(() => {}));
     const bridge = {
       spawnOrAttach: vi.fn(),
@@ -4225,11 +4225,11 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-queue-wait-')),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
-    const telemetry: ReturnType<typeof qwenCore.createDaemonBridgeTelemetry> = {
+    const telemetry: ReturnType<typeof hopcodecore.createDaemonBridgeTelemetry> = {
       captureContext() {
         return undefined;
       },
@@ -4244,11 +4244,11 @@ describe('runHopCodeServe runtime startup failures', () => {
         return request;
       },
     };
-    vi.spyOn(qwenCore, 'createDaemonBridgeTelemetry').mockReturnValue(
+    vi.spyOn(hopcodecore, 'createDaemonBridgeTelemetry').mockReturnValue(
       telemetry,
     );
     const recordPromptQueueWait = vi.spyOn(
-      qwenCore,
+      hopcodecore,
       'recordDaemonPromptQueueWait',
     );
     const bridge = makeRuntimeBridge();
@@ -4307,14 +4307,14 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-timeout-')),
     );
     let resolveTelemetry:
-      | ((settings: qwenCore.ResolvedTelemetrySettings) => void)
+      | ((settings: hopcodecore.ResolvedTelemetrySettings) => void)
       | undefined;
-    const telemetryPromise = new Promise<qwenCore.ResolvedTelemetrySettings>(
+    const telemetryPromise = new Promise<hopcodecore.ResolvedTelemetrySettings>(
       (resolve) => {
         resolveTelemetry = resolve;
       },
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockReturnValue(
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockReturnValue(
       telemetryPromise,
     );
     const bridge = {
@@ -4377,11 +4377,11 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-fail-')),
     );
     const originalClientMcpOverWs =
-      process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
+      process.env['hopcode_serve_client_mcp_over_ws'];
     const originalCdpTunnelOverWs =
-      process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
-    delete process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
-    delete process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
+      process.env['hopcode_serve_cdp_tunnel_over_ws'];
+    delete process.env['hopcode_serve_client_mcp_over_ws'];
+    delete process.env['hopcode_serve_cdp_tunnel_over_ws'];
     const boundWorkspace = canonicalizeWorkspace(tmpDir);
     const blockedLogBaseDir = path.join(tmpDir, 'blocked-log-base');
     fs.writeFileSync(blockedLogBaseDir, 'not a directory');
@@ -4561,14 +4561,14 @@ describe('runHopCodeServe runtime startup failures', () => {
       expect(sameOriginBody.daemon).not.toHaveProperty('logPath');
     } finally {
       if (originalClientMcpOverWs === undefined) {
-        delete process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
+        delete process.env['hopcode_serve_client_mcp_over_ws'];
       } else {
-        process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'] = originalClientMcpOverWs;
+        process.env['hopcode_serve_client_mcp_over_ws'] = originalClientMcpOverWs;
       }
       if (originalCdpTunnelOverWs === undefined) {
-        delete process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
+        delete process.env['hopcode_serve_cdp_tunnel_over_ws'];
       } else {
-        process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'] = originalCdpTunnelOverWs;
+        process.env['hopcode_serve_cdp_tunnel_over_ws'] = originalCdpTunnelOverWs;
       }
       await handle.close();
     }
@@ -4742,7 +4742,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       bridge as ReturnType<typeof acpBridge.createAcpSessionBridge>,
     );
     const dispose = vi.fn();
-    vi.spyOn(qwenCore, 'startEventLoopLagMonitor').mockReturnValueOnce({
+    vi.spyOn(hopcodecore, 'startEventLoopLagMonitor').mockReturnValueOnce({
       snapshot: () => ({
         meanMs: 0,
         p50Ms: 0,
@@ -5659,7 +5659,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
     const secondary = path.join(tmpDir, 'secondary');
     fs.mkdirSync(primary);
     fs.mkdirSync(secondary);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -5723,7 +5723,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
     fs.mkdirSync(secondary);
     const primaryCwd = canonicalizeWorkspace(primary);
     const secondaryCwd = canonicalizeWorkspace(secondary);
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -5852,7 +5852,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
       path.join(secondary, '.hopcode', 'settings.json'),
       JSON.stringify({ channels: { feishu: secondaryChannelConfig } }),
     );
-    vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
+    vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
       sensitiveSpanAttributeMaxLength: 1024 * 1024,
     });
@@ -5994,7 +5994,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
-            'x-qwen-webhook-secret': 'primary-secret',
+            'x-hopcode-webhook-secret': 'primary-secret',
           },
           body: JSON.stringify({ eventType: 'check_failed' }),
         },
@@ -6008,7 +6008,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
           headers: {
             Authorization: 'Bearer worker-remove-token',
             'content-type': 'application/json',
-            'x-qwen-webhook-secret': 'secondary-secret',
+            'x-hopcode-webhook-secret': 'secondary-secret',
           },
           body: JSON.stringify({
             eventType: 'check_failed',
@@ -6121,7 +6121,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
           headers: {
             Authorization: 'Bearer worker-remove-token',
             'content-type': 'application/json',
-            'x-qwen-webhook-secret': 'secondary-secret',
+            'x-hopcode-webhook-secret': 'secondary-secret',
           },
           body: JSON.stringify({ eventType: 'check_failed' }),
         },
@@ -6183,7 +6183,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
           headers: {
             Authorization: 'Bearer worker-remove-token',
             'content-type': 'application/json',
-            'x-qwen-webhook-secret': 'secondary-secret',
+            'x-hopcode-webhook-secret': 'secondary-secret',
           },
           body: JSON.stringify({
             eventType: 'check_failed',
@@ -7785,7 +7785,7 @@ describe('runHopCodeServe startup observability', () => {
   it('preserves Storage runtime base dir for default exported callers', async () => {
     const originalRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
     delete process.env['HOPCODE_RUNTIME_DIR'];
-    qwenCore.Storage.setRuntimeBaseDir(null);
+    hopcodecore.Storage.setRuntimeBaseDir(null);
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-startup-storage-dir-')),
     );
@@ -7797,7 +7797,7 @@ describe('runHopCodeServe startup observability', () => {
       }),
     );
     const runtimeBaseDir = path.join(tmpDir, 'storage-runtime');
-    qwenCore.Storage.setRuntimeBaseDir(runtimeBaseDir);
+    hopcodecore.Storage.setRuntimeBaseDir(runtimeBaseDir);
     const stderrWrites: string[] = [];
     vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
       stderrWrites.push(String(chunk));
@@ -7824,7 +7824,7 @@ describe('runHopCodeServe startup observability', () => {
       expect(fs.existsSync(expectedDaemonDir)).toBe(true);
     } finally {
       await handle?.close();
-      qwenCore.Storage.setRuntimeBaseDir(null);
+      hopcodecore.Storage.setRuntimeBaseDir(null);
       if (originalRuntimeDir === undefined) {
         delete process.env['HOPCODE_RUNTIME_DIR'];
       } else {

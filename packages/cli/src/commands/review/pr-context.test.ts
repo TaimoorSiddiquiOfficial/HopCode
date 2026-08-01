@@ -44,7 +44,7 @@ describe('isLegacySuggestionSummary', () => {
   it('does not match an ordinary comment', () => {
     expect(isLegacySuggestionSummary('no marker here')).toBe(false);
     expect(
-      isLegacySuggestionSummary('mentions qwen-review-suggestion-summary'),
+      isLegacySuggestionSummary('mentions hopcode-review-suggestion-summary'),
     ).toBe(false);
   });
 
@@ -171,7 +171,7 @@ describe('fullCommentBody', () => {
 });
 
 describe('isReviewWorthShowing', () => {
-  const FOOTER = '_— qwen3.7-max via Qwen Code /review_';
+  const FOOTER = '_— qwen3.7-max via HopCode /review_';
 
   it('filters the exact canonical LGTM template, with or without the footer', () => {
     expect(isReviewWorthShowing('No issues found. LGTM! ✅')).toBe(false);
@@ -327,7 +327,7 @@ describe('buildMarkdown — truncation refs are copy-runnable with real coordina
     const issue = [{ id: 31, user: { login: 'r' }, body: 'y'.repeat(400) }];
     const md = buildMarkdown(
       '6711',
-      'QwenLM/qwen-code',
+      'QwenLM/hopcode',
       meta,
       inline,
       issue,
@@ -335,15 +335,15 @@ describe('buildMarkdown — truncation refs are copy-runnable with real coordina
     );
     // A markerless blocker past the snippet cap is recoverable only through
     // the named fetch — and the emitted command must not need filling in.
-    expect(md).toContain('gh api repos/QwenLM/qwen-code/pulls/comments/21');
-    expect(md).toContain('gh api repos/QwenLM/qwen-code/issues/comments/31');
+    expect(md).toContain('gh api repos/QwenLM/hopcode/pulls/comments/21');
+    expect(md).toContain('gh api repos/QwenLM/hopcode/issues/comments/31');
     expect(md).not.toContain('{owner}');
   });
 
   it('a capped review body names the filled-in review fetch', () => {
     const md = buildMarkdown(
       '6711',
-      'QwenLM/qwen-code',
+      'QwenLM/hopcode',
       meta,
       [],
       [],
@@ -356,7 +356,7 @@ describe('buildMarkdown — truncation refs are copy-runnable with real coordina
         },
       ],
     );
-    expect(md).toContain('gh api repos/QwenLM/qwen-code/pulls/6711/reviews/7');
+    expect(md).toContain('gh api repos/QwenLM/hopcode/pulls/6711/reviews/7');
   });
 
   it('a settled replied thread cut past the snippet cap names both comment ids', () => {
@@ -429,7 +429,7 @@ describe('buildMarkdown — a markerless maintainer blocker must not render as a
   const render = () =>
     buildMarkdown(
       '6486',
-      'QwenLM/qwen-code',
+      'QwenLM/hopcode',
       meta,
       [],
       [
@@ -496,7 +496,7 @@ describe('buildMarkdown — a markerless maintainer blocker must not render as a
     // and each false promotion spends the read budget the real blocker needs.
     const md = buildMarkdown(
       '6486',
-      'QwenLM/qwen-code',
+      'QwenLM/hopcode',
       meta,
       [],
       [
@@ -831,7 +831,7 @@ describe('blockerSection — both channels, and the budget', () => {
     });
     const md = buildMarkdown(
       '6486',
-      'QwenLM/qwen-code',
+      'QwenLM/hopcode',
       meta,
       [],
       [big(1), big(2), big(3)],
@@ -844,7 +844,7 @@ describe('blockerSection — both channels, and the budget', () => {
     }
     // The one past the budget is a snippet, and it names the exact fetch.
     expect(md).toContain('section budget spent');
-    expect(md).toContain('gh api repos/QwenLM/qwen-code/issues/comments/3');
+    expect(md).toContain('gh api repos/QwenLM/hopcode/issues/comments/3');
   });
 
   it('renders the bodies that fit in FULL and only degrades past the budget', () => {
@@ -858,7 +858,7 @@ describe('blockerSection — both channels, and the budget', () => {
     });
     const md = buildMarkdown(
       '6486',
-      'QwenLM/qwen-code',
+      'QwenLM/hopcode',
       meta,
       [],
       [big(1), big(2), big(3)],

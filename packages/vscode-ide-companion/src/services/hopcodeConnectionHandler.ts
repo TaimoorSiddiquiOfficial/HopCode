@@ -59,7 +59,7 @@ export class HopCodeConnectionHandler {
     },
   ): Promise<HopCodeConnectionResult> {
     const connectId = Date.now();
-    logger.log(`[QwenAgentManager] 🚀 CONNECT() CALLED - ID: ${connectId}`);
+    logger.log(`[hopcodeagentmanager] 🚀 CONNECT() CALLED - ID: ${connectId}`);
     const autoAuthenticate = options?.autoAuthenticate ?? true;
     let sessionCreated = false;
     let requiresAuth = false;
@@ -82,7 +82,7 @@ export class HopCodeConnectionHandler {
     if (proxyUrl) {
       extraArgs.push('--proxy', proxyUrl);
       logger.log(
-        '[QwenAgentManager] Using proxy from VSCode settings:',
+        '[hopcodeagentmanager] Using proxy from VSCode settings:',
         proxyUrl,
       );
     }
@@ -93,14 +93,14 @@ export class HopCodeConnectionHandler {
     for (let attempt = 1; attempt <= maxConnectAttempts; attempt++) {
       try {
         logger.log(
-          `[QwenAgentManager] Connecting to ACP process (attempt ${attempt}/${maxConnectAttempts})...`,
+          `[hopcodeagentmanager] Connecting to ACP process (attempt ${attempt}/${maxConnectAttempts})...`,
         );
         await connection.connect(cliEntryPath!, workingDir, extraArgs);
-        logger.log('[QwenAgentManager] ACP process connected successfully');
+        logger.log('[hopcodeagentmanager] ACP process connected successfully');
         break;
       } catch (connectError) {
         logger.error(
-          `[QwenAgentManager] Connect attempt ${attempt} failed:`,
+          `[hopcodeagentmanager] Connect attempt ${attempt} failed:`,
           getErrorMessage(connectError),
         );
         if (isAcpConnectionDisconnectError(connectError)) {
@@ -110,7 +110,7 @@ export class HopCodeConnectionHandler {
           throw connectError;
         }
         const delay = Math.min(1000 * Math.pow(2, attempt - 1), 4000);
-        logger.log(`[QwenAgentManager] Retrying connect in ${delay}ms...`);
+        logger.log(`[hopcodeagentmanager] Retrying connect in ${delay}ms...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
@@ -124,12 +124,12 @@ export class HopCodeConnectionHandler {
     // Create new session if unable to restore
     if (!sessionRestored) {
       logger.log(
-        '[QwenAgentManager] no sessionRestored, Creating new session...',
+        '[hopcodeagentmanager] no sessionRestored, Creating new session...',
       );
 
       try {
         logger.log(
-          '[QwenAgentManager] Creating new session (letting CLI handle authentication)...',
+          '[hopcodeagentmanager] Creating new session (letting CLI handle authentication)...',
         );
         const newSessionResult = await this.newSessionWithRetry(
           connection,
@@ -149,7 +149,7 @@ export class HopCodeConnectionHandler {
         ) {
           availableModels = modelState.availableModels;
           logger.log(
-            '[QwenAgentManager] Extracted availableModels from session/new:',
+            '[hopcodeagentmanager] Extracted availableModels from session/new:',
             availableModels.map((m) => m.modelId),
           );
         }
@@ -157,7 +157,7 @@ export class HopCodeConnectionHandler {
         currentModeId = modeState?.currentModeId;
         availableModes = modeState?.availableModes;
 
-        logger.log('[QwenAgentManager] New session created successfully');
+        logger.log('[hopcodeagentmanager] New session created successfully');
         sessionCreated = true;
       } catch (sessionError) {
         const needsAuth =
@@ -166,13 +166,13 @@ export class HopCodeConnectionHandler {
         if (needsAuth) {
           requiresAuth = true;
           logger.log(
-            '[QwenAgentManager] Session creation requires authentication; waiting for user-triggered login.',
+            '[hopcodeagentmanager] Session creation requires authentication; waiting for user-triggered login.',
           );
         } else {
           logger.error(
             `\n⚠️ [SESSION FAILED] newSessionWithRetry threw error\n`,
           );
-          logger.error(`[QwenAgentManager] Error details:`, sessionError);
+          logger.error(`[hopcodeagentmanager] Error details:`, sessionError);
           throw sessionError;
         }
       }
@@ -181,7 +181,7 @@ export class HopCodeConnectionHandler {
     }
 
     logger.log(`\n========================================`);
-    logger.log(`[QwenAgentManager] ✅ CONNECT() COMPLETED SUCCESSFULLY`);
+    logger.log(`[hopcodeagentmanager] ✅ CONNECT() COMPLETED SUCCESSFULLY`);
     logger.log(`========================================\n`);
     return {
       sessionCreated,
@@ -212,16 +212,16 @@ export class HopCodeConnectionHandler {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         logger.log(
-          `[QwenAgentManager] Creating session (attempt ${attempt}/${maxRetries})...`,
+          `[hopcodeagentmanager] Creating session (attempt ${attempt}/${maxRetries})...`,
         );
         const res = await connection.newSession(workingDir);
-        logger.log('[QwenAgentManager] Session created successfully');
+        logger.log('[hopcodeagentmanager] Session created successfully');
         return res;
       } catch (error) {
         lastError = error;
         const errorMessage = getErrorMessage(error);
         logger.error(
-          `[QwenAgentManager] Session creation attempt ${attempt} failed:`,
+          `[hopcodeagentmanager] Session creation attempt ${attempt} failed:`,
           errorMessage,
         );
 
@@ -231,12 +231,12 @@ export class HopCodeConnectionHandler {
         if (requiresAuth) {
           if (!autoAuthenticate) {
             logger.log(
-              '[QwenAgentManager] Authentication required but auto-authentication is disabled. Propagating error.',
+              '[hopcodeagentmanager] Authentication required but auto-authentication is disabled. Propagating error.',
             );
             throw error;
           }
           logger.log(
-            '[QwenAgentManager] Qwen requires authentication. Authenticating and retrying session/new...',
+            '[hopcodeagentmanager] hopcode requires authentication. Authenticating and retrying session/new...',
           );
           try {
             await connection.authenticate(authMethod);
@@ -245,17 +245,17 @@ export class HopCodeConnectionHandler {
             // Add a slight delay to ensure auth state is settled
             await new Promise((resolve) => setTimeout(resolve, 300));
             logger.log(
-              '[QwenAgentManager] newSessionWithRetry Authentication successful',
+              '[hopcodeagentmanager] newSessionWithRetry Authentication successful',
             );
             // Retry immediately after successful auth
             const res = await connection.newSession(workingDir);
             logger.log(
-              '[QwenAgentManager] Session created successfully after auth',
+              '[hopcodeagentmanager] Session created successfully after auth',
             );
             return res;
           } catch (authErr) {
             logger.error(
-              '[QwenAgentManager] Re-authentication failed:',
+              '[hopcodeagentmanager] Re-authentication failed:',
               authErr,
             );
             // Fall through to retry logic below
@@ -267,7 +267,7 @@ export class HopCodeConnectionHandler {
         }
 
         const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-        logger.log(`[QwenAgentManager] Retrying in ${delay}ms...`);
+        logger.log(`[hopcodeagentmanager] Retrying in ${delay}ms...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }

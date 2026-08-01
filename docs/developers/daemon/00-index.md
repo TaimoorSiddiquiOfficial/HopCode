@@ -40,7 +40,7 @@ Pick the path that matches your goal:
 - [`05-mcp-transport-pool.md`](./05-mcp-transport-pool.md) - `McpTransportPool` (F2), pool entries, reverse index, restart, drain.
 - [`06-mcp-budget-guardrails.md`](./06-mcp-budget-guardrails.md) - `WorkspaceMcpBudget`, modes (`off`/`warn`/`enforce`), hysteresis, refused-batch coalescing.
 - [`07-workspace-filesystem.md`](./07-workspace-filesystem.md) - `WorkspaceFileSystem` sandbox, path policy, audit, `BridgeFileSystem` contract.
-- [`08-session-lifecycle.md`](./08-session-lifecycle.md) - create / attach / load / resume, `X-Qwen-Client-Id`, heartbeat, eviction, metadata.
+- [`08-session-lifecycle.md`](./08-session-lifecycle.md) - create / attach / load / resume, `X-hopcode-client-id`, heartbeat, eviction, metadata.
 - [`09-event-schema.md`](./09-event-schema.md) - typed event schema v1: all 53 known event types with payloads, reducers, forward compatibility.
 - [`10-event-bus.md`](./10-event-bus.md) - `EventBus`, monotonic IDs, ring replay, `Last-Event-ID`, slow-client backpressure, `client_evicted`.
 - [`11-capabilities-versioning.md`](./11-capabilities-versioning.md) - capability registry, protocol version, schema version, conditional advertisement.
@@ -127,7 +127,7 @@ Use these anchors when moving from the docs into the latest `main` code:
 | HTTP routes   | The route catalog lives in `qwen-serve-protocol.md`; this daemon set only references it and explains implementation ownership.                                                                          | [`../qwen-serve-protocol.md`](../qwen-serve-protocol.md), [`20`](./20-quickstart-operations.md)               |
 | Event schema  | `EVENT_SCHEMA_VERSION = 1`; 53 known event types; id-less subscriber synthetic frames; `_meta.serverTimestamp` stamped by `EventBus.publish()` (with `formatSseFrame()` fallback for synthetic frames). | [`09`](./09-event-schema.md), [`10`](./10-event-bus.md)                                                       |
 | Capabilities  | `SERVE_PROTOCOL_VERSION = 'v1'`; 75 registered tags; 13 conditional tags.                                                                                                                               | [`11`](./11-capabilities-versioning.md)                                                                       |
-| Session shell | `POST /session/:id/shell` exists behind `--enable-session-shell`, bearer auth, and session-bound `X-Qwen-Client-Id`; capability tag is conditional.                                                     | [`11`](./11-capabilities-versioning.md), [`17`](./17-configuration.md), [`20`](./20-quickstart-operations.md) |
+| Session shell | `POST /session/:id/shell` exists behind `--enable-session-shell`, bearer auth, and session-bound `X-hopcode-client-id`; capability tag is conditional.                                                     | [`11`](./11-capabilities-versioning.md), [`17`](./17-configuration.md), [`20`](./20-quickstart-operations.md) |
 | Rate limiting | Optional per-tier HTTP rate limit is exposed by CLI flags/env and conditional capability tag.                                                                                                           | [`11`](./11-capabilities-versioning.md), [`17`](./17-configuration.md)                                        |
 
 ### Clients / SDK

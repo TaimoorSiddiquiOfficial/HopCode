@@ -1062,7 +1062,7 @@ describe('DaemonClient', () => {
         textResponse(200, '<html>export</html>', {
           'content-type': 'text/html; charset=utf-8',
           'content-disposition':
-            'attachment; filename="qwen-code-export-2026.html"',
+            'attachment; filename="hopcode-export-2026.html"',
         }),
       );
       const client = new DaemonClient({
@@ -1086,7 +1086,7 @@ describe('DaemonClient', () => {
 
       expect(result).toEqual({
         content: '<html>export</html>',
-        filename: 'qwen-code-export-2026.html',
+        filename: 'hopcode-export-2026.html',
         mimeType: 'text/html; charset=utf-8',
         format: 'html',
       });

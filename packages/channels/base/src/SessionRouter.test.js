@@ -503,7 +503,7 @@ describe('SessionRouter', () => {
             expect(router.removeSessionId('missing')).toBe(false);
         });
         it('persists after removing by daemon session id', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             const router = new SessionRouter(bridge, '/tmp', 'user', persistPath);
@@ -513,7 +513,7 @@ describe('SessionRouter', () => {
             expect(JSON.parse(readFileSync(persistPath, 'utf-8'))).toEqual({});
         });
         it('updates persisted target metadata when reusing a restored session', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writePersistedSession(persistPath, 'ch:chat1');
@@ -547,7 +547,7 @@ describe('SessionRouter', () => {
     });
     describe('restoreSessions', () => {
         it('passes channel approval mode when restoring sessions', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writePersistedSession(persistPath);
@@ -560,7 +560,7 @@ describe('SessionRouter', () => {
             expect(bridge.loadSession).toHaveBeenCalledWith('old-session', '/tmp', { approvalMode: 'yolo' }, expect.any(Object));
         });
         it('logs malformed persisted session files', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writeFileSync(persistPath, '{bad');
@@ -582,7 +582,7 @@ describe('SessionRouter', () => {
             }
         });
         it('logs failed restores with sanitized persisted fields', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writeFileSync(persistPath, JSON.stringify({
@@ -621,7 +621,7 @@ describe('SessionRouter', () => {
             }
         });
         it('treats falsy restored session ids as failed restores', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -638,7 +638,7 @@ describe('SessionRouter', () => {
             expect(JSON.parse(readFileSync(persistPath, 'utf-8'))).toEqual({});
         });
         it('treats non-string restored session ids as failed restores', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -655,7 +655,7 @@ describe('SessionRouter', () => {
             expect(JSON.parse(readFileSync(persistPath, 'utf-8'))).toEqual({});
         });
         it('drops existing in-memory mappings when restore fails after restart', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             const router = new SessionRouter(bridge, '/tmp', 'user', persistPath);
@@ -675,7 +675,7 @@ describe('SessionRouter', () => {
             expect(JSON.parse(readFileSync(persistPath, 'utf-8'))).toEqual({});
         });
         it('drops malformed persisted routes from existing eager state', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             const router = new SessionRouter(bridge, '/tmp', 'user', persistPath);
@@ -705,7 +705,7 @@ describe('SessionRouter', () => {
             });
         });
         it('persists replacement ids returned by loadSession', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             const router = new SessionRouter(bridge, '/tmp', 'user', persistPath);
@@ -727,7 +727,7 @@ describe('SessionRouter', () => {
             });
         });
         it('does not restore a session that dies before the route is stored', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -751,7 +751,7 @@ describe('SessionRouter', () => {
             expect(JSON.parse(readFileSync(persistPath, 'utf-8'))).toEqual({});
         });
         it('shares an in-flight restore with concurrent resolve for the same route', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -775,7 +775,7 @@ describe('SessionRouter', () => {
             expect(router.getAll()).toHaveLength(1);
         });
         it.each(['removeSession', 'removeSessionId'])('invalidates a restore waiter when %s runs after reservation resolution', async (removal) => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -806,7 +806,7 @@ describe('SessionRouter', () => {
             expect(JSON.parse(readFileSync(persistPath, 'utf-8'))).toEqual({});
         });
         it('creates a fresh session for concurrent resolve when restore fails', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -830,7 +830,7 @@ describe('SessionRouter', () => {
             expect(router.getAll()).toHaveLength(1);
         });
         it('reserves all persisted routes before restoring them', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             const router = new SessionRouter(bridge, '/tmp', 'user', persistPath);
@@ -858,7 +858,7 @@ describe('SessionRouter', () => {
             expect(router.getTarget('session-2')).toBeUndefined();
         });
         it('keeps dead session ids within the active restore window', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'sessions.json');
             writeFileSync(persistPath, JSON.stringify({
@@ -910,7 +910,7 @@ describe('SessionRouter', () => {
     });
     describe('persistence safety', () => {
         it('quarantines invalid JSON and starts with no routes', () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writeFileSync(persistPath, '{bad');
@@ -922,7 +922,7 @@ describe('SessionRouter', () => {
             expect(readdirSync(dir).some((name) => name.startsWith('routes.json.corrupt-'))).toBe(true);
         });
         it('drops malformed entries but keeps valid siblings', () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writeFileSync(persistPath, JSON.stringify({
@@ -949,7 +949,7 @@ describe('SessionRouter', () => {
             });
         });
         it('persists through a same-directory temporary file and rename', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             const router = new SessionRouter(bridge, '/tmp', 'user', persistPath);
@@ -1003,7 +1003,7 @@ describe('SessionRouter', () => {
     });
     describe('lazy recovery', () => {
         it('rejects route restoration outside lazy recovery mode', () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1016,7 +1016,7 @@ describe('SessionRouter', () => {
             });
         }
         it('restores route metadata without loading daemon sessions', () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1026,7 +1026,7 @@ describe('SessionRouter', () => {
             expect(router.getSession('ch', 'alice', 'chat1')).toBe('old-session');
         });
         it('loads a dormant route once and then reuses the live binding', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1038,7 +1038,7 @@ describe('SessionRouter', () => {
             expect(bridge.newSession).not.toHaveBeenCalled();
         });
         it('coalesces concurrent loads for one dormant route', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1062,7 +1062,7 @@ describe('SessionRouter', () => {
             expect(lazyBridge.loadSession).toHaveBeenCalledTimes(1);
         });
         it('discards a daemon client created after an absent route is cleared', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             const detach = vi.fn().mockResolvedValue(undefined);
@@ -1091,7 +1091,7 @@ describe('SessionRouter', () => {
             expect(detach).toHaveBeenCalledOnce();
         });
         it('discards a loaded daemon client after its dormant route is cleared', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1115,7 +1115,7 @@ describe('SessionRouter', () => {
             expect(session.cancel).toHaveBeenCalledOnce();
         });
         it('falls back to cancel when detach fails for an invalidated replacement', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1145,7 +1145,7 @@ describe('SessionRouter', () => {
             expect(session.cancel).toHaveBeenCalledOnce();
         });
         it('does not discard a same-id binding owned by another in-flight route', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             const firstSession = daemonSession('shared-session');
@@ -1181,7 +1181,7 @@ describe('SessionRouter', () => {
             daemonBridge.stop();
         });
         it.each(['detach', 'cancel'])('does not wait for a hanging %s while rejecting invalidated creation', async (cleanup) => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             const neverSettles = vi.fn(() => new Promise(() => undefined));
@@ -1214,7 +1214,7 @@ describe('SessionRouter', () => {
             expect(daemonBridge.listSessions()).toEqual([]);
         });
         it('discards invalidated bindings despite an unrelated hung operation', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             const finishFactories = [];
@@ -1251,7 +1251,7 @@ describe('SessionRouter', () => {
             expect(daemonBridge.listSessions()).toEqual([]);
         });
         it.each(['removeSession', 'removeSessionId'])('rejects a dormant load invalidated by %s', async (removal) => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1278,7 +1278,7 @@ describe('SessionRouter', () => {
             expect(JSON.parse(readFileSync(persistPath, 'utf-8'))).toEqual({});
         });
         it('does not install a replacement created after route removal', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1302,7 +1302,7 @@ describe('SessionRouter', () => {
             expect(JSON.parse(readFileSync(persistPath, 'utf-8'))).toEqual({});
         });
         it('does not retry an invalidated shared recovery operation', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1328,7 +1328,7 @@ describe('SessionRouter', () => {
             expect(router.getSession('ch', 'alice', 'chat1')).toBeUndefined();
         });
         it('does not install an absent route created after its removal', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             let finishCreation;
@@ -1349,7 +1349,7 @@ describe('SessionRouter', () => {
             expect(existsSync(persistPath)).toBe(false);
         });
         it.each(['dormant load', 'absent creation'])('rejects a late %s after disposal', async (operation) => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             let finish;
@@ -1376,7 +1376,7 @@ describe('SessionRouter', () => {
             expect(router.getAll()).toEqual([]);
         });
         it('replaces a route only after fallback creation succeeds', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1397,7 +1397,7 @@ describe('SessionRouter', () => {
             });
         });
         it('retains the dormant route when load and fallback creation both fail', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1415,7 +1415,7 @@ describe('SessionRouter', () => {
             });
         });
         it('marks a dead lazy session dormant and reloads it on next resolve', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');
@@ -1428,7 +1428,7 @@ describe('SessionRouter', () => {
             expect(bridge.loadSession).toHaveBeenCalledTimes(2);
         });
         it('does not eagerly load route counts above the daemon live-session cap', () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             const entries = Object.fromEntries(Array.from({ length: 25 }, (_, index) => [
@@ -1449,7 +1449,7 @@ describe('SessionRouter', () => {
             expect(bridge.loadSession).not.toHaveBeenCalled();
         });
         it('clears a dormant route destructively', async () => {
-            const dir = mkdtempSync(join(tmpdir(), 'qwen-router-'));
+            const dir = mkdtempSync(join(tmpdir(), 'hopcode-router-'));
             tempDirs.push(dir);
             const persistPath = join(dir, 'routes.json');
             writePersistedSession(persistPath, 'ch:alice:chat1');

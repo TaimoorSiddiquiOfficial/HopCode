@@ -36,7 +36,7 @@ describe('fleet shepherd workflow', () => {
   });
 
   it('is scoped, killable, and never self-cancels mid-action', () => {
-    expect(workflow).toContain("github.repository == 'QwenLM/qwen-code'");
+    expect(workflow).toContain("github.repository == 'QwenLM/hopcode'");
     // Global kill switch: flipping one repository variable stops all writes.
     expect(workflow).toContain("vars.FLEET_SHEPHERD_DISABLED != 'true'");
     // A tick performs real writes; a newer tick must queue, not cancel it.
@@ -243,7 +243,7 @@ describe('fleet shepherd workflow', () => {
               PATH: `${dir}:${process.env.PATH}`,
               SCAN_RUNS_OK: 'true',
               ACTIONS_TOKEN: 'x',
-              REPO: 'QwenLM/qwen-code',
+              REPO: 'QwenLM/hopcode',
             },
             encoding: 'utf8',
           },

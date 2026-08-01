@@ -32,14 +32,14 @@ afterEach(() => {
 });
 describe('ModelDialog current marker', () => {
     it('marks exactly one row current when two models share an id', () => {
-        // Two providers expose the same model id "qwen"; `currentModel` is only an
+        // Two providers expose the same model id "hopcode"; `currentModel` is only an
         // id, so both used to be flagged. Only the first match should be current.
         const models = [
-            { id: 'qwen', authType: 'a', baseUrl: 'https://a' },
-            { id: 'qwen', authType: 'b', baseUrl: 'https://b' },
+            { id: 'hopcode', authType: 'a', baseUrl: 'https://a' },
+            { id: 'hopcode', authType: 'b', baseUrl: 'https://b' },
             { id: 'other', authType: 'c' },
         ];
-        mount(_jsx(ModelDialog, { onSelect: vi.fn(), models: models, currentModelId: "qwen" }));
+        mount(_jsx(ModelDialog, { onSelect: vi.fn(), models: models, currentModelId: "hopcode" }));
         const options = Array.from(container.querySelectorAll('[role="option"]'));
         expect(options).toHaveLength(3);
         const currentClass = dp('dialog-current');

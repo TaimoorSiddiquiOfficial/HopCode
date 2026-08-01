@@ -603,12 +603,12 @@ function areSubToolsEqual(prev, next) {
     }
     return true;
 }
-/** Parse `[text](qwen-session://id)` links in plain-text tool output and
+/** Parse `[text](hopcode-session://id)` links in plain-text tool output and
  * replace them with clickable `<a>` elements that dispatch a DOM event.
  * Keeps the rendering pipeline plain-text-compatible for all other tools. */
-const SESSION_LINK_RE = /\[([^\]]+)\]\(qwen-session:\/\/([^)]+)\)/g;
+const SESSION_LINK_RE = /\[([^\]]+)\]\(hopcode-session:\/\/([^)]+)\)/g;
 function renderWithSessionLinks(text, renderMode) {
-    if (!text || !text.includes('qwen-session://'))
+    if (!text || !text.includes('hopcode-session://'))
         return text;
     const parts = [];
     let lastIndex = 0;

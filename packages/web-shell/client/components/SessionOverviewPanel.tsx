@@ -96,7 +96,7 @@ export function deriveSessionCards(
       label: session.displayName?.trim() || session.sessionId.slice(0, 8),
       status: needsApproval ? 'needsApproval' : running ? 'running' : 'idle',
       clientCount: session.clientCount ?? status?.clientCount ?? 0,
-      model: status?.currentModelId?.startsWith('qwen-route:')
+      model: status?.currentModelId?.startsWith('hopcode-route:')
         ? undefined
         : status?.currentModelId
           ? getModelDisplayName(status.currentModelId)

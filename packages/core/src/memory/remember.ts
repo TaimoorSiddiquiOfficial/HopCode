@@ -55,7 +55,7 @@ export function buildManagedRememberPrompt(
 }
 
 export function buildBareRememberPrompt(fact: string): string {
-  return `Please save the following fact to memory (e.g. append to QWEN.md in the project root):\n\n${fact.trim()}`;
+  return `Please save the following fact to memory (e.g. append to HOPCODE.md in the project root):\n\n${fact.trim()}`;
 }
 
 async function buildCleanMemorySystemPrompt(
@@ -93,7 +93,7 @@ function buildRememberSystemPrompt(memoryPrompt: string): string {
     '',
     'Rules:',
     '- Save only information provided in the task prompt.',
-    '- Use the managed auto-memory system only; do not write QWEN.md or AGENTS.md.',
+    '- Use the managed auto-memory system only; do not write HOPCODE.md or AGENTS.md.',
     '- Do not inspect or depend on any user-visible chat session history.',
     '- Use read/list/search/write/edit tools only inside the managed memory directories.',
     '- When finished, report only whether the memory update completed; do not quote or summarize memory content.',

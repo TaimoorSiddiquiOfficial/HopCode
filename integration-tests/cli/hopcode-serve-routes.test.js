@@ -44,8 +44,8 @@ let port = 0;
 let base = '';
 let client;
 function writePersistedTranscript(sessionId, records, state = 'active') {
-    const qwenHome = path.join(homeDir, '.hopcode');
-    const projectDir = Storage.runWithRuntimeBaseDir(qwenHome, REPO_ROOT, () => new Storage(REPO_ROOT).getProjectDir());
+    const hopcodeHome = path.join(homeDir, '.hopcode');
+    const projectDir = Storage.runWithRuntimeBaseDir(hopcodeHome, REPO_ROOT, () => new Storage(REPO_ROOT).getProjectDir());
     const chatsDir = path.join(projectDir, 'chats', ...(state === 'archived' ? ['archive'] : []));
     mkdirSync(chatsDir, { recursive: true });
     const filePath = path.join(chatsDir, `${sessionId}.jsonl`);
@@ -104,8 +104,8 @@ beforeAll(async () => {
                 'QWEN_SERVE_RATE_LIMIT',
                 'QWEN_SERVE_NO_MCP_POOL',
                 'QWEN_SERVE_NO_PERSISTENT_REGISTRATION',
-                'QWEN_SERVE_CLIENT_MCP_OVER_WS',
-                'QWEN_SERVE_CDP_TUNNEL_OVER_WS',
+                'hopcode_serve_client_mcp_over_ws',
+                'hopcode_serve_cdp_tunnel_over_ws',
             ].includes(k))),
             HOME: homeDir,
             HOPCODE_HOME: path.join(homeDir, '.hopcode'),
@@ -424,8 +424,8 @@ describe('hopcode serve — transcript paging route', () => {
         // `chats/` dir. Remove them so later suites (e.g. PATCH metadata's
         // listWorkspaceSessions readback) start from a clean session list: extra
         // persisted sessions widen a pre-existing listing race and flake them.
-        const qwenHome = path.join(homeDir, '.hopcode');
-        const projectDir = Storage.runWithRuntimeBaseDir(qwenHome, REPO_ROOT, () => new Storage(REPO_ROOT).getProjectDir());
+        const hopcodeHome = path.join(homeDir, '.hopcode');
+        const projectDir = Storage.runWithRuntimeBaseDir(hopcodeHome, REPO_ROOT, () => new Storage(REPO_ROOT).getProjectDir());
         rmSync(path.join(projectDir, 'chats'), { recursive: true, force: true });
     });
 });

@@ -425,7 +425,7 @@ export interface DaemonStatusReport {
       runHopCodeServeToListenMs?: number;
       preheat: { status: string; durationMs?: number; error?: string };
     };
-    qwenCodeVersion?: string;
+    hopcodeversion?: string;
     daemonId?: string;
     runId?: string;
     logMode?: DaemonLogMode;

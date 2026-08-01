@@ -45,33 +45,33 @@ describe('UserMessage', () => {
         expect(container.textContent).toContain('hello world');
     });
     it('renders file references as chips from input annotations', () => {
-        const content = 'list @.qwen/ files';
+        const content = 'list @.hopcode/ files';
         const container = render(_jsx(UserMessage, { content: content, inputAnnotations: [
-                referenceAnnotation(content, '@.qwen/', {
-                    id: 'file:@.qwen/',
+                referenceAnnotation(content, '@.hopcode/', {
+                    id: 'file:@.hopcode/',
                     kind: 'file',
-                    value: '.qwen/',
-                    serialized: '@.qwen/',
+                    value: '.hopcode/',
+                    serialized: '@.hopcode/',
                 }),
             ] }));
-        const chip = container.querySelector('[title="@.qwen/"]');
+        const chip = container.querySelector('[title="@.hopcode/"]');
         expect(chip).not.toBeNull();
-        expect(chip?.textContent).toBe('.qwen/');
-        expect(container.textContent).toContain('list .qwen/ files');
+        expect(chip?.textContent).toBe('.hopcode/');
+        expect(container.textContent).toContain('list .hopcode/ files');
     });
     it('uses configured composer tag icons for annotation chips', () => {
-        const content = 'list @.qwen/ files';
+        const content = 'list @.hopcode/ files';
         const container = render(_jsx(WebShellCustomizationProvider, { value: {
                 composerTagIcons: { file: '/custom-file.svg' },
             }, children: _jsx(UserMessage, { content: content, inputAnnotations: [
-                    referenceAnnotation(content, '@.qwen/', {
-                        id: 'file:@.qwen/',
+                    referenceAnnotation(content, '@.hopcode/', {
+                        id: 'file:@.hopcode/',
                         kind: 'file',
-                        value: '.qwen/',
-                        serialized: '@.qwen/',
+                        value: '.hopcode/',
+                        serialized: '@.hopcode/',
                     }),
                 ] }) }));
-        const icon = container.querySelector('[title="@.qwen/"] [aria-hidden="true"]');
+        const icon = container.querySelector('[title="@.hopcode/"] [aria-hidden="true"]');
         expect(icon).not.toBeNull();
         expect(icon?.style.getPropertyValue('--user-message-tag-icon-url')).toBe('url("/custom-file.svg")');
     });

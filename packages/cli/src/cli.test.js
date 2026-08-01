@@ -146,7 +146,7 @@ describe('runCliEntry', () => {
     it('prints top-level help without loading the full CLI graph', async () => {
         await runCliEntry(['--help']);
         const helpText = stdout.join('');
-        expect(helpText).toContain('Usage: qwen [options] [command]');
+        expect(helpText).toContain('Usage: hopcode [options] [command]');
         expect(helpText).toContain('Manage HopCode hooks');
         expect(helpText).toContain('Manage MCP servers');
         expect(helpText).toContain('Run HopCode as a local HTTP daemon');
@@ -288,7 +288,7 @@ describe('bootstrap import boundaries', () => {
         const wrongDir = mkdtempSync(path.join(tmpdir(), 'qwen-cli-wrong-'));
         const oldDir = path.join(tempDir, 'old');
         const newDir = path.join(tempDir, 'new');
-        const binPath = path.join(tempDir, 'qwen');
+        const binPath = path.join(tempDir, 'hopcode');
         try {
             mkdirSync(oldDir);
             mkdirSync(newDir);
@@ -298,8 +298,8 @@ describe('bootstrap import boundaries', () => {
             writeFileSync(path.join(newDir, 'cli.js'), "process.stdout.write(`${JSON.stringify({ args: process.argv.slice(2), skip: process.env.QWEN_CODE_SKIP_UPDATE_CHECK_ONCE, hasLauncherPid: /^\\d+$/.test(process.env.QWEN_CODE_LAUNCHER_PID ?? ''), launcherPath: process.env.QWEN_CODE_LAUNCHER_PATH })}\\n`);\n");
             writeFileSync(binPath, `#!/bin/sh\nexec "${process.execPath}" "${path.join(oldDir, 'entry.mjs')}" "$@"\n`);
             chmodSync(binPath, 0o755);
-            writeFileSync(path.join(wrongDir, 'qwen'), '#!/bin/sh\necho wrong-launcher\n');
-            chmodSync(path.join(wrongDir, 'qwen'), 0o755);
+            writeFileSync(path.join(wrongDir, 'hopcode'), '#!/bin/sh\necho wrong-launcher\n');
+            chmodSync(path.join(wrongDir, 'hopcode'), 0o755);
             const output = execFileSync(binPath, ['--prompt', 'a&b'], {
                 encoding: 'utf8',
                 env: {
@@ -321,7 +321,7 @@ describe('bootstrap import boundaries', () => {
     it('does not pass the standalone launcher hint to child processes', () => {
         const tempDir = mkdtempSync(path.join(tmpdir(), 'qwen-cli-launcher-env-'));
         const entryPath = path.join(tempDir, 'entry.mjs');
-        const launcherPath = path.join(tempDir, 'qwen');
+        const launcherPath = path.join(tempDir, 'hopcode');
         try {
             copyFileSync('../../scripts/cli-entry.js', entryPath);
             writeFileSync(path.join(tempDir, 'cli.js'), 'process.stdout.write(JSON.stringify({ launcherPath: process.env.QWEN_CODE_LAUNCHER_PATH }));\n');

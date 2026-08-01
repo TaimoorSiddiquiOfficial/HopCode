@@ -442,7 +442,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: '',
             description:
-              'Path to a custom keyterms file (one term per line, "#" for comments) that biases voice transcription toward domain-specific terms. Relative paths resolve from the workspace root; defaults to ".hopcode/voice-keyterms.txt" when present. The file contents are sent to the ASR provider and it is read only in trusted workspaces. Only applies to Qwen ASR models (qwen3-asr-*).',
+              'Path to a custom keyterms file (one term per line, "#" for comments) that biases voice transcription toward domain-specific terms. Relative paths resolve from the workspace root; defaults to ".hopcode/voice-keyterms.txt" when present. The file contents are sent to the ASR provider and it is read only in trusted workspaces. Only applies to hopcode ASR models (qwen3-asr-*).',
             showInDialog: false,
           },
           refineTranscript: {

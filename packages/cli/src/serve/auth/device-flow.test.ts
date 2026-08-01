@@ -1413,7 +1413,7 @@ describe('DeviceFlowRegistry — abort propagation to provider.poll', () => {
 
       // Cancel the flow — registry should abort the entry's
       // cancelController, which is the SAME signal the provider's
-      // `poll` saw. A real Qwen provider passes this to `fetch`, so
+      // `poll` saw. A real hopcode provider passes this to `fetch`, so
       // an in-flight HTTP socket gets torn down immediately.
       registry.cancel(started.deviceFlowId);
       expect(provider.lastPollSignal!.aborted).toBe(true);

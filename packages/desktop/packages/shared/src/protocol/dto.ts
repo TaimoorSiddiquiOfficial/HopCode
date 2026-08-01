@@ -455,27 +455,27 @@ export type SessionCommand =
     }
   | { type: 'getHopCodeCoreSettings' }
   | {
-      type: 'setQwenCoreSetting'
+      type: 'sethopcodecoreSetting'
       scope: HopCodeSettingsScope
       key: HopCodeCoreSettingKey
       value: HopCodeSettingValue
     }
   | {
-      type: 'setQwenMcpServer'
+      type: 'sethopcodemcpserver'
       scope: HopCodeSettingsScope
       name: string
       server: HopCodeMcpServerConfig
     }
-  | { type: 'removeQwenMcpServer'; scope: HopCodeSettingsScope; name: string }
+  | { type: 'removehopcodemcpserver'; scope: HopCodeSettingsScope; name: string }
   | {
-      type: 'setQwenHook'
+      type: 'sethopcodehook'
       scope: HopCodeSettingsScope
       event: HopCodeHookEvent
       index?: number
       hook: HopCodeHookDefinition
     }
   | {
-      type: 'removeQwenHook'
+      type: 'removehopcodehook'
       scope: HopCodeSettingsScope
       event: HopCodeHookEvent
       index: number
@@ -513,7 +513,7 @@ export interface NewChatActionParams {
 }
 
 // ---------------------------------------------------------------------------
-// Qwen permission settings
+// hopcode permission settings
 // ---------------------------------------------------------------------------
 
 export type PermissionRuleType = 'allow' | 'ask' | 'deny'
@@ -538,7 +538,7 @@ export interface HopCodePermissionSettings {
 }
 
 // ---------------------------------------------------------------------------
-// Qwen core settings
+// hopcode core settings
 // ---------------------------------------------------------------------------
 
 export type HopCodeSettingsScope = 'user' | 'workspace'

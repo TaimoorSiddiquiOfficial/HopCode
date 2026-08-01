@@ -7,7 +7,7 @@ const workflow = readFileSync(
   'utf8',
 );
 const yml = parse(workflow);
-const skill = readFileSync('.qwen/skills/ci-flaky-patrol/SKILL.md', 'utf8');
+const skill = readFileSync('.hopcode/skills/ci-flaky-patrol/SKILL.md', 'utf8');
 
 describe('ci failure patrol workflow', () => {
   it('runs every ten minutes with serialized configurable batches', () => {
@@ -24,7 +24,7 @@ describe('ci failure patrol workflow', () => {
 
   it('keeps classifier credentials isolated and PAT writes explicit', () => {
     const classifier = yml.jobs.classify.steps.find((step) =>
-      step.uses?.includes('qwen-code-action'),
+      step.uses?.includes('hopcode-action'),
     );
     expect(classifier.env).toEqual({ GH_TOKEN: '', GITHUB_TOKEN: '' });
     expect(JSON.stringify(classifier)).not.toContain('CI_BOT_PAT');

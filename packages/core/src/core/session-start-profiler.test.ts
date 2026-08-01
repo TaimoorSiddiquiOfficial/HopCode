@@ -386,7 +386,7 @@ describe('session-start-profiler', () => {
 
   it('writes bounded JSONL without sensitive fields', async () => {
     const runtimeDir = await mkdtemp(join(tmpdir(), 'session-start-profiler-'));
-    vi.stubEnv('QWEN_RUNTIME_DIR', runtimeDir);
+    vi.stubEnv('hopcode_runtime_dir', runtimeDir);
     vi.stubEnv(SESSION_START_PROFILE_ENV, '1');
 
     try {
@@ -435,7 +435,7 @@ describe('session-start-profiler', () => {
 
   it('appends to an existing JSONL file', async () => {
     const runtimeDir = await mkdtemp(join(tmpdir(), 'session-start-profiler-'));
-    vi.stubEnv('QWEN_RUNTIME_DIR', runtimeDir);
+    vi.stubEnv('hopcode_runtime_dir', runtimeDir);
     vi.stubEnv(SESSION_START_PROFILE_ENV, '1');
 
     try {
@@ -467,7 +467,7 @@ describe('session-start-profiler', () => {
 
   itNoSymlink('does not write through a symlinked JSONL file', async () => {
     const runtimeDir = await mkdtemp(join(tmpdir(), 'session-start-profiler-'));
-    vi.stubEnv('QWEN_RUNTIME_DIR', runtimeDir);
+    vi.stubEnv('hopcode_runtime_dir', runtimeDir);
     vi.stubEnv(SESSION_START_PROFILE_ENV, '1');
 
     try {
@@ -500,7 +500,7 @@ describe('session-start-profiler', () => {
       const runtimeDir = await mkdtemp(
         join(tmpdir(), 'session-start-profiler-'),
       );
-      vi.stubEnv('QWEN_RUNTIME_DIR', runtimeDir);
+      vi.stubEnv('hopcode_runtime_dir', runtimeDir);
       vi.stubEnv(SESSION_START_PROFILE_ENV, '1');
 
       try {

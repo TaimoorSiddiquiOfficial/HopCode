@@ -1161,7 +1161,7 @@ interface ManagedSession {
   createdAt?: number
   // Total message count (pre-computed in JSONL header for fast list loading)
   messageCount?: number
-  // Message queue for handling new messages while processing. Qwen can consume
+  // Message queue for handling new messages while processing. hopcode can consume
   // some entries mid-turn; those stay here as backup until ACP acknowledges.
   messageQueue: Array<{
     message: string
@@ -1185,7 +1185,7 @@ interface ManagedSession {
   // Runtime guard: for provider-native sessions with empty local JSONL, try one
   // native-history backfill even if a previous render path marked messages loaded.
   externalMessagesLoadAttempted?: boolean
-  // Provider-native history cache watermark. For Qwen canonical sessions, messages
+  // Provider-native history cache watermark. For hopcode canonical sessions, messages
   // are rendered from ACP but not persisted into Craft JSONL, so re-load only
   // when provider listing metadata reports a newer external update.
   externalMessagesLoadedThroughAt?: number
@@ -1519,7 +1519,7 @@ export class SessionManager implements ISessionManager {
   > = new Map()
   // Promise deduplication for lazy-loading messages (prevents race conditions)
   private messageLoadingPromises: Map<string, Promise<void>> = new Map()
-  // Per-workspace provider-native history sync (currently Qwen ACP session/list).
+  // Per-workspace provider-native history sync (currently hopcode ACP session/list).
   private externalSessionListSyncAt: Map<string, number> = new Map()
   private externalSessionListSyncPromises: Map<string, Promise<void>> =
     new Map()
@@ -1725,7 +1725,7 @@ export class SessionManager implements ISessionManager {
       changed = true
     }
 
-    // Qwen canonical mirrors intentionally omit provider titles from local
+    // hopcode canonical mirrors intentionally omit provider titles from local
     // headers. Treat an absent local name as "unknown", not as a delete.
     if (
       !(
@@ -2596,7 +2596,7 @@ export class SessionManager implements ISessionManager {
     if (managed.llmConnection) return managed.llmConnection
 
     // Qwen-only sessions no longer persist llmConnection in desktop JSONL.
-    // Any session with a provider SDK id resumes through the built-in Qwen backend.
+    // Any session with a provider SDK id resumes through the built-in hopcode backend.
     if (managed.sdkSessionId) {
       return HOPCODE_CODE_CONNECTION_SLUG
     }
@@ -2650,7 +2650,7 @@ export class SessionManager implements ISessionManager {
 
     await sessionPersistenceQueue.flush(previousId).catch((error) => {
       sessionLog.debug(
-        `Failed to flush session ${previousId} before Qwen id canonicalization:`,
+        `Failed to flush session ${previousId} before hopcode id canonicalization:`,
         error,
       )
     })
@@ -3174,7 +3174,7 @@ export class SessionManager implements ISessionManager {
       }
     } catch (error) {
       sessionLog.warn(
-        `Failed to infer legacy Qwen attachments for session ${managed.id}:`,
+        `Failed to infer legacy hopcode attachments for session ${managed.id}:`,
         error,
       )
       return []
@@ -4057,7 +4057,7 @@ export class SessionManager implements ISessionManager {
         managed.thinkingLevel = storedSession.thinkingLevel
       }
       // Sync name from disk - ensures title persistence across lazy loading.
-      // Qwen canonical mirrors omit provider titles locally, so missing disk
+      // hopcode canonical mirrors omit provider titles locally, so missing disk
       // names must not clear the in-memory provider title.
       if (
         storedSession.name !== undefined ||
@@ -4192,7 +4192,7 @@ export class SessionManager implements ISessionManager {
       )
       if (latestUserIndex >= 0) {
         sessionLog.info(
-          `Mapped stale Qwen history message id ${messageId} to latest user message ${managed.messages[latestUserIndex].id} in session ${managed.id}`,
+          `Mapped stale hopcode history message id ${messageId} to latest user message ${managed.messages[latestUserIndex].id} in session ${managed.id}`,
         )
         return {
           message: managed.messages[latestUserIndex],
@@ -4299,7 +4299,7 @@ export class SessionManager implements ISessionManager {
       options?.enabledSourceSlugs ?? wsConfig?.defaults?.enabledSourceSlugs
 
     // Resolve model tier hints ('fast' / 'default') to actual model IDs.
-    // EditPopover uses tier hints so the right Qwen model is selected.
+    // EditPopover uses tier hints so the right hopcode model is selected.
     let resolvedModelOption = options?.model || defaultModel
     if (resolvedModelOption === 'fast' || resolvedModelOption === 'default') {
       const tierConnection = resolveSessionConnection(
@@ -4964,7 +4964,7 @@ export class SessionManager implements ISessionManager {
         this.persistSession(managed)
         sessionPersistenceQueue.flush(managed.id)
         // Provider-native mirrors already get their title from Qwen; only push
-        // Craft-owned session names back into Qwen when a child SDK id appears.
+        // Craft-owned session names back into hopcode when a child SDK id appears.
         if (managed.name && managed.id !== sdkSessionId) {
           void this.syncExternalBackendTitleIfSupported(managed, managed.name)
         }
@@ -7590,7 +7590,7 @@ export class SessionManager implements ISessionManager {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       sessionLog.warn(
-        `Failed to refresh Qwen ACP model default after ${reason}: ${message}`,
+        `Failed to refresh hopcode ACP model default after ${reason}: ${message}`,
       )
     }
   }
@@ -8386,7 +8386,7 @@ export class SessionManager implements ISessionManager {
 
       if (backendContext.connection?.providerType === 'hopcode') {
         sessionLog.info(
-          `Skipping local skill source pre-enable for Qwen ACP session: ${invokedSkillSlugs.join(', ')}`,
+          `Skipping local skill source pre-enable for hopcode ACP session: ${invokedSkillSlugs.join(', ')}`,
         )
         return false
       }
@@ -9638,7 +9638,7 @@ export class SessionManager implements ISessionManager {
         )
         return
       } catch (error) {
-        sessionLog.warn('Failed to persist Qwen approval mode via ACP', {
+        sessionLog.warn('Failed to persist hopcode approval mode via ACP', {
           sessionId: managed.id,
           error: error instanceof Error ? error.message : String(error),
         })
@@ -9657,7 +9657,7 @@ export class SessionManager implements ISessionManager {
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagePermissionSettings(agent)) {
       throw new Error(
-        'This session backend does not expose Qwen permission settings',
+        'This session backend does not expose hopcode permission settings',
       )
     }
 
@@ -9678,14 +9678,14 @@ export class SessionManager implements ISessionManager {
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagePermissionSettings(agent)) {
       throw new Error(
-        'This session backend does not expose Qwen permission settings',
+        'This session backend does not expose hopcode permission settings',
       )
     }
 
     return agent.setPermissionRules(scope, ruleType, rules)
   }
 
-  async getSessionQwenCoreSettings(
+  async getSessionhopcodecoreSettings(
     sessionId: string,
   ): Promise<HopCodeCoreSettingsSnapshot> {
     const managed = this.sessions.get(sessionId)
@@ -9695,7 +9695,7 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagehopcodeSettings(agent)) {
-      throw new Error('This session backend does not expose Qwen settings')
+      throw new Error('This session backend does not expose hopcode settings')
     }
 
     return agent.getCoreSettings()
@@ -9711,7 +9711,7 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManageHopCodeProviders(agent)) {
-      throw new Error('This session backend does not expose Qwen providers')
+      throw new Error('This session backend does not expose hopcode providers')
     }
 
     return agent.listProviders()
@@ -9728,13 +9728,13 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManageHopCodeProviders(agent)) {
-      throw new Error('This session backend does not expose Qwen providers')
+      throw new Error('This session backend does not expose hopcode providers')
     }
 
     return agent.connectProvider(params)
   }
 
-  async setSessionQwenCoreSetting(
+  async setSessionhopcodecoreSetting(
     sessionId: string,
     scope: HopCodeSettingsScope,
     key: HopCodeCoreSettingKey,
@@ -9747,13 +9747,13 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagehopcodeSettings(agent)) {
-      throw new Error('This session backend does not expose Qwen settings')
+      throw new Error('This session backend does not expose hopcode settings')
     }
 
     return agent.setCoreSetting(scope, key, value)
   }
 
-  async setSessionQwenMcpServer(
+  async setSessionhopcodemcpserver(
     sessionId: string,
     scope: HopCodeSettingsScope,
     name: string,
@@ -9766,13 +9766,13 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagehopcodeSettings(agent)) {
-      throw new Error('This session backend does not expose Qwen settings')
+      throw new Error('This session backend does not expose hopcode settings')
     }
 
     return agent.setMcpServer(scope, name, server)
   }
 
-  async removeSessionQwenMcpServer(
+  async removeSessionhopcodemcpserver(
     sessionId: string,
     scope: HopCodeSettingsScope,
     name: string,
@@ -9784,13 +9784,13 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagehopcodeSettings(agent)) {
-      throw new Error('This session backend does not expose Qwen settings')
+      throw new Error('This session backend does not expose hopcode settings')
     }
 
     return agent.removeMcpServer(scope, name)
   }
 
-  async setSessionQwenHook(
+  async setSessionhopcodehook(
     sessionId: string,
     scope: HopCodeSettingsScope,
     event: HopCodeHookEvent,
@@ -9804,13 +9804,13 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagehopcodeSettings(agent)) {
-      throw new Error('This session backend does not expose Qwen settings')
+      throw new Error('This session backend does not expose hopcode settings')
     }
 
     return agent.setHook(scope, event, index, hook)
   }
 
-  async removeSessionQwenHook(
+  async removeSessionhopcodehook(
     sessionId: string,
     scope: HopCodeSettingsScope,
     event: HopCodeHookEvent,
@@ -9823,7 +9823,7 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagehopcodeSettings(agent)) {
-      throw new Error('This session backend does not expose Qwen settings')
+      throw new Error('This session backend does not expose hopcode settings')
     }
 
     return agent.removeHook(scope, event, index)
@@ -9843,7 +9843,7 @@ export class SessionManager implements ISessionManager {
 
     const agent = await this.getOrCreateAgent(managed)
     if (!canManagehopcodeSettings(agent)) {
-      throw new Error('This session backend does not expose Qwen settings')
+      throw new Error('This session backend does not expose hopcode settings')
     }
 
     return agent.setExtensionSetting(extensionId, settingKey, scope, value)
@@ -10073,7 +10073,7 @@ export class SessionManager implements ISessionManager {
     }
   }
 
-  private async installDraftQwenSkill(
+  private async installDrafthopcodeskill(
     skill: HopCodeSkillInstallRequest,
     options: RefreshAvailableCommandsOptions,
   ): Promise<{
@@ -10125,7 +10125,7 @@ export class SessionManager implements ISessionManager {
       }
     }
 
-    sessionLog.info('installQwenSkill: starting draft installation', {
+    sessionLog.info('installhopcodeskill: starting draft installation', {
       workspaceId: workspace.id,
       llmConnection: connection?.slug ?? options.llmConnection,
       workingDirectory,
@@ -10164,12 +10164,12 @@ export class SessionManager implements ISessionManager {
           const message =
             error instanceof Error ? error.message : String(error)
           sessionLog.warn(
-            `installQwenSkill: post-install command refresh failed: ${message}`,
+            `installhopcodeskill: post-install command refresh failed: ${message}`,
           )
         }
       }
 
-      sessionLog.info('installQwenSkill: draft installation complete', {
+      sessionLog.info('installhopcodeskill: draft installation complete', {
         workspaceId: workspace.id,
         skillId: skill.id,
         installedSlug: installResult.slug,
@@ -10184,7 +10184,7 @@ export class SessionManager implements ISessionManager {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      sessionLog.warn(`installQwenSkill draft installation failed: ${message}`)
+      sessionLog.warn(`installhopcodeskill draft installation failed: ${message}`)
       return { success: false, error: message }
     } finally {
       if (agent) {
@@ -10198,7 +10198,7 @@ export class SessionManager implements ISessionManager {
     }
   }
 
-  private async deleteDraftQwenSkill(
+  private async deleteDrafthopcodeskill(
     skill: HopCodeSkillDeleteRequest,
     options: RefreshAvailableCommandsOptions,
   ): Promise<{
@@ -10277,7 +10277,7 @@ export class SessionManager implements ISessionManager {
             const message =
               error instanceof Error ? error.message : String(error)
             sessionLog.warn(
-              `deleteQwenSkill: post-delete command refresh failed: ${message}`,
+              `deletehopcodeskill: post-delete command refresh failed: ${message}`,
             )
             return null
           })
@@ -10290,7 +10290,7 @@ export class SessionManager implements ISessionManager {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      sessionLog.warn(`deleteQwenSkill draft deletion failed: ${message}`)
+      sessionLog.warn(`deletehopcodeskill draft deletion failed: ${message}`)
       return { success: false, error: message }
     } finally {
       if (agent) {
@@ -10304,7 +10304,7 @@ export class SessionManager implements ISessionManager {
     }
   }
 
-  private async setDraftQwenSkillEnabled(
+  private async setDrafthopcodeskillEnabled(
     skill: HopCodeSkillSetEnabledRequest,
     options: RefreshAvailableCommandsOptions,
   ): Promise<{
@@ -10383,7 +10383,7 @@ export class SessionManager implements ISessionManager {
             const message =
               error instanceof Error ? error.message : String(error)
             sessionLog.warn(
-              `setQwenSkillEnabled: post-update command refresh failed: ${message}`,
+              `sethopcodeskillEnabled: post-update command refresh failed: ${message}`,
             )
             return null
           })
@@ -10396,7 +10396,7 @@ export class SessionManager implements ISessionManager {
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      sessionLog.warn(`setQwenSkillEnabled draft update failed: ${message}`)
+      sessionLog.warn(`sethopcodeskillEnabled draft update failed: ${message}`)
       return { success: false, error: message }
     } finally {
       if (agent) {
@@ -10511,7 +10511,7 @@ export class SessionManager implements ISessionManager {
     }
   }
 
-  async installQwenSkill(
+  async installhopcodeskill(
     sessionId: string,
     skill: HopCodeSkillInstallRequest,
     options?: RefreshAvailableCommandsOptions,
@@ -10526,13 +10526,13 @@ export class SessionManager implements ISessionManager {
     const managed = this.sessions.get(sessionId)
     if (!managed) {
       if (options?.workspaceId) {
-        return this.installDraftQwenSkill(skill, options)
+        return this.installDrafthopcodeskill(skill, options)
       }
-      sessionLog.warn(`installQwenSkill: session ${sessionId} not found`)
+      sessionLog.warn(`installhopcodeskill: session ${sessionId} not found`)
       return { success: false, error: 'Session not found' }
     }
 
-    sessionLog.info('installQwenSkill: starting', {
+    sessionLog.info('installhopcodeskill: starting', {
       sessionId,
       skillId: skill.id,
       sourceUrl: skill.sourceUrl,
@@ -10571,13 +10571,13 @@ export class SessionManager implements ISessionManager {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       sessionLog.warn(
-        `installQwenSkill failed for session ${sessionId}: ${message}`,
+        `installhopcodeskill failed for session ${sessionId}: ${message}`,
       )
       return { success: false, error: message }
     }
   }
 
-  async deleteQwenSkill(
+  async deletehopcodeskill(
     sessionId: string,
     skill: HopCodeSkillDeleteRequest,
     options?: RefreshAvailableCommandsOptions,
@@ -10592,9 +10592,9 @@ export class SessionManager implements ISessionManager {
     const managed = this.sessions.get(sessionId)
     if (!managed) {
       if (options?.workspaceId) {
-        return this.deleteDraftQwenSkill(skill, options)
+        return this.deleteDrafthopcodeskill(skill, options)
       }
-      sessionLog.warn(`deleteQwenSkill: session ${sessionId} not found`)
+      sessionLog.warn(`deletehopcodeskill: session ${sessionId} not found`)
       return { success: false, error: 'Session not found' }
     }
 
@@ -10628,13 +10628,13 @@ export class SessionManager implements ISessionManager {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       sessionLog.warn(
-        `deleteQwenSkill failed for session ${sessionId}: ${message}`,
+        `deletehopcodeskill failed for session ${sessionId}: ${message}`,
       )
       return { success: false, error: message }
     }
   }
 
-  async setQwenSkillEnabled(
+  async sethopcodeskillEnabled(
     sessionId: string,
     skill: HopCodeSkillSetEnabledRequest,
     options?: RefreshAvailableCommandsOptions,
@@ -10649,9 +10649,9 @@ export class SessionManager implements ISessionManager {
     const managed = this.sessions.get(sessionId)
     if (!managed) {
       if (options?.workspaceId) {
-        return this.setDraftQwenSkillEnabled(skill, options)
+        return this.setDrafthopcodeskillEnabled(skill, options)
       }
-      sessionLog.warn(`setQwenSkillEnabled: session ${sessionId} not found`)
+      sessionLog.warn(`sethopcodeskillEnabled: session ${sessionId} not found`)
       return { success: false, error: 'Session not found' }
     }
 
@@ -10685,7 +10685,7 @@ export class SessionManager implements ISessionManager {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       sessionLog.warn(
-        `setQwenSkillEnabled failed for session ${sessionId}: ${message}`,
+        `sethopcodeskillEnabled failed for session ${sessionId}: ${message}`,
       )
       return { success: false, error: message }
     }

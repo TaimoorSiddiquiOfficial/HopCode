@@ -8,7 +8,7 @@ export const LOAD_REPLAY_META_KEY = 'hopcode.session.loadReplay';
 export const LOAD_REPLAY_PAGE_SIZE_META_KEY = 'hopcode.session.loadReplayPageSize';
 export const LOAD_REPLAY_BULK_MODE = 'bulk';
 export const LOAD_REPLAY_VERSION = 1;
-export const CHANNEL_STARTUP_PROFILE_META_KEY = 'qwen.daemon.channelStartupProfile';
+export const CHANNEL_STARTUP_PROFILE_META_KEY = 'hopcode.daemon.channelStartupProfile';
 export const CHANNEL_STARTUP_PROFILE_VERSION = 1;
 /**
  * ACP ext-method the spawned `hopcode --acp` child calls between tool batches to
@@ -36,7 +36,7 @@ export const TODO_STOP_GUARD_QUEUE_RELEASE_METHOD = 'craft/todoStopGuardQueueRel
  * runtime-MCP-add config. The `hopcode --acp` child reads it in its
  * `workspaceMcpRuntimeAdd` handler to (1) KEEP `type: 'sdk'` instead of
  * stripping it and (2) let the session `McpClientManager` bind that server's
- * `sendSdkMcpMessage` to the `qwen/control/client_mcp/message` ext-method.
+ * `sendSdkMcpMessage` to the `hopcode/control/client_mcp/message` ext-method.
  * Defined here — the single contract package both the parent provider
  * (`cli/src/serve/acp-http`) and the child handler (`cli/src/acp-integration`)
  * import — so a rename can't silently break the handshake.

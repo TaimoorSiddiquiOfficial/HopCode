@@ -11,7 +11,7 @@
  * The Chrome extension cannot be a listening MCP server: it hosts MCP tools
  * that the agent (running inside the daemon's ACP child) reaches by carrying
  * `mcp_message` JSON-RPC frames over the daemon WS. This test boots a real
- * daemon (with `QWEN_SERVE_CLIENT_MCP_OVER_WS=1`), connects a headless `ws`
+ * daemon (with `hopcode_serve_client_mcp_over_ws=1`), connects a headless `ws`
  * client standing in for the extension, and exercises the full round-trip
  * WITHOUT any LLM turn:
  *

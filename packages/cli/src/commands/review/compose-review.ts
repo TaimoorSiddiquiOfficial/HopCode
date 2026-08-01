@@ -471,7 +471,7 @@ export function composeReview(input: ComposeReviewInput): ComposeReviewResult {
     downgradedFrom = 'Request changes';
   }
 
-  const footer = `_— ${modelId} via Qwen Code /review_`;
+  const footer = `_— ${modelId} via HopCode /review_`;
   const finish = (text: string): string =>
     text === '' ? '' : `${text}\n\n${footer}`;
 

@@ -492,8 +492,8 @@ export interface DaemonMcpChildRefusedBatchData {
 
 /**
  * A `POST /workspace/memory` write completed successfully. `scope`
- * records which file was touched (workspace QWEN.md vs global
- * ~/.hopcode/QWEN.md), `mode` is the requested write mode, and
+ * records which file was touched (workspace HOPCODE.md vs global
+ * ~/.hopcode/HOPCODE.md), `mode` is the requested write mode, and
  * `bytesWritten` is the size of the file post-write.
  */
 export interface DaemonFileMemoryChangedData {
@@ -1310,7 +1310,7 @@ export interface DaemonSessionViewState {
   /**
    * Workspace-scoped -- every session bus receives
    * `workspace_initialized` events. `lastWorkspaceInit` records the
-   * most recent envelope so adapters can render a "QWEN.md was just
+   * most recent envelope so adapters can render a "HOPCODE.md was just
    * scaffolded by another client" notice without polling.
    */
   workspaceInitCount: number;
@@ -2093,7 +2093,7 @@ export function reduceDaemonSessionEvent(
       return base;
     case 'workspace_initialized':
       // Workspace-scoped fan-out. Non-terminal â€” just records that a
-      // QWEN.md scaffold was performed.
+      // HOPCODE.md scaffold was performed.
       return {
         ...base,
         workspaceInitCount: base.workspaceInitCount + 1,

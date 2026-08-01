@@ -547,7 +547,7 @@ export interface QueryOptions {
   fallbackModel?: string[];
 
   /**
-   * Proxy URL for the Qwen CLI process.
+   * Proxy URL for the hopcode CLI process.
    * @deprecated Use the "proxy" setting in settings.json instead.
    */
   proxy?: string;

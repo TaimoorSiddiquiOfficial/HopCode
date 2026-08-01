@@ -141,7 +141,7 @@ function primaryWorkspaceArg(
 export const serveCommand: CommandModule<unknown, ServeArgs> = {
   command: 'serve',
   describe:
-    'Run Qwen Code as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
+    'Run HopCode as a local HTTP daemon (Stage 1 experimental: --http-bridge)',
   builder: (yargs: Argv) =>
     yargs
       .option('port', {
@@ -159,7 +159,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       .option('token', {
         type: 'string',
         description:
-          'Bearer token required on every request. Falls back to the QWEN_SERVER_TOKEN env var.',
+          'Bearer token required on every request. Falls back to the hopcode_server_token env var.',
       })
       .option('max-sessions', {
         type: 'number',
@@ -206,7 +206,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
           'Refuse to start without a bearer token, even on loopback. ' +
           'Hardens the loopback developer default for shared dev hosts / CI ' +
           'runners / multi-tenant workstations where any local user can hit ' +
-          '127.0.0.1. Requires --token or QWEN_SERVER_TOKEN. /health also ' +
+          '127.0.0.1. Requires --token or hopcode_server_token. /health also ' +
           'requires Authorization when enabled (no loopback exemption — ' +
           'k8s/Compose probes must pass the bearer too).',
       })
@@ -398,7 +398,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
       // `/proc/<pid>/environ` (owner-only).
       writeStderrLine(
         'hopcode serve: --token is visible in the process command line; ' +
-          'prefer the QWEN_SERVER_TOKEN env var for any non-trivial ' +
+          'prefer the hopcode_server_token env var for any non-trivial ' +
           'deployment.',
       );
     }

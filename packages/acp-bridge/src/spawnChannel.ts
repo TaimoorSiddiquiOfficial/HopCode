@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -121,7 +121,7 @@ export function createSpawnChannelFactory(
 ): ChannelFactory {
   return async (workspaceCwd, childEnvOverrides) => {
     const sourceEnv = options.sourceEnv ?? process.env;
-    const cliEntry = sourceEnv['QWEN_CLI_ENTRY'] || process.argv[1];
+    const cliEntry = sourceEnv['hopcode_cli_entry'] || process.argv[1];
     if (!cliEntry) {
       throw new MissingCliEntryError();
     }

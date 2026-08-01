@@ -42,7 +42,7 @@ import {
 } from './lib/prompt-record.js';
 
 const PLAN = {
-  diffPathAbsolute: '/abs/.hopcode/tmp/qwen-review-pr-6771-diff.txt',
+  diffPathAbsolute: '/abs/.hopcode/tmp/hopcode-review-pr-6771-diff.txt',
   chunks: [
     {
       id: 13,
@@ -1047,7 +1047,7 @@ describe('--roster — every prompt the plan requires, in one call', () => {
           diffLines: 5000,
           worktreePath: dir,
           prNumber: '6771',
-          ownerRepo: 'QwenLM/qwen-code',
+          ownerRepo: 'QwenLM/hopcode',
           files: [
             {
               path: 'src/big.ts',
@@ -1682,7 +1682,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
   const PR_PLAN = {
     ...PLAN,
     prNumber: '6766',
-    ownerRepo: 'QwenLM/qwen-code',
+    ownerRepo: 'QwenLM/hopcode',
     worktreePath: '.hopcode/tmp/review-pr-6766',
     mergeBaseSha: 'abc123',
   };
@@ -1753,7 +1753,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     );
     expect(p).toMatch(/--worktree \/[^\s]*review-pr-6766/);
     expect(p).not.toMatch(/--worktree \.hopcode/);
-    expect(p).toContain('--out /abs/tmp/qwen-review-pr-6766-efficacy.json');
+    expect(p).toContain('--out /abs/tmp/hopcode-review-pr-6766-efficacy.json');
   });
 
   it('hands Agent 7 the build-test command with absolute --plan/--worktree/--out', () => {
@@ -1762,12 +1762,12 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     expect(p).toContain('--plan /abs/tmp/plan.json');
     expect(p).toMatch(/--worktree \/[^\s]*review-pr-6766/);
     expect(p).not.toMatch(/--plan \.hopcode/);
-    expect(p).toContain('--out /abs/tmp/qwen-review-pr-6766-build-test.json');
+    expect(p).toContain('--out /abs/tmp/hopcode-review-pr-6766-build-test.json');
   });
 
   it('never emits a literal "undefined" in the build-test --out filename', () => {
     // `prNumber` is typed `unknown` and can be absent. Without the guard, the
-    // filename resolves to `qwen-review-pr-undefined-build-test.json` — a report the
+    // filename resolves to `hopcode-review-pr-undefined-build-test.json` — a report the
     // agent writes and downstream never finds. With a worktree but no PR number the
     // block still emits (a re-review can lack the number), just with the stable local
     // name — never an interpolated `undefined`.
@@ -1775,7 +1775,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     delete (noPr as { prNumber?: unknown }).prNumber;
     const p = buildRoleBrief(noPr, '7', { planPath: '/abs/tmp/plan.json' });
     expect(p).not.toContain('undefined');
-    expect(p).toContain('--out /abs/tmp/qwen-review-build-test.json');
+    expect(p).toContain('--out /abs/tmp/hopcode-review-build-test.json');
   });
 
   it('emits a build-test block for a LOCAL review (no worktree, no PR number)', () => {
@@ -1812,11 +1812,11 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
 
   it('welds the PR into Agent 0 — a bare `gh pr view` judges the wrong issue', () => {
     const p = buildRoleBrief(PR_PLAN, '0', {
-      planPath: '/x/qwen-review-pr-6766-fetch.json',
+      planPath: '/x/hopcode-review-pr-6766-fetch.json',
     });
     expect(p).toContain('#6766');
-    expect(p).toContain('QwenLM/qwen-code');
-    expect(p).toContain('/x/qwen-review-pr-6766-context.md');
+    expect(p).toContain('QwenLM/hopcode');
+    expect(p).toContain('/x/hopcode-review-pr-6766-context.md');
     // The empty scope is a complete answer, and it needs evidence to be one.
     expect(p).toContain('scope empty');
   });

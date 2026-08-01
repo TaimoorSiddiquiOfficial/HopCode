@@ -48,8 +48,8 @@ describe('createChannelWorkerSupervisor', () => {
   });
 
   it('passes daemon connection details through env without putting token in argv', async () => {
-    vi.stubEnv('QWEN_SERVER_TOKEN', 'serve-token');
-    vi.stubEnv('QWEN_DAEMON_TOKEN', 'stale-daemon-token');
+    vi.stubEnv('hopcode_server_token', 'serve-token');
+    vi.stubEnv('hopcode_daemon_token', 'stale-daemon-token');
     vi.stubEnv('OPENAI_API_KEY', 'openai-secret');
     vi.stubEnv('ANTHROPIC_API_KEY', 'anthropic-secret');
     vi.stubEnv('AWS_SECRET_ACCESS_KEY', 'aws-secret');
@@ -92,11 +92,11 @@ describe('createChannelWorkerSupervisor', () => {
       ],
       expect.objectContaining({
         env: expect.objectContaining({
-          QWEN_DAEMON_URL: 'http://127.0.0.1:4170',
-          QWEN_DAEMON_TOKEN: 'secret-token',
-          QWEN_DAEMON_WORKSPACE: '/workspace',
+          hopcode_daemon_url: 'http://127.0.0.1:4170',
+          hopcode_daemon_token: 'secret-token',
+          hopcode_daemon_workspace: '/workspace',
           HOPCODE_CODE_NO_RELAUNCH: 'true',
-          QWEN_CHANNEL_DAEMON_WORKER: expect.any(String),
+          hopcode_channel_daemon_worker: expect.any(String),
         }),
         cwd: '/workspace',
         stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
@@ -104,16 +104,16 @@ describe('createChannelWorkerSupervisor', () => {
     );
     const env = (spawnWorker.mock.calls[0]![2] as { env: NodeJS.ProcessEnv })
       .env;
-    expect(env).not.toHaveProperty('QWEN_SERVER_TOKEN');
+    expect(env).not.toHaveProperty('hopcode_server_token');
     expect(env).toHaveProperty('CUSTOM', 'value');
-    expect(env).toHaveProperty('QWEN_DAEMON_TOKEN', 'secret-token');
+    expect(env).toHaveProperty('hopcode_daemon_token', 'secret-token');
     expect(env).toHaveProperty('OPENAI_API_KEY', 'openai-secret');
     expect(env).toHaveProperty('ANTHROPIC_API_KEY', 'anthropic-secret');
     expect(env).toHaveProperty('AWS_SECRET_ACCESS_KEY', 'aws-secret');
     expect(env).toHaveProperty('GITHUB_TOKEN', 'github-secret');
     expect(env).toHaveProperty('TELEGRAM_BOT_TOKEN', 'telegram-secret');
     expect(env).toHaveProperty('HTTPS_PROXY', 'http://proxy.example.com:8080');
-    expect(env['QWEN_CHANNEL_DAEMON_WORKER']).not.toBe('1');
+    expect(env['hopcode_channel_daemon_worker']).not.toBe('1');
     const argv = spawnWorker.mock.calls[0]![1];
     expect(argv).not.toContain('secret-token');
     expect(supervisor.snapshot()).toMatchObject({

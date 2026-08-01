@@ -243,7 +243,7 @@ function resolvehopcodeCliPath(
       }).trim();
       if (systemQwen && existsSync(systemQwen)) return systemQwen;
     } catch {
-      // System Qwen CLI not found.
+      // System hopcode CLI not found.
     }
   }
 

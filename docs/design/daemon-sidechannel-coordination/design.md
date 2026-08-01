@@ -47,7 +47,7 @@
 - **§1.1 item 2 de-staled** — split into 2a (A1 `extNotification`) / 2b (A2 `sessionUpdate`); v7 had corrected §2/§2.1/§6/§7 but missed §1.1.
 - **§2.1: `scope` folded into the promoted `approval_mode_changed` payload** (`{sessionId, previous, next, persisted, scope}`); clarified its relation to `persisted`.
 - **§2.2 reconciliation observability** — `[reconcile] session=… published=… actual=… action=corrected|converged|read-error` + explicit read-error handling.
-- **extNotification method name pinned** to `qwen/notify/session/model-update` (matches #4546) + note the early-return guard must become a dispatch.
+- **extNotification method name pinned** to `hopcode/notify/session/model-update` (matches #4546) + note the early-return guard must become a dispatch.
 - **Dual-emit removal enforcement** — `TODO(dual-emit-removal)` at the site + a tracking issue in §7.
 - Fixed §0 ("two demux insertion points"), the §3.4→§3-point-4 cross-ref, and expanded §8 with staleness-drop / reconciliation-corrective / cross-axis-non-suppression / dual-emit / extNotification-transport scenarios.
 
@@ -145,7 +145,7 @@ v1's "agent is the single emitter; bridge drops its publish" was **rejected** �
 
 ### Proposed design
 
-1. **Transport: `extNotification`, not a sessionUpdate (v7).** `current_model_update` is **not** an ACP `SessionUpdate` variant. So `Session.setModel`, after `switchModel` resolves (**success only**), emits via the agent→bridge **`extNotification`** side-channel with the **fully-qualified method name `qwen/notify/session/model-update`** (matching the existing `qwen/notify/session/*` convention; impl in #4546) and payload `{ v:1, sessionId, currentModelId }`. No `previousModelId` / `authType` (the bridge derives `previous` from its state cache §2.3; `model_switched` is `{sessionId,modelId}`). **Implementation note:** `BridgeClient.extNotification()`'s current early-return guard (`if (method !== 'qwen/notify/session/mcp-budget-event') return;`) must become a method dispatch so the model-update handler is reachable (done in #4546).
+1. **Transport: `extNotification`, not a sessionUpdate (v7).** `current_model_update` is **not** an ACP `SessionUpdate` variant. So `Session.setModel`, after `switchModel` resolves (**success only**), emits via the agent→bridge **`extNotification`** side-channel with the **fully-qualified method name `hopcode/notify/session/model-update`** (matching the existing `hopcode/notify/session/*` convention; impl in #4546) and payload `{ v:1, sessionId, currentModelId }`. No `previousModelId` / `authType` (the bridge derives `previous` from its state cache §2.3; `model_switched` is `{sessionId,modelId}`). **Implementation note:** `BridgeClient.extNotification()`'s current early-return guard (`if (method !== 'hopcode/notify/session/mcp-budget-event') return;`) must become a method dispatch so the model-update handler is reachable (done in #4546).
 2. **`BridgeClient.extNotification()` (`bridgeClient.ts:491`) demuxes** the `current_model_update` notification → `model_switched` (§2.1), **only when no bridge model roundtrip is in flight** for that session. (A2's `current_mode_update` stays a real sessionUpdate, demuxed in `sessionUpdate()` — see §2.1.)
 3. **`model_switch_failed` stays bridge-only** — `Session.setModel` throws with no notification; the bridge keeps publishing it on both failure paths.
 4. **Timeout-race (best-effort demux drop + authoritative reconciliation backstop — v9).** The bridge's `withTimeout` (`bridge.ts:2844-2849`) can reject (publishing `model_switch_failed(A)`) while A's ACP call keeps running (FIXME `bridge.ts:2836-2840`). If a change B then succeeds (`model_switched(B)`) and A's call finally completes, A's late `current_model_update(A)` must not make A the apparent final state. **Value comparison alone can't decide** this (a late stale `A` and a fresh switch to `A` look identical — a distributed-ordering problem). So: the demux does a **best-effort dedup** (drops a `current_model_update` whose `currentModelId` already equals `entry.currentModelId` — a redundant no-op), and the **authoritative correctness comes from §2.2 reconciliation**: a timed-out earlier change always corresponds to a _settled bridge roundtrip_, which triggers a post-settle authoritative read that re-publishes the agent's true model. No agent-side sequence counter required.
@@ -272,7 +272,7 @@ Additive wire (`current_mode_update` reuse + `previousModeId` + `scope`) but **n
 
 ### Proposed design (additive on wire and SDK)
 
-- **Wire:** emit `voterClientId` alongside `originatorClientId` (same value). Both **optional** — no-voter resolutions (timer expiry, session-closed, loopback voter without `X-Qwen-Client-Id`) carry neither, as today.
+- **Wire:** emit `voterClientId` alongside `originatorClientId` (same value). Both **optional** — no-voter resolutions (timer expiry, session-closed, loopback voter without `X-hopcode-client-id`) carry neither, as today.
 - **SDK typed event:** expose **both** `originatorClientId` (unchanged — no rename, no break) **and** a new optional `voterClientId`; old field documented as deprecated-alias for a future major.
 - Prompt originator remains available by correlating with the matching `permission_request`.
 

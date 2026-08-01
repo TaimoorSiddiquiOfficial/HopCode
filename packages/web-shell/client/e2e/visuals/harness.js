@@ -11,7 +11,7 @@ import { installMockDaemon, replayCompleteEvent, } from '../utils/mockDaemon';
 import { VISUAL_VIEWPORT } from './constants';
 export { VISUAL_VIEWPORT };
 /** localStorage key the web-shell reads for its persisted theme (see index.html). */
-const THEME_STORAGE_KEY = 'qwen-code-web-shell-theme';
+const THEME_STORAGE_KEY = 'hopcode-web-shell-theme';
 const HERE = dirname(fileURLToPath(import.meta.url));
 /**
  * Root the capture pipeline collects. The CI job points

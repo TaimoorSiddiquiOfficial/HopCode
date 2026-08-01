@@ -117,7 +117,7 @@ describe('Qwen native history loading', () => {
     expect(secondAgent).toBe(fakeAgent);
   });
 
-  it('hides unresolved stripped Qwen canonical mirrors from session lists', () => {
+  it('hides unresolved stripped hopcode canonical mirrors from session lists', () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -315,7 +315,7 @@ describe('Qwen native history loading', () => {
     });
   });
 
-  it('does not persist existing Qwen provider metadata during list refresh', async () => {
+  it('does not persist existing hopcode provider metadata during list refresh', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -407,7 +407,7 @@ describe('Qwen native history loading', () => {
     expect(managed.lastMessageAt).toBe(timestamp);
   });
 
-  it('does not clear Qwen provider titles from stripped local headers', () => {
+  it('does not clear hopcode provider titles from stripped local headers', () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -637,7 +637,7 @@ describe('Qwen native history loading', () => {
     );
   });
 
-  it('syncs Craft session titles to Qwen custom titles through the provider rename hook', async () => {
+  it('syncs Craft session titles to hopcode custom titles through the provider rename hook', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -791,7 +791,7 @@ describe('Qwen native history loading', () => {
     ).toBe(false);
   });
 
-  it('uses provider-loaded first prompt when listed Qwen title is localized new chat', async () => {
+  it('uses provider-loaded first prompt when listed hopcode title is localized new chat', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -883,7 +883,7 @@ describe('Qwen native history loading', () => {
     ).toBeUndefined();
   });
 
-  it('applies token usage returned with provider-loaded Qwen history', async () => {
+  it('applies token usage returned with provider-loaded hopcode history', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -973,7 +973,7 @@ describe('Qwen native history loading', () => {
     });
   });
 
-  it('does not repeatedly reload empty Qwen canonical history for the same external timestamp', async () => {
+  it('does not repeatedly reload empty hopcode canonical history for the same external timestamp', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -1072,7 +1072,7 @@ describe('Qwen native history loading', () => {
     expect(loadCalls).toBe(1);
   });
 
-  it('uses workspace default cwd when opening a stripped Qwen canonical session', async () => {
+  it('uses workspace default cwd when opening a stripped hopcode canonical session', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -1153,7 +1153,7 @@ describe('Qwen native history loading', () => {
     expect(loaded?.messageCount).toBeUndefined();
   });
 
-  it('persists only local visual overlays for Qwen canonical sessions', async () => {
+  it('persists only local visual overlays for hopcode canonical sessions', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -1247,7 +1247,7 @@ describe('Qwen native history loading', () => {
     expect(header).not.toHaveProperty('messageCount');
   });
 
-  it('flushes local visual overlays when sending Qwen messages with attachments', async () => {
+  it('flushes local visual overlays when sending hopcode messages with attachments', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -2028,7 +2028,7 @@ describe('Qwen native history loading', () => {
     expect(managed.messageQueue[0]?.attachments).toEqual([liveAttachment]);
   });
 
-  it('merges local visual overlays into provider-loaded Qwen messages', async () => {
+  it('merges local visual overlays into provider-loaded hopcode messages', async () => {
     const workspaceRoot = mkdtempSync(
       join(tmpdir(), 'craft-managed-workspace-'),
     );
@@ -2873,7 +2873,7 @@ describe('Qwen native history loading', () => {
     expect(persisted?.lastMessageAt).toBeUndefined();
   });
 
-  it('does not reload Qwen native history between repeated edits of the latest user message', async () => {
+  it('does not reload hopcode native history between repeated edits of the latest user message', async () => {
     const workspaceRoot = mkdtempSync(join(tmpdir(), 'craft-qwen-edit-'));
     tempRoots.push(workspaceRoot);
 

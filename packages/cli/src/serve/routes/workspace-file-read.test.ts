@@ -76,7 +76,7 @@ describe('workspaceRelative', () => {
     scratch = await fsp.mkdtemp(
       path.join(
         os.tmpdir(),
-        `qwen-route-rel-${randomBytes(4).toString('hex')}-`,
+        `hopcode-route-rel-${randomBytes(4).toString('hex')}-`,
       ),
     );
   });

@@ -211,7 +211,7 @@ export const PROVIDER_REGISTRY: readonly ProviderConfig[] = [
     id: 'ollama-cloud',
     label: 'Ollama Cloud',
     description:
-      'Llama, DeepSeek, Qwen & more on Ollama Cloud · Requires OLLAMA_CLOUD_API_KEY',
+      'Llama, DeepSeek, hopcode & more on Ollama Cloud · Requires OLLAMA_CLOUD_API_KEY',
     envKey: 'OLLAMA_CLOUD_API_KEY',
     baseUrl: 'https://openai.ollama.com/v1',
     authType: AuthType.USE_OPENAI,

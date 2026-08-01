@@ -81,7 +81,7 @@ import {
   transcribeVoiceAudio,
 } from '../voice/voice-transcriber.js';
 import { refineVoiceTranscript } from '../voice/voice-refine.js';
-import { openQwenAsrRealtimeStream } from '../voice/hopcode-asr-realtime-session.js';
+import { openhopcodeasrrealtimestream } from '../voice/hopcode-asr-realtime-session.js';
 import { openVoiceStream } from '../voice/voice-stream-session.js';
 import { openVoiceStreamWithRetry } from '../voice/voice-stream-retry.js';
 import { VoiceIndicator } from './VoiceIndicator.js';
@@ -496,7 +496,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
         .then(() =>
           openVoiceStreamWithRetry(() =>
             streamConfig.transport === 'qwen-asr-realtime'
-              ? openQwenAsrRealtimeStream(streamConfig, callbacks)
+              ? openhopcodeasrrealtimestream(streamConfig, callbacks)
               : openVoiceStream(streamConfig, callbacks),
           ),
         )
@@ -728,7 +728,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
       {
         type: 'error',
         text: t(
-          'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall Qwen Code or use the npm installation method.',
+          'Clipboard image paste is unavailable because the native clipboard module could not be loaded. Reinstall HopCode or use the npm installation method.',
         ),
       },
       Date.now(),

@@ -158,14 +158,14 @@ describe('MemoryDialog', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders managed memory folders without advertising QWEN.md', () => {
+  it('renders managed memory folders without advertising HOPCODE.md', () => {
     const { lastFrame } = render(<MemoryDialog onClose={vi.fn()} />);
 
     expect(lastFrame()).toContain('› 1. User memory');
     expect(lastFrame()).toContain('2. Project memory');
     expect(lastFrame()).toContain('/memories');
     expect(lastFrame()).toContain('/memory');
-    expect(lastFrame()).not.toContain('QWEN.md');
+    expect(lastFrame()).not.toContain('HOPCODE.md');
     expect(lastFrame()).not.toContain('Open auto-memory folder');
   });
 
@@ -519,7 +519,7 @@ describe('MemoryDialog', () => {
     expect(lastFrame()).toContain('› Confirm auto-skills before saving: off');
   });
 
-  it('keeps QWEN.md editor entries when managed memory is unavailable', async () => {
+  it('keeps HOPCODE.md editor entries when managed memory is unavailable', async () => {
     const launchEditor = vi.fn();
     mockedUseLaunchEditor.mockReturnValue(launchEditor);
     mockedUseConfig.mockReturnValue({
@@ -536,9 +536,9 @@ describe('MemoryDialog', () => {
     const { lastFrame } = render(<MemoryDialog onClose={vi.fn()} />);
 
     expect(lastFrame()).toContain('› 1. User memory');
-    expect(lastFrame()).toContain('Saved in ~/.hopcode/QWEN.md');
+    expect(lastFrame()).toContain('Saved in ~/.hopcode/HOPCODE.md');
     expect(lastFrame()).toContain('2. Project memory');
-    expect(lastFrame()).toContain('Saved in QWEN.md');
+    expect(lastFrame()).toContain('Saved in HOPCODE.md');
 
     const keypressHandler = mockedUseKeypress.mock.calls[0][0];
     await act(async () => {
@@ -553,7 +553,7 @@ describe('MemoryDialog', () => {
     expect(mockedSpawn).not.toHaveBeenCalled();
   });
 
-  it('opens the project QWEN.md editor entry when managed memory is unavailable', async () => {
+  it('opens the project HOPCODE.md editor entry when managed memory is unavailable', async () => {
     const launchEditor = vi.fn();
     mockedUseLaunchEditor.mockReturnValue(launchEditor);
     mockedUseConfig.mockReturnValue({
@@ -576,7 +576,7 @@ describe('MemoryDialog', () => {
       await Promise.resolve();
     });
 
-    expect(launchEditor).toHaveBeenCalledWith('/tmp/project/QWEN.md');
+    expect(launchEditor).toHaveBeenCalledWith('/tmp/project/HOPCODE.md');
     expect(mockedSpawn).not.toHaveBeenCalled();
   });
 

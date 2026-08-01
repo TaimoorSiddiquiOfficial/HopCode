@@ -54,7 +54,7 @@ export async function updateBeforeRelaunch(
       if (!installationInfo.updateCommand) {
         writeStderrLine(
           installationInfo.updateMessage ??
-            t('Manual update required. Please reinstall Qwen Code.'),
+            t('Manual update required. Please reinstall HopCode.'),
         );
         return false;
       }

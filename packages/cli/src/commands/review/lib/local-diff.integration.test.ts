@@ -257,8 +257,8 @@ describe('captureLocalDiff — untracked files', () => {
     // The review writes its args/parse-args/diff/plan under .hopcode/tmp before this
     // capture runs; in a repo that does not ignore .hopcode they would show up as
     // the user's untracked work and the review would report on its own plumbing.
-    write('.hopcode/tmp/qwen-skill-args-review.txt', '6771 --comment\n');
-    write('.hopcode/tmp/qwen-review-local-plan.json', '{}\n');
+    write('.hopcode/tmp/hopcode-skill-args-review.txt', '6771 --comment\n');
+    write('.hopcode/tmp/hopcode-review-local-plan.json', '{}\n');
     write('real.ts', 'export const r = 1;\n');
 
     const res = capture();

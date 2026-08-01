@@ -201,7 +201,7 @@ async function fetchBytes(url: string, githubToken?: string): Promise<Buffer> {
   const response = await fetch(url, {
     headers: {
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'qwen-code',
+      'User-Agent': 'hopcode',
       ...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
     },
   });
@@ -261,7 +261,7 @@ async function downloadGitHubDirectory(
   const response = await fetch(apiUrl, {
     headers: {
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'qwen-code',
+      'User-Agent': 'hopcode',
       ...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
     },
   });
@@ -332,7 +332,7 @@ async function downloadGitHubDirectoryWithGit(
   ref: string,
   directory: string,
 ): Promise<SkillPackageFile[]> {
-  const checkout = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-skill-git-'));
+  const checkout = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-skill-git-'));
   try {
     await execFileAsync(
       'git',

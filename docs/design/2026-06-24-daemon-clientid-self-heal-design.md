@@ -201,7 +201,7 @@ URL through a real `DaemonClient` (exercises the real `failOnError` →
 1. **Non-blocking self-heal:** first `POST /session/s-1/prompt` → `400
 {code:'invalid_client_id'}`; `POST /session/s-1/resume` → fresh
    `clientId: 'client-2'`; second prompt → `202`. Assert: prompt resolves, the
-   second prompt request carries `x-qwen-client-id: client-2`, resume called once.
+   second prompt request carries `x-hopcode-client-id: client-2`, resume called once.
 2. **Blocking self-heal** (`subscriptionActive` false): same, via the blocking
    `prompt` path (`200`/`202`+turn-complete on retry).
 3. **Retry bounded:** prompt → `400 invalid_client_id` twice → the error

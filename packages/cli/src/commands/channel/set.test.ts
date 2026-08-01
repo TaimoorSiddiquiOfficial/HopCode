@@ -23,16 +23,16 @@ import { setCommand } from './set.js';
 
 async function runHandler(argv: Record<string, unknown>): Promise<void> {
   if (!setCommand.handler) throw new Error('set handler missing');
-  await setCommand.handler({ _: [], $0: 'qwen', ...argv } as never);
+  await setCommand.handler({ _: [], $0: 'hopcode', ...argv } as never);
 }
 
 describe('channel set command', () => {
   beforeEach(() => {
     vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
     vi.unstubAllEnvs();
-    vi.stubEnv('QWEN_DAEMON_URL', undefined);
-    vi.stubEnv('QWEN_SERVER_TOKEN', undefined);
-    vi.stubEnv('QWEN_DAEMON_TOKEN', undefined);
+    vi.stubEnv('hopcode_daemon_url', undefined);
+    vi.stubEnv('hopcode_server_token', undefined);
+    vi.stubEnv('hopcode_daemon_token', undefined);
     mockSetSelection.mockResolvedValue({
       changed: true,
       replaced: false,
@@ -67,8 +67,8 @@ describe('channel set command', () => {
   });
 
   it('accepts all by itself and uses daemon environment defaults', async () => {
-    vi.stubEnv('QWEN_DAEMON_URL', 'http://env-daemon:7');
-    vi.stubEnv('QWEN_DAEMON_TOKEN', 'env-secret');
+    vi.stubEnv('hopcode_daemon_url', 'http://env-daemon:7');
+    vi.stubEnv('hopcode_daemon_token', 'env-secret');
 
     await runHandler({ names: ['all'] });
 

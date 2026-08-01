@@ -65,7 +65,7 @@ import {
 } from './loggers.js';
 import * as metrics from './metrics.js';
 import { apiActivityTracker } from './api-activity-tracker.js';
-import { QwenLogger } from './qwen-logger/qwen-logger.js';
+import { QwenLogger } from './hopcode-logger/hopcode-logger.js';
 import * as sdk from './sdk.js';
 import * as tokenUsageService from '../services/tokenUsageService.js';
 import { ToolCallDecision } from './tool-call-decision.js';

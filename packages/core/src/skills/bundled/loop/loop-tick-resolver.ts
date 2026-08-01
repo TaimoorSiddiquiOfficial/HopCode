@@ -49,10 +49,10 @@ export const LOOP_SENTINEL_DYNAMIC = '<<loop.md-dynamic>>';
 export interface LoopTickResolverDeps {
   /** Pass `config.getWorkingDir()` — loop.md is resolved against the cwd. */
   projectRoot: string;
-  /** Home-candidate confinement root: `$QWEN_HOME` when set, else `$HOME`. */
+  /** Home-candidate confinement root: `$hopcode_home` when set, else `$HOME`. */
   homeDir: string;
   /**
-   * QWEN_HOME-aware global dir holding the home `loop.md` (`Storage.getGlobalhopcodeDir()`).
+   * hopcode_home-aware global dir holding the home `loop.md` (`Storage.getGlobalhopcodeDir()`).
    * Omitted → defaults to `<homeDir>/.hopcode` inside readLoopTaskFile.
    */
   homehopcodeDir?: string;
@@ -261,12 +261,12 @@ export class LoopTickResolver {
   /** MODEL-FACING label for the home loop.md location. Mirrors
    * readLoopTaskFile's home candidate (`<homehopcodeDir>/loop.md`) so the absent
    * reminder — and the caller's sanitized resolve-error — names the location
-   * actually checked (QWEN_HOME-aware), but must NEVER surface a raw absolute
+   * actually checked (hopcode_home-aware), but must NEVER surface a raw absolute
    * path: it flows into model/API text, leaking the host's filesystem layout.
    *   - under $HOME             → tilde-abbreviated `~/.hopcode/loop.md`;
-   *   - relocated via $QWEN_HOME → the literal `$QWEN_HOME/loop.md`, not the
+   *   - relocated via $hopcode_home → the literal `$hopcode_home/loop.md`, not the
    *     resolved dir (`tildeifyPath` only abbreviates $HOME, so it's a no-op for
-   *     a $QWEN_HOME outside $HOME and would otherwise pass the path through);
+   *     a $hopcode_home outside $HOME and would otherwise pass the path through);
    *   - any other out-of-$HOME dir → a generic placeholder, never the path.
    * The real absolute path stays in LOCAL debug logs only. */
   homeLoopLabel(): string {
@@ -278,17 +278,17 @@ export class LoopTickResolver {
     if (tildeified !== homeLoopPath) {
       return tildeified.replace(/\\/g, '/');
     }
-    // Outside $HOME: tildeifyPath was a no-op. When $QWEN_HOME relocated the
+    // Outside $HOME: tildeifyPath was a no-op. When $hopcode_home relocated the
     // global dir (homehopcodeDir is its resolved value), report the literal env-var
     // name — never the absolute path. The home candidate is always
-    // `<homehopcodeDir>/loop.md`, so swap the whole resolved dir for `$QWEN_HOME` and
+    // `<homehopcodeDir>/loop.md`, so swap the whole resolved dir for `$hopcode_home` and
     // re-attach the user-facing POSIX slash + basename directly. Deriving the tail from the
     // resolved path's length instead mishandles edge dirs: a trailing slash
-    // (`$QWEN_HOME=/x/.hopcode/`) over-counts the separator, and a filesystem-root
-    // homehopcodeDir (`$QWEN_HOME=/` → homeLoopPath `/loop.md`, dirname `/`) drops the
-    // leading separator — both garbling the tail into `$QWEN_HOMEloop.md`.
-    if (process.env['QWEN_HOME']) {
-      return '$QWEN_HOME/loop.md';
+    // (`$hopcode_home=/x/.hopcode/`) over-counts the separator, and a filesystem-root
+    // homehopcodeDir (`$hopcode_home=/` → homeLoopPath `/loop.md`, dirname `/`) drops the
+    // leading separator — both garbling the tail into `$hopcode_homeloop.md`.
+    if (process.env['hopcode_home']) {
+      return '$hopcode_home/loop.md';
     }
     return 'the configured global loop.md';
   }
@@ -297,7 +297,7 @@ export class LoopTickResolver {
    * caller's sanitized resolve-error. Names the project candidate ONLY when it
    * was actually read (`projectChecked` — a trusted folder), so neither path can
    * claim `.hopcode/loop.md (project)` for an untrusted folder where the project
-   * file is skipped. The home label is the QWEN_HOME-aware, never-absolute
+   * file is skipped. The home label is the hopcode_home-aware, never-absolute
    * homeLoopLabel(). Single source of truth so the two messages can't drift. */
   absentLocations(projectChecked: boolean): string {
     const homeLabel = this.homeLoopLabel();

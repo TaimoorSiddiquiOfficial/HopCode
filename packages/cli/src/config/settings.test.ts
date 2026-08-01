@@ -3235,7 +3235,7 @@ describe('Settings Loading and Merging', () => {
 
   describe('reloadScopeFromDisk', () => {
     it('reloads a scope from disk and resolves home env vars', () => {
-      const homeQwenEnvPath = path.join(
+      const homehopcodeenvpath = path.join(
         path.dirname(USER_SETTINGS_PATH),
         '.env',
       );
@@ -3262,14 +3262,14 @@ describe('Settings Loading and Merging', () => {
       );
 
       (mockFsExistsSync as Mock).mockImplementation(
-        (p: fs.PathLike) => p === USER_SETTINGS_PATH || p === homeQwenEnvPath,
+        (p: fs.PathLike) => p === USER_SETTINGS_PATH || p === homehopcodeenvpath,
       );
       (fs.readFileSync as Mock).mockImplementation(
         (p: fs.PathOrFileDescriptor) => {
           if (p === USER_SETTINGS_PATH) {
             return currentUserSettingsContent;
           }
-          if (p === homeQwenEnvPath) {
+          if (p === homehopcodeenvpath) {
             return 'RELOADED_THEME=light';
           }
           return '{}';
@@ -3770,19 +3770,19 @@ describe('Settings Loading and Merging', () => {
         .spyOn(process, 'cwd')
         .mockReturnValue(MOCK_WORKSPACE_DIR);
       const projectEnvPath = path.join(MOCK_WORKSPACE_DIR, '.env');
-      const userQwenEnvPath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
+      const userhopcodeenvpath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
 
       vi.mocked(isWorkspaceTrusted).mockReturnValue({
         isTrusted: true,
         source: 'file',
       });
       (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-        [projectEnvPath, userQwenEnvPath].includes(p.toString()),
+        [projectEnvPath, userhopcodeenvpath].includes(p.toString()),
       );
       (fs.readFileSync as Mock).mockImplementation(
         (p: fs.PathOrFileDescriptor) => {
           if (p === projectEnvPath) return 'PROJECT_ONLY_VAR=from_project';
-          if (p === userQwenEnvPath)
+          if (p === userhopcodeenvpath)
             return 'OPENCODE_GO_API_KEY=from_user_HOPCODE_env';
           return '{}';
         },
@@ -3805,20 +3805,20 @@ describe('Settings Loading and Merging', () => {
         .spyOn(process, 'cwd')
         .mockReturnValue(MOCK_WORKSPACE_DIR);
       const projectEnvPath = path.join(MOCK_WORKSPACE_DIR, '.env');
-      const userQwenEnvPath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
+      const userhopcodeenvpath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
 
       vi.mocked(isWorkspaceTrusted).mockReturnValue({
         isTrusted: true,
         source: 'file',
       });
       (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-        [projectEnvPath, userQwenEnvPath].includes(p.toString()),
+        [projectEnvPath, userhopcodeenvpath].includes(p.toString()),
       );
       (fs.readFileSync as Mock).mockImplementation(
         (p: fs.PathOrFileDescriptor) => {
           if (p === projectEnvPath)
             return 'OPENCODE_GO_API_KEY=from_project_env';
-          if (p === userQwenEnvPath)
+          if (p === userhopcodeenvpath)
             return 'OPENCODE_GO_API_KEY=from_user_HOPCODE_env';
           return '{}';
         },
@@ -3841,19 +3841,19 @@ describe('Settings Loading and Merging', () => {
         .spyOn(process, 'cwd')
         .mockReturnValue(MOCK_WORKSPACE_DIR);
       const projectEnvPath = path.join(MOCK_WORKSPACE_DIR, '.env');
-      const userQwenEnvPath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
+      const userhopcodeenvpath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
 
       vi.mocked(isWorkspaceTrusted).mockReturnValue({
         isTrusted: false,
         source: 'file',
       });
       (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-        [projectEnvPath, userQwenEnvPath].includes(p.toString()),
+        [projectEnvPath, userhopcodeenvpath].includes(p.toString()),
       );
       (fs.readFileSync as Mock).mockImplementation(
         (p: fs.PathOrFileDescriptor) => {
           if (p === projectEnvPath) return 'PROJECT_ENV_VAR=from_project';
-          if (p === userQwenEnvPath)
+          if (p === userhopcodeenvpath)
             return 'OPENCODE_GO_API_KEY=from_user_HOPCODE_env';
           return '{}';
         },
@@ -3880,7 +3880,7 @@ describe('Settings Loading and Merging', () => {
         .mockReturnValue(path.join(nestedWorkspaceDir, 'nested'));
       const firstWorkspaceEnvPath = path.join(nestedWorkspaceDir, '.env');
       const parentWorkspaceEnvPath = path.join(MOCK_WORKSPACE_DIR, '.env');
-      const userQwenEnvPath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
+      const userhopcodeenvpath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
 
       vi.mocked(isWorkspaceTrusted).mockReturnValue({
         isTrusted: true,
@@ -3890,7 +3890,7 @@ describe('Settings Loading and Merging', () => {
         [
           firstWorkspaceEnvPath,
           parentWorkspaceEnvPath,
-          userQwenEnvPath,
+          userhopcodeenvpath,
         ].includes(p.toString()),
       );
       (fs.readFileSync as Mock).mockImplementation(
@@ -3899,7 +3899,7 @@ describe('Settings Loading and Merging', () => {
             return 'FIRST_WORKSPACE_VAR=from_first_workspace';
           if (p === parentWorkspaceEnvPath)
             return 'PARENT_WORKSPACE_VAR=from_parent_workspace';
-          if (p === userQwenEnvPath)
+          if (p === userhopcodeenvpath)
             return 'OPENCODE_GO_API_KEY=from_user_HOPCODE_env';
           return '{}';
         },
@@ -3926,20 +3926,20 @@ describe('Settings Loading and Merging', () => {
         .spyOn(process, 'cwd')
         .mockReturnValue(MOCK_WORKSPACE_DIR);
       const projectEnvPath = path.join(MOCK_WORKSPACE_DIR, '.env');
-      const userQwenEnvPath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
+      const userhopcodeenvpath = path.join('/mock/home/user', HOPCODE_DIR, '.env');
 
       vi.mocked(isWorkspaceTrusted).mockReturnValue({
         isTrusted: true,
         source: 'file',
       });
       (mockFsExistsSync as Mock).mockImplementation((p: fs.PathLike) =>
-        [projectEnvPath, userQwenEnvPath].includes(p.toString()),
+        [projectEnvPath, userhopcodeenvpath].includes(p.toString()),
       );
       (fs.readFileSync as Mock).mockImplementation(
         (p: fs.PathOrFileDescriptor) => {
           if (p === projectEnvPath)
             return 'GOOGLE_CLOUD_PROJECT=from_project_env';
-          if (p === userQwenEnvPath)
+          if (p === userhopcodeenvpath)
             return 'GOOGLE_CLOUD_PROJECT=from_user_HOPCODE_env';
           return '{}';
         },
@@ -4736,10 +4736,10 @@ describe('Settings Loading and Merging', () => {
       delete process.env['OPENCODE_GO_API_KEY'];
       delete process.env['PROJECT_ONLY_VAR'];
       const projectEnvPath = path.resolve(MOCK_WORKSPACE_DIR, '.env');
-      const userQwenEnvPath = path.normalize(
+      const userhopcodeenvpath = path.normalize(
         path.join('/mock/home/user', HOPCODE_DIR, '.env'),
       );
-      const envPaths = new Set([projectEnvPath, userQwenEnvPath]);
+      const envPaths = new Set([projectEnvPath, userhopcodeenvpath]);
 
       vi.mocked(isWorkspaceTrusted).mockReturnValue({
         isTrusted: true,
@@ -4753,7 +4753,7 @@ describe('Settings Loading and Merging', () => {
           const filePath = normalizeFsPath(p);
           if (filePath === projectEnvPath)
             return 'PROJECT_ONLY_VAR=from_project';
-          if (filePath === userQwenEnvPath)
+          if (filePath === userhopcodeenvpath)
             return 'OPENCODE_GO_API_KEY=from_user_HOPCODE_env';
           return '{}';
         },
@@ -4773,10 +4773,10 @@ describe('Settings Loading and Merging', () => {
     it('keeps the project .env value during reload when user .hopcode/.env also defines it', () => {
       delete process.env['OPENCODE_GO_API_KEY'];
       const projectEnvPath = path.resolve(MOCK_WORKSPACE_DIR, '.env');
-      const userQwenEnvPath = path.normalize(
+      const userhopcodeenvpath = path.normalize(
         path.join('/mock/home/user', HOPCODE_DIR, '.env'),
       );
-      const envPaths = new Set([projectEnvPath, userQwenEnvPath]);
+      const envPaths = new Set([projectEnvPath, userhopcodeenvpath]);
 
       vi.mocked(isWorkspaceTrusted).mockReturnValue({
         isTrusted: true,
@@ -4790,7 +4790,7 @@ describe('Settings Loading and Merging', () => {
           const filePath = normalizeFsPath(p);
           if (filePath === projectEnvPath)
             return 'OPENCODE_GO_API_KEY=from_project_env';
-          if (filePath === userQwenEnvPath)
+          if (filePath === userhopcodeenvpath)
             return 'OPENCODE_GO_API_KEY=from_user_HOPCODE_env';
           return '{}';
         },

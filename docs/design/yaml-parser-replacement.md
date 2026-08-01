@@ -6,8 +6,8 @@ Internal design document for replacing the hand-rolled 192-line YAML parser at
 round-trip safely through subagent / skill / converter code paths.
 
 Companion to [`docs/design/declarative-agents-port.md`](./declarative-agents-port.md).
-Issue: [#4821](https://github.com/QwenLM/qwen-code/issues/4821). Prereq for
-the follow-up to [PR #4842](https://github.com/QwenLM/qwen-code/pull/4842).
+Issue: [#4821](https://github.com/QwenLM/hopcode/issues/4821). Prereq for
+the follow-up to [PR #4842](https://github.com/QwenLM/hopcode/pull/4842).
 
 ## Phase 0 — Sources verified
 

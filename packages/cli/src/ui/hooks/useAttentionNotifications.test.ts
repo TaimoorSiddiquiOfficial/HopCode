@@ -365,8 +365,8 @@ describe('useAttentionNotifications', () => {
       expect(mockedSendNotification).toHaveBeenCalledTimes(1);
       expect(mockedSendNotification).toHaveBeenCalledWith(
         {
-          message: 'Qwen Code is waiting for your input',
-          title: 'Qwen Code',
+          message: 'HopCode is waiting for your input',
+          title: 'HopCode',
         },
         mockTerminal,
         true,

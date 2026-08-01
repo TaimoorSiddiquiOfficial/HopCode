@@ -21,7 +21,7 @@ describe('isBackgroundSubAgentToolCall', () => {
         expect(isBackgroundSubAgentToolCall(agentTool({ run_in_background: false }))).toBe(false);
     });
     it('keeps caller-owned working_dir launches in the foreground by default', () => {
-        expect(isBackgroundSubAgentToolCall(agentTool({ working_dir: '.qwen/worktrees/review' }))).toBe(false);
+        expect(isBackgroundSubAgentToolCall(agentTool({ working_dir: '.hopcode/worktrees/review' }))).toBe(false);
     });
     it('does not change named teammate classification', () => {
         expect(isBackgroundSubAgentToolCall(agentTool({ name: 'reviewer' }))).toBe(false);

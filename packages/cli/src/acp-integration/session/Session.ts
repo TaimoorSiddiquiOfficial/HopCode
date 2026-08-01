@@ -4172,7 +4172,7 @@ export class Session implements SessionContext {
     // the current project; a fresh resolver also correctly re-delivers full.
     if (!this.loopTickResolver || this.loopTickResolverRoot !== root) {
       // Resolve the home/global loop.md from the HOPCODE_HOME-aware global dir (the
-      // rest of Qwen honors HOPCODE_HOME for `.hopcode`); reading raw os.homedir() here
+      // rest of hopcode honors HOPCODE_HOME for `.hopcode`); reading raw os.homedir() here
       // would always hit the real `~/.hopcode` and ignore a relocated config home.
       const { homeConfineRoot, homehopcodeDir } = resolveHomeLoopResolverRoots();
       this.loopTickResolver = new LoopTickResolver({
@@ -7243,7 +7243,7 @@ export class Session implements SessionContext {
     // placed AFTER this content — mirroring the interactive path, which keeps
     // the prompt prominent by merging IDE editor context in FRONT of the
     // prompt via prependToFirstTextPart (client.ts), leaving the instruction
-    // last. Recency-biased providers (e.g. local Ollama qwen models) otherwise
+    // last. Recency-biased providers (e.g. local Ollama hopcode models) otherwise
     // latch onto trailing file content and answer as if it were the task,
     // ignoring a prompt buried before it. The model correlates each @reference
     // with its content block by the "@path" token left in the prompt text and

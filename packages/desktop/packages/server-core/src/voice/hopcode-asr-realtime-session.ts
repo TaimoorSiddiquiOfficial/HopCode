@@ -1,4 +1,4 @@
-﻿import { randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import WebSocket from 'ws';
 import type {
   SocketLike,
@@ -52,7 +52,7 @@ function formatServerErrorMessage(raw: unknown, apiKey?: string): string {
   return escapeAnsiCtrlCodes(sanitizeResponseDetails(text, apiKey));
 }
 
-export function openQwenAsrRealtimeStream(
+export function openhopcodeasrrealtimestream(
   config: VoiceStreamConfig,
   callbacks: VoiceStreamCallbacks = {},
   deps: QwenRealtimeDeps = {},
@@ -191,7 +191,7 @@ export function openQwenAsrRealtimeStream(
         msg = JSON.parse(String(data));
       } catch (error) {
         logger.warn(
-          '[voice] failed to parse Qwen ASR realtime message:',
+          '[voice] failed to parse hopcode ASR realtime message:',
           error,
         );
         return;
@@ -216,7 +216,7 @@ export function openQwenAsrRealtimeStream(
                 if (!backpressureWarned) {
                   backpressureWarned = true;
                   logger.warn(
-                    '[voice] dropping Qwen ASR realtime audio due to socket backpressure.',
+                    '[voice] dropping hopcode ASR realtime audio due to socket backpressure.',
                   );
                 }
                 return;

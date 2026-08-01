@@ -53,7 +53,7 @@ describe('createTranscriptReplayMachine', () => {
     ]);
     expect(projected[0]?._meta).toMatchObject({
       timestamp: Date.parse('2026-07-14T00:00:00.000Z'),
-      qwenTranscript: { sourceRecordIds: ['assistant-1'] },
+      hopcodetranscript: { sourceRecordIds: ['assistant-1'] },
     });
   });
 
@@ -71,12 +71,12 @@ describe('createTranscriptReplayMachine', () => {
 
     expect(projected[0]).toMatchObject({
       sessionUpdate: 'tool_call',
-      toolCallId: 'qwen-replay-tool:assistant-1:0',
+      toolCallId: 'hopcode-replay-tool:assistant-1:0',
     });
     const finalized = [...machine.finalize()].map((item) => item.update);
     expect(finalized[0]).toMatchObject({
       sessionUpdate: 'tool_call_update',
-      toolCallId: 'qwen-replay-tool:assistant-1:0',
+      toolCallId: 'hopcode-replay-tool:assistant-1:0',
       status: 'failed',
       content: [
         {
@@ -155,7 +155,7 @@ describe('createTranscriptReplayMachine', () => {
     );
 
     expect(result[0]).toMatchObject({
-      toolCallId: 'qwen-replay-tool:result-1:result',
+      toolCallId: 'hopcode-replay-tool:result-1:result',
     });
     expect(onDiagnostic).toHaveBeenCalledWith(
       expect.objectContaining({

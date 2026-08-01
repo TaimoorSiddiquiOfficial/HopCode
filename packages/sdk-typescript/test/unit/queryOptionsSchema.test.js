@@ -39,7 +39,7 @@ describe('QueryOptionsSchema', () => {
         '-m',
         '--auth-type',
         '--approval-mode',
-        '--yolo',
+        '--izn',
         '-y',
         '--insecure',
         '--allowed-tools',
@@ -158,7 +158,7 @@ describe('QueryOptionsSchema', () => {
         }
     });
     it.each([
-        '--yolo',
+        '--izn',
         '-y',
         '--openai-base-url',
         '--openai-api-key',

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -21,7 +21,7 @@ describe('getLinterTempDir', () => {
     const { getLinterTempDir } = await import('../lint.js');
 
     const first = getLinterTempDir({
-      cwd: '/runner/_work/qwen-code/qwen-code',
+      cwd: '/runner/_work/hoptrendy/hopcode',
       env: {
         RUNNER_TEMP: '/runner/_work/_temp',
         GITHUB_RUN_ID: '28501834362',
@@ -30,7 +30,7 @@ describe('getLinterTempDir', () => {
       },
     });
     const second = getLinterTempDir({
-      cwd: '/runner/_work/qwen-code/qwen-code',
+      cwd: '/runner/_work/hoptrendy/hopcode',
       env: {
         RUNNER_TEMP: '/runner/_work/_temp',
         GITHUB_RUN_ID: '28501834363',
@@ -40,10 +40,10 @@ describe('getLinterTempDir', () => {
     });
 
     expect(first).toBe(
-      '/runner/_work/_temp/qwen-code-linters/28501834362-1-test',
+      '/runner/_work/_temp/hopcode-linters/28501834362-1-test',
     );
     expect(second).toBe(
-      '/runner/_work/_temp/qwen-code-linters/28501834363-1-integration_cli',
+      '/runner/_work/_temp/hopcode-linters/28501834363-1-integration_cli',
     );
     expect(first).not.toBe(second);
   });
@@ -52,16 +52,16 @@ describe('getLinterTempDir', () => {
     const { getLinterTempDir } = await import('../lint.js');
 
     const first = getLinterTempDir({
-      cwd: '/tmp/qwen-code-a',
+      cwd: '/tmp/hopcode-a',
       env: {},
     });
     const second = getLinterTempDir({
-      cwd: '/tmp/qwen-code-b',
+      cwd: '/tmp/hopcode-b',
       env: {},
     });
 
-    expect(first).toMatch(/\/qwen-code-linters\/local-[a-f0-9]{16}$/);
-    expect(second).toMatch(/\/qwen-code-linters\/local-[a-f0-9]{16}$/);
+    expect(first).toMatch(/\/hopcode-linters\/local-[a-f0-9]{16}$/);
+    expect(second).toMatch(/\/hopcode-linters\/local-[a-f0-9]{16}$/);
     expect(first).not.toBe(second);
   });
 });

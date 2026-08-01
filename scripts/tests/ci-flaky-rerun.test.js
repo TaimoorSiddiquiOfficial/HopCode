@@ -25,12 +25,12 @@ function run(overrides = {}) {
   return {
     databaseId: 11,
     name: 'E2E Tests',
-    workflowName: 'Qwen Code CI',
+    workflowName: 'HopCode CI',
     status: 'COMPLETED',
     conclusion: 'FAILURE',
     startedAt: '2026-07-12T07:10:00.000Z',
     completedAt: '2026-07-12T07:20:00.000Z',
-    detailsUrl: 'https://github.com/QwenLM/qwen-code/actions/runs/123/job/1',
+    detailsUrl: 'https://github.com/QwenLM/hopcode/actions/runs/123/job/1',
     ...overrides,
   };
 }
@@ -111,7 +111,7 @@ function client(overrides = {}) {
 }
 
 describe('ci flaky rerun patrol', () => {
-  it('selects only recent stale current Qwen Code CI failures', () => {
+  it('selects only recent stale current HopCode CI failures', () => {
     const selected = selectCandidateTargets(
       [
         pr({
@@ -124,7 +124,7 @@ describe('ci flaky rerun patrol', () => {
               completedAt: null,
               startedAt: '2026-07-12T07:40:00.000Z',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/124/job/2',
+                'https://github.com/QwenLM/hopcode/actions/runs/124/job/2',
             }),
           ],
         }),
@@ -136,7 +136,7 @@ describe('ci flaky rerun patrol', () => {
               databaseId: 13,
               conclusion: 'TIMED_OUT',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/125/job/3',
+                'https://github.com/QwenLM/hopcode/actions/runs/125/job/3',
             }),
           ],
         }),
@@ -168,7 +168,7 @@ describe('ci flaky rerun patrol', () => {
             run({
               completedAt: '2026-07-12T06:00:00.000Z',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/121/job/1',
+                'https://github.com/QwenLM/hopcode/actions/runs/121/job/1',
             }),
           ],
         }),
@@ -190,7 +190,7 @@ describe('ci flaky rerun patrol', () => {
               name: 'Unit Tests',
               completedAt: '2026-07-12T07:25:00.000Z',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/124/job/2',
+                'https://github.com/QwenLM/hopcode/actions/runs/124/job/2',
             }),
           ],
         }),
@@ -254,7 +254,7 @@ describe('ci flaky rerun patrol', () => {
   });
 
   it('ignores empty lines in paginated comment output', async () => {
-    const api = new GhClient('QwenLM/qwen-code');
+    const api = new GhClient('QwenLM/hopcode');
     api.gh = async () => '{"body":"first"}\n\n{"body":"second"}\n';
     await expect(api.comments(42)).resolves.toEqual([
       { body: 'first' },
@@ -263,7 +263,7 @@ describe('ci flaky rerun patrol', () => {
   });
 
   it('requests the PR number when refreshing current PR state', async () => {
-    const api = new GhClient('QwenLM/qwen-code');
+    const api = new GhClient('QwenLM/hopcode');
     let args = [];
     api.gh = async (nextArgs) => {
       args = nextArgs;
@@ -311,7 +311,7 @@ describe('ci flaky rerun patrol', () => {
               conclusion: 'SUCCESS',
               completedAt: '2026-07-12T07:30:00.000Z',
               detailsUrl:
-                'https://github.com/QwenLM/qwen-code/actions/runs/124/job/2',
+                'https://github.com/QwenLM/hopcode/actions/runs/124/job/2',
             }),
           ],
         }),
@@ -438,7 +438,7 @@ describe('ci flaky rerun patrol', () => {
         statusCheckRollup: [
           run({
             detailsUrl:
-              'https://github.com/QwenLM/qwen-code/actions/runs/123/job/2',
+              'https://github.com/QwenLM/hopcode/actions/runs/123/job/2',
           }),
         ],
       }),
@@ -472,7 +472,7 @@ describe('ci flaky rerun patrol', () => {
             headRefOid: prNumber === 42 ? 'abc123' : 'def456',
             statusCheckRollup: [
               run({
-                detailsUrl: `https://github.com/QwenLM/qwen-code/actions/runs/${prNumber === 42 ? 123 : 124}/job/1`,
+                detailsUrl: `https://github.com/QwenLM/hopcode/actions/runs/${prNumber === 42 ? 123 : 124}/job/1`,
               }),
             ],
           }),

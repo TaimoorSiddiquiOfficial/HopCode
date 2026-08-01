@@ -251,7 +251,7 @@ describe('tool output session links', () => {
         const root = createRoot(container);
         const toolLine = (_jsx(ToolLine, { tool: makeTool({
                 toolName: 'custom_tool',
-                rawOutput: '[child](qwen-session://child-session)',
+                rawOutput: '[child](hopcode-session://child-session)',
             }), forceExpanded: true }));
         act(() => {
             root.render(_jsx(I18nProvider, { language: "en", children: readonly ? (_jsx(TranscriptRenderModeProvider, { value: "readonly", children: toolLine })) : (toolLine) }));

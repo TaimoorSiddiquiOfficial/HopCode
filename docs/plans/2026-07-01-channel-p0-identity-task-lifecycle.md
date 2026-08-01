@@ -73,7 +73,7 @@ it('uses configured channel identity and memory namespace in lifecycle metadata'
       description: 'Coordinates repository operations.',
     },
     memoryScope: {
-      namespace: 'qwen-tag:ops',
+      namespace: 'hopcode-tag:ops',
       mode: 'metadata-only',
     },
   });
@@ -87,7 +87,7 @@ it('uses configured channel identity and memory namespace in lifecycle metadata'
       description: 'Coordinates repository operations.',
     },
     memoryScope: {
-      namespace: 'qwen-tag:ops',
+      namespace: 'hopcode-tag:ops',
       mode: 'metadata-only',
     },
   });
@@ -291,7 +291,7 @@ it('prepends channel boundary metadata before custom instructions once per sessi
       description: 'Coordinates repository operations.',
     },
     memoryScope: {
-      namespace: 'qwen-tag:ops',
+      namespace: 'hopcode-tag:ops',
       mode: 'metadata-only',
     },
   });
@@ -305,7 +305,7 @@ it('prepends channel boundary metadata before custom instructions once per sessi
   expect(prompt).toContain('- display name: Ops Agent');
   expect(prompt).toContain('- description: Coordinates repository operations.');
   expect(prompt).toContain('Memory scope:');
-  expect(prompt).toContain('- namespace: qwen-tag:ops');
+  expect(prompt).toContain('- namespace: hopcode-tag:ops');
   expect(prompt).toContain('- mode: metadata-only');
   expect(prompt).toContain(
     '- storage isolation: not enforced by this version.',
@@ -321,14 +321,14 @@ it('prepends channel boundary metadata before custom instructions once per sessi
 it('/who and /status include channel identity and memory metadata', async () => {
   const ch = createChannel({
     identity: { id: 'ops-agent', displayName: 'Ops Agent' },
-    memoryScope: { namespace: 'qwen-tag:ops', mode: 'metadata-only' },
+    memoryScope: { namespace: 'hopcode-tag:ops', mode: 'metadata-only' },
   });
 
   await ch.handleInbound(envelope({ text: '/who' }));
   await ch.handleInbound(envelope({ text: '/status' }));
 
   expect(ch.sent[0]!.text).toContain('Identity: Ops Agent');
-  expect(ch.sent[0]!.text).toContain('Memory: qwen-tag:ops');
+  expect(ch.sent[0]!.text).toContain('Memory: hopcode-tag:ops');
   expect(ch.sent[1]!.text).toContain('Identity: ops-agent');
   expect(ch.sent[1]!.text).toContain('Memory: metadata-only');
 });
@@ -653,7 +653,7 @@ it('preserves channel identity and metadata-only memory scope config', async () 
       description: 'Coordinates repository operations.',
     },
     memoryScope: {
-      namespace: 'qwen-tag:ops',
+      namespace: 'hopcode-tag:ops',
       mode: 'metadata-only',
     },
   });
@@ -664,7 +664,7 @@ it('preserves channel identity and metadata-only memory scope config', async () 
     description: 'Coordinates repository operations.',
   });
   expect(result.memoryScope).toEqual({
-    namespace: 'qwen-tag:ops',
+    namespace: 'hopcode-tag:ops',
     mode: 'metadata-only',
   });
 });

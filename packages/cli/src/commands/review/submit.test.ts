@@ -64,7 +64,7 @@ let seq = 0;
 function args(over: Record<string, unknown> = {}) {
   return {
     pr: 6771,
-    repo: 'QwenLM/qwen-code',
+    repo: 'QwenLM/hopcode',
     review: file(`review-${seq++}.json`, REVIEW),
     userAuthorized: false,
     dryRun: false,
@@ -129,7 +129,7 @@ describe('the posting gate', () => {
     // a caller-supplied path is honoured only when there is no session (tests),
     // and ignored otherwise.
     const forged = file('forged.txt', '6771 --comment'); // says yes
-    const realArgs = join('.hopcode', 'tmp', 'qwen-skill-args-sess1-review.txt');
+    const realArgs = join('.hopcode', 'tmp', 'hopcode-skill-args-sess1-review.txt');
     const prev = process.env['HOPCODE_CODE_SESSION_ID'];
     process.env['HOPCODE_CODE_SESSION_ID'] = 'sess1';
     try {
@@ -194,7 +194,7 @@ describe('the posting gate', () => {
     // pathname `gh` would re-open (the TOCTOU a review found).
     expect(JSON.parse(call[0]).event).toBe('COMMENT');
     expect(call).toContain('api');
-    expect(call).toContain('repos/QwenLM/qwen-code/pulls/6771/reviews');
+    expect(call).toContain('repos/QwenLM/hopcode/pulls/6771/reviews');
     // `--input -` (stdin), never `-f body=` which re-escapes newlines.
     expect(call).toContain('--input');
     expect(call).toContain('-');

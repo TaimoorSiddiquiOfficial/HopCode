@@ -9,7 +9,7 @@ describe('session slug generator', () => {
   const date = new Date(2026, 3, 29);
 
   it('derives readable session IDs from prompt hints', () => {
-    expect(generateUniqueSessionId([], date, 'Fix Qwen ACP session names')).toBe(
+    expect(generateUniqueSessionId([], date, 'Fix hopcode ACP session names')).toBe(
       '260429-fix-hopcode-acp-session-names',
     );
   });
@@ -25,7 +25,7 @@ describe('session slug generator', () => {
       generateUniqueSessionId(
         ['260429-fix-hopcode-acp-session-names'],
         date,
-        'Fix Qwen ACP session names',
+        'Fix hopcode ACP session names',
       ),
     ).toBe('260429-fix-hopcode-acp-session-names-2');
   });

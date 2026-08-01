@@ -61,7 +61,7 @@ function runEval(configDir: string, defaultWorkspaceDir: string, code: string): 
 }
 
 describe('default conversation workspace', () => {
-  it('creates a protected Qwen conversation workspace outside managed project storage', () => {
+  it('creates a protected hopcode conversation workspace outside managed project storage', () => {
     const configDir = setupConfigDir()
     const defaultWorkspaceDir = join(tmpdir(), `qwen-documents-${crypto.randomUUID()}`, 'hopcode')
 

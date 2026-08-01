@@ -75,7 +75,7 @@ function isRecord(value) {
 function getCanonicalModelId(response, fallback) {
     if (!isRecord(response) || !isRecord(response['_meta']))
         return fallback;
-    const modelSwitch = response['_meta']['qwenModelSwitch'];
+    const modelSwitch = response['_meta']['hopcodeModelSwitch'];
     if (!isRecord(modelSwitch))
         return fallback;
     const modelId = modelSwitch['modelId'];
@@ -156,7 +156,7 @@ function extractLoadReplayResponse(state) {
     };
 }
 function isServeDebugLoggingEnabled() {
-    const value = process.env['QWEN_SERVE_DEBUG'];
+    const value = process.env['HOPCODE_SERVE_DEBUG'];
     if (!value)
         return false;
     return !['0', 'false', 'off', 'no'].includes(value.trim().toLowerCase());
@@ -323,7 +323,7 @@ function pickUserInputEchoMeta(meta) {
  * `suppressOwnUserEcho: true` skip the echo for the originator (the
  * envelope-level `originatorClientId` matches their own clientId).
  *
- * Anonymous-prompt caveat: a stable `X-Qwen-Client-Id` is a PRECONDITION
+ * Anonymous-prompt caveat: a stable `X-HopCode-Client-Id` is a PRECONDITION
  * for that dedup. A prompt with no clientId (curl smoke / pre-registration
  * script) produces an envelope without `originatorClientId`, so
  * `suppressOwnUserEcho` has nothing to match and the originating connection
@@ -578,15 +578,15 @@ const MAX_PARENT_PERSIST_ATTEMPTS = 3;
 const MCP_RESTART_TIMEOUT_MS = 300_000;
 const WORKSPACE_MEMORY_REMEMBER_TIMEOUT_MS = 300_000;
 const MCP_OAUTH_TIMEOUT_MS = 600_000;
-const DAEMON_RETRY_META_KEY = 'qwen.daemon.retry';
+const DAEMON_RETRY_META_KEY = 'hopcode.daemon.retry';
 // Trusted continuation marker. `sendPrompt` strips it from every caller and
 // re-arms it only for the trusted `continueSession` dispatch (the `isContinue`
 // flag), so an external `POST /session/:id/prompt` can never smuggle it in to
 // trigger a continuation that skips `continueLastTurn()`'s accept/reject
 // pre-check. Mirrors how `DAEMON_RETRY_META_KEY` is stripped and re-armed.
-const DAEMON_CONTINUE_META_KEY = 'qwen.daemon.continueLastTurn';
+const DAEMON_CONTINUE_META_KEY = 'hopcode.daemon.continueLastTurn';
 /**
- * Backstop timeout for `qwen/control/session/recap`. The underlying
+ * Backstop timeout for `hopcode/control/session/recap`. The underlying
  * side-query is single-attempt with `maxOutputTokens: 300`, so a
  * healthy call finishes in 1–5 seconds; we cap at 60s to absorb model-
  * provider hiccups without inheriting the 10s `initTimeoutMs` default
@@ -715,7 +715,7 @@ export function createAcpSessionBridge(opts) {
     // `channelFactory` at spawn time receive this as the 2nd arg, so
     // the default factory can merge into the child env without
     // consulting any global state that another concurrent
-    // `runQwenServe()` handle might have mutated. Frozen to make
+    // `runHopCodeServe()` handle might have mutated. Frozen to make
     // accidental mutation throw rather than silently corrupt later
     // spawns.
     const childEnvOverrides = opts.childEnvOverrides
@@ -757,7 +757,7 @@ export function createAcpSessionBridge(opts) {
     }
     // The bound path is the canonical form `spawnOrAttach` compares
     // incoming `workspaceCwd` against. The caller MUST pass an already-
-    // canonical value (via `canonicalizeWorkspace`). `runQwenServe`
+    // canonical value (via `canonicalizeWorkspace`). `runHopCodeServe`
     // does this at boot and threads the same value into both
     // `createHttpAcpBridge` and `createServeApp`; direct embeds / tests
     // must call `canonicalizeWorkspace` first. No redundant
@@ -1055,7 +1055,7 @@ export function createAcpSessionBridge(opts) {
     // dispatched on an existing connection AFTER the shutdown snapshot
     // taken in `shutdown()` fails fast instead of creating a child the
     // shutdown path has no more visibility into. Without this, the
-    // server.listen → bridge.shutdown ordering in `runQwenServe` leaves
+    // server.listen → bridge.shutdown ordering in `runHopCodeServe` leaves
     // a window between (a) shutdown snapshotting `byId` for kills and
     // (b) `server.close` rejecting new connections, during which a
     // late-arriving `POST /session` slips a fresh child past cleanup.
@@ -1167,9 +1167,9 @@ export function createAcpSessionBridge(opts) {
         const promise = (async () => {
             const acpChannelId = randomUUID();
             const channel = await telemetry.withSpan('channel.spawn', {
-                'qwen-code.daemon.bridge.operation': 'channel.spawn',
-                'qwen-code.daemon.channel.reused': false,
-                'qwen-code.daemon.acp_channel.id': acpChannelId,
+                'hopcode.daemon.bridge.operation': 'channel.spawn',
+                'hopcode.daemon.channel.reused': false,
+                'hopcode.daemon.acp_channel.id': acpChannelId,
             }, async () => await channelFactory(boundWorkspace, childEnvOverrides));
             const sessionIds = new Set();
             const client = new BridgeClient(
@@ -1210,7 +1210,7 @@ export function createAcpSessionBridge(opts) {
             }, 
             // Reverse tool channel (issue #5626, Phase 2): forward the optional
             // client-hosted-MCP sender lookup so `BridgeClient.extMethod` can
-            // answer `qwen/control/client_mcp/message` from the child by reaching
+            // answer `hopcode/control/client_mcp/message` from the child by reaching
             // the per-WS-connection `ClientMcpRegistrar`. Omitted callers (tests,
             // Mode A) never host a client MCP server, so the method stays
             // unreachable.
@@ -1330,7 +1330,7 @@ export function createAcpSessionBridge(opts) {
                 //
                 // Suppressed during `shuttingDown` because the operator
                 // already saw "received SIGINT, draining..." from
-                // `runQwenServe`'s signal handler. The standalone
+                // `runHopCodeServe`'s signal handler. The standalone
                 // killSession case (last session leaves, channel torn down
                 // but daemon stays up) still logs — there's no upstream
                 // context line in that flow, and the message confirms the
@@ -1398,8 +1398,8 @@ export function createAcpSessionBridge(opts) {
             // the alive-set cleanup when the OS reaps the child.
             try {
                 await telemetry.withSpan('channel.initialize', {
-                    'qwen-code.daemon.bridge.operation': 'channel.initialize',
-                    'qwen-code.daemon.acp_channel.id': acpChannelId,
+                    'hopcode.daemon.bridge.operation': 'channel.initialize',
+                    'hopcode.daemon.acp_channel.id': acpChannelId,
                 }, async () => {
                     const response = await withTimeout(connection.initialize({
                         protocolVersion: PROTOCOL_VERSION,
@@ -1411,7 +1411,7 @@ export function createAcpSessionBridge(opts) {
                         clientCapabilities: {
                             fs: { readTextFile: true, writeTextFile: true },
                         },
-                        clientInfo: { name: 'qwen-serve-bridge', version: '0' },
+                        clientInfo: { name: 'hopcode-serve-bridge', version: '0' },
                     }), initTimeoutMs, 'initialize');
                     try {
                         const attributes = getChannelStartupProfileAttributes(response, Date.now(), initTimeoutMs);
@@ -1491,8 +1491,8 @@ export function createAcpSessionBridge(opts) {
                 ? 'joined'
                 : 'spawned_on_request';
         const ci = await telemetry.withSpan('channel.wait', {
-            'qwen-code.daemon.bridge.operation': 'channel.wait',
-            'qwen-code.daemon.channel.path': channelPath,
+            'hopcode.daemon.bridge.operation': 'channel.wait',
+            'hopcode.daemon.channel.path': channelPath,
         }, ensureChannel);
         ci.sessionSpawnsInFlight++;
         let sessionRegistered = false;
@@ -1502,10 +1502,10 @@ export function createAcpSessionBridge(opts) {
         try {
             try {
                 newSessionResp = await telemetry.withSpan('session.new', {
-                    'qwen-code.daemon.bridge.operation': 'session.new',
-                    'qwen-code.daemon.session_scope': effectiveScope,
-                    'qwen-code.daemon.channel.path': channelPath,
-                    'qwen-code.daemon.acp_channel.id': ci.id,
+                    'hopcode.daemon.bridge.operation': 'session.new',
+                    'hopcode.daemon.session_scope': effectiveScope,
+                    'hopcode.daemon.channel.path': channelPath,
+                    'hopcode.daemon.acp_channel.id': ci.id,
                 }, async () => {
                     // This legacy-named helper sanitizes and injects trace metadata
                     // for any ACP request, not only prompts.
@@ -1515,7 +1515,7 @@ export function createAcpSessionBridge(opts) {
                     })), initTimeoutMs, 'newSession');
                     telemetry.event('session.new.completed', {
                         'session.id': response.sessionId,
-                        'qwen-code.daemon.acp_channel.id': ci.id,
+                        'hopcode.daemon.acp_channel.id': ci.id,
                     });
                     return response;
                 });
@@ -1812,7 +1812,7 @@ export function createAcpSessionBridge(opts) {
         if (persist && !persistApprovalMode) {
             throw new Error('setSessionApprovalMode called with `persist: true` but no ' +
                 '`persistApprovalMode` callback wired in BridgeOptions. ' +
-                'runQwenServe wires the production callback; direct embeds ' +
+                'runHopCodeServe wires the production callback; direct embeds ' +
                 'and tests must opt in or omit `persist`.');
         }
         const approvalWork = entry.approvalModeQueue.then(async () => {
@@ -3234,7 +3234,7 @@ export function createAcpSessionBridge(opts) {
         },
         async spawnOrAttach(req) {
             if (shuttingDown) {
-                // `runQwenServe.close()` calls `bridge.shutdown()` BEFORE
+                // `runHopCodeServe.close()` calls `bridge.shutdown()` BEFORE
                 // `server.close()`. During that window, established HTTP
                 // connections can still hit `POST /session`. Refuse here so
                 // late-arrivers don't spawn children the shutdown path won't
@@ -3545,7 +3545,7 @@ export function createAcpSessionBridge(opts) {
                         'session.id': sessionId,
                         'hopcode.daemon.prompt.queue_wait_ms': queueWaitMs,
                         ...(context?.clientId
-                            ? { 'qwen-code.client_id': context.clientId }
+                            ? { 'hopcode.client_id': context.clientId }
                             : {}),
                     }, async () => {
                         const normalized = telemetry.injectPromptContext({
@@ -4348,7 +4348,7 @@ export function createAcpSessionBridge(opts) {
             // are downgraded to the debug channel when `shuttingDown` is
             // true. `EventBus.publish` is documented never to throw, so
             // anything landing here in normal ops is unexpected — silencing
-            // via QWEN_SERVE_DEBUG would let a regression succeed at the
+            // via HOPCODE_SERVE_DEBUG would let a regression succeed at the
             // route layer while SSE subscribers stop seeing events.
             //
             // PR #4255 fold-in 9: track per-session success/fail. A
@@ -4408,7 +4408,7 @@ export function createAcpSessionBridge(opts) {
             // Snapshot the union of every live session's stamped client ids.
             // Returned as a fresh Set so callers can mutate-safely (the live
             // per-session maps stay private). Workspace-level mutation routes
-            // use this to validate `X-Qwen-Client-Id` without owning a
+            // use this to validate `X-HopCode-Client-Id` without owning a
             // session id.
             const out = new Set();
             for (const entry of byId.values()) {
@@ -4890,7 +4890,7 @@ export function createAcpSessionBridge(opts) {
             };
         },
         async setSessionApprovalMode(sessionId, mode, opts, context) {
-            // Forwards through `qwen/control/session/approval_mode` so the
+            // Forwards through `hopcode/control/session/approval_mode` so the
             // change lands inside the ACP child's own `Config` (per-session
             // `setApprovalMode`). The bridge layer adds two things on top:
             // trusted `originatorClientId` resolution and an opt-in persist
@@ -4906,7 +4906,7 @@ export function createAcpSessionBridge(opts) {
             return await applyApprovalMode(entry, mode, opts.persist, originatorClientId);
         },
         async generateSessionRecap(sessionId, _context) {
-            // Thin pass-through to `qwen/control/session/
+            // Thin pass-through to `hopcode/control/session/
             // recap` — the ACP child runs `generateSessionRecap` against the
             // session's GeminiClient history and returns `{sessionId, recap}`
             // where `recap` may be `null` for too-short histories or transient
@@ -5735,7 +5735,7 @@ export function createAcpSessionBridge(opts) {
             });
             void (async () => {
                 // Set BEFORE the snapshot so any racing `spawnOrAttach` triggered
-                // by an in-flight HTTP connection after `runQwenServe.close()`
+                // by an in-flight HTTP connection after `runHopCodeServe.close()`
                 // entered the bridge.shutdown() phase fails fast instead of
                 // spawning a child this teardown won't see.
                 shuttingDown = true;
@@ -5820,7 +5820,7 @@ export function createAcpSessionBridge(opts) {
         async preheat() {
             if (shuttingDown)
                 return;
-            await telemetry.withSpan('channel.preheat', { 'qwen-code.daemon.bridge.operation': 'channel.preheat' }, async () => {
+            await telemetry.withSpan('channel.preheat', { 'hopcode.daemon.bridge.operation': 'channel.preheat' }, async () => {
                 const ci = await ensureChannel();
                 const idleMs = resolvedChannelIdleTimeoutMs();
                 if (idleMs > 0 && hasNoChannelWork(ci)) {

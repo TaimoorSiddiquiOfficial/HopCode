@@ -22,7 +22,7 @@ const summaryReport = {
         uptimeMs: 3_723_000,
         mode: 'http-bridge',
         workspaceCwd: '/work/demo',
-        qwenCodeVersion: '0.9.0',
+        hopcodeversion: '0.9.0',
     },
     security: {
         tokenConfigured: true,
@@ -121,7 +121,7 @@ const fullReport = {
             },
         },
         auth: {
-            supportedDeviceFlowProviders: ['qwen'],
+            supportedDeviceFlowProviders: ['hopcode'],
             pendingDeviceFlowCount: 0,
         },
     },

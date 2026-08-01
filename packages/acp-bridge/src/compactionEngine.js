@@ -442,7 +442,7 @@ function extractParentToolCallIdFromMeta(meta) {
 function extractSourceRecordIdsFromMeta(meta) {
     if (typeof meta !== 'object' || meta === null)
         return undefined;
-    const transcript = meta['qwenTranscript'];
+    const transcript = meta['hopcodetranscript'];
     if (typeof transcript !== 'object' || transcript === null)
         return undefined;
     const ids = transcript['sourceRecordIds'];
@@ -516,7 +516,7 @@ function mergeTranscriptUpdateMeta(existing, incoming) {
         ...(existingRecord ?? {}),
         ...(incomingRecord ?? {}),
         ...(sourceRecordIds.length > 0
-            ? { qwenTranscript: { sourceRecordIds } }
+            ? { hopcodetranscript: { sourceRecordIds } }
             : {}),
     };
 }

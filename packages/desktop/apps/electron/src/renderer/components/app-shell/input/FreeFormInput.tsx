@@ -603,7 +603,7 @@ export function FreeFormInput({
 
   // Compute available models from HopCode. In the real app this list is
   // populated from ACP session/new models.availableModels; playground keeps
-  // the Qwen seed list so local component demos remain useful.
+  // the hopcode seed list so local component demos remain useful.
   const availableModels = React.useMemo(() => {
     if (connectionUnavailable) return [];
     if (!appShellCtx) return HOPCODE_MODELS;

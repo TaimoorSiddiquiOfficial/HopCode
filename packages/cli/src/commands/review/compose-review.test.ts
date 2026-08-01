@@ -292,7 +292,7 @@ function blindPlan(): string {
   return plan();
 }
 
-const FOOTER = `_— ${MODEL} via Qwen Code /review_`;
+const FOOTER = `_— ${MODEL} via HopCode /review_`;
 
 function base(overrides: Partial<ComposeReviewInput>): ComposeReviewInput {
   return {

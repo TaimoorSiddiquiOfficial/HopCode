@@ -143,7 +143,7 @@ install-hopcode-standalone.bat --repair-path --path-scope machine
 
 ## Optional Native Modules
 
-The standalone archives bundle Qwen Code, a private Node.js runtime, and the
+The standalone archives bundle HopCode, a private Node.js runtime, and the
 matching `@teddyzhu/clipboard` native package for clipboard image paste. They
 do not currently install every npm optional native module, such as `node-pty`,
 so terminal pty behavior may not be identical to an npm installation.

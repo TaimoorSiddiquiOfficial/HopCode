@@ -38,7 +38,7 @@ export declare class BridgeChannelClosedError extends Error {
     constructor(context: string);
 }
 /**
- * Raised by `defaultSpawnChannelFactory` when neither `QWEN_CLI_ENTRY` nor
+ * Raised by `defaultSpawnChannelFactory` when neither `hopcode_cli_entry` nor
  * `process.argv[1]` resolves to a path that can be re-spawned for the ACP
  * child. Replaces a generic `new Error(...)` so `mapDomainErrorToErrorKind`
  * can return `'missing_binary'` via `instanceof` rather than regex-matching
@@ -635,7 +635,7 @@ export interface ServeWorkspaceMemoryFile {
     path: string;
     /**
      * 'workspace' for files under the bound workspace tree, 'global' for
-     * `~/.qwen/QWEN.md` style entries. Helps adapters render scope chips.
+     * `~/.qwen/HOPCODE.md` style entries. Helps adapters render scope chips.
      */
     scope: ServeContextFileScope;
     /** Size in bytes of the file's serialized contents on disk. */
@@ -649,7 +649,7 @@ export interface ServeWorkspaceMemoryStatus {
     /** Total bytes across all hierarchical files (sum of `files[].bytes`). */
     totalBytes: number;
     /**
-     * Number of merged QWEN.md / AGENTS.md files the loader pulled in.
+     * Number of merged HOPCODE.md / AGENTS.md files the loader pulled in.
      * Mirrors `LoadServerHierarchicalMemoryResponse.fileCount`.
      */
     fileCount: number;

@@ -141,7 +141,7 @@ vi.mock('node:fs/promises', async (importOriginal) => {
 });
 
 describe('channel memory', () => {
-  const originalhopcodeHome = process.env['QWEN_HOME'];
+  const originalhopcodeHome = process.env['hopcode_home'];
   let hopcodeHome: string;
 
   const target: ChannelMemoryTarget = {
@@ -151,7 +151,7 @@ describe('channel memory', () => {
 
   beforeEach(() => {
     hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-channel-memory-'));
-    process.env['QWEN_HOME'] = hopcodeHome;
+    process.env['hopcode_home'] = hopcodeHome;
   });
 
   afterEach(() => {
@@ -166,9 +166,9 @@ describe('channel memory', () => {
     lockObservation.attempted = undefined;
     vi.restoreAllMocks();
     if (originalhopcodeHome === undefined) {
-      delete process.env['QWEN_HOME'];
+      delete process.env['hopcode_home'];
     } else {
-      process.env['QWEN_HOME'] = originalhopcodeHome;
+      process.env['hopcode_home'] = originalhopcodeHome;
     }
     fs.rmSync(hopcodeHome, { recursive: true, force: true });
   });
