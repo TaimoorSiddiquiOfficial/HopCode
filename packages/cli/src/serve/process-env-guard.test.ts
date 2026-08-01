@@ -121,7 +121,7 @@ const allowedProcessEnvAccesses = normalizeAllowances([
     {
       reason:
         'The fast-path entry point initializes process-level daemon defaults.',
-      accesses: { whole: 2 },
+      accesses: { whole: 2, 'key:HOPCODE_CODE_SUPPRESS_IZN_WARNING': 1, 'key:SANDBOX': 1 },
     },
   ],
   [
