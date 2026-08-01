@@ -1397,7 +1397,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
   let stdoutDestroySpy: MockInstance<typeof process.stdout.destroy>;
 
   const mockArgv = {} as CliArgs;
-  const acpLocalReadRootsEnv = 'QWEN_ACP_LOCAL_READ_ROOTS';
+  const acpLocalReadRootsEnv = 'HOPCODE_ACP_LOCAL_READ_ROOTS';
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -1551,7 +1551,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     }
   });
 
-  it('appends QWEN_ACP_LOCAL_READ_ROOTS absolute entries to ACP file system fallback roots', async () => {
+  it('appends HOPCODE_ACP_LOCAL_READ_ROOTS absolute entries to ACP file system fallback roots', async () => {
     const previousRoots = process.env[acpLocalReadRootsEnv];
     const envRootA = path.resolve('/custom/acp-a');
     const envRootB = path.resolve('/custom/acp-b');
@@ -6429,13 +6429,13 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       },
     }) as AgentLike;
 
-    await expect(agent.extMethod('qwen/settings/getPath', {})).resolves.toEqual(
+    await expect(agent.extMethod('hopcode/settings/getPath', {})).resolves.toEqual(
       {
         path: '/home/test/.hopcode/settings.json',
       },
     );
     await expect(
-      agent.extMethod('qwen/settings/getMemory', {}),
+      agent.extMethod('hopcode/settings/getMemory', {}),
     ).resolves.toEqual({
       settings: {
         enableManagedAutoMemory: true,
@@ -6447,7 +6447,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       },
     });
     await expect(
-      agent.extMethod('qwen/settings/getMemoryPaths', {
+      agent.extMethod('hopcode/settings/getMemoryPaths', {
         cwd: '/tmp/qwen-memory-cwd-test',
         projectRoot: '/tmp/qwen-memory-root-test',
       }),
@@ -6459,7 +6459,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       },
     });
     await expect(
-      agent.extMethod('qwen/settings/setMemory', {
+      agent.extMethod('hopcode/settings/setMemory', {
         updates: {
           enableManagedAutoDream: true,
           enableAutoSkill: true,
@@ -6504,7 +6504,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       },
     }) as AgentLike;
 
-    await agent.extMethod('qwen/settings/setCoreValue', {
+    await agent.extMethod('hopcode/settings/setCoreValue', {
       scope: 'user',
       key: 'general.outputLanguage',
       value: 'Japanese',
@@ -6521,7 +6521,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  // Shared boot helper for the qwen/settings/* handler tests below.
+  // Shared boot helper for the hopcode/settings/* handler tests below.
   async function bootCoreSettingsAgent(settings: LoadedSettings) {
     vi.mocked(loadSettings).mockReturnValue(settings);
     const agentPromise = runAcpAgent(mockConfig, settings, mockArgv);
@@ -6579,12 +6579,12 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/getCore returns user, workspace, and merged views', async () => {
+  it('hopcode/settings/getCore returns user, workspace, and merged views', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/getCore', {}),
+      agent.extMethod('hopcode/settings/getCore', {}),
     ).resolves.toMatchObject({
       user: expect.objectContaining({ values: expect.anything() }),
       workspace: expect.objectContaining({ values: expect.anything() }),
@@ -6595,11 +6595,11 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setCoreValue clears model.baseUrl when setting model.name', async () => {
+  it('hopcode/settings/setCoreValue clears model.baseUrl when setting model.name', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    await agent.extMethod('qwen/settings/setCoreValue', {
+    await agent.extMethod('hopcode/settings/setCoreValue', {
       scope: 'user',
       key: 'model.name',
       value: 'qwen3.7-max',
@@ -6617,7 +6617,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/getCore excludes untrusted workspace integrations from merged view', async () => {
+  it('hopcode/settings/getCore excludes untrusted workspace integrations from merged view', async () => {
     const settings = makeCoreSettings();
     (settings as { isTrusted: boolean }).isTrusted = false;
     (settings.user.settings as Record<string, unknown>)['mcpServers'] = {
@@ -6634,7 +6634,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     };
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = (await agent.extMethod('qwen/settings/getCore', {})) as {
+    const result = (await agent.extMethod('hopcode/settings/getCore', {})) as {
       workspace: { mcpServers: Array<{ name: string }> };
       merged: {
         mcpServers: Array<{ name: string }>;
@@ -6664,7 +6664,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/getCore excludes inactive extension integrations from merged view', async () => {
+  it('hopcode/settings/getCore excludes inactive extension integrations from merged view', async () => {
     mockExtensionManagerState.extensions = [
       {
         id: 'active-ext',
@@ -6706,7 +6706,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = (await agent.extMethod('qwen/settings/getCore', {})) as {
+    const result = (await agent.extMethod('hopcode/settings/getCore', {})) as {
       merged: {
         mcpServers: Array<{ name: string }>;
         hooks: Array<{ extensionName?: string }>;
@@ -6730,7 +6730,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/getCore redacts MCP server env/header secrets', async () => {
+  it('hopcode/settings/getCore redacts MCP server env/header secrets', async () => {
     const settings = makeCoreSettings();
     (settings.user.settings as Record<string, unknown>)['mcpServers'] = {
       secure: {
@@ -6744,7 +6744,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     };
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = (await agent.extMethod('qwen/settings/getCore', {})) as {
+    const result = (await agent.extMethod('hopcode/settings/getCore', {})) as {
       user: {
         mcpServers: Array<{
           name: string;
@@ -6772,7 +6772,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/getCore redacts hook env/header secrets', async () => {
+  it('hopcode/settings/getCore redacts hook env/header secrets', async () => {
     const settings = makeCoreSettings();
     (settings.user.settings as Record<string, unknown>)['hooks'] = {
       PreToolUse: [
@@ -6789,7 +6789,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     };
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = await agent.extMethod('qwen/settings/getCore', {});
+    const result = await agent.extMethod('hopcode/settings/getCore', {});
     const serialized = JSON.stringify(result);
     expect(serialized).not.toContain('xoxb-realsecret');
     expect(serialized).toContain('__redacted__');
@@ -6798,7 +6798,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setHook restores a redacted hook secret instead of persisting the sentinel', async () => {
+  it('hopcode/settings/setHook restores a redacted hook secret instead of persisting the sentinel', async () => {
     const settings = makeCoreSettings();
     (settings.user.settings as Record<string, unknown>)['hooks'] = {
       PreToolUse: [
@@ -6816,7 +6816,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     // Client echoes back the masked env while editing the command in place.
-    await agent.extMethod('qwen/settings/setHook', {
+    await agent.extMethod('hopcode/settings/setHook', {
       scope: 'user',
       event: 'PreToolUse',
       index: 0,
@@ -6844,19 +6844,19 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setMcpServer rejects a missing name and persists a valid one', async () => {
+  it('hopcode/settings/setMcpServer rejects a missing name and persists a valid one', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/setMcpServer', {
+      agent.extMethod('hopcode/settings/setMcpServer', {
         scope: 'user',
         name: '   ',
         server: { transport: 'stdio', command: 'node' },
       }),
     ).rejects.toThrowError(/MCP server name is required/);
 
-    await agent.extMethod('qwen/settings/setMcpServer', {
+    await agent.extMethod('hopcode/settings/setMcpServer', {
       scope: 'user',
       name: 'local',
       server: { transport: 'stdio', command: 'node', args: ['server.js'] },
@@ -6873,7 +6873,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setMcpServer restores redacted secrets instead of persisting the sentinel', async () => {
+  it('hopcode/settings/setMcpServer restores redacted secrets instead of persisting the sentinel', async () => {
     const settings = makeCoreSettings();
     (settings.user.settings as Record<string, unknown>)['mcpServers'] = {
       local: {
@@ -6885,7 +6885,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
 
     // Client read getCore (env masked to __redacted__), changed an unrelated
     // field, and wrote the whole config back.
-    await agent.extMethod('qwen/settings/setMcpServer', {
+    await agent.extMethod('hopcode/settings/setMcpServer', {
       scope: 'user',
       name: 'local',
       server: {
@@ -6908,12 +6908,12 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setMcpServer rejects an invalid transport', async () => {
+  it('hopcode/settings/setMcpServer rejects an invalid transport', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/setMcpServer', {
+      agent.extMethod('hopcode/settings/setMcpServer', {
         scope: 'user',
         name: 'bad',
         server: { transport: 'carrier-pigeon' },
@@ -6924,12 +6924,12 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setMcpServer rejects malformed timeout strings', async () => {
+  it('hopcode/settings/setMcpServer rejects malformed timeout strings', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/setMcpServer', {
+      agent.extMethod('hopcode/settings/setMcpServer', {
         scope: 'user',
         name: 'bad-timeout',
         server: { transport: 'stdio', command: 'node', timeout: '10ms' },
@@ -6937,14 +6937,14 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     ).rejects.toThrowError(/Expected a positive integer/);
 
     await expect(
-      agent.extMethod('qwen/settings/setMcpServer', {
+      agent.extMethod('hopcode/settings/setMcpServer', {
         scope: 'user',
         name: 'fractional-timeout',
         server: { transport: 'stdio', command: 'node', timeout: '1.5' },
       }),
     ).rejects.toThrowError(/Expected a positive integer/);
 
-    await agent.extMethod('qwen/settings/setMcpServer', {
+    await agent.extMethod('hopcode/settings/setMcpServer', {
       scope: 'user',
       name: 'valid-timeout',
       server: { transport: 'stdio', command: 'node', timeout: '1500' },
@@ -6961,7 +6961,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/removeMcpServer drops the named server and rejects a missing name', async () => {
+  it('hopcode/settings/removeMcpServer drops the named server and rejects a missing name', async () => {
     const settings = makeCoreSettings();
     (settings.user.settings as Record<string, unknown>)['mcpServers'] = {
       local: { transport: 'stdio', command: 'node' },
@@ -6970,10 +6970,10 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/removeMcpServer', { scope: 'user' }),
+      agent.extMethod('hopcode/settings/removeMcpServer', { scope: 'user' }),
     ).rejects.toThrowError(/MCP server name is required/);
 
-    await agent.extMethod('qwen/settings/removeMcpServer', {
+    await agent.extMethod('hopcode/settings/removeMcpServer', {
       scope: 'user',
       name: 'local',
     });
@@ -6985,19 +6985,19 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setHook rejects an invalid event and appends a valid hook', async () => {
+  it('hopcode/settings/setHook rejects an invalid event and appends a valid hook', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/setHook', {
+      agent.extMethod('hopcode/settings/setHook', {
         scope: 'user',
         event: 'NotARealEvent',
         hook: { hooks: [{ type: 'command', command: 'echo hi' }] },
       }),
     ).rejects.toThrowError(/Invalid hook event/);
 
-    await agent.extMethod('qwen/settings/setHook', {
+    await agent.extMethod('hopcode/settings/setHook', {
       scope: 'user',
       event: 'PreToolUse',
       hook: { hooks: [{ type: 'command', command: 'echo hi' }] },
@@ -7030,7 +7030,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     };
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = (await agent.extMethod('qwen/settings/getCore', {})) as {
+    const result = (await agent.extMethod('hopcode/settings/getCore', {})) as {
       user: { hooks: Array<{ event: string }> };
     };
     expect(result.user.hooks.map((entry) => entry.event).sort()).toEqual([
@@ -7038,12 +7038,12 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       'UserPromptExpansion',
     ]);
 
-    await agent.extMethod('qwen/settings/setHook', {
+    await agent.extMethod('hopcode/settings/setHook', {
       scope: 'user',
       event: 'PostToolBatch',
       hook: { hooks: [{ type: 'command', command: 'echo more' }] },
     });
-    await agent.extMethod('qwen/settings/setHook', {
+    await agent.extMethod('hopcode/settings/setHook', {
       scope: 'user',
       event: 'UserPromptExpansion',
       hook: { hooks: [{ type: 'command', command: 'echo more' }] },
@@ -7059,12 +7059,12 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setHook rejects malformed timeout strings', async () => {
+  it('hopcode/settings/setHook rejects malformed timeout strings', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/setHook', {
+      agent.extMethod('hopcode/settings/setHook', {
         scope: 'user',
         event: 'PreToolUse',
         hook: {
@@ -7077,7 +7077,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setHook replaces in place at a valid index and appends for out-of-range', async () => {
+  it('hopcode/settings/setHook replaces in place at a valid index and appends for out-of-range', async () => {
     const settings = makeCoreSettings();
     (settings.user.settings as Record<string, unknown>)['hooks'] = {
       PreToolUse: [{ hooks: [{ type: 'command', command: 'original' }] }],
@@ -7085,7 +7085,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     // In-place replace at index 0.
-    await agent.extMethod('qwen/settings/setHook', {
+    await agent.extMethod('hopcode/settings/setHook', {
       scope: 'user',
       event: 'PreToolUse',
       index: 0,
@@ -7101,7 +7101,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     expect(persisted.PreToolUse[0]!.hooks[0]!.command).toBe('replaced');
 
     // Out-of-range index appends instead of creating a sparse hole.
-    await agent.extMethod('qwen/settings/setHook', {
+    await agent.extMethod('hopcode/settings/setHook', {
       scope: 'user',
       event: 'PreToolUse',
       index: 99,
@@ -7122,7 +7122,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/removeHook rejects a negative index and an out-of-range index', async () => {
+  it('hopcode/settings/removeHook rejects a negative index and an out-of-range index', async () => {
     const settings = makeCoreSettings();
     (settings.user.settings as Record<string, unknown>)['hooks'] = {
       PreToolUse: [{ hooks: [{ type: 'command', command: 'echo hi' }] }],
@@ -7130,7 +7130,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/removeHook', {
+      agent.extMethod('hopcode/settings/removeHook', {
         scope: 'user',
         event: 'PreToolUse',
         index: -1,
@@ -7138,7 +7138,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     ).rejects.toThrowError(/Invalid hook index/);
 
     await expect(
-      agent.extMethod('qwen/settings/removeHook', {
+      agent.extMethod('hopcode/settings/removeHook', {
         scope: 'user',
         event: 'PreToolUse',
         index: 5,
@@ -7147,7 +7147,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
 
     // Non-integer index must be rejected (a float would corrupt array ops).
     await expect(
-      agent.extMethod('qwen/settings/removeHook', {
+      agent.extMethod('hopcode/settings/removeHook', {
         scope: 'user',
         event: 'PreToolUse',
         index: 1.5,
@@ -7158,24 +7158,24 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/settings/setExtensionSetting validates required params before touching extensions', async () => {
+  it('hopcode/settings/setExtensionSetting validates required params before touching extensions', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/settings/setExtensionSetting', {
+      agent.extMethod('hopcode/settings/setExtensionSetting', {
         settingKey: 'k',
         value: 'v',
       }),
     ).rejects.toThrowError(/extensionId is required/);
     await expect(
-      agent.extMethod('qwen/settings/setExtensionSetting', {
+      agent.extMethod('hopcode/settings/setExtensionSetting', {
         extensionId: 'ext',
         value: 'v',
       }),
     ).rejects.toThrowError(/settingKey is required/);
     await expect(
-      agent.extMethod('qwen/settings/setExtensionSetting', {
+      agent.extMethod('hopcode/settings/setExtensionSetting', {
         extensionId: 'ext',
         settingKey: 'k',
         value: 42,
@@ -7404,25 +7404,25 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     );
   }
 
-  it('qwen/session/loadUpdates rejects an invalid sessionId', async () => {
+  it('hopcode/session/loadUpdates rejects an invalid sessionId', async () => {
     const settings = makeCoreSettings();
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/session/loadUpdates', { sessionId: 'nope' }),
+      agent.extMethod('hopcode/session/loadUpdates', { sessionId: 'nope' }),
     ).rejects.toThrowError(/Invalid or missing sessionId/);
 
     mockConnectionState.resolve();
     await agentPromise;
   });
 
-  it('qwen/session/loadUpdates returns empty updates when no conversation exists', async () => {
+  it('hopcode/session/loadUpdates returns empty updates when no conversation exists', async () => {
     const settings = makeCoreSettings();
     mockSessionServiceLoad(null);
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
     await expect(
-      agent.extMethod('qwen/session/loadUpdates', {
+      agent.extMethod('hopcode/session/loadUpdates', {
         sessionId: VALID_SESSION_ID,
       }),
     ).resolves.toEqual({ updates: [] });
@@ -7431,7 +7431,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/session/loadUpdates replays history and lifts _meta.timestamp to the top level', async () => {
+  it('hopcode/session/loadUpdates replays history and lifts _meta.timestamp to the top level', async () => {
     const settings = makeCoreSettings();
     mockSessionServiceLoad({
       conversation: {
@@ -7450,7 +7450,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     );
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = (await agent.extMethod('qwen/session/loadUpdates', {
+    const result = (await agent.extMethod('hopcode/session/loadUpdates', {
       sessionId: VALID_SESSION_ID,
     })) as { updates: Array<{ timestamp?: number }>; startTime?: string };
     expect(result.startTime).toBe('start');
@@ -7462,7 +7462,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/session/loadUpdates threads detected historyGaps to the replayer', async () => {
+  it('hopcode/session/loadUpdates threads detected historyGaps to the replayer', async () => {
     const settings = makeCoreSettings();
     const gaps = [{ childUuid: 'c', missingParentUuid: 'gone' }];
     mockSessionServiceLoad({
@@ -7476,7 +7476,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     mockHistoryReplay.mockResolvedValue(undefined);
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    await agent.extMethod('qwen/session/loadUpdates', {
+    await agent.extMethod('hopcode/session/loadUpdates', {
       sessionId: VALID_SESSION_ID,
     });
     // 3rd arg to the replayer is the historyGaps threaded through
@@ -7492,7 +7492,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/session/loadUpdates surfaces partial + replayError when replay throws', async () => {
+  it('hopcode/session/loadUpdates surfaces partial + replayError when replay throws', async () => {
     const settings = makeCoreSettings();
     mockSessionServiceLoad({
       conversation: {
@@ -7504,7 +7504,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     mockHistoryReplay.mockRejectedValue(new Error('replay boom'));
     const { agent, agentPromise } = await bootCoreSettingsAgent(settings);
 
-    const result = (await agent.extMethod('qwen/session/loadUpdates', {
+    const result = (await agent.extMethod('hopcode/session/loadUpdates', {
       sessionId: VALID_SESSION_ID,
     })) as { partial?: boolean; replayError?: string };
     expect(result.partial).toBe(true);
@@ -8844,7 +8844,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     }) as AgentLike;
 
     await expect(
-      agent.extMethod('qwen/settings/setCoreValue', {
+      agent.extMethod('hopcode/settings/setCoreValue', {
         scope: 'user',
         key: 'tools.approvalMode',
         value: 'auto',
@@ -9318,7 +9318,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     }) as AgentLike;
 
     await expect(
-      agent.extMethod('qwen/settings/setMemory', {
+      agent.extMethod('hopcode/settings/setMemory', {
         updates: { enableManagedAutoDream: 'yes' },
       }),
     ).rejects.toThrow("Invalid memory setting 'enableManagedAutoDream'");

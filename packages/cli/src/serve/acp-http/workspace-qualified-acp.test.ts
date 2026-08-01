@@ -532,7 +532,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
       {
         jsonrpc: '2.0',
         id: 3,
-        method: '_qwen/session/shell',
+        method: '_hopcode/session/shell',
         params: { sessionId: 'secondary-session', command: 'pwd' },
       },
     ]);
@@ -551,7 +551,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
     const primary = await sendWsRequest('/acp', {
       jsonrpc: '2.0',
       id: 4,
-      method: '_qwen/session/shell',
+      method: '_hopcode/session/shell',
       params: { sessionId: 'secondary-session', command: 'pwd' },
     });
     expect(primary['error']).toMatchObject({ code: -32602 });
@@ -577,7 +577,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
       const response = await sendWsRequest('/workspaces/secondary-id/acp', {
         jsonrpc: '2.0',
         id: 2,
-        method: '_qwen/session/update_organization',
+        method: '_hopcode/session/update_organization',
         params: { sessionId, isPinned: true },
       });
 
@@ -595,7 +595,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
       const legacy = await sendWsRequest('/acp', {
         jsonrpc: '2.0',
         id: 4,
-        method: '_qwen/session/update_organization',
+        method: '_hopcode/session/update_organization',
         params: { sessionId, isPinned: false },
       });
       expect(legacy['error']).toMatchObject({ code: -32602 });

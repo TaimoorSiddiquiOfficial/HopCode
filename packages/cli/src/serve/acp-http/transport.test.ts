@@ -1077,7 +1077,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       '_hopcode/session/shell',
     );
     expect(result.agentCapabilities._meta.hopcode.methods).not.toContain(
-      '_qwen/session/rewind',
+      '_hopcode/session/rewind',
     );
   });
 
@@ -3723,7 +3723,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
     });
   });
 
-  it('_qwen/session/heartbeat does not wait for archive gate', async () => {
+  it('_hopcode/session/heartbeat does not wait for archive gate', async () => {
     await withRuntimeDir(async () => {
       const sessionId = '550e8400-e29b-41d4-a716-446655440130';
       await writeStoredSession(sessionId);
@@ -3763,7 +3763,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 222,
-        method: '_qwen/session/heartbeat',
+        method: '_hopcode/session/heartbeat',
         params: { sessionId },
       });
       expect(await reader.next()).toMatchObject({
@@ -6033,7 +6033,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/artifacts returns the session artifact snapshot', async () => {
+    it('_hopcode/session/artifacts returns the session artifact snapshot', async () => {
       const connId = await initialize();
       const streamRes = openStream(connId);
       await new Promise((r) => setTimeout(r, 30));
@@ -6047,7 +6047,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 58,
-        method: '_qwen/session/artifacts',
+        method: '_hopcode/session/artifacts',
         params: { sessionId: 'sess-1' },
       });
       const frames = await takeFrames(await streamRes, 2);
@@ -6066,7 +6066,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/artifacts/add forwards only public artifact fields', async () => {
+    it('_hopcode/session/artifacts/add forwards only public artifact fields', async () => {
       const connId = await initialize();
       const streamRes = openStream(connId);
       await new Promise((r) => setTimeout(r, 30));
@@ -6080,7 +6080,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 58,
-        method: '_qwen/session/artifacts/add',
+        method: '_hopcode/session/artifacts/add',
         params: {
           sessionId: 'sess-1',
           title: 'Lineage',
@@ -6126,7 +6126,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/artifacts/add maps artifact validation errors to invalid params', async () => {
+    it('_hopcode/session/artifacts/add maps artifact validation errors to invalid params', async () => {
       bridge.addSessionArtifact = async () => {
         throw new SessionArtifactValidationError(
           'url must use http or https',
@@ -6146,7 +6146,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 59,
-        method: '_qwen/session/artifacts/add',
+        method: '_hopcode/session/artifacts/add',
         params: {
           sessionId: 'sess-1',
           title: 'Bad URL',
@@ -6162,7 +6162,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/artifacts/remove forwards artifact id', async () => {
+    it('_hopcode/session/artifacts/remove forwards artifact id', async () => {
       const connId = await initialize();
       const streamRes = openStream(connId);
       await new Promise((r) => setTimeout(r, 30));
@@ -6176,7 +6176,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 59,
-        method: '_qwen/session/artifacts/remove',
+        method: '_hopcode/session/artifacts/remove',
         params: {
           sessionId: 'sess-1',
           artifactId: 'artifact-1',
@@ -6206,7 +6206,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/artifacts/remove rejects missing artifact id', async () => {
+    it('_hopcode/session/artifacts/remove rejects missing artifact id', async () => {
       const connId = await initialize();
       const streamRes = openStream(connId);
       await new Promise((r) => setTimeout(r, 30));
@@ -6220,7 +6220,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 60,
-        method: '_qwen/session/artifacts/remove',
+        method: '_hopcode/session/artifacts/remove',
         params: { sessionId: 'sess-1' },
       });
       const frames = await takeFrames(await streamRes, 2);
@@ -6233,7 +6233,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       expect(bridge.lastRemovedArtifact).toBeUndefined();
     });
 
-    it('_qwen/session/artifacts/remove maps artifact authorization errors', async () => {
+    it('_hopcode/session/artifacts/remove maps artifact authorization errors', async () => {
       bridge.removeSessionArtifact = async () => {
         throw new SessionArtifactAuthorizationError(
           'sess-1',
@@ -6255,7 +6255,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       await post(connId, {
         jsonrpc: '2.0',
         id: 61,
-        method: '_qwen/session/artifacts/remove',
+        method: '_hopcode/session/artifacts/remove',
         params: { sessionId: 'sess-1', artifactId: 'artifact-1' },
       });
 
@@ -6273,7 +6273,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/artifacts/add holds the archive gate while mutating', async () => {
+    it('_hopcode/session/artifacts/add holds the archive gate while mutating', async () => {
       await withRuntimeDir(async () => {
         const sessionId = '550e8400-e29b-41d4-a716-446655440131';
         await writeStoredSession(sessionId);
@@ -6306,7 +6306,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         await post(connId, {
           jsonrpc: '2.0',
           id: 60,
-          method: '_qwen/session/artifacts/add',
+          method: '_hopcode/session/artifacts/add',
           params: {
             sessionId,
             title: 'Lineage',
@@ -6338,7 +6338,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/artifacts/remove holds the archive gate while mutating', async () => {
+    it('_hopcode/session/artifacts/remove holds the archive gate while mutating', async () => {
       await withRuntimeDir(async () => {
         const sessionId = '550e8400-e29b-41d4-a716-446655440132';
         await writeStoredSession(sessionId);
@@ -6383,7 +6383,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         await post(connId, {
           jsonrpc: '2.0',
           id: 62,
-          method: '_qwen/session/artifacts/remove',
+          method: '_hopcode/session/artifacts/remove',
           params: { sessionId, artifactId: 'artifact-1' },
         });
         await removeStartedPromise;
@@ -6482,7 +6482,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         await post(connId, {
           jsonrpc: '2.0',
           id: 71,
-          method: '_qwen/session/update_organization',
+          method: '_hopcode/session/update_organization',
           params: {
             sessionId,
             isPinned: true,
@@ -6556,7 +6556,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
       });
     });
 
-    it('_qwen/session/update_organization assigns a color echoed by session/list', async () => {
+    it('_hopcode/session/update_organization assigns a color echoed by session/list', async () => {
       await withRuntimeDir(async () => {
         const sessionId = '550e8400-e29b-41d4-a716-446655440011';
         await writeStoredSession(sessionId);
@@ -6568,7 +6568,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         await post(connId, {
           jsonrpc: '2.0',
           id: 80,
-          method: '_qwen/session/update_organization',
+          method: '_hopcode/session/update_organization',
           params: { sessionId, color: 'purple' },
         });
         expect(await reader.next()).toMatchObject({
@@ -6652,7 +6652,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         await post(connId, {
           jsonrpc: '2.0',
           id: 82,
-          method: '_qwen/session/update_organization',
+          method: '_hopcode/session/update_organization',
           params: { sessionId, color: 'red' },
         });
         expect(await reader.next()).toMatchObject({
@@ -6706,7 +6706,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         await post(connId, {
           jsonrpc: '2.0',
           id: 85,
-          method: '_qwen/session/update_organization',
+          method: '_hopcode/session/update_organization',
           params: { sessionId, groupId, color: 'red' },
         });
         expect(await reader.next()).toMatchObject({
@@ -6857,7 +6857,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         message: '`color` must be a supported color or null',
       },
     ])(
-      '_qwen/session/update_organization rejects invalid params: $message',
+      '_hopcode/session/update_organization rejects invalid params: $message',
       async ({ params, message }) => {
         const connId = await initialize();
         const streamRes = openStream(connId);
@@ -6865,7 +6865,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         await post(connId, {
           jsonrpc: '2.0',
           id: 76,
-          method: '_qwen/session/update_organization',
+          method: '_hopcode/session/update_organization',
           params,
         });
         const frames = await takeFrames(await streamRes, 1);

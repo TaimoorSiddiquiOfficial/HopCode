@@ -2194,7 +2194,7 @@ export function mountAcpHttp(
           const isPrompt =
             isRequest(message) &&
             (message.method === 'session/prompt' ||
-              message.method === '_qwen/session/prompt');
+              message.method === '_hopcode/session/prompt');
           const dispatchP = activeMount.dispatcher
             .handle(conn, message, undefined, fromLoopback)
             .catch((err: unknown) => {
