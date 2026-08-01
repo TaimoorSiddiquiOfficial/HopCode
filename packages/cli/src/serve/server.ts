@@ -1805,7 +1805,7 @@ export function createServeApp(
         boundWorkspace: workspaceCwd,
         onError: (sessionId, err) => {
           process.stderr.write(
-            `qwen serve: failed to rehydrate scheduled-task session ${sessionId}: ${
+            `hopcode serve: failed to rehydrate scheduled-task session ${sessionId}: ${
               err instanceof Error ? err.message : String(err)
             }\n`,
           );
@@ -1817,7 +1817,7 @@ export function createServeApp(
         // failure here leaves every bound task dormant with no diagnostic.
       }).catch((err) => {
         process.stderr.write(
-          `qwen serve: unexpected scheduled-task rehydration failure: ${
+          `hopcode serve: unexpected scheduled-task rehydration failure: ${
             err instanceof Error ? err.message : String(err)
           }\n`,
         );

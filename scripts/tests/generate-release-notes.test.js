@@ -177,7 +177,7 @@ describe('renderReleaseNotes', () => {
       repo: 'QwenLM/qwen-code',
     });
 
-    expect(markdown).toContain('<!-- qwen-release-notes:v1 -->');
+    expect(markdown).toContain('<!-- hopcode-release-notes:v1 -->');
     expect(markdown).toContain('## Highlights');
     expect(markdown).toContain(
       'Session workflows are easier to find and recover. ([#1]',
@@ -386,7 +386,7 @@ describe('createOpenAiCompleter', () => {
     const complete = createOpenAiCompleter({
       apiKey: 'secret',
       baseUrl: 'https://model.example/v1/',
-      model: 'qwen-test',
+      model: 'hopcode-test',
       fetchImpl: async (url, init) => {
         requests.push({ url, init });
         return {
@@ -403,7 +403,7 @@ describe('createOpenAiCompleter', () => {
     expect(requests[0].url).toBe('https://model.example/v1/chat/completions');
     expect(requests[0].init.headers.Authorization).toBe('Bearer secret');
     const body = JSON.parse(requests[0].init.body);
-    expect(body.model).toBe('qwen-test');
+    expect(body.model).toBe('hopcode-test');
     expect(body.response_format).toEqual({ type: 'json_object' });
     expect(body.max_tokens).toBe(4096);
     expect(body.tools).toBeUndefined();

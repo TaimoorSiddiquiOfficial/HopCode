@@ -9,7 +9,7 @@ import { channelStartupFailureBody, formatChannelStartupFailures, safeChannelCom
 const DEFAULT_DAEMON_URL = 'http://127.0.0.1:4170';
 export const setCommand = {
     command: 'set <names..>',
-    describe: 'Set the channel selection for a running qwen serve daemon',
+    describe: 'Set the channel selection for a running hopcode serve daemon',
     builder: (yargs) => yargs
         .positional('names', {
         type: 'string',

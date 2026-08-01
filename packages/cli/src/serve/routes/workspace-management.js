@@ -292,7 +292,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                             throw err;
                         }
                         try {
-                            writeStderrLine(`qwen serve: ${err.message}`);
+                            writeStderrLine(`hopcode serve: ${err.message}`);
                         }
                         catch {
                             // The registration is committed; diagnostics are best-effort.
@@ -315,7 +315,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                     });
                     return;
                 }
-                writeStderrLine(`qwen serve: failed to persist existing workspace registration: ${err instanceof Error ? err.message : String(err)}`);
+                writeStderrLine(`hopcode serve: failed to persist existing workspace registration: ${err instanceof Error ? err.message : String(err)}`);
                 res.status(500).json({
                     error: 'Failed to persist workspace registration',
                     code: 'workspace_registration_store_error',
@@ -390,7 +390,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                             }
                             persistedRecordAdded = true;
                             try {
-                                writeStderrLine(`qwen serve: ${err.message}`);
+                                writeStderrLine(`hopcode serve: ${err.message}`);
                             }
                             catch {
                                 // The registration is committed; diagnostics are best-effort.
@@ -408,7 +408,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                 }
                 catch (err) {
                     try {
-                        writeStderrLine(`qwen serve: workspace runtime adapter notification failed after registry add: ${err instanceof Error ? err.message : String(err)}`);
+                        writeStderrLine(`hopcode serve: workspace runtime adapter notification failed after registry add: ${err instanceof Error ? err.message : String(err)}`);
                     }
                     catch {
                         // The runtime is registered; diagnostics are best-effort.
@@ -421,7 +421,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                         await workspaceRegistrationStore.removeById(workspaceRegistrationId(canonical));
                     }
                     catch (rollbackErr) {
-                        writeStderrLine(`qwen serve: failed to roll back workspace persistence after runtime registration failure: ${rollbackErr instanceof Error
+                        writeStderrLine(`hopcode serve: failed to roll back workspace persistence after runtime registration failure: ${rollbackErr instanceof Error
                             ? rollbackErr.message
                             : String(rollbackErr)}`);
                     }
@@ -454,7 +454,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
         catch (err) {
             // Log the full error server-side but return a generic message so the
             // response can't leak internal filesystem paths / implementation detail.
-            writeStderrLine(`qwen serve: POST /workspaces failed for ${canonical}: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: POST /workspaces failed for ${canonical}: ${err instanceof Error ? err.message : String(err)}`);
             if (persistenceFailed) {
                 res.status(500).json({
                     error: 'Failed to persist workspace registration',
@@ -618,12 +618,12 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                 getAcpHandle?.()?.commitWorkspaceRemoval(runtime.workspaceId);
             }
             catch (err) {
-                logCleanupFailure(`qwen serve: failed to commit workspace ACP removal: ${err instanceof Error ? err.message : String(err)}`);
+                logCleanupFailure(`hopcode serve: failed to commit workspace ACP removal: ${err instanceof Error ? err.message : String(err)}`);
             }
             await runtimeRemoval
                 .disposeRuntime(runtime, 'workspace_removed')
                 .catch((err) => {
-                logCleanupFailure(`qwen serve: workspace runtime cleanup failed: ${err instanceof Error ? err.message : String(err)}`);
+                logCleanupFailure(`hopcode serve: workspace runtime cleanup failed: ${err instanceof Error ? err.message : String(err)}`);
                 try {
                     runtime.bridge.killAllSync();
                 }
@@ -635,19 +635,19 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                 getAcpHandle?.()?.disposeWorkspace(runtime.workspaceId);
             }
             catch (err) {
-                logCleanupFailure(`qwen serve: failed to dispose workspace ACP mount: ${err instanceof Error ? err.message : String(err)}`);
+                logCleanupFailure(`hopcode serve: failed to dispose workspace ACP mount: ${err instanceof Error ? err.message : String(err)}`);
             }
             try {
                 runtimeRemoval.completeDrain(runtime);
             }
             catch (err) {
-                logCleanupFailure(`qwen serve: failed to complete workspace admission drain: ${err instanceof Error ? err.message : String(err)}`);
+                logCleanupFailure(`hopcode serve: failed to complete workspace admission drain: ${err instanceof Error ? err.message : String(err)}`);
             }
             try {
                 workspaceRegistry.completeDrain(runtime);
             }
             catch (err) {
-                logCleanupFailure(`qwen serve: failed to complete workspace registry drain: ${err instanceof Error ? err.message : String(err)}`);
+                logCleanupFailure(`hopcode serve: failed to complete workspace registry drain: ${err instanceof Error ? err.message : String(err)}`);
             }
             registryDraining = false;
             controllerDraining = false;
@@ -695,7 +695,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                         }
                         persistedRegistrationRemoved = true;
                         try {
-                            writeStderrLine(`qwen serve: ${err.message}`);
+                            writeStderrLine(`hopcode serve: ${err.message}`);
                         }
                         catch {
                             // Persistence committed; diagnostics are best-effort.
@@ -704,7 +704,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                 }
                 catch (err) {
                     rollbackDrain();
-                    writeStderrLine(`qwen serve: failed to remove workspace persistence: ${err instanceof Error ? err.message : String(err)}`);
+                    writeStderrLine(`hopcode serve: failed to remove workspace persistence: ${err instanceof Error ? err.message : String(err)}`);
                     res.status(500).json({
                         error: 'Failed to persist workspace removal',
                         code: 'workspace_persist_failed',
@@ -726,7 +726,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
         }
         catch (err) {
             rollbackDrain();
-            writeStderrLine(`qwen serve: DELETE /workspaces/:workspace failed: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: DELETE /workspaces/:workspace failed: ${err instanceof Error ? err.message : String(err)}`);
             if (!res.headersSent) {
                 res.status(500).json({
                     error: 'Failed to remove workspace runtime',
@@ -771,7 +771,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
             });
         }
         catch (err) {
-            writeStderrLine(`qwen serve: failed to read workspace registrations: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: failed to read workspace registrations: ${err instanceof Error ? err.message : String(err)}`);
             res.status(500).json({
                 error: 'Failed to read workspace registrations',
                 code: 'workspace_registration_store_error',
@@ -808,7 +808,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                     storedCwd = snapshot.workspaces.find((workspace) => workspaceRegistrationId(workspace) === registrationId);
                 }
                 catch (err) {
-                    writeStderrLine(`qwen serve: failed to read workspace registration before forget: ${err instanceof Error ? err.message : String(err)}`);
+                    writeStderrLine(`hopcode serve: failed to read workspace registration before forget: ${err instanceof Error ? err.message : String(err)}`);
                     res.status(500).json({
                         error: 'Failed to read workspace registration',
                         code: 'workspace_registration_store_error',
@@ -855,7 +855,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
                 }
                 removed = true;
                 try {
-                    writeStderrLine(`qwen serve: ${err.message}`);
+                    writeStderrLine(`hopcode serve: ${err.message}`);
                 }
                 catch {
                     // The forget committed; diagnostics are best-effort.
@@ -875,7 +875,7 @@ export function registerWorkspaceManagementRoutes(app, deps) {
             });
         }
         catch (err) {
-            writeStderrLine(`qwen serve: failed to forget workspace registration: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: failed to forget workspace registration: ${err instanceof Error ? err.message : String(err)}`);
             res.status(500).json({
                 error: 'Failed to forget workspace registration',
                 code: 'workspace_registration_store_error',

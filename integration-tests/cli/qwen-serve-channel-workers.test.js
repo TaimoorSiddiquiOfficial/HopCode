@@ -152,7 +152,7 @@ afterEach(async () => {
     secondaryServer = undefined;
     testRoot = undefined;
 });
-describe('qwen serve multi-workspace channel workers', () => {
+describe('hopcode serve multi-workspace channel workers', () => {
     it('controls a real mock-plugin worker after a channel-less boot', async () => {
         testRoot = realpathSync(mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-runtime-')));
         const qwenHome = path.join(testRoot, 'qwen-home');

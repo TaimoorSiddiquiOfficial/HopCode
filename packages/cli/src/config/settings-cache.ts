@@ -24,7 +24,7 @@ import type { LoadedSettings } from './settings.js';
 /**
  * Process-level cache for `loadSettings()`, keyed by workspace directory.
  *
- * The ACP child under `qwen serve` is long-lived and serves many sessions
+ * The ACP child under `hopcode serve` is long-lived and serves many sessions
  * (often for the same cwd). A full `loadSettings()` runs on the shared event
  * loop for every `session/new` / `session/load`: four settings files read,
  * parsed, migration-checked and structuredClone'd, the `.env` tree walked,

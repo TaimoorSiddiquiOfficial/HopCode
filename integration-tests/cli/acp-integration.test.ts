@@ -104,7 +104,7 @@ function setupAcpTest(
   const acpFlag =
     options?.useNewFlag !== false ? '--acp' : '--experimental-acp';
 
-  // Isolate this agent's GLOBAL (User-scope) qwen config dir via HOPCODE_HOME.
+  // Isolate this agent's GLOBAL (User-scope) hopcode config dir via HOPCODE_HOME.
   // `globalSetup` does not sandbox HOME, so every integration test shares the
   // real `$HOME/.hopcode`, and `vitest.config.ts` runs test files with
   // `fileParallelism: true` (up to 4 at once). The ACP `authenticate` /

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review submit`: the only thing in this skill that writes to a pull
+// `hopcode review submit`: the only thing in this skill that writes to a pull
 // request.
 //
 // Step 7 has always opened with a posting gate — "posting is a public,

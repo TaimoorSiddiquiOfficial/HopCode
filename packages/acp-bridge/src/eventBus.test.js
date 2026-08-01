@@ -164,7 +164,7 @@ describe('EventBus', () => {
         });
         expect((collected[3]?.data).queuedBytes).toBeGreaterThan(0);
         expect((collected[3]?.data).eventBytes).toBeUndefined();
-        expect(process.stderr.write).toHaveBeenCalledWith(expect.stringContaining('qwen serve: EventBus subscriber evicted {"reason":"queue_overflow"'));
+        expect(process.stderr.write).toHaveBeenCalledWith(expect.stringContaining('hopcode serve: EventBus subscriber evicted {"reason":"queue_overflow"'));
         expect(bus.subscriberCount).toBe(0);
         abort.abort();
     });
@@ -190,7 +190,7 @@ describe('EventBus', () => {
             maxQueued: 8,
             threshold: 'frames',
         });
-        expect(process.stderr.write).toHaveBeenCalledWith(expect.stringContaining('qwen serve: EventBus slow_client_warning {"queueSize":6,"maxQueued":8'));
+        expect(process.stderr.write).toHaveBeenCalledWith(expect.stringContaining('hopcode serve: EventBus slow_client_warning {"queueSize":6,"maxQueued":8'));
         abort.abort();
     });
     it('reports frames_and_bytes when both warning thresholds are crossed', async () => {
@@ -358,7 +358,7 @@ describe('EventBus', () => {
         });
         expect(evicted.data.queuedBytes).toBeGreaterThan(0);
         expect(evicted.data.eventBytes).toBeGreaterThan(0);
-        expect(process.stderr.write).toHaveBeenCalledWith(expect.stringContaining('qwen serve: EventBus subscriber evicted {"reason":"queue_bytes_overflow"'));
+        expect(process.stderr.write).toHaveBeenCalledWith(expect.stringContaining('hopcode serve: EventBus subscriber evicted {"reason":"queue_bytes_overflow"'));
         expect(bus.subscriberCount).toBe(0);
         abort.abort();
     });
@@ -493,7 +493,7 @@ describe('EventBus', () => {
         expect(second.done).toBe(false);
         expect(second.value.type).toBe('foo');
         expect(second.value.data).toBe('tail');
-        expect(process.stderr.write).toHaveBeenCalledWith(expect.stringContaining('qwen serve: EventBus event sizing failed {"type":"foo"}'));
+        expect(process.stderr.write).toHaveBeenCalledWith(expect.stringContaining('hopcode serve: EventBus event sizing failed {"type":"foo"}'));
         expect(bus.subscriberCount).toBe(1);
         await it.return?.();
         abort.abort();

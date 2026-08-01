@@ -134,7 +134,7 @@ export function registerWorkspaceModelsRoutes(
           );
         } catch (err) {
           writeStderrLine(
-            `qwen serve: DELETE /workspace/models broadcast error (key=${write.key}): ${
+            `hopcode serve: DELETE /workspace/models broadcast error (key=${write.key}): ${
               err instanceof Error ? err.message : String(err)
             }`,
           );
@@ -241,7 +241,7 @@ export function registerWorkspaceModelsRoutes(
         }
       } catch (err) {
         writeStderrLine(
-          `qwen serve: DELETE /workspace/models error (authType=${parsed.authType}, modelId=${parsed.modelId}): ${
+          `hopcode serve: DELETE /workspace/models error (authType=${parsed.authType}, modelId=${parsed.modelId}): ${
             err instanceof Error ? err.message : String(err)
           }`,
         );

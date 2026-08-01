@@ -17,7 +17,7 @@
  *   finalizeStartupProfile(id)   — call after last checkpoint to write report
  *
  * By default profiles inside the sandbox child process to avoid duplicate
- * reports. `qwen serve` has no sandbox child, so it is profiled directly.
+ * reports. `hopcode serve` has no sandbox child, so it is profiled directly.
  * Set QWEN_CODE_PROFILE_STARTUP_OUTER=1 to also profile the outer
  * (pre-sandbox) process for non-serve runs; outer reports are written with an
  * `outer-` filename prefix to keep them separate from sandbox-child reports.

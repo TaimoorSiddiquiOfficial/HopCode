@@ -236,9 +236,9 @@ function parseSessionGenerationEvent(
 }
 
 /**
- * SDK-side HTTP client for the `qwen serve` daemon. Sibling to
+ * SDK-side HTTP client for the `hopcode serve` daemon. Sibling to
  * `ProcessTransport`: ProcessTransport drives a stdio child running
- * `qwen --input-format stream-json`; DaemonClient hits the daemon's HTTP
+ * `hopcode --input-format stream-json`; DaemonClient hits the daemon's HTTP
  * routes (POST /session, POST /session/:id/prompt, GET /session/:id/events,
  * etc.) and yields ACP-flavored events.
  *

@@ -70,7 +70,7 @@ export const statusCommand = {
             process.exit(0);
         }
         if (info.owner === 'serve') {
-            writeStdoutLine(`Channel service: managed by qwen serve (PID ${info.pid})`);
+            writeStdoutLine(`Channel service: managed by hopcode serve (PID ${info.pid})`);
             if (info.workerPid !== undefined) {
                 writeStdoutLine(`Worker PID:      ${info.workerPid}`);
             }

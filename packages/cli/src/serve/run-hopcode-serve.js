@@ -414,7 +414,7 @@ function writeServeChannelReservation(channelServicePidfile, channels) {
     });
 }
 function channelServicePidfileConflictError(info) {
-    const owner = info.owner === 'serve' ? 'qwen serve' : 'qwen channel start';
+    const owner = info.owner === 'serve' ? 'hopcode serve' : 'qwen channel start';
     return Object.assign(new Error(`Channel service is already running under ${owner} (PID ${info.pid}). Stop it before enabling daemon-managed channels.`), { code: 'channel_service_conflict', owner: info.owner, pid: info.pid });
 }
 function channelServiceStartingConflictError() {
@@ -1474,7 +1474,7 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
                     cwd = validateAndCanonicalizeWorkspace(storedWorkspace);
                 }
                 catch (err) {
-                    writeStderrLine(`qwen serve: skipping persisted workspace registration ${JSON.stringify(storedWorkspace)}: ${err instanceof Error ? err.message : String(err)}`);
+                    writeStderrLine(`hopcode serve: skipping persisted workspace registration ${JSON.stringify(storedWorkspace)}: ${err instanceof Error ? err.message : String(err)}`);
                     continue;
                 }
                 const existingInput = workspaceInputs.find((workspace) => workspace.cwd === cwd);
@@ -1485,11 +1485,11 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
                 const nested = workspaceInputs.some((workspace) => isWithinRoot(cwd, workspace.cwd) ||
                     isWithinRoot(workspace.cwd, cwd));
                 if (nested) {
-                    writeStderrLine(`qwen serve: skipping persisted workspace registration ${JSON.stringify(storedWorkspace)}: path nests with an explicit or earlier restored workspace`);
+                    writeStderrLine(`hopcode serve: skipping persisted workspace registration ${JSON.stringify(storedWorkspace)}: path nests with an explicit or earlier restored workspace`);
                     continue;
                 }
                 if (workspaceInputs.length >= MAX_REGISTERED_WORKSPACES) {
-                    writeStderrLine(`qwen serve: skipping persisted workspace registration ${JSON.stringify(storedWorkspace)}: workspace limit reached`);
+                    writeStderrLine(`hopcode serve: skipping persisted workspace registration ${JSON.stringify(storedWorkspace)}: workspace limit reached`);
                     continue;
                 }
                 workspaceInputs.push({
@@ -1501,7 +1501,7 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
             }
         }
         catch (err) {
-            writeStderrLine(`qwen serve: failed to read persisted workspace registrations: ${err instanceof Error ? err.message : String(err)}; continuing with explicit workspaces only`);
+            writeStderrLine(`hopcode serve: failed to read persisted workspace registrations: ${err instanceof Error ? err.message : String(err)}; continuing with explicit workspaces only`);
         }
     }
     if (workspaceInputs.length > 1 && deps.bridge) {
@@ -2528,7 +2528,7 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
                 secondarySettings = settingsRuntime.settings.loadSettings(workspaceInput.cwd);
             }
             catch (err) {
-                writeStderrLine(`qwen serve: could not read full settings for secondary workspace ` +
+                writeStderrLine(`hopcode serve: could not read full settings for secondary workspace ` +
                     `${workspaceInput.cwd} (${err instanceof Error ? err.message : String(err)}); ` +
                     `falling back to defaults.`);
             }
@@ -2843,7 +2843,7 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
             catch (err) {
                 // Match the startup secondary-workspace path: surface why full settings
                 // couldn't be read instead of silently falling back to defaults.
-                writeStderrLine(`qwen serve: could not read full settings for dynamic workspace ` +
+                writeStderrLine(`hopcode serve: could not read full settings for dynamic workspace ` +
                     `${cwd} (${err instanceof Error ? err.message : String(err)}); ` +
                     `falling back to defaults.`);
             }
@@ -3435,7 +3435,7 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
                     });
                 }
                 if (opts.channelSelection?.mode === 'all') {
-                    writeStderrLine('qwen serve: --channel all is primary-workspace only; non-primary workspace channels are not hosted.');
+                    writeStderrLine('hopcode serve: --channel all is primary-workspace only; non-primary workspace channels are not hosted.');
                 }
             }
             writeStdoutLine(`hopcode serve listening on ${url} (mode=${opts.mode}, ` +
@@ -3458,7 +3458,7 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
             if (!token) {
                 writeStderrLine(`hopcode serve: bearer auth disabled (loopback default). Set ${HOPCODE_SERVER_TOKEN_ENV} to enable.`);
                 if (opts.clientMcpOverWs === true) {
-                    writeStderrLine(`qwen serve: client-hosted MCP tools are accepted over the WebSocket without auth. ` +
+                    writeStderrLine(`hopcode serve: client-hosted MCP tools are accepted over the WebSocket without auth. ` +
                         `Set ${HOPCODE_SERVE_CLIENT_MCP_OVER_WS_ENV}=0 to disable.`);
                 }
             }
@@ -4149,7 +4149,7 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
                     }, (closeErr) => {
                         writeDaemonLifecycleBestEffort(() => daemonLog.error('shutdown after runtime startup error failed', closeErr instanceof Error ? closeErr : null));
                         if (channelWorkerManager?.state().enabled) {
-                            writeDaemonLifecycleBestEffort(() => daemonLog.error('runtime startup failed, but qwen serve remains alive to retain the channel service lease until worker exit is confirmed'));
+                            writeDaemonLifecycleBestEffort(() => daemonLog.error('runtime startup failed, but hopcode serve remains alive to retain the channel service lease until worker exit is confirmed'));
                             return;
                         }
                         reject(err instanceof Error ? err : new Error(String(err)));
@@ -4202,12 +4202,12 @@ async function runHopCodeServeImpl(optsIn, deps, loggerLifecycle) {
                     opts.port !== 0 &&
                     nextPort <= 65535 &&
                     attempt < MAX_PORT_ATTEMPTS - 1) {
-                    writeStderrLine(`qwen serve: port ${attemptPort} is in use, trying ${nextPort}...`);
+                    writeStderrLine(`hopcode serve: port ${attemptPort} is in use, trying ${nextPort}...`);
                     tryListen(nextPort, attempt + 1);
                 }
                 else {
                     if (err.code === 'EADDRINUSE' && attempt > 0) {
-                        writeStderrLine(`qwen serve: all ports ${opts.port}–${attemptPort} are in use`);
+                        writeStderrLine(`hopcode serve: all ports ${opts.port}–${attemptPort} are in use`);
                     }
                     removeCurrentServePidfile();
                     reject(err);

@@ -96,7 +96,7 @@ function sendWorkspaceMemoryWriteError(
   const { route, scope, mode } = options;
   if (err instanceof WorkspaceMemoryWriteTimeoutError) {
     writeStderrLine(
-      `qwen serve: ${route} timeout — file lock at ` +
+      `hopcode serve: ${route} timeout — file lock at ` +
         `${err.filePath} did not acquire within ${err.timeoutMs}ms ` +
         `(stalled FS / OneDrive / NFS)`,
     );
@@ -115,7 +115,7 @@ function sendWorkspaceMemoryWriteError(
   }
   if (err instanceof WorkspaceMemoryFileTooLargeError) {
     writeStderrLine(
-      `qwen serve: ${route} refused — existing file ` +
+      `hopcode serve: ${route} refused — existing file ` +
         `${err.filePath} is ${err.bytes} bytes (cap ${err.limit})`,
     );
     const debug = isServeDebugMode();
@@ -133,7 +133,7 @@ function sendWorkspaceMemoryWriteError(
     return;
   }
   writeStderrLine(
-    `qwen serve: ${route} failed (scope=${scope} mode=${mode}): ${
+    `hopcode serve: ${route} failed (scope=${scope} mode=${mode}): ${
       err instanceof Error ? (err.stack ?? err.message) : String(err)
     }`,
   );
@@ -321,7 +321,7 @@ export function mountWorkspaceQualifiedMemoryRoutes(
       res.status(200).json(await collectStatus(runtime.workspaceCwd));
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/memory failed: ${
+        `hopcode serve: GET /workspaces/:workspace/memory failed: ${
           err instanceof Error ? (err.stack ?? err.message) : String(err)
         }`,
       );

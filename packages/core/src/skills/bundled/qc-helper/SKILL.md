@@ -80,7 +80,7 @@ Use this index to locate the right document for the user's question. Load only t
 
 | Topic                             | Doc Path                          |
 | --------------------------------- | --------------------------------- |
-| qwen serve (daemon mode overview) | `docs/qwen-serve.md`              |
+| hopcode serve (daemon mode overview) | `docs/qwen-serve.md`              |
 | Local launch templates            | `docs/qwen-serve-deploy-local.md` |
 
 ### IDE Integration

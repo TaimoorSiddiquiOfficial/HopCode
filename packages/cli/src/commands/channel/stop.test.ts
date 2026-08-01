@@ -60,7 +60,7 @@ describe('stopCommand', () => {
     expect(mockSignalService).not.toHaveBeenCalled();
     expect(mockRemoveServiceInfo).not.toHaveBeenCalled();
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      expect.stringContaining('managed by qwen serve'),
+      expect.stringContaining('managed by hopcode serve'),
     );
   });
 

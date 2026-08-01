@@ -12461,7 +12461,7 @@ describe('createAcpSessionBridge', () => {
       expect(session.sessionId).toBeTruthy();
       expect(diagnostics).toEqual([
         {
-          line: 'qwen serve: fresh session admission release failed: release broken',
+          line: 'hopcode serve: fresh session admission release failed: release broken',
           level: 'warn',
         },
       ]);

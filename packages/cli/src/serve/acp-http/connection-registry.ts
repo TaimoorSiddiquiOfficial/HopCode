@@ -524,7 +524,7 @@ export class AcpConnection {
       clearTimeout(binding.graceTimer);
       binding.graceTimer = undefined;
       writeStderrLine(
-        `qwen serve: /acp session reclaimed within grace (${logSafe(sessionId)})`,
+        `hopcode serve: /acp session reclaimed within grace (${logSafe(sessionId)})`,
       );
     }
     const prevStream = binding.stream;
@@ -585,7 +585,7 @@ export class AcpConnection {
       // trace. Logging the arm gives operators a starting point when responses
       // look stuck behind the replay window.
       writeStderrLine(
-        `qwen serve: /acp replay deferral armed (${logSafe(sessionId)}, from id ${resumeFromEventId ?? 'initial'})`,
+        `hopcode serve: /acp replay deferral armed (${logSafe(sessionId)}, from id ${resumeFromEventId ?? 'initial'})`,
       );
     }
     // Drain the gap buffer into a separate array first: on the resume path the
@@ -710,7 +710,7 @@ export class AcpConnection {
     // disconnect→reconnect gap against the grace window (the reclaim/expiry
     // logs alone can't tell "reclaimed with 0.5s to spare" from "9.5s").
     writeStderrLine(
-      `qwen serve: /acp session stream detached (${logSafe(sessionId)}), ` +
+      `hopcode serve: /acp session stream detached (${logSafe(sessionId)}), ` +
         `grace=${graceMs}ms`,
     );
     // Stop the closing stream's event pump; the prompt + ownership live on.
@@ -725,7 +725,7 @@ export class AcpConnection {
       // debugging a vanished session can tell grace-expiry teardown apart from
       // an explicit `session/close` or connection drop.
       writeStderrLine(
-        `qwen serve: /acp session grace expired (${logSafe(sessionId)}), ` +
+        `hopcode serve: /acp session grace expired (${logSafe(sessionId)}), ` +
           `no reconnect within ${graceMs}ms — tearing down`,
       );
       // `closeSessionStream` → `teardownBinding` runs external callbacks
@@ -737,7 +737,7 @@ export class AcpConnection {
         this.closeSessionStream(sessionId);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: /acp teardown failed during grace expiry ` +
+          `hopcode serve: /acp teardown failed during grace expiry ` +
             `(${logSafe(sessionId)}): ` +
             (err instanceof Error ? err.message : String(err)),
         );
@@ -752,7 +752,7 @@ export class AcpConnection {
         this.onSessionGraceExpired?.();
       } catch (err) {
         writeStderrLine(
-          `qwen serve: /acp onSessionGraceExpired failed during grace expiry ` +
+          `hopcode serve: /acp onSessionGraceExpired failed during grace expiry ` +
             `(${logSafe(sessionId)}): ` +
             (err instanceof Error ? err.message : String(err)),
         );

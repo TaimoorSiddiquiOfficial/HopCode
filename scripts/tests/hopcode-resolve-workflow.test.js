@@ -188,7 +188,7 @@ describe('hopcode resolve workflow', () => {
     expect(runStep).toContain('[ "$qwen_status" -eq 137 ]');
     expect(fallbackStep).toContain('FAILURE_KIND:');
     expect(fallbackStep).toContain('TIMEOUT_MINUTES:');
-    expect(fallbackStep).toContain('@qwen-code /review --timeout=240');
+    expect(fallbackStep).toContain('@hopcode /review --timeout=240');
     expect(fallbackStep).toContain(
       'This run already used the maximum 240 minute timeout.',
     );

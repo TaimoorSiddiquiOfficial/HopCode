@@ -206,7 +206,7 @@ function logSessionArchiveResult(action, result) {
         `notFound=${result.notFound.length} notFoundIds=${formatSessionIds(result.notFound)}`,
         `errors=${result.errors.length} errorIds=${formatSessionErrors(result.errors)}`,
     ].join(' ');
-    writeStderrLine(`qwen serve: sessions ${action} result ${details}`);
+    writeStderrLine(`hopcode serve: sessions ${action} result ${details}`);
 }
 function formatSessionIds(sessionIds) {
     return `[${sessionIds.map((sessionId) => safeLogValue(sessionId)).join(',')}]`;
@@ -220,7 +220,7 @@ function errorMessage(error) {
     return error instanceof Error ? error.message : String(error);
 }
 export function logSessionArchiveWarning(message) {
-    writeStderrLine(`qwen serve: ${sanitizeLogLine(message)}`);
+    writeStderrLine(`hopcode serve: ${sanitizeLogLine(message)}`);
 }
 // Control characters are intentionally stripped from daemon log lines.
 /* eslint-disable no-control-regex */

@@ -156,7 +156,7 @@ export const SERVE_CONTROL_EXT_METHODS = {
     workspaceExtensionsRefresh: 'qwen/control/workspace/extensions/refresh',
     /**
      * Reverse tool channel (issue #5626, Phase 2). Unlike every other entry
-     * here — which the PARENT serve process calls DOWN into the `qwen --acp`
+     * here — which the PARENT serve process calls DOWN into the `hopcode --acp`
      * child — this one is called by the CHILD UP into the parent: a
      * client-hosted (extension) MCP server's `sendSdkMcpMessage` round-trips a
      * JSON-RPC `mcp_message` from the child's `McpClientManager` back to the

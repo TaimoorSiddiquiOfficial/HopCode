@@ -118,8 +118,8 @@ describe('scripts/dev.js launcher', () => {
   });
 
   it('stamps HOPCODE_CODE_CLI with its own path, overriding an inherited one', async () => {
-    // A dev CLI started from inside another qwen session's shell inherits that
-    // session's HOPCODE_CODE_CLI. Honouring it points every `qwen …` subprocess of
+    // A dev CLI started from inside another hopcode session's shell inherits that
+    // session's HOPCODE_CODE_CLI. Honouring it points every `hopcode …` subprocess of
     // THIS session at the OUTER session's build — the exact version skew the
     // variable exists to prevent, one level up and silent. Each entry stamps
     // itself; nested sessions each call their own build.

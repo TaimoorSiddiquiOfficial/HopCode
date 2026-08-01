@@ -994,7 +994,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
    */
   private async handleNewHopCodeSession(): Promise<void> {
     try {
-      logger.log('[SessionMessageHandler] Creating new Qwen session...');
+      logger.log('[SessionMessageHandler] Creating new hopcode session...');
 
       // Ensure connection (auth) before creating a new session
       if (!this.agentManager.isConnected) {

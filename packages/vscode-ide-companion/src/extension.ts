@@ -13,8 +13,8 @@ import {
   detectIdeFromEnv,
   IDE_DEFINITIONS,
   type IdeInfo,
-} from '@qwen-code/qwen-code-core';
-import { redactLogCredentials } from '@qwen-code/acp-bridge/logRedaction';
+} from '@hopcode/qwen-code-core';
+import { redactLogCredentials } from '@hopcode/acp-bridge/logRedaction';
 import { WebViewProvider } from './webview/providers/WebViewProvider.js';
 import { ChatProviderRegistry } from './webview/providers/ChatProviderRegistry.js';
 import { registerChatViewProviders } from './webview/providers/chatViewRegistration.js';

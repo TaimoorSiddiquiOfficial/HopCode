@@ -1,7 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, } from 'react';
-import { useActions, useConnection, useSessions, useWorkspace, useWorkspaceActions, } from '@qwen-code/webui/daemon-react-sdk';
-import { DaemonHttpError } from '@qwen-code/sdk/daemon';
+import { useActions, useConnection, useSessions, useWorkspace, useWorkspaceActions, } from '@hopcode/webui/daemon-react-sdk';
+import { DaemonHttpError } from '@hopcode/sdk/daemon';
 import { ActivityIcon, BlocksIcon, CalendarClockIcon, ChevronDownIcon, ChevronRightIcon, Columns2Icon, LayoutGridIcon, InfoIcon, EllipsisVerticalIcon, ArchiveIcon, ArchiveRestoreIcon, DownloadIcon, FolderInputIcon, PencilIcon, PinIcon, Trash2Icon, MoonIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PlusIcon, SearchIcon, SettingsIcon, SquarePenIcon, SunIcon, TargetIcon, } from 'lucide-react';
 import { WebShellThemeId } from '../../themeContext';
 import { useI18n } from '../../i18n';
@@ -2067,7 +2067,7 @@ export function WebShellSidebar({ collapsed, onCollapsedChange, onOpenSettings, 
                                                         (projectExpanded || searchQuery.trim()) ? (_jsx("div", { className: styles.workspaceSessionBody, children: body })) : null] }, ws.id))) }) })) })), archivedSection] }) }), footer !== false && (_jsxs("div", { className: cx(styles.footer, footerCompact && styles.footerCompact, footerTight && styles.footerTight), children: [_jsxs("div", { className: styles.footerPrimary, children: [footerItems.has('settings') && (_jsxs("button", { className: styles.footerButton, type: "button", title: t('sidebar.settings'), "aria-label": t('sidebar.settings'), onClick: onOpenSettings, children: [_jsx("span", { className: `${styles.navIcon} ${styles.settingsIcon}`, children: _jsx(SettingsIcon, { size: 16, strokeWidth: 1.2 }) }), !collapsed && !footerCompact && (_jsx("span", { className: styles.footerButtonLabel, children: t('sidebar.settings') }))] })), !collapsed &&
                                         !footerTight &&
                                         versionLabel &&
-                                        footerItems.has('version') && (_jsx("span", { className: styles.version, title: `Qwen Code ${versionLabel}`, children: versionLabel }))] }), _jsxs("div", { className: styles.footerActions, children: [footerItems.has('theme') && (_jsx("button", { className: styles.collapseButton, type: "button", title: theme === WebShellThemeId.Dark
+                                        footerItems.has('version') && (_jsx("span", { className: styles.version, title: `hopcode Code ${versionLabel}`, children: versionLabel }))] }), _jsxs("div", { className: styles.footerActions, children: [footerItems.has('theme') && (_jsx("button", { className: styles.collapseButton, type: "button", title: theme === WebShellThemeId.Dark
                                             ? t('sidebar.themeLight')
                                             : t('sidebar.themeDark'), "aria-label": theme === WebShellThemeId.Dark
                                             ? t('sidebar.themeLight')

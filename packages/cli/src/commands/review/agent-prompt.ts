@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review agent-prompt`: build a review agent's launch prompt in code.
+// `hopcode review agent-prompt`: build a review agent's launch prompt in code.
 //
 // The prompt used to be composed by the orchestrator, from a paragraph of the
 // skill's instructions telling it what to include. Measured against the harness's
@@ -837,7 +837,7 @@ export function buildRoleBrief(
         // Prefixed like every other executable review command: this block is run
         // by a SUBAGENT — the one call site neither the SKILL.md sweep nor the
         // stderr hints could reach — and its shell gets HOPCODE_CODE_CLI exactly as
-        // the orchestrator's does. A bare `qwen` here re-creates the PATH skew on
+        // the orchestrator's does. A bare `hopcode` here re-creates the PATH skew on
         // the machines this exists for, and worse: `build-test` is recent enough
         // that an old global lacks it entirely, wedging Agent 7 between its
         // mandate (no hand-run `npm run build`) and a command that does not exist.

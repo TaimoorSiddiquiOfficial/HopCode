@@ -958,7 +958,7 @@ describe('EventBus + CompactionEngine integration', () => {
                 retainedEvents: 1,
                 maxBytes: 1,
             });
-            expect(stderrSpy).toHaveBeenCalledWith(expect.stringContaining('qwen serve: EventBus event sizing failed {"type":"seeded_misc"}'));
+            expect(stderrSpy).toHaveBeenCalledWith(expect.stringContaining('hopcode serve: EventBus event sizing failed {"type":"seeded_misc"}'));
         }
         finally {
             stderrSpy.mockRestore();

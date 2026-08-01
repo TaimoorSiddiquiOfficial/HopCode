@@ -7626,7 +7626,7 @@ describe('ACP WebSocket transport security', () => {
     expect(bridge.runtimeMcpAdds).toHaveLength(0);
     expect(bridge.runtimeMcpRemoves).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: set HOPCODE_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
+      'hopcode serve: set HOPCODE_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
     );
 
     ws.close();
@@ -7643,7 +7643,7 @@ describe('ACP WebSocket transport security', () => {
     await yieldImmediate();
     expect(bridge.runtimeMcpAdds).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: set HOPCODE_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
+      'hopcode serve: set HOPCODE_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
     );
 
     ws.close();
@@ -7734,7 +7734,7 @@ describe('ACP WebSocket transport security', () => {
       originatorClientId: bridge.runtimeMcpAdds[0]?.originatorClientId,
     });
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: chrome-devtools runtime MCP skipped because settings already define it',
+      'hopcode serve: chrome-devtools runtime MCP skipped because settings already define it',
     );
     ws.close();
     await new Promise<void>((resolve) => ws.once('close', () => resolve()));
@@ -7755,7 +7755,7 @@ describe('ACP WebSocket transport security', () => {
     await vi.waitFor(() => expect(bridge.runtimeMcpAdds).toHaveLength(1));
     expect(bridge.runtimeMcpRemoves).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: chrome-devtools runtime MCP skipped: budget_exceeded',
+      'hopcode serve: chrome-devtools runtime MCP skipped: budget_exceeded',
     );
 
     bridge.runtimeMcpAddResult = {};
@@ -7803,7 +7803,7 @@ describe('ACP WebSocket transport security', () => {
 
     await vi.waitFor(() => {
       expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-        'qwen serve: failed to add chrome-devtools runtime MCP: add failed',
+        'hopcode serve: failed to add chrome-devtools runtime MCP: add failed',
       );
     });
 
@@ -7861,7 +7861,7 @@ describe('ACP WebSocket transport security', () => {
     await vi.waitFor(
       () => {
         expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-          'qwen serve: failed to add chrome-devtools runtime MCP: no channel',
+          'hopcode serve: failed to add chrome-devtools runtime MCP: no channel',
         );
       },
       { timeout: 7_000 },
@@ -7886,7 +7886,7 @@ describe('ACP WebSocket transport security', () => {
 
     expect(bridge.runtimeMcpAdds).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: chrome-devtools runtime MCP skipped because /cdp requires bearer auth',
+      'hopcode serve: chrome-devtools runtime MCP skipped because /cdp requires bearer auth',
     );
     ws.close();
     await new Promise<void>((resolve) => ws.once('close', () => resolve()));

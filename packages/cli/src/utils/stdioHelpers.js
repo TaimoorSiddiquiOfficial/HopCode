@@ -32,7 +32,7 @@ export const writeStderrLine = (message) => {
  * `writeStderrLine` that cannot throw.
  *
  * `process.stderr.write` throws on EPIPE or a closed fd — reachable whenever
- * the reader goes away (`qwen … | head`) or a daemon redirects its stderr. Most
+ * the reader goes away (`hopcode … | head`) or a daemon redirects its stderr. Most
  * of the CLI *wants* that to be loud, so this is not the default.
  *
  * Use it only where the write is incidental to the work in hand and failing it

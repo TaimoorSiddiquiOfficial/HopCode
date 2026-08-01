@@ -191,7 +191,7 @@ export const serveCommand = {
         .option('http-bridge', {
         type: 'boolean',
         default: true,
-        description: 'HTTP bridge mode: attempt to preheat one primary `qwen --acp` child; trusted ' +
+        description: 'HTTP bridge mode: attempt to preheat one primary `hopcode --acp` child; trusted ' +
             'secondaries start one on demand. Stage 2 native in-process mode is ' +
             'not yet implemented; this flag will become opt-in then.',
     })
@@ -300,7 +300,7 @@ export const serveCommand = {
             channelSelection = normalizeServeChannelSelection(argv.channel);
         }
         catch (err) {
-            writeStderrLine(`qwen serve: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: ${err instanceof Error ? err.message : String(err)}`);
             process.exit(1);
         }
         // Validate budget + mode combination at boot, before we

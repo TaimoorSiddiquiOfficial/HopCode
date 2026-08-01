@@ -464,7 +464,7 @@ export function registerWorkspaceQualifiedSettingsRoutes(
       res.status(200).json(response);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/settings error: ${
+        `hopcode serve: GET /workspaces/:workspace/settings error: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -592,7 +592,7 @@ export function registerWorkspaceQualifiedSettingsRoutes(
         }
       } catch (err) {
         writeStderrLine(
-          `qwen serve: POST /workspaces/:workspace/settings persist error (key=${key}, scope=${scope}, workspace=${runtime.workspaceCwd}): ${
+          `hopcode serve: POST /workspaces/:workspace/settings persist error (key=${key}, scope=${scope}, workspace=${runtime.workspaceCwd}): ${
             err instanceof Error ? err.message : String(err)
           }`,
         );

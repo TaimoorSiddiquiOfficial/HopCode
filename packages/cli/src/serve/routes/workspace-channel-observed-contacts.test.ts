@@ -262,7 +262,7 @@ describe('workspace observed channel contact routes', () => {
     });
     expect(JSON.stringify(response.body)).not.toContain(filePath);
     expect(stderr).toHaveBeenCalledWith(
-      'qwen serve: observed channel contacts unavailable.\n',
+      'hopcode serve: observed channel contacts unavailable.\n',
     );
   });
 });

@@ -208,7 +208,7 @@ describe('qwen-autofix workflow', () => {
       "pull_request_review:\n    types:\n      - 'submitted'",
     );
     expect(workflow).toContain(
-      'AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || \'qwen-code-dev-bot\' }}"',
+      'AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || \'hopcode-dev-bot\' }}"',
     );
     expect(workflow).toContain("MAX_ROUNDS: '5'");
     expect(workflow).toContain("MAX_OPEN_AUTOFIX_PRS: '5'");
@@ -320,7 +320,7 @@ describe('qwen-autofix workflow', () => {
           join(dir, 'ic.json'),
           JSON.stringify(
             marks.map((m) => ({
-              user: { login: 'qwen-code-dev-bot' },
+              user: { login: 'hopcode-dev-bot' },
               created_at: '2026-07-18T09:00:00Z',
               body: `eval <!-- autofix-eval ts=${m.ts} acted=${m.acted ?? 'true'} round=${m.round} -->`,
             })),
@@ -346,8 +346,8 @@ describe('qwen-autofix workflow', () => {
               ROUND: String(round),
               CONFLICT: conflict,
               MAX_ROUNDS: '5',
-              AUTOFIX_BOT: 'qwen-code-dev-bot',
-              REVIEW_BOT: 'qwen-code-ci-bot',
+              AUTOFIX_BOT: 'hopcode-dev-bot',
+              REVIEW_BOT: 'hopcode-ci-bot',
               TRUSTED_ASSOC: '["OWNER","MEMBER","COLLABORATOR"]',
             },
             encoding: 'utf8',
@@ -508,7 +508,7 @@ describe('qwen-autofix workflow', () => {
               BRANCH: 'ci/some-branch',
               WATERMARK: '2026-07-18T08:00:00Z',
               ROUND: '2',
-              AUTOFIX_BOT: 'qwen-code-dev-bot',
+              AUTOFIX_BOT: 'hopcode-dev-bot',
               TAKEOVER_LABEL: 'autofix/takeover',
               SKIP_LABEL: 'autofix/skip',
               GITHUB_OUTPUT: out,
@@ -528,7 +528,7 @@ describe('qwen-autofix workflow', () => {
     };
     const pr = (over = {}) => ({
       state: 'OPEN',
-      author: { login: 'qwen-code-dev-bot' },
+      author: { login: 'hopcode-dev-bot' },
       isCrossRepository: false,
       baseRefName: 'main',
       headRefName: 'ci/some-branch',
@@ -708,7 +708,7 @@ describe('qwen-autofix workflow', () => {
       'contains(fromJSON(\'["OWNER", "MEMBER", "COLLABORATOR"]\'), github.event.review.author_association)',
     );
     expect(routeJob).toContain(
-      "github.event.review.user.login == 'qwen-code-ci-bot'",
+      "github.event.review.user.login == 'hopcode-ci-bot'",
     );
     // The load-bearing STRUCTURE, not just substrings: the trust || is
     // parenthesized and the whole clause gates the per-PR format. Without
@@ -716,12 +716,12 @@ describe('qwen-autofix workflow', () => {
     // OWNER/MEMBER/COLLABORATOR review the run-unique group and the
     // review-bot the per-PR group unconditionally.
     expect(routeJob).toContain(
-      "(github.event_name == 'pull_request_review' && (contains(fromJSON('[\"OWNER\", \"MEMBER\", \"COLLABORATOR\"]'), github.event.review.author_association) || github.event.review.user.login == 'qwen-code-ci-bot') && format('qwen-autofix-route-pr-{0}', github.event.pull_request.number))",
+      "(github.event_name == 'pull_request_review' && (contains(fromJSON('[\"OWNER\", \"MEMBER\", \"COLLABORATOR\"]'), github.event.review.author_association) || github.event.review.user.login == 'hopcode-ci-bot') && format('qwen-autofix-route-pr-{0}', github.event.pull_request.number))",
     );
     expect(workflow).toContain(
       'TRUSTED_ASSOC: \'["OWNER", "MEMBER", "COLLABORATOR"]\'',
     );
-    expect(workflow).toContain("REVIEW_BOT: 'qwen-code-ci-bot'");
+    expect(workflow).toContain("REVIEW_BOT: 'hopcode-ci-bot'");
     expect(workflow).toContain(
       'gh api "repos/${REPO}/collaborators/${SENDER_LOGIN}/permission"',
     );
@@ -887,7 +887,7 @@ describe('qwen-autofix workflow', () => {
     // Must fetch issue comments for the count (already fetched for markers).
     expect(reviewScanStep).toContain('ic.json');
     // Must exclude known non-actionable bot comments.
-    expect(reviewScanStep).toContain('qwen-triage');
+    expect(reviewScanStep).toContain('hopcode-triage');
     expect(reviewScanStep).toContain('qwen-review-suggestion-summary');
     // The "nothing new" gate must check all three feedback sources.
     expect(reviewScanStep).toContain('"${N_ISSUE_COMMENTS}" -eq 0');

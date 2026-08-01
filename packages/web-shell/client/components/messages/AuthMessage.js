@@ -618,7 +618,7 @@ export function AuthMessage({ onMessage, onClose }) {
                         value: group.id,
                         label: t(group.label),
                         description: t(group.description),
-                    })), groupIndex, setGroupIndex), _jsxs("div", { className: styles.terms, children: [_jsxs("div", { children: [t('auth.termsTitle'), ":"] }), _jsx("a", { className: styles.link, href: "https://qwenlm.github.io/hopcode-docs/en/users/support/tos-privacy/", target: "_blank", rel: "noreferrer", children: "https://qwenlm.github.io/hopcode-docs/en/users/support/tos-privacy/" })] })] }));
+                    })), groupIndex, setGroupIndex), _jsxs("div", { className: styles.terms, children: [_jsxs("div", { children: [t('auth.termsTitle'), ":"] }), _jsx("a", { className: styles.link, href: "https://hoptrendy.github.io/hopcode-docs/en/users/support/tos-privacy/", target: "_blank", rel: "noreferrer", children: "https://hoptrendy.github.io/hopcode-docs/en/users/support/tos-privacy/" })] })] }));
         }
         if (view === 'providers') {
             return renderOptions(providers.map((item) => ({

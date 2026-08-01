@@ -86,7 +86,7 @@ export async function setupGithub(options = {}) {
         releaseTag = await getLatestGitHubRelease(options.proxy);
     }
     catch (error) {
-        writeStderrLine(`qwen setup-github: failed to determine latest hopcode-action release: ${error instanceof Error ? error.message : String(error)}`);
+        writeStderrLine(`hopcode setup-github: failed to determine latest hopcode-action release: ${error instanceof Error ? error.message : String(error)}`);
         debugLogger.debug('Failed to determine latest hopcode-action release:', error);
         throw new SetupGithubError('github_release_lookup_failed', 'Unable to determine the latest hopcode-action release on GitHub.', 502);
     }

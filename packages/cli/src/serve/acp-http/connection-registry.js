@@ -341,7 +341,7 @@ export class AcpConnection {
         if (binding.graceTimer) {
             clearTimeout(binding.graceTimer);
             binding.graceTimer = undefined;
-            writeStderrLine(`qwen serve: /acp session reclaimed within grace (${logSafe(sessionId)})`);
+            writeStderrLine(`hopcode serve: /acp session reclaimed within grace (${logSafe(sessionId)})`);
         }
         const prevStream = binding.stream;
         binding.abort.abort();
@@ -399,7 +399,7 @@ export class AcpConnection {
             // a pump error — the replies stay buffered indefinitely with no other
             // trace. Logging the arm gives operators a starting point when responses
             // look stuck behind the replay window.
-            writeStderrLine(`qwen serve: /acp replay deferral armed (${logSafe(sessionId)}, from id ${resumeFromEventId ?? 'initial'})`);
+            writeStderrLine(`hopcode serve: /acp replay deferral armed (${logSafe(sessionId)}, from id ${resumeFromEventId ?? 'initial'})`);
         }
         // Drain the gap buffer into a separate array first: on the resume path the
         // loop pushes id-less entries BACK into `binding.buffer`, so iterating the
@@ -514,7 +514,7 @@ export class AcpConnection {
         // Breadcrumb at the moment of detach so an operator can measure the actual
         // disconnect→reconnect gap against the grace window (the reclaim/expiry
         // logs alone can't tell "reclaimed with 0.5s to spare" from "9.5s").
-        writeStderrLine(`qwen serve: /acp session stream detached (${logSafe(sessionId)}), ` +
+        writeStderrLine(`hopcode serve: /acp session stream detached (${logSafe(sessionId)}), ` +
             `grace=${graceMs}ms`);
         // Stop the closing stream's event pump; the prompt + ownership live on.
         binding.abort.abort();
@@ -528,7 +528,7 @@ export class AcpConnection {
             // releases ownership, detaches the bridge client). Log it so an operator
             // debugging a vanished session can tell grace-expiry teardown apart from
             // an explicit `session/close` or connection drop.
-            writeStderrLine(`qwen serve: /acp session grace expired (${logSafe(sessionId)}), ` +
+            writeStderrLine(`hopcode serve: /acp session grace expired (${logSafe(sessionId)}), ` +
                 `no reconnect within ${graceMs}ms — tearing down`);
             // `closeSessionStream` → `teardownBinding` runs external callbacks
             // (`abandonPendingForSession`, `onDetachSession`) that can throw. This
@@ -539,7 +539,7 @@ export class AcpConnection {
                 this.closeSessionStream(sessionId);
             }
             catch (err) {
-                writeStderrLine(`qwen serve: /acp teardown failed during grace expiry ` +
+                writeStderrLine(`hopcode serve: /acp teardown failed during grace expiry ` +
                     `(${logSafe(sessionId)}): ` +
                     (err instanceof Error ? err.message : String(err)));
             }
@@ -553,7 +553,7 @@ export class AcpConnection {
                 this.onSessionGraceExpired?.();
             }
             catch (err) {
-                writeStderrLine(`qwen serve: /acp onSessionGraceExpired failed during grace expiry ` +
+                writeStderrLine(`hopcode serve: /acp onSessionGraceExpired failed during grace expiry ` +
                     `(${logSafe(sessionId)}): ` +
                     (err instanceof Error ? err.message : String(err)));
             }

@@ -2535,7 +2535,7 @@ class QwenAgent {
      * Re-registers the `/goal` Stop hook when a resumed transcript ends on an
      * unsatisfied goal — the daemon counterpart of the TUI's resume restore.
      * Without this the goal loop silently dies whenever a session is reloaded or
-     * `qwen serve` restarts, even though the transcript still shows it as active.
+     * `hopcode serve` restarts, even though the transcript still shows it as active.
      *
      * The `addItem` bridge that `restoreGoalFromHistory` takes in the TUI is not
      * used here — the daemon's terminal card goes out over the wire, not into an
@@ -3622,7 +3622,7 @@ class QwenAgent {
                     status: 'warning',
                     errorKind: 'auth_env_error',
                     error: 'No auth method configured.',
-                    hint: 'Run `qwen` and complete the auth flow, or set a provider env var.',
+                    hint: 'Run `hopcode` and complete the auth flow, or set a provider env var.',
                     detail: { source: 'none', hasToken: false },
                 });
             }

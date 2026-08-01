@@ -65,10 +65,10 @@ Or run the same adapter under the experimental daemon-managed channel worker:
 
 ```bash
 cd /path/to/your/project
-qwen serve --channel my-plugin-test
+hopcode serve --channel my-plugin-test
 ```
 
-`qwen serve --channel` requires the channel's configured `cwd` to resolve to one registered, trusted daemon workspace. In a multi-workspace daemon, named channels are grouped into one worker per owning workspace; `--channel all` still selects only the primary workspace's channels.
+`hopcode serve --channel` requires the channel's configured `cwd` to resolve to one registered, trusted daemon workspace. In a multi-workspace daemon, named channels are grouped into one worker per owning workspace; `--channel all` still selects only the primary workspace's channels.
 
 ### 6. Send a message
 

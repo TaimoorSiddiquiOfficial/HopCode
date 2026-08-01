@@ -1756,7 +1756,7 @@ describe('createDaemonWorkspaceService', () => {
       });
       expect(preheatAcpChild).toHaveBeenCalledTimes(2);
       expect(mockWriteStderrLine).toHaveBeenCalledWith(
-        'qwen serve: ACP preheat timed out after 1ms',
+        'hopcode serve: ACP preheat timed out after 1ms',
       );
     });
 

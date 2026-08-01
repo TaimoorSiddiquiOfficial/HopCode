@@ -33,7 +33,7 @@ export class CdpTunnelRegistry {
         // (its `dispose()` guards re-entry), and we skip a no-op re-register.
         const previous = this.active;
         if (previous && previous !== endpoint) {
-            writeStderrLine(`qwen serve: /cdp tunnel — extension bridge '${endpoint.connectionId}' ` +
+            writeStderrLine(`hopcode serve: /cdp tunnel — extension bridge '${endpoint.connectionId}' ` +
                 `superseded the stale '${previous.connectionId}'`);
             previous.onExtensionGone?.();
         }

@@ -1178,7 +1178,7 @@ describe('EventBus + CompactionEngine integration', () => {
       });
       expect(stderrSpy).toHaveBeenCalledWith(
         expect.stringContaining(
-          'qwen serve: EventBus event sizing failed {"type":"seeded_misc"}',
+          'hopcode serve: EventBus event sizing failed {"type":"seeded_misc"}',
         ),
       );
     } finally {

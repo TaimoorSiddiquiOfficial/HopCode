@@ -8,7 +8,7 @@
  * "Goals" page.
  *
  * A goal is a session-scoped Stop hook whose state (condition, judge turn count,
- * last verdict) lives only in the `qwen --acp` child's in-memory store. The serve
+ * last verdict) lives only in the `hopcode --acp` child's in-memory store. The serve
  * process holds no copy, so this route fans out one `sessionGoalGet` ext-method
  * call per live session and collects the answers. There is no durable goal store
  * to read instead: a goal only advances while its session is resident, so "the

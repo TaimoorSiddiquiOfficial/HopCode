@@ -6616,7 +6616,7 @@ describe('ACP WebSocket transport security', () => {
         await yieldImmediate();
         expect(bridge.runtimeMcpAdds).toHaveLength(0);
         expect(bridge.runtimeMcpRemoves).toHaveLength(0);
-        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('qwen serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)');
+        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('hopcode serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)');
         ws.close();
         await new Promise((resolve) => ws.once('close', () => resolve()));
     });
@@ -6628,7 +6628,7 @@ describe('ACP WebSocket transport security', () => {
         await initializeCdpBridge(ws);
         await yieldImmediate();
         expect(bridge.runtimeMcpAdds).toHaveLength(0);
-        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('qwen serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)');
+        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('hopcode serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)');
         ws.close();
         await new Promise((resolve) => ws.once('close', () => resolve()));
     });
@@ -6704,7 +6704,7 @@ describe('ACP WebSocket transport security', () => {
             name: 'chrome-devtools',
             originatorClientId: bridge.runtimeMcpAdds[0]?.originatorClientId,
         });
-        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('qwen serve: chrome-devtools runtime MCP skipped because settings already define it');
+        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('hopcode serve: chrome-devtools runtime MCP skipped because settings already define it');
         ws.close();
         await new Promise((resolve) => ws.once('close', () => resolve()));
     });
@@ -6720,7 +6720,7 @@ describe('ACP WebSocket transport security', () => {
         await initializeCdpBridge(first, 1);
         await vi.waitFor(() => expect(bridge.runtimeMcpAdds).toHaveLength(1));
         expect(bridge.runtimeMcpRemoves).toHaveLength(0);
-        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('qwen serve: chrome-devtools runtime MCP skipped: budget_exceeded');
+        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('hopcode serve: chrome-devtools runtime MCP skipped: budget_exceeded');
         bridge.runtimeMcpAddResult = {};
         const second = await wsConnect();
         await initializeCdpBridge(second, 2);
@@ -6758,7 +6758,7 @@ describe('ACP WebSocket transport security', () => {
         const first = await wsConnect();
         await initializeCdpBridge(first, 1);
         await vi.waitFor(() => {
-            expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('qwen serve: failed to add chrome-devtools runtime MCP: add failed');
+            expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('hopcode serve: failed to add chrome-devtools runtime MCP: add failed');
         });
         bridge.runtimeMcpAddError = undefined;
         const second = await wsConnect();
@@ -6801,7 +6801,7 @@ describe('ACP WebSocket transport security', () => {
         const ws = await wsConnect();
         await initializeCdpBridge(ws);
         await vi.waitFor(() => {
-            expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('qwen serve: failed to add chrome-devtools runtime MCP: no channel');
+            expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('hopcode serve: failed to add chrome-devtools runtime MCP: no channel');
         }, { timeout: 7_000 });
         expect(bridge.runtimeMcpAdds).toHaveLength(21);
         ws.close();
@@ -6819,7 +6819,7 @@ describe('ACP WebSocket transport security', () => {
         });
         await initializeCdpBridge(ws);
         expect(bridge.runtimeMcpAdds).toHaveLength(0);
-        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('qwen serve: chrome-devtools runtime MCP skipped because /cdp requires bearer auth');
+        expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith('hopcode serve: chrome-devtools runtime MCP skipped because /cdp requires bearer auth');
         ws.close();
         await new Promise((resolve) => ws.once('close', () => resolve()));
     });

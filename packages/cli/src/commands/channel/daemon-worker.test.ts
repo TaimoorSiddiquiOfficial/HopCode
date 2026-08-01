@@ -1,4 +1,4 @@
-﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockCanonicalizeWorkspace = vi.hoisted(() => vi.fn((p: string) => p));
 const mockLoadChannelsConfig = vi.hoisted(() => vi.fn());
@@ -1578,7 +1578,7 @@ describe('daemonWorkerCommand', () => {
     ).rejects.toThrow('process.exit 1');
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      '[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.',
+      '[Channel] daemon worker failed: daemon-worker is an internal hopcode serve command.',
     );
   });
 
@@ -1605,7 +1605,7 @@ describe('daemonWorkerCommand', () => {
     expect(process.env['QWEN_DAEMON_URL']).toBeUndefined();
     expect(process.env['QWEN_DAEMON_WORKSPACE']).toBeUndefined();
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      '[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.',
+      '[Channel] daemon worker failed: daemon-worker is an internal hopcode serve command.',
     );
   });
 
@@ -1632,7 +1632,7 @@ describe('daemonWorkerCommand', () => {
     expect(process.env['QWEN_DAEMON_URL']).toBeUndefined();
     expect(process.env['QWEN_DAEMON_WORKSPACE']).toBeUndefined();
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      '[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.',
+      '[Channel] daemon worker failed: daemon-worker is an internal hopcode serve command.',
     );
   });
 

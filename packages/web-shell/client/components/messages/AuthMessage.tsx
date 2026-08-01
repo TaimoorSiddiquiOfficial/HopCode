@@ -828,11 +828,11 @@ export function AuthMessage({ onMessage, onClose }: AuthMessageProps) {
             <div>{t('auth.termsTitle')}:</div>
             <a
               className={styles.link}
-              href="https://qwenlm.github.io/hopcode-docs/en/users/support/tos-privacy/"
+              href="https://hoptrendy.github.io/hopcode-docs/en/users/support/tos-privacy/"
               target="_blank"
               rel="noreferrer"
             >
-              https://qwenlm.github.io/hopcode-docs/en/users/support/tos-privacy/
+              https://hoptrendy.github.io/hopcode-docs/en/users/support/tos-privacy/
             </a>
           </div>
         </>

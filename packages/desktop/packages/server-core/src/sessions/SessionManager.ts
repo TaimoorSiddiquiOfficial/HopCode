@@ -2121,7 +2121,7 @@ export class SessionManager implements ISessionManager {
       })
     } catch (error) {
       sessionLog.warn(
-        `Qwen runtime model cache unavailable: ${error instanceof Error ? error.message : String(error)}`,
+        `hopcode runtime model cache unavailable: ${error instanceof Error ? error.message : String(error)}`,
       )
       return
     }
@@ -2141,7 +2141,7 @@ export class SessionManager implements ISessionManager {
       if (changed) this.broadcastLlmConnectionsChanged()
     } catch (error) {
       sessionLog.warn(
-        `Qwen runtime default model update failed: ${error instanceof Error ? error.message : String(error)}`,
+        `hopcode runtime default model update failed: ${error instanceof Error ? error.message : String(error)}`,
       )
     }
   }
@@ -2690,7 +2690,7 @@ export class SessionManager implements ISessionManager {
       workspace.id,
     )
     sessionLog.info(
-      `Canonicalized Qwen session id ${previousId} -> ${sdkSessionId}`,
+      `Canonicalized hopcode session id ${previousId} -> ${sdkSessionId}`,
     )
 
     return managed
@@ -7392,7 +7392,7 @@ export class SessionManager implements ISessionManager {
               )
             } catch (error) {
               sessionLog.warn(
-                `Qwen model follow-up refresh failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
+                `hopcode model follow-up refresh failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`,
               )
             }
           })()

@@ -128,7 +128,7 @@ export class CdpBrowserEmulator {
                     // browser-level command a CDP client sends. Until then the
                     // empty-result ack keeps puppeteer from hanging on optional commands;
                     // surface the unknown ones so the coverage gap stays visible.
-                    this.cb.log?.(`qwen serve: /cdp unsupported browser-level CDP method: ${method ?? '(none)'}`);
+                    this.cb.log?.(`hopcode serve: /cdp unsupported browser-level CDP method: ${method ?? '(none)'}`);
                     return this.cb.reply({ id, result: {} });
             }
         }

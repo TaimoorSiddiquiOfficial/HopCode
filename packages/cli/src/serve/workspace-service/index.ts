@@ -246,7 +246,7 @@ export function createDaemonWorkspaceService(
         // enumeration below instead of failing the request — matching
         // getWorkspaceEnvStatus / getWorkspacePreflightStatus.
         writeStderrLine(
-          `qwen serve: getWorkspaceSkillsStatus query failed: ${err instanceof Error ? err.message : String(err)}`,
+          `hopcode serve: getWorkspaceSkillsStatus query failed: ${err instanceof Error ? err.message : String(err)}`,
         );
         status = createIdleWorkspaceSkillsStatus(boundWorkspace);
       }
@@ -268,7 +268,7 @@ export function createDaemonWorkspaceService(
           return await workspaceSkillsStatusProvider(boundWorkspace);
         } catch (err) {
           writeStderrLine(
-            `qwen serve: getWorkspaceSkillsStatus local provider failed: ${err instanceof Error ? err.message : String(err)}`,
+            `hopcode serve: getWorkspaceSkillsStatus local provider failed: ${err instanceof Error ? err.message : String(err)}`,
           );
         }
       }
@@ -290,7 +290,7 @@ export function createDaemonWorkspaceService(
         !(err instanceof BridgeChannelClosedError)
       ) {
         writeStderrLine(
-          `qwen serve: workspace skill refresh after mutation failed: ${err instanceof Error ? err.message : String(err)}`,
+          `hopcode serve: workspace skill refresh after mutation failed: ${err instanceof Error ? err.message : String(err)}`,
         );
       }
     }
@@ -364,7 +364,7 @@ export function createDaemonWorkspaceService(
         });
         void inFlightAcpPreheat.catch((err) => {
           writeStderrLine(
-            `qwen serve: ACP preheat failed: ${err instanceof Error ? err.message : String(err)}`,
+            `hopcode serve: ACP preheat failed: ${err instanceof Error ? err.message : String(err)}`,
           );
         });
       }
@@ -379,7 +379,7 @@ export function createDaemonWorkspaceService(
         if (err instanceof TimeoutError) {
           inFlightAcpPreheat = undefined;
           writeStderrLine(
-            `qwen serve: ACP preheat timed out after ${opts?.timeoutMs ?? 5_000}ms`,
+            `hopcode serve: ACP preheat timed out after ${opts?.timeoutMs ?? 5_000}ms`,
           );
         }
         const live = channelLive();
@@ -751,7 +751,7 @@ export function createDaemonWorkspaceService(
               activation = 'partial';
               sessionsFailed = 1;
               writeStderrLine(
-                `qwen serve: workspace skill refresh failed: ${err instanceof Error ? err.message : String(err)}`,
+                `hopcode serve: workspace skill refresh failed: ${err instanceof Error ? err.message : String(err)}`,
               );
             }
           }

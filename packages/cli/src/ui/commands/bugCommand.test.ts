@@ -46,7 +46,7 @@ describe('bugCommand', () => {
     });
     mockOpenBrowserSecurely.mockClear();
     mockOpenBrowserSecurely.mockResolvedValue(undefined);
-    vi.stubEnv('SANDBOX', 'qwen-test');
+    vi.stubEnv('SANDBOX', 'hopcode-test');
   });
 
   afterEach(() => {

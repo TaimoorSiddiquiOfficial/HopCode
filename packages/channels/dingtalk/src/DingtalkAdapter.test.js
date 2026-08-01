@@ -635,7 +635,7 @@ describe('DingtalkChannel parsed-message logging', () => {
                 senderStaffId: 'staff-1',
                 senderId: 'sender-1',
                 isInAtList: true,
-                text: { content: '@qwen-code hello' },
+                text: { content: '@hopcode hello' },
             }),
             headers: { messageId: 'group-name-m1' },
         };
@@ -660,7 +660,7 @@ describe('DingtalkChannel parsed-message logging', () => {
                 senderStaffId: 'staff-1',
                 senderId: 'sender-1',
                 isInAtList: true,
-                text: { content: '@qwen-code hello' },
+                text: { content: '@hopcode hello' },
             }),
             headers: { messageId: 'debug-m1' },
         };
@@ -698,7 +698,7 @@ describe('DingtalkChannel parsed-message logging', () => {
                 senderStaffId: 'staff-1',
                 senderId: 'sender-1',
                 isInAtList: true,
-                text: { content: '@qwen-code hello' },
+                text: { content: '@hopcode hello' },
             }),
             headers: { messageId: 'm1' },
         };
@@ -857,7 +857,7 @@ describe('DingtalkChannel sender attribution', () => {
                 senderStaffId: 'staff-1',
                 senderId: 'sender-1',
                 isInAtList: true,
-                text: { content: '@qwen-code hello' },
+                text: { content: '@hopcode hello' },
             }),
             headers: { messageId: 'm1' },
         };
@@ -884,7 +884,7 @@ describe('DingtalkChannel sender attribution', () => {
                 senderStaffId: 'staff-1',
                 senderId: 'sender-1',
                 isInAtList: true,
-                text: { content: '@qwen-code 查看记忆\u200b' },
+                text: { content: '@hopcode 查看记忆\u200b' },
             }),
             headers: { messageId: 'm1' },
         };
@@ -912,7 +912,7 @@ describe('DingtalkChannel sender attribution', () => {
                 senderStaffId: 'staff-1',
                 senderId: 'sender-1',
                 isInAtList: true,
-                text: { content: '@qwen-code\u200b查看记忆' },
+                text: { content: '@hopcode\u200b查看记忆' },
             }),
             headers: { messageId: 'm1' },
         };
@@ -940,7 +940,7 @@ describe('DingtalkChannel sender attribution', () => {
                 senderStaffId: ['staff-1'],
                 senderId: 123,
                 isInAtList: true,
-                text: { content: '@qwen-code hello' },
+                text: { content: '@hopcode hello' },
             }),
             headers: { messageId: 'header-m1' },
         };

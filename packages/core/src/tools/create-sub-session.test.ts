@@ -35,7 +35,7 @@ describe('CreateSubSessionTool', () => {
     const res = await tool
       .build({ prompt: 'do X' })
       .execute(new AbortController().signal);
-    expect(res.error?.message).toContain('qwen serve');
+    expect(res.error?.message).toContain('hopcode serve');
     expect(res.returnDisplay).toContain('daemon-only');
   });
 

@@ -147,7 +147,7 @@ export class WorkspaceVoiceCoordinator {
     }
     if (timedOut && state.leases.size > 0) {
       process.stderr.write(
-        `qwen serve: Voice runtime disposal timed out with ${state.leases.size} active lease(s).\n`,
+        `hopcode serve: Voice runtime disposal timed out with ${state.leases.size} active lease(s).\n`,
       );
     }
   }

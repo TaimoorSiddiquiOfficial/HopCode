@@ -153,9 +153,9 @@ describe('CdpReverseLink (Plan C #5626)', () => {
             const p = link.forwardToTab('Page.navigate', { url: 'about:blank' });
             await Promise.resolve();
             p.catch(() => undefined);
-            expect(log).toHaveBeenCalledWith('qwen serve: /cdp forwarded command id=2 method=Page.navigate to extension');
+            expect(log).toHaveBeenCalledWith('hopcode serve: /cdp forwarded command id=2 method=Page.navigate to extension');
             await vi.advanceTimersByTimeAsync(30_000);
-            expect(log).toHaveBeenCalledWith('qwen serve: /cdp still waiting for command id=2 method=Page.navigate after 30000ms');
+            expect(log).toHaveBeenCalledWith('hopcode serve: /cdp still waiting for command id=2 method=Page.navigate after 30000ms');
             await vi.advanceTimersByTimeAsync(20_000);
             await expect(p).rejects.toMatchObject({
                 message: 'CDP command id=2 method=Page.navigate timed out after 50000ms',

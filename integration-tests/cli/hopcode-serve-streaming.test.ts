@@ -564,7 +564,7 @@ describeLLM('hopcode serve — Last-Event-ID resume', () => {
   }, 60_000);
 });
 
-describePOSIX('qwen serve — daemon Todo Stop Guard replay', () => {
+describePOSIX('hopcode serve — daemon Todo Stop Guard replay', () => {
   it('continues after prompt admission without an SSE client and replays the bounded attempts', async () => {
     const session = await client.createOrAttachSession({
       workspaceCwd: REPO_ROOT,

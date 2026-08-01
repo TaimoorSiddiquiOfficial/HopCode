@@ -16,8 +16,8 @@ import {
   useSessions,
   useWorkspace,
   useWorkspaceActions,
-} from '@qwen-code/webui/daemon-react-sdk';
-import { DaemonHttpError } from '@qwen-code/sdk/daemon';
+} from '@hopcode/webui/daemon-react-sdk';
+import { DaemonHttpError } from '@hopcode/sdk/daemon';
 import type {
   DaemonSessionGroup,
   DaemonSessionGroupColor,
@@ -26,7 +26,7 @@ import type {
   DaemonSessionSummary,
   DaemonWorkspaceCapability,
   DaemonWorkspaceRemovalActivity,
-} from '@qwen-code/sdk/daemon';
+} from '@hopcode/sdk/daemon';
 import {
   ActivityIcon,
   BlocksIcon,
@@ -3696,7 +3696,7 @@ export function WebShellSidebar({
                 footerItems.has('version') && (
                   <span
                     className={styles.version}
-                    title={`Qwen Code ${versionLabel}`}
+                    title={`hopcode Code ${versionLabel}`}
                   >
                     {versionLabel}
                   </span>

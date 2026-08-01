@@ -1,7 +1,7 @@
-﻿# @hoptrendy/chrome-bridge
+# @hoptrendy/chrome-bridge
 
 A Chrome extension that brings HopCode into the browser as a thin client of a
-local [`qwen serve`](../../docs/users/qwen-serve.md) daemon — no Native
+local [`hopcode serve`](../../docs/users/qwen-serve.md) daemon — no Native
 Messaging host to install.
 
 It does two things:
@@ -29,7 +29,7 @@ it will tell you exactly what to run — it generates the command with this
 extension's own id:
 
 ```bash
-qwen serve --allow-origin chrome-extension://<this-extension-id>
+hopcode serve --allow-origin chrome-extension://<this-extension-id>
 ```
 
 `--allow-origin chrome-extension://<id>` is required: it lets the daemon's Web
@@ -48,7 +48,7 @@ clicking require an explicit external MCP adapter command:
 
 ```bash
 QWEN_CDP_MCP_COMMAND=/path/to/cdp-mcp-adapter \
-qwen serve --allow-origin chrome-extension://<this-extension-id>
+hopcode serve --allow-origin chrome-extension://<this-extension-id>
 ```
 
 No browser automation adapter is bundled with the main `@hoptrendy/hopcode`
@@ -67,7 +67,7 @@ The side panel probes `GET /health` and `GET /capabilities` and shows one of:
 
 | State                | Meaning                                | Shown                            |
 | -------------------- | -------------------------------------- | -------------------------------- |
-| `down`               | no daemon reachable                    | "Start qwen serve" + command     |
+| `down`               | no daemon reachable                    | "Start hopcode serve" + command     |
 | `needs-allow-origin` | daemon up but `--allow-origin` not set | "Allow this extension" + command |
 | `ready`              | daemon up and framing permitted        | the Web Shell (chat)             |
 

@@ -112,7 +112,7 @@ export function registerUsageStatsRoutes(
       res.status(200).json(dashboard);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /usage/dashboard failed: ${
+        `hopcode serve: GET /usage/dashboard failed: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );

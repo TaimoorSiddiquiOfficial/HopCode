@@ -312,7 +312,7 @@ function sliceLineRange(content, startLine, endLine) {
  *     subscribers (`GET /session/:id/events`) drain it.
  *   - File reads/writes proxy to local fs (daemon and agent share the host).
  *
- * Stage 1 trust model: the spawned `qwen --acp` child runs as the same user
+ * Stage 1 trust model: the spawned `hopcode --acp` child runs as the same user
  * as the daemon, so the file-proxy methods do NOT enforce a workspace-cwd
  * sandbox. The agent could already read or write the same files via its
  * built-in tools (e.g. shell). Restricting the bridge here would be
@@ -373,7 +373,7 @@ export class BridgeClient {
      * Optional fs injection seam. When provided, `writeTextFile` /
      * `readTextFile` delegate to this implementation instead of running
      * the inline `fs.realpath` / `fs.writeFile` / `fs.readFile` proxy
-     * below. Production `qwen serve` wires a serve-side adapter
+     * below. Production `hopcode serve` wires a serve-side adapter
      * wrapping `WorkspaceFileSystem` here so writes get the TOCTOU +
      * symlink + trust-gate + audit machinery the inline proxy lacks.
      * Omitted by tests + Mode A in-process consumers + channels / IDE
@@ -503,7 +503,7 @@ export class BridgeClient {
             });
         }
         catch (error) {
-            writeStderrLine(`qwen serve: failed to snapshot pending interaction ${requestId}: ${error instanceof Error ? error.message : String(error)}`);
+            writeStderrLine(`hopcode serve: failed to snapshot pending interaction ${requestId}: ${error instanceof Error ? error.message : String(error)}`);
             interaction = fallbackPendingPermissionInteraction(requestId, options);
         }
         entry.pendingPermissionIds.add(requestId);
@@ -1360,7 +1360,7 @@ export class BridgeClient {
         this.sweepExpiredTombstones(now);
         if (this.tombstonedSessionIds.has(sessionId) &&
             !this.inFlightRestoreIds.has(sessionId)) {
-            writeStderrLine(`qwen serve: dropping early extNotification ` +
+            writeStderrLine(`hopcode serve: dropping early extNotification ` +
                 `for tombstoned session ${JSON.stringify(sessionId)} ` +
                 `(post-close stale event)`);
             return;
@@ -1371,7 +1371,7 @@ export class BridgeClient {
             if (this.earlyEvents.size >= MAX_EARLY_EVENT_SESSIONS) {
                 // Hitting this cap means the daemon is under notification
                 // pressure from 64+ concurrent sessions — worth surfacing.
-                writeStderrLine(`qwen serve: dropping early extNotification — ` +
+                writeStderrLine(`hopcode serve: dropping early extNotification — ` +
                     `early-event buffer at MAX_EARLY_EVENT_SESSIONS ` +
                     `(${MAX_EARLY_EVENT_SESSIONS}); possible session-id fanout abuse`);
                 return;
@@ -1380,7 +1380,7 @@ export class BridgeClient {
             this.earlyEvents.set(sessionId, buf);
         }
         if (buf.frames.length >= MAX_EARLY_EVENTS_PER_SESSION) {
-            writeStderrLine(`qwen serve: dropping early extNotification ` +
+            writeStderrLine(`hopcode serve: dropping early extNotification ` +
                 `for session ${JSON.stringify(sessionId)} — per-session ` +
                 `cap (${MAX_EARLY_EVENTS_PER_SESSION}) reached`);
             return;
@@ -1475,7 +1475,7 @@ export class BridgeClient {
     }
     async writeTextFile(params) {
         // Delegate to the injected `BridgeFileSystem` when present.
-        // Production `qwen serve` wires `WorkspaceFileSystem` through a
+        // Production `hopcode serve` wires `WorkspaceFileSystem` through a
         // serve-side adapter so writes get the trust-gate + TOCTOU +
         // symlink + `.gitignore` + audit machinery the inline proxy below
         // lacks. Tests, Mode A consumers, channels, and IDE companion
@@ -1633,7 +1633,7 @@ export class BridgeClient {
     }
     async readTextFile(params) {
         // Delegate to the injected `BridgeFileSystem` when present
-        // (parallels the write path above). Production `qwen serve` wires
+        // (parallels the write path above). Production `hopcode serve` wires
         // `WorkspaceFileSystem` adapter; tests + Mode A + channels + IDE
         // companion fall through to the inline proxy below.
         if (this.fileSystem) {

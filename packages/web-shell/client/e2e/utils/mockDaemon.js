@@ -31,7 +31,7 @@ export function createWebShellDaemonScenario(overrides = {}) {
     const sessionId = overrides.sessionId ?? 'web-shell-e2e-session';
     const clientId = overrides.clientId ?? 'web-shell-e2e-client';
     const displayName = overrides.displayName ?? 'E2E Harness Session';
-    const currentModel = overrides.currentModel ?? 'qwen-test';
+    const currentModel = overrides.currentModel ?? 'hopcode-test';
     const currentMode = overrides.currentMode ?? 'default';
     const state = {
         displayName,
@@ -45,8 +45,8 @@ export function createWebShellDaemonScenario(overrides = {}) {
                     contextLimit: 32_768,
                 },
                 {
-                    modelId: 'qwen-test-alt',
-                    baseModelId: 'qwen-test-alt',
+                    modelId: 'hopcode-test-alt',
+                    baseModelId: 'hopcode-test-alt',
                     name: 'Qwen Test Alt',
                     contextLimit: 16_384,
                 },
@@ -69,7 +69,7 @@ export function createWebShellDaemonScenario(overrides = {}) {
             'workspace_settings',
             'workspace_voice',
         ],
-        modelServices: ['qwen-test'],
+        modelServices: ['hopcode-test'],
         transports: ['rest-sse'],
         workspaceCwd,
         qwenCodeVersion: '0.0.0-e2e',
@@ -102,8 +102,8 @@ export function createWebShellDaemonScenario(overrides = {}) {
                         isRuntime: true,
                     },
                     {
-                        modelId: 'qwen-test-alt',
-                        baseModelId: 'qwen-test-alt',
+                        modelId: 'hopcode-test-alt',
+                        baseModelId: 'hopcode-test-alt',
                         name: 'Qwen Test Alt',
                         contextLimit: 16_384,
                         isCurrent: false,

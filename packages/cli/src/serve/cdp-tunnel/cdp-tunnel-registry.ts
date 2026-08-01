@@ -64,7 +64,7 @@ export class CdpTunnelRegistry {
     const previous = this.active;
     if (previous && previous !== endpoint) {
       writeStderrLine(
-        `qwen serve: /cdp tunnel — extension bridge '${endpoint.connectionId}' ` +
+        `hopcode serve: /cdp tunnel — extension bridge '${endpoint.connectionId}' ` +
           `superseded the stale '${previous.connectionId}'`,
       );
       previous.onExtensionGone?.();

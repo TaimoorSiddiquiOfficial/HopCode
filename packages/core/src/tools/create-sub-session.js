@@ -5,7 +5,7 @@
  */
 import { BaseDeclarativeTool, BaseToolInvocation, Kind } from './tools.js';
 import { ToolNames, ToolDisplayNames } from './tool-names.js';
-const DAEMON_ONLY_MESSAGE = 'create_sub_session is only available when running under `qwen serve` ' +
+const DAEMON_ONLY_MESSAGE = 'create_sub_session is only available when running under `hopcode serve` ' +
     '(daemon mode). There is no session bridge in this environment, so a ' +
     'sub-session cannot be spawned.';
 /** Ceiling on the delegated prompt. Mirrors the scheduled-task REST route's
@@ -163,7 +163,7 @@ export class CreateSubSessionTool extends BaseDeclarativeTool {
             'transcript) and run a prompt in it. Use to fan work out into a ' +
             'separate session — e.g. a self-contained sub-task you want isolated ' +
             'from this conversation.\n\n' +
-            'ONLY available when running under `qwen serve` (daemon mode); it is ' +
+            'ONLY available when running under `hopcode serve` (daemon mode); it is ' +
             'inert in a plain interactive session.\n\n' +
             '## Completion modes\n' +
             "- `first-turn` (default): waits for the sub-session's first turn to " +

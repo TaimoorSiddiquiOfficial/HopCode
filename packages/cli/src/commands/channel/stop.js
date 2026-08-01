@@ -43,7 +43,7 @@ export const stopCommand = {
             process.exit(0);
         }
         if (info.owner === 'serve') {
-            writeStderrLine(`Channel service is managed by qwen serve (PID ${info.pid}). Stop qwen serve to stop channels.`);
+            writeStderrLine(`Channel service is managed by hopcode serve (PID ${info.pid}). Stop hopcode serve to stop channels.`);
             process.exit(1);
         }
         writeStdoutLine(`Stopping channel service (PID ${info.pid})...`);

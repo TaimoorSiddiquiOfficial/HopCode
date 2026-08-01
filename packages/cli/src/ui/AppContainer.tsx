@@ -1164,7 +1164,7 @@ export const AppContainer = (props: AppContainerProps) => {
       return undefined;
     }
     // Guard the clear-screen write on stdout being a TTY: with stdout piped or
-    // redirected (`qwen | tee log`) the transcript degrades to in-buffer
+    // redirected (`hopcode | tee log`) the transcript degrades to in-buffer
     // rendering (AlternateScreen skips its escapes on non-TTY), so emitting
     // `clearTerminal` here would leak raw control bytes into the captured
     // output without ever having taken over a screen to repaint.

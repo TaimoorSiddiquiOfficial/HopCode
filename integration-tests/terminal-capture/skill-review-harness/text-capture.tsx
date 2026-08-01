@@ -138,7 +138,7 @@ async function renderGlobalBefore(skills: PendingSkillView[]) {
   }).trim();
   const packageRoot =
     process.env['QWEN_GLOBAL_PACKAGE_ROOT'] ??
-    path.join(npmRoot, '@qwen-code', 'qwen-code');
+    path.join(npmRoot, '@hoptrendy', 'qwen-code');
   const packageJson = JSON.parse(
     await fs.readFile(path.join(packageRoot, 'package.json'), 'utf-8'),
   ) as { version?: string };

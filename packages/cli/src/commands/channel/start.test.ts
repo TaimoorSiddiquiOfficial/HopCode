@@ -264,7 +264,7 @@ describe('resolveExtensionChannelEntrySpecifier', () => {
 });
 
 describe('startCommand.handler', () => {
-  it('refuses to start when channels are managed by qwen serve', async () => {
+  it('refuses to start when channels are managed by hopcode serve', async () => {
     mockReadServiceInfo.mockReturnValue({
       owner: 'serve',
       pid: 1234,
@@ -286,7 +286,7 @@ describe('startCommand.handler', () => {
     }
 
     expect(mockWriteStderrLine).toHaveBeenCalledWith(
-      expect.stringContaining('managed by qwen serve'),
+      expect.stringContaining('managed by hopcode serve'),
     );
     expect(mockBridgeStart).not.toHaveBeenCalled();
   });

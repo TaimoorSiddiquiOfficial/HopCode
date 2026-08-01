@@ -171,7 +171,7 @@ export function registerWorkspaceQualifiedPermissionsRoutes(
         .json(buildPermissionSettings(loadSettings(runtime.workspaceCwd)));
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/permissions error: ${
+        `hopcode serve: GET /workspaces/:workspace/permissions error: ${
           err instanceof Error ? err.message : String(err)
         }`,
       );
@@ -260,7 +260,7 @@ export function registerWorkspaceQualifiedPermissionsRoutes(
           return;
         }
         writeStderrLine(
-          `qwen serve: POST /workspaces/:workspace/permissions ACP error (ruleType=${ruleType}, workspace=${runtime.workspaceCwd}): ${
+          `hopcode serve: POST /workspaces/:workspace/permissions ACP error (ruleType=${ruleType}, workspace=${runtime.workspaceCwd}): ${
             err instanceof Error ? err.message : String(err)
           }`,
         );

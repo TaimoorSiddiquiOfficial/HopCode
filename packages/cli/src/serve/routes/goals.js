@@ -75,7 +75,7 @@ export function registerGoalsRoutes(app, deps) {
                 });
             }
             if (dropped.length > 0) {
-                writeStderrLine(`qwen serve: GET /goals could not probe ${dropped.length} of ${sessions.length} session(s): ${dropped.join('; ')}`);
+                writeStderrLine(`hopcode serve: GET /goals could not probe ${dropped.length} of ${sessions.length} session(s): ${dropped.join('; ')}`);
             }
             // Newest first, matching the scheduled-tasks page.
             goals.sort((a, b) => b.setAt - a.setAt);
@@ -85,7 +85,7 @@ export function registerGoalsRoutes(app, deps) {
             res.status(200).json({ v: 1, goals, droppedCount: dropped.length });
         }
         catch (err) {
-            writeStderrLine(`qwen serve: GET /goals failed: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: GET /goals failed: ${err instanceof Error ? err.message : String(err)}`);
             res.status(500).json({
                 error: 'Failed to list active goals',
                 code: 'goals_read_failed',

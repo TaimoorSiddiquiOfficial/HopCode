@@ -3,9 +3,9 @@
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  *
- * Daemon discovery: probe `GET /health` to decide whether a local `qwen serve`
+ * Daemon discovery: probe `GET /health` to decide whether a local `hopcode serve`
  * daemon is reachable before the side panel opens a session — so the UI can show
- * a "start `qwen serve`" hint instead of a broken chat.
+ * a "start `hopcode serve`" hint instead of a broken chat.
  */
 /** Probe the daemon's `/health` endpoint with a short timeout. */
 export async function checkDaemonHealth(config, timeoutMs = 2_000) {

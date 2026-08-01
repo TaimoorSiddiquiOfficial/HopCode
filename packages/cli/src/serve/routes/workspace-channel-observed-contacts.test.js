@@ -192,7 +192,7 @@ describe('workspace observed channel contact routes', () => {
             code: 'channel_observed_contacts_unavailable',
         });
         expect(JSON.stringify(response.body)).not.toContain(filePath);
-        expect(stderr).toHaveBeenCalledWith('qwen serve: observed channel contacts unavailable.\n');
+        expect(stderr).toHaveBeenCalledWith('hopcode serve: observed channel contacts unavailable.\n');
     });
 });
 //# sourceMappingURL=workspace-channel-observed-contacts.test.js.map

@@ -1271,7 +1271,7 @@ export function createServeApp(opts, getPort = () => opts.port, deps = {}) {
                 bridge: taskBridge,
                 boundWorkspace: workspaceCwd,
                 onError: (sessionId, err) => {
-                    process.stderr.write(`qwen serve: failed to rehydrate scheduled-task session ${sessionId}: ${err instanceof Error ? err.message : String(err)}\n`);
+                    process.stderr.write(`hopcode serve: failed to rehydrate scheduled-task session ${sessionId}: ${err instanceof Error ? err.message : String(err)}\n`);
                 },
                 // Outer catch is defense-in-depth: rehydrateScheduledTaskSessions already
                 // catches readCronTasks failures and per-session load errors internally
@@ -1279,7 +1279,7 @@ export function createServeApp(opts, getPort = () => opts.port, deps = {}) {
                 // from the function entry itself. Log rather than swallow it — a silent
                 // failure here leaves every bound task dormant with no diagnostic.
             }).catch((err) => {
-                process.stderr.write(`qwen serve: unexpected scheduled-task rehydration failure: ${err instanceof Error ? err.message : String(err)}\n`);
+                process.stderr.write(`hopcode serve: unexpected scheduled-task rehydration failure: ${err instanceof Error ? err.message : String(err)}\n`);
             });
         };
         // Every registered workspace gets its own keepalive + rehydration against

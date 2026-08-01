@@ -18,7 +18,7 @@
 // to them would enable data exfiltration.
 export const PREAPPROVED_HOSTS = new Set([
     // Qwen ecosystem
-    'qwenlm.github.io',
+    'hoptrendy.github.io',
     'qwen.readthedocs.io',
     'github.com/QwenLM',
     // Matches QwenLM raw files whether requested directly or via a github.com

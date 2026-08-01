@@ -186,7 +186,7 @@ test('opens slash menu, resume dialog, model dialog, and theme dialog @smoke', a
   await submitLocalCommand(page, '/model');
   await expect(page.locator('[data-web-shell-model-dialog]')).toBeVisible();
   await page
-    .locator('[data-web-shell-model-option][data-model-id="qwen-test-alt"]')
+    .locator('[data-web-shell-model-option][data-model-id="hopcode-test-alt"]')
     .click();
   await expect(page.locator('[data-web-shell-model-dialog]')).toHaveCount(0);
   await expect.poll(() => daemon.modelRequests().length).toBe(1);
@@ -194,7 +194,7 @@ test('opens slash menu, resume dialog, model dialog, and theme dialog @smoke', a
   expect(modelRequest.method).toBe('POST');
   expect(modelRequest.path).toBe(`/session/${resumedSessionId}/model`);
   expect(requestBodyRecord(modelRequest)).toEqual({
-    modelId: 'qwen-test-alt',
+    modelId: 'hopcode-test-alt',
   });
 
   await page.reload();
@@ -203,7 +203,7 @@ test('opens slash menu, resume dialog, model dialog, and theme dialog @smoke', a
   await expect(page.locator('[data-web-shell-model-dialog]')).toBeVisible();
   await expect(
     page.locator(
-      '[data-web-shell-model-option][data-model-id="qwen-test-alt"]',
+      '[data-web-shell-model-option][data-model-id="hopcode-test-alt"]',
     ),
   ).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('button', { name: 'close' }).click();

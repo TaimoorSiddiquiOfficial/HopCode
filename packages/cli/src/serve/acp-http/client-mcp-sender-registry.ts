@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -11,7 +11,7 @@
  * The daemon WS (parent process) holds a per-connection `ClientMcpRegistrar`
  * that carries `mcp_message` JSON-RPC frames down to the extension. But the
  * agent's `McpClientManager` — where the matching `sendSdkMcpMessage` binds —
- * runs in the `qwen --acp` CHILD process. The child reaches back up via the
+ * runs in the `hopcode --acp` CHILD process. The child reaches back up via the
  * `qwen/control/client_mcp/message` ext-method, which `BridgeClient.extMethod`
  * answers by looking up a sender for the named server.
  *

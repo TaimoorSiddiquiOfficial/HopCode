@@ -1216,7 +1216,7 @@ export class SessionManager {
             });
         }
         catch (error) {
-            sessionLog.warn(`Qwen runtime model cache unavailable: ${error instanceof Error ? error.message : String(error)}`);
+            sessionLog.warn(`hopcode runtime model cache unavailable: ${error instanceof Error ? error.message : String(error)}`);
             return;
         }
         if (changed)
@@ -1236,7 +1236,7 @@ export class SessionManager {
                 this.broadcastLlmConnectionsChanged();
         }
         catch (error) {
-            sessionLog.warn(`Qwen runtime default model update failed: ${error instanceof Error ? error.message : String(error)}`);
+            sessionLog.warn(`hopcode runtime default model update failed: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
     broadcastSkillsChanged(workspaceId, skills) {
@@ -1618,7 +1618,7 @@ export class SessionManager {
         // A single rename event lets the renderer migrate selection + per-session
         // state from previousId -> sdkSessionId in place.
         this.sendEvent({ type: 'session_id_changed', previousId, sessionId: sdkSessionId }, workspace.id);
-        sessionLog.info(`Canonicalized Qwen session id ${previousId} -> ${sdkSessionId}`);
+        sessionLog.info(`Canonicalized hopcode session id ${previousId} -> ${sdkSessionId}`);
         return managed;
     }
     externalSessionDeleteKey(workspaceId, sdkSessionId) {
@@ -4999,7 +4999,7 @@ export class SessionManager {
                             await this.refreshhopcodeConnectionDefault(sessionConn.slug, 'session model update');
                         }
                         catch (error) {
-                            sessionLog.warn(`Qwen model follow-up refresh failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`);
+                            sessionLog.warn(`hopcode model follow-up refresh failed for session ${sessionId}: ${error instanceof Error ? error.message : String(error)}`);
                         }
                     })();
                 }

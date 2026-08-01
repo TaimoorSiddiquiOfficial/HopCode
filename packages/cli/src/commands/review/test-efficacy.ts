@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review test-efficacy`: does the diff's new test actually gate the
+// `hopcode review test-efficacy`: does the diff's new test actually gate the
 // diff's new behaviour?
 //
 // Agent 5 and the test-coverage matrix ask whether a test EXISTS and whether

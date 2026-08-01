@@ -1235,7 +1235,7 @@ describe('daemonWorkerCommand', () => {
     it('rejects direct user invocation without the internal sentinel', async () => {
         mockProcessExit();
         await expect(daemonWorkerCommand.handler({ channel: ['telegram'], _: [], $0: 'qwen' })).rejects.toThrow('process.exit 1');
-        expect(mockWriteStderrLine).toHaveBeenCalledWith('[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.');
+        expect(mockWriteStderrLine).toHaveBeenCalledWith('[Channel] daemon worker failed: daemon-worker is an internal hopcode serve command.');
     });
     it('rejects the legacy static internal sentinel', async () => {
         mockProcessExit();
@@ -1256,7 +1256,7 @@ describe('daemonWorkerCommand', () => {
         expect(process.env['QWEN_CHANNEL_DAEMON_WORKER']).toBeUndefined();
         expect(process.env['QWEN_DAEMON_URL']).toBeUndefined();
         expect(process.env['QWEN_DAEMON_WORKSPACE']).toBeUndefined();
-        expect(mockWriteStderrLine).toHaveBeenCalledWith('[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.');
+        expect(mockWriteStderrLine).toHaveBeenCalledWith('[Channel] daemon worker failed: daemon-worker is an internal hopcode serve command.');
     });
     it('rejects internal sentinel without parent IPC', async () => {
         mockProcessExit();
@@ -1277,7 +1277,7 @@ describe('daemonWorkerCommand', () => {
         expect(process.env['QWEN_CHANNEL_DAEMON_WORKER']).toBeUndefined();
         expect(process.env['QWEN_DAEMON_URL']).toBeUndefined();
         expect(process.env['QWEN_DAEMON_WORKSPACE']).toBeUndefined();
-        expect(mockWriteStderrLine).toHaveBeenCalledWith('[Channel] daemon worker failed: daemon-worker is an internal qwen serve command.');
+        expect(mockWriteStderrLine).toHaveBeenCalledWith('[Channel] daemon worker failed: daemon-worker is an internal hopcode serve command.');
     });
     it('scrubs daemon connection env before validating channel selection', async () => {
         mockProcessExit();

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review resolve-anchors`: turn each finding's quoted code snippet into
+// `hopcode review resolve-anchors`: turn each finding's quoted code snippet into
 // the line number GitHub needs, by matching it against the captured diff.
 //
 // Step 7 used to post the line number the review agent reported. GitHub rejects

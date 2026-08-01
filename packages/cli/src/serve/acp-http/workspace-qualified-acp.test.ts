@@ -349,7 +349,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
     result?: {
       protocolVersion?: number;
       agentCapabilities?: {
-        _meta?: { qwen?: { workspaceCwd?: string } };
+        _meta?: { hopcode?: { workspaceCwd?: string } };
       };
     };
     error?: {
@@ -932,7 +932,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
     expect(handle!.getWorkspaceActivity('secondary-id').acpConnections).toBe(0);
     await expect(initializeWs('/acp')).resolves.toMatchObject({
       result: {
-        agentCapabilities: { _meta: { qwen: { workspaceCwd: '/ws' } } },
+        agentCapabilities: { _meta: { hopcode: { workspaceCwd: '/ws' } } },
       },
     });
   });
@@ -993,7 +993,7 @@ describe('workspace-qualified ACP (/workspaces/:workspace/acp)', () => {
       initializeWs('/workspaces/secondary-id/acp'),
     ).resolves.toMatchObject({
       result: {
-        agentCapabilities: { _meta: { qwen: { workspaceCwd: '/ws-b' } } },
+        agentCapabilities: { _meta: { hopcode: { workspaceCwd: '/ws-b' } } },
       },
     });
   });

@@ -32,8 +32,8 @@ function makeMetafile(outputs) {
       'dist/chunks/fast-path-settings.js': output({
         inputs: ['packages/cli/src/serve/fast-path-settings.ts'],
       }),
-      'dist/chunks/run-qwen-serve.js': output({
-        inputs: ['packages/cli/src/serve/run-qwen-serve.ts'],
+      'dist/chunks/run-hopcode-serve.js': output({
+        inputs: ['packages/cli/src/serve/run-hopcode-serve.ts'],
       }),
       'dist/chunks/acp-agent.js': output({
         inputs: ['packages/cli/src/acp-integration/acpAgent.ts'],
@@ -71,8 +71,8 @@ function dynamicImport(path) {
 describe('serve fast-path bundle check', () => {
   it('reports forbidden source files reached through static imports', () => {
     const metafile = makeMetafile({
-      'dist/chunks/run-qwen-serve.js': output({
-        inputs: ['packages/cli/src/serve/run-qwen-serve.ts'],
+      'dist/chunks/run-hopcode-serve.js': output({
+        inputs: ['packages/cli/src/serve/run-hopcode-serve.ts'],
         imports: [staticImport('dist/chunks/acp-runtime.js')],
       }),
       'dist/chunks/acp-runtime.js': output({
@@ -91,7 +91,7 @@ describe('serve fast-path bundle check', () => {
         outputPath: 'dist/chunks/acp-runtime.js',
         bytes: 179_129,
         importPath: [
-          'dist/chunks/run-qwen-serve.js',
+          'dist/chunks/run-hopcode-serve.js',
           'dist/chunks/acp-runtime.js',
         ],
       }),
@@ -101,15 +101,15 @@ describe('serve fast-path bundle check', () => {
       'output: dist/chunks/acp-runtime.js (179129 bytes)',
     );
     expect(diagnostic).toContain(
-      'static path: dist/chunks/run-qwen-serve.js -> dist/chunks/acp-runtime.js',
+      'static path: dist/chunks/run-hopcode-serve.js -> dist/chunks/acp-runtime.js',
     );
   });
 
   it('keeps the ACP startup profiler out of the pre-listen closure', () => {
     const metafile = makeMetafile({
-      'dist/chunks/run-qwen-serve.js': output({
+      'dist/chunks/run-hopcode-serve.js': output({
         inputs: [
-          'packages/cli/src/serve/run-qwen-serve.ts',
+          'packages/cli/src/serve/run-hopcode-serve.ts',
           'packages/cli/src/utils/acp-startup-profiler.ts',
         ],
       }),
@@ -122,9 +122,9 @@ describe('serve fast-path bundle check', () => {
 
   it('keeps the Gemini and ACP runtimes out of the pre-listen closure', () => {
     const metafile = makeMetafile({
-      'dist/chunks/run-qwen-serve.js': output({
+      'dist/chunks/run-hopcode-serve.js': output({
         inputs: [
-          'packages/cli/src/serve/run-qwen-serve.ts',
+          'packages/cli/src/serve/run-hopcode-serve.ts',
           'packages/cli/src/gemini.tsx',
           'packages/cli/src/acp-integration/acpAgent.ts',
         ],
@@ -141,8 +141,8 @@ describe('serve fast-path bundle check', () => {
 
   it('reports forbidden built package files reached through static imports', () => {
     const metafile = makeMetafile({
-      'dist/chunks/run-qwen-serve.js': output({
-        inputs: ['packages/cli/dist/src/serve/run-qwen-serve.js'],
+      'dist/chunks/run-hopcode-serve.js': output({
+        inputs: ['packages/cli/dist/src/serve/run-hopcode-serve.js'],
         imports: [staticImport('dist/chunks/acp-runtime.js')],
       }),
       'dist/chunks/acp-runtime.js': output({
@@ -182,8 +182,8 @@ describe('serve fast-path bundle check', () => {
 
   it('allows forbidden runtime files behind dynamic imports', () => {
     const metafile = makeMetafile({
-      'dist/chunks/run-qwen-serve.js': output({
-        inputs: ['packages/cli/src/serve/run-qwen-serve.ts'],
+      'dist/chunks/run-hopcode-serve.js': output({
+        inputs: ['packages/cli/src/serve/run-hopcode-serve.ts'],
         imports: [dynamicImport('dist/chunks/bridge.js')],
       }),
       'dist/chunks/bridge.js': output({
@@ -196,8 +196,8 @@ describe('serve fast-path bundle check', () => {
 
   it('ignores external imports in the static closure', () => {
     const metafile = makeMetafile({
-      'dist/chunks/run-qwen-serve.js': output({
-        inputs: ['packages/cli/src/serve/run-qwen-serve.ts'],
+      'dist/chunks/run-hopcode-serve.js': output({
+        inputs: ['packages/cli/src/serve/run-hopcode-serve.ts'],
         imports: [
           {
             path: 'dist/chunks/acp-runtime.js',
@@ -216,8 +216,8 @@ describe('serve fast-path bundle check', () => {
 
   it('reports vendor packages reached through the core runtime chunk', () => {
     const metafile = makeMetafile({
-      'dist/chunks/run-qwen-serve.js': output({
-        inputs: ['packages/cli/src/serve/run-qwen-serve.ts'],
+      'dist/chunks/run-hopcode-serve.js': output({
+        inputs: ['packages/cli/src/serve/run-hopcode-serve.ts'],
         imports: [staticImport('dist/chunks/core-runtime.js')],
       }),
       'dist/chunks/core-runtime.js': output({
@@ -242,15 +242,15 @@ describe('serve fast-path bundle check', () => {
       'fzf vendor package',
     ]);
     expect(offenders[0].importPath).toEqual([
-      'dist/chunks/run-qwen-serve.js',
+      'dist/chunks/run-hopcode-serve.js',
       'dist/chunks/core-runtime.js',
     ]);
   });
 
   it('matches normalized source suffixes without accepting partial names', () => {
     const metafile = makeMetafile({
-      'dist\\chunks\\run-qwen-serve.js': output({
-        inputs: ['..\\..\\packages\\cli\\src\\serve\\run-qwen-serve.ts'],
+      'dist\\chunks\\run-hopcode-serve.js': output({
+        inputs: ['..\\..\\packages\\cli\\src\\serve\\run-hopcode-serve.ts'],
         imports: [staticImport('dist\\chunks\\false-positive.js')],
       }),
       'dist\\chunks\\false-positive.js': output({
@@ -258,8 +258,8 @@ describe('serve fast-path bundle check', () => {
       }),
     });
 
-    expect(normalizeMetafilePath('dist\\chunks\\run-qwen-serve.js')).toBe(
-      'dist/chunks/run-qwen-serve.js',
+    expect(normalizeMetafilePath('dist\\chunks\\run-hopcode-serve.js')).toBe(
+      'dist/chunks/run-hopcode-serve.js',
     );
     expect(findServeFastPathBundleOffenders(metafile)).toEqual([]);
   });
@@ -283,8 +283,8 @@ describe('serve fast-path bundle check', () => {
 
   it('reports each matched input for the same forbidden label and output', () => {
     const metafile = makeMetafile({
-      'dist/chunks/run-qwen-serve.js': output({
-        inputs: ['packages/cli/src/serve/run-qwen-serve.ts'],
+      'dist/chunks/run-hopcode-serve.js': output({
+        inputs: ['packages/cli/src/serve/run-hopcode-serve.ts'],
         imports: [staticImport('dist/chunks/acp-runtime.js')],
       }),
       'dist/chunks/acp-runtime.js': output({
@@ -315,8 +315,8 @@ describe('serve fast-path bundle check', () => {
       const metafilePath = writeMetafile(
         tempDir,
         makeMetafile({
-          'dist/chunks/run-qwen-serve.js': output({
-            inputs: ['packages/cli/src/serve/run-qwen-serve.ts'],
+          'dist/chunks/run-hopcode-serve.js': output({
+            inputs: ['packages/cli/src/serve/run-hopcode-serve.ts'],
             imports: [staticImport('dist/chunks/acp-runtime.js')],
           }),
           'dist/chunks/acp-runtime.js': output({
@@ -383,8 +383,8 @@ describe('serve fast-path bundle check', () => {
       writeMetafile(
         tempDir,
         makeMetafile({
-          'dist/chunks/run-qwen-serve.js': output({
-            inputs: ['packages/cli/src/serve/run-qwen-serve.ts'],
+          'dist/chunks/run-hopcode-serve.js': output({
+            inputs: ['packages/cli/src/serve/run-hopcode-serve.ts'],
             imports: [staticImport('dist/chunks/acp-runtime.js')],
           }),
           'dist/chunks/acp-runtime.js': output({

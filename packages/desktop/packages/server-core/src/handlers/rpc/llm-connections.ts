@@ -168,7 +168,7 @@ export function registerLlmConnectionsHandlers(
           await getModelRefreshService().refreshNow(hopcodeConnection.slug);
         } catch (err) {
           deps.platform.logger?.warn(
-            `Qwen model refresh after provider connect failed: ${err instanceof Error ? err.message : err}`,
+            `hopcode model refresh after provider connect failed: ${err instanceof Error ? err.message : err}`,
           );
         }
 
@@ -214,7 +214,7 @@ export function registerLlmConnectionsHandlers(
           await getModelRefreshService().refreshNow(hopcodeConnection.slug);
         } catch (err) {
           deps.platform.logger?.warn(
-            `Qwen model refresh after setup failed: ${err instanceof Error ? err.message : err}`,
+            `hopcode model refresh after setup failed: ${err instanceof Error ? err.message : err}`,
           );
         }
 
@@ -385,7 +385,7 @@ export function registerLlmConnectionsHandlers(
             .refreshNow(slug)
             .catch((err) => {
               deps.platform.logger?.warn(
-                `Qwen model refresh failed during validation: ${err instanceof Error ? err.message : err}`,
+                `hopcode model refresh failed during validation: ${err instanceof Error ? err.message : err}`,
               );
             });
         }

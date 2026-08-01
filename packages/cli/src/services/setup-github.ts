@@ -194,7 +194,7 @@ export async function setupGithub(
     releaseTag = await getLatestGitHubRelease(options.proxy);
   } catch (error) {
     writeStderrLine(
-      `qwen setup-github: failed to determine latest hopcode-action release: ${
+      `hopcode setup-github: failed to determine latest hopcode-action release: ${
         error instanceof Error ? error.message : String(error)
       }`,
     );

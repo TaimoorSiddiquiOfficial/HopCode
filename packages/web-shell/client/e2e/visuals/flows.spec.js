@@ -28,7 +28,7 @@ test('flow: open the slash menu and switch model', async ({ browser, }, testInfo
         await expect(page.locator('[data-web-shell-model-dialog]')).toBeVisible();
         await beat(page);
         await page
-            .locator('[data-web-shell-model-option][data-model-id="qwen-test-alt"]')
+            .locator('[data-web-shell-model-option][data-model-id="hopcode-test-alt"]')
             .click();
         await expect(page.locator('[data-web-shell-model-dialog]')).toHaveCount(0);
         // Confirm the switch actually reached the daemon (not just the dialog UI

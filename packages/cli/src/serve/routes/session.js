@@ -1773,7 +1773,7 @@ export function registerSessionRoutes(app, deps) {
                 bridge: runtime.bridge,
                 coordinator: archiveCoordinator,
                 onError: ({ phase, sessionId, error }) => {
-                    writeStderrLine(`qwen serve: ${phase}Session failed for ${safeLogValue(sessionId)}: ${safeLogValue(error)}`);
+                    writeStderrLine(`hopcode serve: ${phase}Session failed for ${safeLogValue(sessionId)}: ${safeLogValue(error)}`);
                 },
             });
             res.status(200).json(result);
@@ -2252,7 +2252,7 @@ export function registerSessionRoutes(app, deps) {
             }
             if (sendSessionOrganizationError(res, err))
                 return;
-            writeStderrLine(`qwen serve: failed to list sessions for workspace ${safeLogValue(key)} (options=${safeLogValue(JSON.stringify({
+            writeStderrLine(`hopcode serve: failed to list sessions for workspace ${safeLogValue(key)} (options=${safeLogValue(JSON.stringify({
                 view: req.query['view'],
                 archiveState: req.query['archiveState'],
                 group: req.query['group'],
@@ -2281,7 +2281,7 @@ export function registerSessionRoutes(app, deps) {
             res.status(200).json(info);
         }
         catch (err) {
-            writeStderrLine(`qwen serve: failed to read session-info for workspace ${safeLogValue(key)}: ${safeLogValue(err instanceof Error ? err.message : String(err))}`);
+            writeStderrLine(`hopcode serve: failed to read session-info for workspace ${safeLogValue(key)}: ${safeLogValue(err instanceof Error ? err.message : String(err))}`);
             res.status(500).json({
                 error: 'Failed to read session info',
                 code: 'session_info_failed',

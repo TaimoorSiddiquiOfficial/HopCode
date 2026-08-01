@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -292,7 +292,7 @@ function registerScheduledTaskCrudRoutes(
       // reading as empty — surface it instead of hiding the user's tasks
       // behind a silent [].
       writeStderrLine(
-        `qwen serve: GET ${base} failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: GET ${base} failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({
         error: 'Failed to read scheduled tasks (the tasks file may be corrupt)',
@@ -427,7 +427,7 @@ function registerScheduledTaskCrudRoutes(
         }
       } catch (err) {
         writeStderrLine(
-          `qwen serve: POST ${base} failed to create the task's session: ${err instanceof Error ? err.message : String(err)}`,
+          `hopcode serve: POST ${base} failed to create the task's session: ${err instanceof Error ? err.message : String(err)}`,
         );
         res.status(500).json({
           error: "Failed to create the task's session",
@@ -482,7 +482,7 @@ function registerScheduledTaskCrudRoutes(
     } catch (err) {
       await rollbackSession();
       writeStderrLine(
-        `qwen serve: POST ${base} failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: POST ${base} failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({
         error: 'Failed to create scheduled task',
@@ -680,7 +680,7 @@ function registerScheduledTaskCrudRoutes(
       });
     } catch (err) {
       writeStderrLine(
-        `qwen serve: PATCH ${base}/${id} failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: PATCH ${base}/${id} failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({
         error: 'Failed to update scheduled task',
@@ -761,7 +761,7 @@ function registerScheduledTaskCrudRoutes(
       });
     } catch (err) {
       writeStderrLine(
-        `qwen serve: DELETE ${base}/${id} failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: DELETE ${base}/${id} failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({
         error: 'Failed to delete scheduled task',
@@ -853,7 +853,7 @@ function registerScheduledTaskCrudRoutes(
       });
     } catch (err) {
       writeStderrLine(
-        `qwen serve: POST ${base}/${id}/run failed: ${err instanceof Error ? err.message : String(err)}`,
+        `hopcode serve: POST ${base}/${id}/run failed: ${err instanceof Error ? err.message : String(err)}`,
       );
       res.status(500).json({
         error: 'Failed to record scheduled task run',

@@ -325,7 +325,7 @@ describe('parseReviewArgs — case and single-dash disposal (bug: guessed where 
  * Wiring-level tests: the real yargs command, not the pure function. The
  * pure-function table cannot see transport failures — the documented
  * positional invocation broke on any raw string that begins with a flag
- * (`qwen review parse-args '--effort low'` → `Unknown argument`), and every
+ * (`hopcode review parse-args '--effort low'` → `Unknown argument`), and every
  * unit test kept passing while it did.
  */
 describe('parseArgsCommand wiring', () => {

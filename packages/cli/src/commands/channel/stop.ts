@@ -77,7 +77,7 @@ export const stopCommand: CommandModule<unknown, StopArgs> = {
 
     if (info.owner === 'serve') {
       writeStderrLine(
-        `Channel service is managed by qwen serve (PID ${info.pid}). Stop qwen serve to stop channels.`,
+        `Channel service is managed by hopcode serve (PID ${info.pid}). Stop hopcode serve to stop channels.`,
       );
       process.exit(1);
     }

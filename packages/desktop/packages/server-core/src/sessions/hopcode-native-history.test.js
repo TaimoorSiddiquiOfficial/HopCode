@@ -983,7 +983,7 @@ describe('Qwen native history loading', () => {
         expect(persisted?.messages[0]?.content).toBe('这个是什么图片');
         expect(persisted?.messages[0]?.attachments).toEqual([attachment]);
     });
-    it('flushes queued local visual overlays for Qwen sessions with attachments', async () => {
+    it('flushes queued local visual overlays for hopcode sessions with attachments', async () => {
         const workspaceRoot = mkdtempSync(join(tmpdir(), 'craft-managed-workspace-'));
         tempRoots.push(workspaceRoot);
         const sessionId = '260602-qwen-queued-visual-overlay';
@@ -1565,7 +1565,7 @@ describe('Qwen native history loading', () => {
         expect(loaded?.messages[1]?.content).toContain('```image-preview');
         expect(loaded?.messageCount).toBeUndefined();
     });
-    it('repairs legacy Qwen sessions with orphaned image attachments', async () => {
+    it('repairs legacy hopcode sessions with orphaned image attachments', async () => {
         const workspaceRoot = mkdtempSync(join(tmpdir(), 'craft-managed-workspace-'));
         const projectRoot = mkdtempSync(join(tmpdir(), 'hopcode-project-'));
         tempRoots.push(workspaceRoot, projectRoot);
@@ -2160,7 +2160,7 @@ describe('Qwen native history loading', () => {
             sdkSessionId: sessionId,
             sdkCwd: workspaceRoot,
             workingDirectory: workspaceRoot,
-            name: 'editable qwen session',
+            name: 'editable hopcode session',
             createdAt: timestamp,
             lastUsedAt: timestamp,
             lastMessageAt: timestamp,
@@ -2219,7 +2219,7 @@ describe('Qwen native history loading', () => {
             sdkSessionId: sessionId,
             sdkCwd: workspaceRoot,
             workingDirectory: workspaceRoot,
-            name: 'editable qwen session',
+            name: 'editable hopcode session',
             createdAt: timestamp,
             lastUsedAt: timestamp,
             lastMessageAt: timestamp,
@@ -2277,7 +2277,7 @@ describe('Qwen native history loading', () => {
             sdkSessionId: sessionId,
             sdkCwd: workspaceRoot,
             workingDirectory: workspaceRoot,
-            name: 'legacy qwen session',
+            name: 'legacy hopcode session',
             createdAt: timestamp,
             lastUsedAt: timestamp,
             lastMessageAt: timestamp,
@@ -2294,7 +2294,7 @@ describe('Qwen native history loading', () => {
             },
         });
         const nativeMessages = [
-            { id: 'qwen-1', role: 'user', content: 'legacy qwen session', timestamp },
+            { id: 'qwen-1', role: 'user', content: 'legacy hopcode session', timestamp },
             {
                 id: 'qwen-2',
                 role: 'assistant',
@@ -2325,7 +2325,7 @@ describe('Qwen native history loading', () => {
             sdkSessionId: sessionId,
             sdkCwd: workspaceRoot,
             workingDirectory: workspaceRoot,
-            name: 'legacy qwen session',
+            name: 'legacy hopcode session',
             createdAt: timestamp,
             lastUsedAt: timestamp,
             lastMessageAt: timestamp,

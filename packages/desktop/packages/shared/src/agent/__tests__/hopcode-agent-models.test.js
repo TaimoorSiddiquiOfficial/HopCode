@@ -16,7 +16,7 @@ function createAgent(cwd, onAvailableModelsUpdate) {
         },
         session: {
             id: 'session-qwen',
-            name: 'Qwen Session',
+            name: 'hopcode session',
             workspaceRootPath: cwd,
             createdAt: Date.now(),
             lastUsedAt: Date.now(),

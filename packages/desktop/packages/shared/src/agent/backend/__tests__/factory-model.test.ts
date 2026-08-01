@@ -17,7 +17,7 @@ function makeConnection(overrides: Partial<LlmConnection> = {}): LlmConnection {
 }
 
 describe('backend model resolution', () => {
-  it('lets provider-managed Qwen sessions resolve without a fallback model', () => {
+  it('lets provider-managed hopcode sessions resolve without a fallback model', () => {
     expect(resolveModelForProvider('hopcode', undefined, makeConnection())).toBe('')
   })
 

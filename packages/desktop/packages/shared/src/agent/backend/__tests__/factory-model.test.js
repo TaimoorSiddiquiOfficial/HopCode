@@ -11,7 +11,7 @@ function makeConnection(overrides = {}) {
     };
 }
 describe('backend model resolution', () => {
-    it('lets provider-managed Qwen sessions resolve without a fallback model', () => {
+    it('lets provider-managed hopcode sessions resolve without a fallback model', () => {
         expect(resolveModelForProvider('hopcode', undefined, makeConnection())).toBe('');
     });
     it('keeps explicit managed model values', () => {

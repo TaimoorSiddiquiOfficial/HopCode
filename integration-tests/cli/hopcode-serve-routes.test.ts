@@ -396,7 +396,7 @@ describe('hopcode serve — capabilities envelope', () => {
   });
 });
 
-describe('qwen serve — transcript paging route', () => {
+describe('hopcode serve — transcript paging route', () => {
   const getTranscript = (sessionId: string, query = '') =>
     fetch(`${base}/session/${sessionId}/transcript${query}`, {
       headers: { Authorization: `Bearer ${TOKEN}` },
@@ -528,7 +528,7 @@ describe('qwen serve — transcript paging route', () => {
   });
 });
 
-describe('qwen serve — POST /session validation + concurrent coalescing', () => {
+describe('hopcode serve — POST /session validation + concurrent coalescing', () => {
   it('rejects relative cwd', async () => {
     const res = await fetch(`${base}/session`, {
       method: 'POST',
@@ -747,7 +747,7 @@ describe('hopcode serve — cancel + list', () => {
   });
 });
 
-describe('qwen serve — GET /goals', () => {
+describe('hopcode serve — GET /goals', () => {
   const getGoals = async () => {
     const res = await fetch(`${base}/goals`, {
       headers: { Authorization: `Bearer ${TOKEN}` },
@@ -763,7 +763,7 @@ describe('qwen serve — GET /goals', () => {
 
   it('probes each live session over the bridge without reporting a goal', async () => {
     // The real round trip: serve -> bridge -> `sessionGoalGet` ext method in
-    // the `qwen --acp` child -> back. A live session with no `/goal` must come
+    // the `hopcode --acp` child -> back. A live session with no `/goal` must come
     // back as "no goal" rather than an error or a phantom entry.
     const session = await client.createOrAttachSession({
       workspaceCwd: REPO_ROOT,
@@ -787,7 +787,7 @@ describe('qwen serve — GET /goals', () => {
   });
 });
 
-describe('qwen serve — DELETE /session/:id', () => {
+describe('hopcode serve — DELETE /session/:id', () => {
   it('204 on explicit close', async () => {
     const session = await client.createOrAttachSession({
       workspaceCwd: REPO_ROOT,

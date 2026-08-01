@@ -37,14 +37,14 @@ function safeLogValue(raw) {
 export function parseLastEventId(raw, logPrefix = '') {
     if (typeof raw !== 'string' || !/^\d+$/.test(raw)) {
         if (typeof raw === 'string' && raw.length > 0) {
-            writeStderrLine(`qwen serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
+            writeStderrLine(`hopcode serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
                 `(not a decimal integer)`);
         }
         return undefined;
     }
     const n = Number.parseInt(raw, 10);
     if (!Number.isFinite(n) || n > Number.MAX_SAFE_INTEGER) {
-        writeStderrLine(`qwen serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
+        writeStderrLine(`hopcode serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
             `(exceeds Number.MAX_SAFE_INTEGER)`);
         return undefined;
     }

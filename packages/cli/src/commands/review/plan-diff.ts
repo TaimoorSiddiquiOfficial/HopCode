@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review plan-diff`: partition an already-captured diff file into review
+// `hopcode review plan-diff`: partition an already-captured diff file into review
 // chunks and emit the same plan `fetch-pr` emits.
 //
 // Step 3B's chunk agents are defined as "one per entry in `chunks[]`", and only

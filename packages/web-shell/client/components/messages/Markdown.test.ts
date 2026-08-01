@@ -192,7 +192,7 @@ describe('qwen-session:// links', () => {
     c.remove();
   });
 
-  it('renders qwen session references as inert text in readonly mode', () => {
+  it('renders hopcode session references as inert text in readonly mode', () => {
     const container = document.createElement('div');
     document.body.appendChild(container);
     const root = createRoot(container);

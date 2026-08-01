@@ -7,7 +7,7 @@
  * `create_sub_session` tool — spawns a FRESH top-level sub-session (a sibling
  * of the current session, its own transcript) and runs a prompt in it.
  *
- * Daemon-only: it works only when running under `qwen serve`, where the ACP
+ * Daemon-only: it works only when running under `hopcode serve`, where the ACP
  * session wires a {@link SubSessionSpawner} that routes the request to the
  * daemon bridge (`spawnOrAttach` + `sendPrompt`). In interactive TUI / headless
  * there is no bridge, so no spawner is wired and the tool reports itself

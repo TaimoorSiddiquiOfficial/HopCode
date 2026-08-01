@@ -1195,7 +1195,7 @@ export class WebViewProvider {
       }
     } catch (error) {
       logger.error(
-        '[WebViewProvider] Failed to sync qwen config to VSCode settings:',
+        '[WebViewProvider] Failed to sync hopcode config to VSCode settings:',
         error,
       );
     }
@@ -1319,7 +1319,7 @@ export class WebViewProvider {
           });
         }
 
-        // Load messages from the current Qwen session
+        // Load messages from the current hopcode session
         const sessionReady = await this.loadCurrentSessionMessages(options);
 
         if (sessionReady) {
@@ -1578,7 +1578,7 @@ export class WebViewProvider {
   }
 
   /**
-   * Load messages from current Qwen session
+   * Load messages from current hopcode session
    * Skips session restoration and creates a new session directly
    */
   private async loadCurrentSessionMessages(options?: {
@@ -2505,7 +2505,7 @@ export class WebViewProvider {
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
       const workingDir = workspaceFolder?.uri.fsPath || process.cwd();
 
-      // Create new Qwen session via agent manager
+      // Create new hopcode session via agent manager
       await this.agentManager.createNewSession(workingDir, { forceNew: true });
       this.messageHandler.setCurrentConversationId(null);
 

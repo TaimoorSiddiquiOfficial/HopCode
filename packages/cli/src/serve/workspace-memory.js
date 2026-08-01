@@ -14,7 +14,7 @@ const MAX_MEMORY_CONTENT_BYTES = 1024 * 1024;
 function sendWorkspaceMemoryWriteError(res, err, options) {
     const { route, scope, mode } = options;
     if (err instanceof WorkspaceMemoryWriteTimeoutError) {
-        writeStderrLine(`qwen serve: ${route} timeout — file lock at ` +
+        writeStderrLine(`hopcode serve: ${route} timeout — file lock at ` +
             `${err.filePath} did not acquire within ${err.timeoutMs}ms ` +
             `(stalled FS / OneDrive / NFS)`);
         const debug = isServeDebugMode();
@@ -31,7 +31,7 @@ function sendWorkspaceMemoryWriteError(res, err, options) {
         return;
     }
     if (err instanceof WorkspaceMemoryFileTooLargeError) {
-        writeStderrLine(`qwen serve: ${route} refused — existing file ` +
+        writeStderrLine(`hopcode serve: ${route} refused — existing file ` +
             `${err.filePath} is ${err.bytes} bytes (cap ${err.limit})`);
         const debug = isServeDebugMode();
         res.status(413).json({
@@ -47,7 +47,7 @@ function sendWorkspaceMemoryWriteError(res, err, options) {
         });
         return;
     }
-    writeStderrLine(`qwen serve: ${route} failed (scope=${scope} mode=${mode}): ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`);
+    writeStderrLine(`hopcode serve: ${route} failed (scope=${scope} mode=${mode}): ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`);
     const osCode = err && typeof err === 'object' && 'code' in err
         ? err.code
         : undefined;
@@ -204,7 +204,7 @@ export function mountWorkspaceQualifiedMemoryRoutes(app, deps) {
             res.status(200).json(await collectStatus(runtime.workspaceCwd));
         }
         catch (err) {
-            writeStderrLine(`qwen serve: GET /workspaces/:workspace/memory failed: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`);
+            writeStderrLine(`hopcode serve: GET /workspaces/:workspace/memory failed: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`);
             res.status(500).json({
                 error: 'Failed to discover workspace memory',
                 code: 'memory_discovery_failed',

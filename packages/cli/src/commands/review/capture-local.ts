@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review capture-local`: capture the working tree's diff — staged,
+// `hopcode review capture-local`: capture the working tree's diff — staged,
 // unstaged, and untracked — and partition it into review chunks, in one pass.
 // The local counterpart of `fetch-pr`.
 //

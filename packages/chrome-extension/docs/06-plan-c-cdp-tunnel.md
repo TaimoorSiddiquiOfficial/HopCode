@@ -41,7 +41,7 @@
 ## 2. 架构
 
 ```
-DevTools MCP adapter           qwen serve daemon              扩展(MV3)        真实 tab
+DevTools MCP adapter           hopcode serve daemon              扩展(MV3)        真实 tab
  puppeteer.connect   browser级  ┌ /cdp WS endpoint ┐  reverse  cdp-bridge   chrome.
  ({browserWS}) ───CDP───────▶  │ CdpBrowserEmulator│   WS /acp  chrome.      debugger
                                │ ①本地应答browser域│ cdp_command .debugger ──▶ Page/DOM
@@ -94,7 +94,7 @@ DevTools MCP adapter           qwen serve daemon              扩展(MV3)       
 - **Phase 0 — spike（0.5–1 天）**：独立脚本起最小 `/cdp` + ExtensionTransport 4 命令合成，跑*未改的*上游 adapter 调一次 `take_snapshot`，**确认它在 `McpContext.from()` 抛 `CDPSession creation failed.`** → 钉死 fork 范围。
 - **Phase 1 — MVP（5–8 天）**：单 tab `take_snapshot`/`click` 跑通。
   - daemon 新增 `packages/cli/src/serve/cdp-tunnel/{cdp-ws,cdp-browser-emulator,cdp-reverse-link}.ts`。
-  - daemon 改 `acp-http/index.ts`（upgrade 加 `/cdp` 分支，复用 auth/CSRF/origin）+ reverse WS 加 `isCdpFrameType` 守卫；`run-qwen-serve.ts`/`server.ts`/`serve/types.ts`/`serve/capabilities.ts` 加 `cdpTunnelOverWs` flag（仿 `clientMcpOverWs`，默认 OFF）。
+  - daemon 改 `acp-http/index.ts`（upgrade 加 `/cdp` 分支，复用 auth/CSRF/origin）+ reverse WS 加 `isCdpFrameType` 守卫；`run-hopcode-serve.ts`/`server.ts`/`serve/types.ts`/`serve/capabilities.ts` 加 `cdpTunnelOverWs` flag（仿 `clientMcpOverWs`，默认 OFF）。
   - 扩展新增 `cdp-bridge.ts`（attach 活动 tab、全 domain 透传、`onDetach`→`cdp_detach`），复用现有 daemon-WS client；与 `chrome_network_debugger_*` 互斥门。
   - 新帧：`cdp_attach`/`cdp_attached`/`cdp_command`/`cdp_result`/`cdp_event`/`cdp_detach`。
   - cdp-mcp patch（见 §5）。

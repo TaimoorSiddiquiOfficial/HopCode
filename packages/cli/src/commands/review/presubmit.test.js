@@ -241,7 +241,7 @@ describe('presubmitCommand', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         ensureAuthenticatedMock.mockReturnValue(undefined);
-        currentUserMock.mockReturnValue('qwen-code-ci-bot');
+        currentUserMock.mockReturnValue('hopcode-ci-bot');
         ghMock.mockReturnValue('contributor');
         ghApiAllMock.mockReturnValue([]);
         ghApiAllNestedMock.mockReturnValue([]);

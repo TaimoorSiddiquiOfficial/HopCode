@@ -758,7 +758,7 @@ export function createExtensionsController(
               ...(warnings.length > 0 ? { warnings } : {}),
             });
             writeStderrLine(
-              `qwen serve: [${boundWorkspace}] extensions ${operation}: refreshed ${result.refreshed} session(s), ${result.failed} failed`,
+              `hopcode serve: [${boundWorkspace}] extensions ${operation}: refreshed ${result.refreshed} session(s), ${result.failed} failed`,
             );
           } catch (refreshErr) {
             const message = sanitizeDaemonMessage(
@@ -792,7 +792,7 @@ export function createExtensionsController(
               });
             } catch (broadcastErr) {
               writeStderrLine(
-                `qwen serve: [${boundWorkspace}] extensions ${operation}: failed to broadcast refresh failure: ${sanitizeDaemonMessage(
+                `hopcode serve: [${boundWorkspace}] extensions ${operation}: failed to broadcast refresh failure: ${sanitizeDaemonMessage(
                   broadcastErr instanceof Error
                     ? broadcastErr.message
                     : String(broadcastErr),
@@ -800,7 +800,7 @@ export function createExtensionsController(
               );
             }
             writeStderrLine(
-              `qwen serve: [${boundWorkspace}] extensions ${operation}: mutation succeeded but refresh failed: ${message}`,
+              `hopcode serve: [${boundWorkspace}] extensions ${operation}: mutation succeeded but refresh failed: ${message}`,
             );
           }
         }
@@ -875,7 +875,7 @@ export function createExtensionsController(
           }
           try {
             writeStderrLine(
-              `qwen serve: [${boundWorkspace}] extensions ${operation}: ${error}`,
+              `hopcode serve: [${boundWorkspace}] extensions ${operation}: ${error}`,
             );
           } catch {
             // Keep queued background work from surfacing as unhandledRejection.
@@ -902,7 +902,7 @@ export function createExtensionsController(
           });
         } catch (broadcastErr) {
           writeStderrLine(
-            `qwen serve: [${boundWorkspace}] extensions ${operation}: failed to broadcast failure: ${sanitizeDaemonMessage(
+            `hopcode serve: [${boundWorkspace}] extensions ${operation}: failed to broadcast failure: ${sanitizeDaemonMessage(
               broadcastErr instanceof Error
                 ? broadcastErr.message
                 : String(broadcastErr),
@@ -911,7 +911,7 @@ export function createExtensionsController(
         }
         try {
           writeStderrLine(
-            `qwen serve: [${boundWorkspace}] extensions ${operation}: background task failed: ${message}`,
+            `hopcode serve: [${boundWorkspace}] extensions ${operation}: background task failed: ${message}`,
           );
         } catch {
           // Keep queued background work from surfacing as unhandledRejection.

@@ -27,7 +27,7 @@ function createAgent(permissionMode: 'ask' | 'allow-all' = 'ask'): QwenAgent {
       }),
       session: createMockSession({
         id: 'session-qwen',
-        name: 'Qwen Session',
+        name: 'hopcode session',
         workspaceRootPath: '/tmp/qwen-permission-tests',
         permissionMode,
       }),

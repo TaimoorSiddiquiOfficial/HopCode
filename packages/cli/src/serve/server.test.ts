@@ -60,9 +60,9 @@ import {
   type PrepareExtensionInstallOptions,
   type PreparedExtensionMutation,
   type SessionListItem,
-} from '@qwen-code/qwen-code-core';
-import * as qwenCore from '@qwen-code/qwen-code-core';
-import type { DaemonStatusProvider } from '@qwen-code/acp-bridge';
+} from '@hopcode/qwen-code-core';
+import * as qwenCore from '@hopcode/qwen-code-core';
+import type { DaemonStatusProvider } from '@hopcode/acp-bridge';
 import {
   CancelSentinelCollisionError,
   InvalidClientIdError,
@@ -14982,7 +14982,7 @@ describe('createServeApp', () => {
             parts: [{ text: 'export response' }],
           },
           cwd: wsDir,
-          model: 'qwen-test',
+          model: 'hopcode-test',
         },
       ];
       const body = records.map((record) => JSON.stringify(record)).join('\n');

@@ -355,7 +355,7 @@ async function listAllPersistedSummaries(
       (sessions.length >= MAX_ORGANIZED_SESSIONS && cursor !== undefined)
     ) {
       writeStderrLine(
-        `qwen serve: organized session list truncated at ${MAX_ORGANIZED_SESSIONS} sessions`,
+        `hopcode serve: organized session list truncated at ${MAX_ORGANIZED_SESSIONS} sessions`,
       );
       truncated = true;
       break;
@@ -528,7 +528,7 @@ async function listOrganizedWorkspaceSessionsForResponse(
     } catch (error) {
       liveMergeFailed = true;
       writeStderrLine(
-        `qwen serve: organized session list live merge failed; using persisted sessions only: ${
+        `hopcode serve: organized session list live merge failed; using persisted sessions only: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
@@ -629,7 +629,7 @@ async function listWorkspaceSessionsByMetadataForResponse(
     } catch (error) {
       liveMergeFailed = true;
       writeStderrLine(
-        `qwen serve: session metadata filter live merge failed; using persisted sessions only: ${
+        `hopcode serve: session metadata filter live merge failed; using persisted sessions only: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );

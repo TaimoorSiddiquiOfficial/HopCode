@@ -343,7 +343,7 @@ export function sendBridgeError(res, err, ctx, daemonLog) {
         // safe (canonicalized at boot from operator-controlled
         // `--workspace` / `process.cwd()`) but quoted symmetrically for
         // readability.
-        writeStderrLine(`qwen serve: workspace_mismatch (POST /session): ` +
+        writeStderrLine(`hopcode serve: workspace_mismatch (POST /session): ` +
             `runtime bound to ${JSON.stringify(err.bound)}, ` +
             `rejected ${JSON.stringify(err.requested)}`);
         res.status(400).json({

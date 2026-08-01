@@ -716,7 +716,7 @@ export function mountWorkspaceQualifiedAgentsRoutes(
       res.status(200).json(status);
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/agents failed: ${
+        `hopcode serve: GET /workspaces/:workspace/agents failed: ${
           err instanceof Error ? (err.stack ?? err.message) : String(err)
         }`,
       );
@@ -761,7 +761,7 @@ export function mountWorkspaceQualifiedAgentsRoutes(
       } catch (err) {
         if (sendCreateAgentError(res, err, config.name)) return;
         writeStderrLine(
-          `qwen serve: POST /workspaces/:workspace/agents failed: ${
+          `hopcode serve: POST /workspaces/:workspace/agents failed: ${
             err instanceof Error ? (err.stack ?? err.message) : String(err)
           }`,
         );
@@ -775,7 +775,7 @@ export function mountWorkspaceQualifiedAgentsRoutes(
       const created = await manager.loadSubagent(config.name, level);
       if (!created) {
         writeStderrLine(
-          `qwen serve: agent_create_reload_failed (name=${safeLogValue(config.name)} ` +
+          `hopcode serve: agent_create_reload_failed (name=${safeLogValue(config.name)} ` +
             `level=${level}) — file likely persisted on disk; check ` +
             '`GET /workspaces/:workspace/agents` for a phantom entry',
         );
@@ -817,7 +817,7 @@ export function mountWorkspaceQualifiedAgentsRoutes(
       res.status(200).json(toDetail(config));
     } catch (err) {
       writeStderrLine(
-        `qwen serve: GET /workspaces/:workspace/agents/${safeLogValue(agentType)} failed: ${
+        `hopcode serve: GET /workspaces/:workspace/agents/${safeLogValue(agentType)} failed: ${
           err instanceof Error ? (err.stack ?? err.message) : String(err)
         }`,
       );
@@ -881,7 +881,7 @@ export function mountWorkspaceQualifiedAgentsRoutes(
       } catch (err) {
         if (sendUpdateAgentError(res, err, agentType)) return;
         writeStderrLine(
-          `qwen serve: POST /workspaces/:workspace/agents/${safeLogValue(agentType)} failed: ${
+          `hopcode serve: POST /workspaces/:workspace/agents/${safeLogValue(agentType)} failed: ${
             err instanceof Error ? (err.stack ?? err.message) : String(err)
           }`,
         );
@@ -895,7 +895,7 @@ export function mountWorkspaceQualifiedAgentsRoutes(
       const updated = await manager.loadSubagent(agentType, existing.level);
       if (!updated) {
         writeStderrLine(
-          `qwen serve: agent_update_reload_failed (name=${safeLogValue(agentType)} ` +
+          `hopcode serve: agent_update_reload_failed (name=${safeLogValue(agentType)} ` +
             `level=${existing.level}) — disk write completed; check ` +
             `\`GET /workspaces/:workspace/agents/${safeLogValue(agentType)}\` for the new state`,
         );
@@ -959,7 +959,7 @@ export function mountWorkspaceQualifiedAgentsRoutes(
           }
         }
         writeStderrLine(
-          `qwen serve: DELETE /workspaces/:workspace/agents/${safeLogValue(agentType)} failed: ${
+          `hopcode serve: DELETE /workspaces/:workspace/agents/${safeLogValue(agentType)} failed: ${
             err instanceof Error ? (err.stack ?? err.message) : String(err)
           }`,
         );
@@ -974,7 +974,7 @@ export function mountWorkspaceQualifiedAgentsRoutes(
         try {
           await fs.access(existing.filePath);
           writeStderrLine(
-            `qwen serve: DELETE /workspaces/:workspace/agents/${safeLogValue(agentType)} partial — ` +
+            `hopcode serve: DELETE /workspaces/:workspace/agents/${safeLogValue(agentType)} partial — ` +
               `remaining=${existing.level}:${existing.filePath}`,
           );
           res.status(500).json({

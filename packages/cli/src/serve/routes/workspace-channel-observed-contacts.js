@@ -37,7 +37,7 @@ function sendContacts(req, res, workspaceCwd) {
         res.status(200).json(store.list({ freshWithinSeconds }));
     }
     catch {
-        process.stderr.write('qwen serve: observed channel contacts unavailable.\n');
+        process.stderr.write('hopcode serve: observed channel contacts unavailable.\n');
         res.status(500).json({
             error: 'Observed channel contacts are unavailable.',
             code: 'channel_observed_contacts_unavailable',

@@ -32,7 +32,7 @@ describe('main CI failure issue workflow', () => {
     expect(workflow).toContain("issues: 'write'");
     expect(workflow).toContain('CI_DEV_BOT_PAT');
     expect(workflow).toContain(
-      'AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || \'qwen-code-dev-bot\' }}"',
+      'AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || \'hopcode-dev-bot\' }}"',
     );
     expect(workflow).toContain("BUG_LABEL: 'type/bug'");
     expect(workflow).toContain(
@@ -48,7 +48,7 @@ describe('main CI failure issue workflow', () => {
   });
 
   it('deduplicates failures for the same commit and includes run context', () => {
-    expect(workflow).toContain('qwen-main-ci-failure:${HEAD_SHA}');
+    expect(workflow).toContain('hopcode-main-ci-failure:${HEAD_SHA}');
     expect(workflow).toContain('gh issue list');
     expect(workflow).toContain('gh issue create');
     expect(workflow).toContain('apply_autofix_route "${existing_issue}"');

@@ -186,7 +186,7 @@ async function listAllPersistedSummaries(sessionService, archiveState) {
         }
         if (page.items.length > remaining ||
             (sessions.length >= MAX_ORGANIZED_SESSIONS && cursor !== undefined)) {
-            writeStderrLine(`qwen serve: organized session list truncated at ${MAX_ORGANIZED_SESSIONS} sessions`);
+            writeStderrLine(`hopcode serve: organized session list truncated at ${MAX_ORGANIZED_SESSIONS} sessions`);
             truncated = true;
             break;
         }
@@ -291,7 +291,7 @@ async function listOrganizedWorkspaceSessionsForResponse(bridge, workspaceCwd, o
         }
         catch (error) {
             liveMergeFailed = true;
-            writeStderrLine(`qwen serve: organized session list live merge failed; using persisted sessions only: ${error instanceof Error ? error.message : String(error)}`);
+            writeStderrLine(`hopcode serve: organized session list live merge failed; using persisted sessions only: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
     const filtered = [...bySessionId.values()].filter((session) => {
@@ -361,7 +361,7 @@ async function listWorkspaceSessionsByMetadataForResponse(bridge, workspaceCwd, 
         }
         catch (error) {
             liveMergeFailed = true;
-            writeStderrLine(`qwen serve: session metadata filter live merge failed; using persisted sessions only: ${error instanceof Error ? error.message : String(error)}`);
+            writeStderrLine(`hopcode serve: session metadata filter live merge failed; using persisted sessions only: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
     const matches = [...bySessionId.values()]

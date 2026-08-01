@@ -710,7 +710,7 @@ export class SessionMessageHandler extends BaseMessageHandler {
      */
     async handleNewHopCodeSession() {
         try {
-            logger.log('[SessionMessageHandler] Creating new Qwen session...');
+            logger.log('[SessionMessageHandler] Creating new hopcode session...');
             // Ensure connection (auth) before creating a new session
             if (!this.agentManager.isConnected) {
                 const proceeded = await this.promptAuth('You need to configure your provider before creating a new session.');

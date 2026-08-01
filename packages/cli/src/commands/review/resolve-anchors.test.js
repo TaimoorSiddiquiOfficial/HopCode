@@ -62,7 +62,7 @@ describe('resolve-anchors (command boundary)', () => {
         dir = mkdtempSync(join(tmpdir(), 'resolve-anchors-'));
     });
     afterEach(() => rmSync(dir, { recursive: true, force: true }));
-    /** Drive the real yargs handler, as `qwen review resolve-anchors` does. */
+    /** Drive the real yargs handler, as `hopcode review resolve-anchors` does. */
     function run(findings) {
         const diff = join(dir, 'diff.txt');
         const input = join(dir, 'in.json');

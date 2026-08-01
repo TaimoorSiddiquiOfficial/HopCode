@@ -1301,7 +1301,7 @@ describe('createDaemonWorkspaceService', () => {
                 reason: 'timeout',
             });
             expect(preheatAcpChild).toHaveBeenCalledTimes(2);
-            expect(mockWriteStderrLine).toHaveBeenCalledWith('qwen serve: ACP preheat timed out after 1ms');
+            expect(mockWriteStderrLine).toHaveBeenCalledWith('hopcode serve: ACP preheat timed out after 1ms');
         });
         it('returns error when preheat fails before the deadline', async () => {
             const preheatAcpChild = vi

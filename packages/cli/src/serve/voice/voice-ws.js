@@ -157,7 +157,7 @@ export function createVoiceWsConnectionHandler(boundWorkspace, deps = {}) {
     return (ws) => {
         const admission = (deps.acquireVoiceLease ?? acquireLocalLease)();
         if (admission.kind === 'rejected') {
-            writeStderrLine('qwen serve: voice websocket rejected');
+            writeStderrLine('hopcode serve: voice websocket rejected');
             try {
                 if (admission.reason === 'draining') {
                     ws.close(1012, 'Workspace removed');
@@ -175,13 +175,13 @@ export function createVoiceWsConnectionHandler(boundWorkspace, deps = {}) {
             return;
         }
         const lease = admission.lease;
-        writeStderrLine('qwen serve: voice websocket accepted');
+        writeStderrLine('hopcode serve: voice websocket accepted');
         let released = false;
         const releaseSlot = () => {
             if (!released) {
                 released = true;
                 lease.release();
-                writeStderrLine('qwen serve: voice websocket slot released');
+                writeStderrLine('hopcode serve: voice websocket slot released');
             }
         };
         let state = 'idle';

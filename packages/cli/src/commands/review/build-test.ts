@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review build-test`: run the project's own build and tests over the code
+// `hopcode review build-test`: run the project's own build and tests over the code
 // the PR actually changed, and report what happened as data.
 //
 // Agent 7's brief was a paragraph. It named `npm run build`, then `npm test`, and

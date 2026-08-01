@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -2418,7 +2418,7 @@ export function registerSessionRoutes(
           coordinator: archiveCoordinator,
           onError: ({ phase, sessionId, error }) => {
             writeStderrLine(
-              `qwen serve: ${phase}Session failed for ${safeLogValue(sessionId)}: ${safeLogValue(error)}`,
+              `hopcode serve: ${phase}Session failed for ${safeLogValue(sessionId)}: ${safeLogValue(error)}`,
             );
           },
         });
@@ -2979,7 +2979,7 @@ export function registerSessionRoutes(
         }
         if (sendSessionOrganizationError(res, err)) return;
         writeStderrLine(
-          `qwen serve: failed to list sessions for workspace ${safeLogValue(
+          `hopcode serve: failed to list sessions for workspace ${safeLogValue(
             key,
           )} (options=${safeLogValue(
             JSON.stringify({
@@ -3024,7 +3024,7 @@ export function registerSessionRoutes(
         res.status(200).json(info);
       } catch (err) {
         writeStderrLine(
-          `qwen serve: failed to read session-info for workspace ${safeLogValue(
+          `hopcode serve: failed to read session-info for workspace ${safeLogValue(
             key,
           )}: ${safeLogValue(err instanceof Error ? err.message : String(err))}`,
         );

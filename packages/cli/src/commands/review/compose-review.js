@@ -122,7 +122,7 @@ export function composeReview(input) {
             // have read it — and relaunching it would produce another agent that
             // cannot either. Do not call this a whiff; the prompt is the bug.
             // The rebuild command goes to stderr with the other remediation, not into
-            // this line: the line lands in the posted body, and `qwen review
+            // this line: the line lands in the posted body, and `hopcode review
             // agent-prompt` is not something a PR author can run.
             for (const label of cov.blindAgents) {
                 unreviewed.push(`${label} — launched with a prompt that never named the diff file, ` +

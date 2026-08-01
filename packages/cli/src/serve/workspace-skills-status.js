@@ -76,7 +76,7 @@ async function buildWorkspaceSkillsStatus(workspaceCwd, managers) {
     }
     catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        writeStderrLine(`qwen serve: daemon-local skills enumeration failed for ${workspaceCwd}: ${message}`);
+        writeStderrLine(`hopcode serve: daemon-local skills enumeration failed for ${workspaceCwd}: ${message}`);
         return {
             v: STATUS_SCHEMA_VERSION,
             workspaceCwd,

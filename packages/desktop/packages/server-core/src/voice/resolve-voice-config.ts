@@ -68,7 +68,7 @@ export function normalizeBaseUrl(raw: string): string {
 }
 
 /**
- * Resolve the global qwen config dir, mirroring core's
+ * Resolve the global hopcode config dir, mirroring core's
  * `Storage.getGlobalQwenDir()` so desktop voice reads the SAME `~/.hopcode`
  * credentials the qwen CLI writes. QWEN_HOME is normalized exactly as core does:
  * a leading `~`/`~/` expands to homedir() and a relative value resolves to an

@@ -144,7 +144,7 @@ export async function handleList(argv) {
             writeStdoutLine(JSON.stringify(toJsonItem(item)));
         }
         // Emit hasMore hint via stderr so it never contaminates the stdout JSON
-        // stream, keeping pipelines like `qwen sessions list --json | jq …` safe.
+        // stream, keeping pipelines like `hopcode sessions list --json | jq …` safe.
         if (result.items.length > 0 && result.hasMore) {
             writeStderrLine(`Note: ${result.items.length} sessions shown, more available. Use --limit to show more.`);
         }

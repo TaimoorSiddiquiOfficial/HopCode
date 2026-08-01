@@ -104,7 +104,7 @@ export function registerWorkspaceQualifiedPermissionsRoutes(app, deps) {
                 .json(buildPermissionSettings(loadSettings(runtime.workspaceCwd)));
         }
         catch (err) {
-            writeStderrLine(`qwen serve: GET /workspaces/:workspace/permissions error: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: GET /workspaces/:workspace/permissions error: ${err instanceof Error ? err.message : String(err)}`);
             res.status(500).json({
                 error: 'Failed to load permission rules',
                 code: 'internal_error',
@@ -168,7 +168,7 @@ export function registerWorkspaceQualifiedPermissionsRoutes(app, deps) {
                 });
                 return;
             }
-            writeStderrLine(`qwen serve: POST /workspaces/:workspace/permissions ACP error (ruleType=${ruleType}, workspace=${runtime.workspaceCwd}): ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: POST /workspaces/:workspace/permissions ACP error (ruleType=${ruleType}, workspace=${runtime.workspaceCwd}): ${err instanceof Error ? err.message : String(err)}`);
             res.status(500).json({
                 error: 'Failed to update permission rules',
                 code: 'permission_update_failed',

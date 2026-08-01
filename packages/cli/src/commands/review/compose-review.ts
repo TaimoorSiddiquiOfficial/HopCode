@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// `qwen review compose-review`: deterministic event selection and body
+// `hopcode review compose-review`: deterministic event selection and body
 // composition for the /review skill's Step 7 submission.
 //
 // This logic used to be prose — a C/S table, three event-capping overrides,
@@ -277,7 +277,7 @@ export function composeReview(input: ComposeReviewInput): ComposeReviewResult {
       // have read it — and relaunching it would produce another agent that
       // cannot either. Do not call this a whiff; the prompt is the bug.
       // The rebuild command goes to stderr with the other remediation, not into
-      // this line: the line lands in the posted body, and `qwen review
+      // this line: the line lands in the posted body, and `hopcode review
       // agent-prompt` is not something a PR author can run.
       for (const label of cov.blindAgents) {
         unreviewed.push(

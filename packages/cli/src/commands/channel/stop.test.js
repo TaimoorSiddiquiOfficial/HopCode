@@ -47,7 +47,7 @@ describe('stopCommand', () => {
         await expect(invokeStop()).rejects.toThrow('process.exit: 1');
         expect(mockSignalService).not.toHaveBeenCalled();
         expect(mockRemoveServiceInfo).not.toHaveBeenCalled();
-        expect(mockWriteStderrLine).toHaveBeenCalledWith(expect.stringContaining('managed by qwen serve'));
+        expect(mockWriteStderrLine).toHaveBeenCalledWith(expect.stringContaining('managed by hopcode serve'));
     });
     it('stops daemon-managed channels remotely without touching the pidfile', async () => {
         mockStopChannelWorker.mockResolvedValueOnce({ changed: true });

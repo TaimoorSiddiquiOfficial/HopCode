@@ -39,7 +39,7 @@ let lastReloadSnapshotSeeded = false;
 /**
  * Returns the set of normalized .env file paths that count as user-level.
  *
- * User-level paths cover the home `.env` and the global Qwen config dir
+ * User-level paths cover the home `.env` and the global hopcode config dir
  * `.env` (which respects `HOPCODE_HOME`). When `HOPCODE_HOME` redirects elsewhere,
  * the legacy `<homedir>/.hopcode/.env` is also included so credentials users
  * left there continue to load (and the trust check in untrusted workspaces

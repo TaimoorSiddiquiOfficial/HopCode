@@ -210,7 +210,7 @@ describe('EventBus', () => {
     ).toBeUndefined();
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining(
-        'qwen serve: EventBus subscriber evicted {"reason":"queue_overflow"',
+        'hopcode serve: EventBus subscriber evicted {"reason":"queue_overflow"',
       ),
     );
     expect(bus.subscriberCount).toBe(0);
@@ -241,7 +241,7 @@ describe('EventBus', () => {
     });
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining(
-        'qwen serve: EventBus slow_client_warning {"queueSize":6,"maxQueued":8',
+        'hopcode serve: EventBus slow_client_warning {"queueSize":6,"maxQueued":8',
       ),
     );
     abort.abort();
@@ -444,7 +444,7 @@ describe('EventBus', () => {
     ).toBeGreaterThan(0);
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining(
-        'qwen serve: EventBus subscriber evicted {"reason":"queue_bytes_overflow"',
+        'hopcode serve: EventBus subscriber evicted {"reason":"queue_bytes_overflow"',
       ),
     );
     expect(bus.subscriberCount).toBe(0);
@@ -602,7 +602,7 @@ describe('EventBus', () => {
     expect(second.value.data).toBe('tail');
     expect(process.stderr.write).toHaveBeenCalledWith(
       expect.stringContaining(
-        'qwen serve: EventBus event sizing failed {"type":"foo"}',
+        'hopcode serve: EventBus event sizing failed {"type":"foo"}',
       ),
     );
     expect(bus.subscriberCount).toBe(1);

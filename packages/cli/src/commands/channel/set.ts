@@ -60,7 +60,7 @@ interface SetArgs {
 
 export const setCommand: CommandModule<unknown, SetArgs> = {
   command: 'set <names..>',
-  describe: 'Set the channel selection for a running qwen serve daemon',
+  describe: 'Set the channel selection for a running hopcode serve daemon',
   builder: (yargs) =>
     yargs
       .positional('names', {

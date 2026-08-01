@@ -5,11 +5,11 @@
  *
  * Daemon connection config for the daemon-direct architecture (issue #5626).
  *
- * The extension talks directly to a local `qwen serve` daemon instead of a
+ * The extension talks directly to a local `hopcode serve` daemon instead of a
  * native messaging host. Loopback binds are auth-free so `token` is optional;
  * both fields are overridable via `chrome.storage.local`.
  */
-/** `qwen serve`'s default bind (see `qwen serve --port`, default 4170). */
+/** `hopcode serve`'s default bind (see `hopcode serve --port`, default 4170). */
 export const DEFAULT_DAEMON_BASE_URL = 'http://127.0.0.1:4170';
 const STORAGE_KEY = 'qwen.daemon';
 /* global console */

@@ -164,7 +164,7 @@ function isServeDebugLoggingEnabled() {
 function writeServeDebugLine(message) {
     if (!isServeDebugLoggingEnabled())
         return;
-    writeStderrLine(`qwen serve debug: ${message}`);
+    writeStderrLine(`hopcode serve debug: ${message}`);
 }
 const MAX_DISPLAY_NAME_LENGTH = 256;
 /**
@@ -675,7 +675,7 @@ export function createAcpSessionBridge(opts) {
             reservation.release();
         }
         catch (err) {
-            opts.onDiagnosticLine?.(`qwen serve: fresh session admission release failed: ${err instanceof Error ? err.message : String(err)}`, 'warn');
+            opts.onDiagnosticLine?.(`hopcode serve: fresh session admission release failed: ${err instanceof Error ? err.message : String(err)}`, 'warn');
         }
     };
     const emitSessionLifecycle = (event) => {
@@ -683,7 +683,7 @@ export function createAcpSessionBridge(opts) {
             opts.sessionLifecycle?.(event);
         }
         catch (err) {
-            const message = `qwen serve: session lifecycle callback failed: ${err instanceof Error ? err.message : String(err)}`;
+            const message = `hopcode serve: session lifecycle callback failed: ${err instanceof Error ? err.message : String(err)}`;
             opts.onDiagnosticLine?.(message, 'warn');
             writeStderrLine(message);
         }
@@ -1029,7 +1029,7 @@ export function createAcpSessionBridge(opts) {
     // Build the mediator before the BridgeClient so the agent's
     // `requestPermission` callback can hand the record straight in.
     // Audit publisher fallback: when the host doesn't supply one
-    // (cli/serve/run-qwen-serve.ts wraps a real `PermissionAuditRing`
+    // (cli/serve/run-hopcode-serve.ts wraps a real `PermissionAuditRing`
     // backed publisher in production), we use the canonical no-op
     // fallback so the mediator can still run for embedded callers /
     // tests without an audit consumer.
@@ -1067,7 +1067,7 @@ export function createAcpSessionBridge(opts) {
     const teeServeDebugLine = (message) => {
         writeServeDebugLine(message);
         if (opts.onDiagnosticLine && isServeDebugLoggingEnabled()) {
-            opts.onDiagnosticLine(`qwen serve debug: ${message}`, 'info');
+            opts.onDiagnosticLine(`hopcode serve debug: ${message}`, 'info');
         }
     };
     // Coalesces concurrent `spawnOrAttach` calls under single-scope and
@@ -1133,7 +1133,7 @@ export function createAcpSessionBridge(opts) {
             await closeSessionImpl(entry.sessionId, undefined, {
                 reason: 'last_client_detached',
             }).catch((err) => {
-                writeStderrLine(`qwen serve: close-on-attach-rollback failed for ` +
+                writeStderrLine(`hopcode serve: close-on-attach-rollback failed for ` +
                     `${JSON.stringify(entry.sessionId)}: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`);
             });
         }
@@ -1147,7 +1147,7 @@ export function createAcpSessionBridge(opts) {
         return clientId;
     };
     /**
-     * Get-or-create the daemon's single `qwen --acp` channel. N sessions
+     * Get-or-create the daemon's single `hopcode --acp` channel. N sessions
      * multiplex onto it via `connection.newSession()`. Concurrent callers
      * coalesce through `inFlightChannelSpawn` so we never spawn two
      * children. Wires up the one-and-only `channel.exited` cleanup on
@@ -1190,7 +1190,7 @@ export function createAcpSessionBridge(opts) {
                 return undefined;
             }, (sessionId) => sessionId ? pendingRestoreEvents.get(sessionId) : undefined, permissionMediator, permissionTimeoutMs, maxPendingPerSession, 
             // Forward the optional `BridgeFileSystem` injection so
-            // production `qwen serve` can wire the `WorkspaceFileSystem`
+            // production `hopcode serve` can wire the `WorkspaceFileSystem`
             // adapter into BridgeClient's fs proxy methods. Tests + Mode A
             // consumers + channels / IDE companion omit it; BridgeClient
             // falls back to its inline fs proxy.
@@ -1325,7 +1325,7 @@ export function createAcpSessionBridge(opts) {
                 // `session_died` frame and disconnects, the daemon's
                 // child-stderr forwarder emits whatever the child wrote before
                 // dying (often nothing on a SIGKILL / segfault), and operators
-                // can't tell from `qwen serve`'s own output that the agent
+                // can't tell from `hopcode serve`'s own output that the agent
                 // process is gone.
                 //
                 // Suppressed during `shuttingDown` because the operator
@@ -1621,7 +1621,7 @@ export function createAcpSessionBridge(opts) {
                 }
                 if (parentSessionPersisted === false) {
                     // One diagnostic covering both the cause and the API consequence.
-                    writeStderrLine(`qwen serve: parentSessionId for ${entry.sessionId} was not persisted ` +
+                    writeStderrLine(`hopcode serve: parentSessionId for ${entry.sessionId} was not persisted ` +
                         `(${lastParentErr ?? 'unknown'}) — the parent link is live-only ` +
                         `until restart (reported to the caller via parentSessionPersisted=false)`);
                 }
@@ -1645,7 +1645,7 @@ export function createAcpSessionBridge(opts) {
                 }
                 catch (err) {
                     sourcePersisted = false;
-                    writeStderrLine(`qwen serve: source metadata for ${entry.sessionId} was not persisted ` +
+                    writeStderrLine(`hopcode serve: source metadata for ${entry.sessionId} was not persisted ` +
                         `(${err instanceof Error ? err.message : String(err)}) — the source is live-only ` +
                         `until restart (reported to the caller via sourcePersisted=false)`);
                 }
@@ -3493,7 +3493,7 @@ export function createAcpSessionBridge(opts) {
                     void entry.connection
                         .extMethod(TODO_STOP_GUARD_QUEUE_RELEASE_METHOD, { sessionId })
                         .catch((error) => {
-                        writeStderrLine(`qwen serve: Todo Stop Guard queued-prompt release failed for ` +
+                        writeStderrLine(`hopcode serve: Todo Stop Guard queued-prompt release failed for ` +
                             `${JSON.stringify(sessionId)}: ${error instanceof Error ? error.message : String(error)}`);
                     });
                 }, { once: true });
@@ -4086,12 +4086,12 @@ export function createAcpSessionBridge(opts) {
                         releaseAdmissionOnce();
                     }
                     catch (restoreErr) {
-                        writeStderrLine(`qwen serve: branchSession load failed for ${result.newSessionId}, attempting cleanup...`);
+                        writeStderrLine(`hopcode serve: branchSession load failed for ${result.newSessionId}, attempting cleanup...`);
                         try {
                             await ci.connection.extMethod(SERVE_CONTROL_EXT_METHODS.sessionClose, { sessionId: result.newSessionId, cwd: boundWorkspace });
                         }
                         catch (cleanupErr) {
-                            writeStderrLine(`qwen serve: branchSession cleanup of ${result.newSessionId} failed: ${cleanupErr instanceof Error ? cleanupErr.message : cleanupErr}`);
+                            writeStderrLine(`hopcode serve: branchSession cleanup of ${result.newSessionId} failed: ${cleanupErr instanceof Error ? cleanupErr.message : cleanupErr}`);
                         }
                         throw restoreErr;
                     }
@@ -4222,7 +4222,7 @@ export function createAcpSessionBridge(opts) {
                             .then((res) => {
                             const r = res;
                             if (r && r.persisted === false) {
-                                writeStderrLine(`qwen serve: displayName for ${sessionId} was not persisted`);
+                                writeStderrLine(`hopcode serve: displayName for ${sessionId} was not persisted`);
                             }
                         })
                             .catch((err) => {

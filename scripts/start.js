@@ -64,10 +64,10 @@ const env = {
   ...process.env,
   CLI_VERSION: pkg.version,
   DEV: 'true',
-  // The entry a `qwen …` subprocess should call to reach THIS build. This
+  // The entry a `hopcode …` subprocess should call to reach THIS build. This
   // launcher runs `node packages/cli` directly — no bin wrapper in the chain, so
   // nothing else publishes it, and a /review run from `npm start` would fall
-  // back to whatever `qwen` PATH resolves to. Assignment, not `||=`, for the
+  // back to whatever `hopcode` PATH resolves to. Assignment, not `||=`, for the
   // same reason as scripts/dev.js: an inherited value is another session's CLI.
   HOPCODE_CODE_CLI: fileURLToPath(import.meta.url),
 };

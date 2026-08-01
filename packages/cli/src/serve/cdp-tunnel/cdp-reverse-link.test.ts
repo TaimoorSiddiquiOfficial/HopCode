@@ -184,12 +184,12 @@ describe('CdpReverseLink (Plan C #5626)', () => {
       p.catch(() => undefined);
 
       expect(log).toHaveBeenCalledWith(
-        'qwen serve: /cdp forwarded command id=2 method=Page.navigate to extension',
+        'hopcode serve: /cdp forwarded command id=2 method=Page.navigate to extension',
       );
 
       await vi.advanceTimersByTimeAsync(30_000);
       expect(log).toHaveBeenCalledWith(
-        'qwen serve: /cdp still waiting for command id=2 method=Page.navigate after 30000ms',
+        'hopcode serve: /cdp still waiting for command id=2 method=Page.navigate after 30000ms',
       );
 
       await vi.advanceTimersByTimeAsync(20_000);

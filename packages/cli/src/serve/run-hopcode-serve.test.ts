@@ -1385,7 +1385,7 @@ describe('runHopCodeServe pre-listen bridge option validation', () => {
         { bridge: makeRuntimeBridge() },
       ),
     ).rejects.toThrow(/Injected bridge dependencies/);
-    expect(stdoutWrites.join('')).not.toContain('qwen serve listening on');
+    expect(stdoutWrites.join('')).not.toContain('hopcode serve listening on');
   });
 });
 
@@ -1478,7 +1478,7 @@ describe('runHopCodeServe runtime startup failures', () => {
 
   async function readBrowserMcpFeatureFlagsForEnv(
     raw: string | undefined,
-    origin = 'chrome-extension://qwen-test-extension',
+    origin = 'chrome-extension://hopcode-test-extension',
     cdpMcpCommand?: string,
   ) {
     tmpDir = fs.realpathSync(
@@ -1628,7 +1628,7 @@ describe('runHopCodeServe runtime startup failures', () => {
   it('advertises browser automation MCP when the external CDP adapter command is set', async () => {
     const features = await readBrowserMcpFeatureFlagsForEnv(
       undefined,
-      'chrome-extension://qwen-test-extension',
+      'chrome-extension://hopcode-test-extension',
       '/opt/qwen-cdp-mcp-adapter',
     );
 
@@ -1684,7 +1684,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         workspace: tmpDir,
         maxSessions: 1,
         serveWebShell: false,
-        allowOrigins: ['chrome-extension://qwen-test-extension'],
+        allowOrigins: ['chrome-extension://hopcode-test-extension'],
       },
       { resolveOnListen: true },
     );
@@ -7182,7 +7182,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
           channelServicePidfile: pidfile,
         },
       ),
-    ).rejects.toThrow('Channel service is already running under qwen serve');
+    ).rejects.toThrow('Channel service is already running under hopcode serve');
 
     expect(workerFactory).not.toHaveBeenCalled();
     expect(pidfile.reserveServeServiceInfo).not.toHaveBeenCalled();
@@ -7662,7 +7662,7 @@ describe('runHopCodeServe startup observability', () => {
         workspace: tmpDir,
         maxSessions: 1,
         serveWebShell: false,
-        allowOrigins: ['chrome-extension://qwen-test-extension'],
+        allowOrigins: ['chrome-extension://hopcode-test-extension'],
       },
       { bridge: makeFakeBridge() },
     );
@@ -7679,7 +7679,7 @@ describe('runHopCodeServe startup observability', () => {
         /hopcode serve: startup timing: processToListenMs=\d+ runHopCodeServeToListenMs=\d+/,
       );
       expect(stderrWrites.join('')).not.toContain(
-        'qwen serve: client-hosted MCP tools are accepted over the WebSocket without auth.',
+        'hopcode serve: client-hosted MCP tools are accepted over the WebSocket without auth.',
       );
 
       expect(await readStartup(handle)).toMatchObject({

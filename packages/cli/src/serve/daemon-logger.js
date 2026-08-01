@@ -700,7 +700,7 @@ function createConcreteLogger(input) {
             input.issues.add('queue_overflow');
             if (!overflowEpisode) {
                 overflowEpisode = true;
-                input.stderr('qwen serve: daemon log queue limit reached; dropping file copies until capacity recovers');
+                input.stderr('hopcode serve: daemon log queue limit reached; dropping file copies until capacity recovers');
             }
         }
     };
@@ -708,13 +708,13 @@ function createConcreteLogger(input) {
         input.issues.add('rotation_failed');
         input.state.nextRotationRetryAt =
             input.monotonicNow() + input.policy.rotationRetryIntervalMs;
-        input.warnOnce(`rotation:${message}`, `qwen serve: daemon log rotation failed; ${message}${error
+        input.warnOnce(`rotation:${message}`, `hopcode serve: daemon log rotation failed; ${message}${error
             ? `: ${error instanceof Error ? error.message : String(error)}`
             : ''}`);
     };
     const markRetentionFailure = (error) => {
         input.issues.add('retention_failed');
-        input.warnOnce('retention', `qwen serve: daemon log retention cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+        input.warnOnce('retention', `hopcode serve: daemon log retention cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
     };
     const fileMutationAllowed = () => !input.state.poisoned &&
         !input.family.lease.compromised &&
@@ -854,7 +854,7 @@ function createConcreteLogger(input) {
         catch (error) {
             input.state.poisoned = true;
             input.issues.add('write_failed');
-            input.warnOnce('write-failed', `qwen serve: daemon log write failed; file logging disabled for this run: ${error instanceof Error ? error.message : String(error)}`);
+            input.warnOnce('write-failed', `hopcode serve: daemon log write failed; file logging disabled for this run: ${error instanceof Error ? error.message : String(error)}`);
             return 'unknown';
         }
     };
@@ -889,7 +889,7 @@ function createConcreteLogger(input) {
             catch (error) {
                 input.state.poisoned = true;
                 input.issues.add('write_failed');
-                input.warnOnce('queue-failed', `qwen serve: daemon log queue failed; file logging disabled for this run: ${error instanceof Error ? error.message : String(error)}`);
+                input.warnOnce('queue-failed', `hopcode serve: daemon log queue failed; file logging disabled for this run: ${error instanceof Error ? error.message : String(error)}`);
             }
             finally {
                 onSettled?.(outcome);
@@ -959,7 +959,7 @@ function createConcreteLogger(input) {
         }
         else {
             await input.family.releaseLease().catch((error) => {
-                input.warnOnce('release-failed', `qwen serve: daemon log lease release failed: ${error instanceof Error ? error.message : String(error)}`);
+                input.warnOnce('release-failed', `hopcode serve: daemon log lease release failed: ${error instanceof Error ? error.message : String(error)}`);
             });
         }
     };
@@ -984,7 +984,7 @@ function createConcreteLogger(input) {
             acceptingFileRecords = false;
             const finalizer = finalize().catch((error) => {
                 try {
-                    input.warnOnce('close-failed', `qwen serve: daemon log close failed: ${error instanceof Error ? error.message : String(error)}`);
+                    input.warnOnce('close-failed', `hopcode serve: daemon log close failed: ${error instanceof Error ? error.message : String(error)}`);
                 }
                 catch {
                     // close() is non-rejecting even if stderr itself is unavailable.
@@ -994,7 +994,7 @@ function createConcreteLogger(input) {
             const deadline = new Promise((resolve) => {
                 timeout = setTimeout(() => {
                     try {
-                        input.warnOnce('close-timeout', `qwen serve: daemon log close drain exceeded ${input.policy.closeDrainBudgetMs}ms; ownership will release after pending I/O settles or process exit`);
+                        input.warnOnce('close-timeout', `hopcode serve: daemon log close drain exceeded ${input.policy.closeDrainBudgetMs}ms; ownership will release after pending I/O settles or process exit`);
                     }
                     catch {
                         // close() is non-rejecting even if stderr itself is unavailable.
@@ -1052,7 +1052,7 @@ export async function initDaemonLogger(opts) {
     }
     catch (error) {
         issues.add('init_failed');
-        warnOnce('init', `qwen serve: daemon log disabled — init failed: ${error instanceof Error ? error.message : String(error)}`);
+        warnOnce('init', `hopcode serve: daemon log disabled — init failed: ${error instanceof Error ? error.message : String(error)}`);
         return createStderrOnlyLogger({
             runId,
             daemonId: computeDaemonId(pid),
@@ -1066,7 +1066,7 @@ export async function initDaemonLogger(opts) {
         issues.add('lease_compromised');
         if (currentState)
             currentState.poisoned = true;
-        warnOnce('lease-compromised', `qwen serve: daemon log lease compromised; file logging disabled for this run: ${error.message}`);
+        warnOnce('lease-compromised', `hopcode serve: daemon log lease compromised; file logging disabled for this run: ${error.message}`);
     };
     const tryFamily = async (family) => {
         let state;
@@ -1090,7 +1090,7 @@ export async function initDaemonLogger(opts) {
                 archiveAvailable = false;
                 if (familyMutationAllowed()) {
                     issues.add('rotation_failed');
-                    warnOnce(`archive-init:${family.mode}`, `qwen serve: daemon log archive unavailable; active file will remain bounded: ${error instanceof Error ? error.message : String(error)}`);
+                    warnOnce(`archive-init:${family.mode}`, `hopcode serve: daemon log archive unavailable; active file will remain bounded: ${error instanceof Error ? error.message : String(error)}`);
                 }
             }
             state = {
@@ -1172,13 +1172,13 @@ export async function initDaemonLogger(opts) {
                     issues.add('retention_failed');
                     state.nextRotationRetryAt =
                         monotonicNow() + policy.rotationRetryIntervalMs;
-                    warnOnce('startup-retention', `qwen serve: daemon log retention cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+                    warnOnce('startup-retention', `hopcode serve: daemon log retention cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
                 }
             }
             return concrete.logger;
         }
         catch (error) {
-            warnOnce(`family-init:${family.mode}`, `qwen serve: daemon ${family.mode} log initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+            warnOnce(`family-init:${family.mode}`, `hopcode serve: daemon ${family.mode} log initialization failed: ${error instanceof Error ? error.message : String(error)}`);
             return undefined;
         }
     };
@@ -1214,7 +1214,7 @@ export async function initDaemonLogger(opts) {
                     mutationAllowed: () => !stableLease.compromised && !stableLease.released,
                     onRetentionError: (error) => {
                         issues.add('retention_failed');
-                        warnOnce('fallback-retention', `qwen serve: daemon fallback log cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+                        warnOnce('fallback-retention', `hopcode serve: daemon fallback log cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
                     },
                 });
             }
@@ -1225,16 +1225,16 @@ export async function initDaemonLogger(opts) {
             await stableLease.release();
         }
         catch (error) {
-            warnOnce('stable-release', `qwen serve: daemon stable log lease release failed; trying fallback: ${error instanceof Error ? error.message : String(error)}`);
+            warnOnce('stable-release', `hopcode serve: daemon stable log lease release failed; trying fallback: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
     catch (error) {
         if (isErrno(error, 'ELOCKED')) {
-            warnOnce('stable-contention', `qwen serve: daemon stable log is owned by another daemon instance; using a fallback log for runId=${runId}`);
+            warnOnce('stable-contention', `hopcode serve: daemon stable log is owned by another daemon instance; using a fallback log for runId=${runId}`);
         }
         else {
             issues.add('init_failed');
-            warnOnce('stable-lock', `qwen serve: daemon stable log unavailable; trying a fallback: ${error instanceof Error ? error.message : String(error)}`);
+            warnOnce('stable-lock', `hopcode serve: daemon stable log unavailable; trying a fallback: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
     let fallbackFamily;
@@ -1288,14 +1288,14 @@ export async function initDaemonLogger(opts) {
             }
         }
         catch (error) {
-            warnOnce('fallback-locator', `qwen serve: daemon fallback locator update failed; use ${activeFallbackFamily.activePath}: ${error instanceof Error ? error.message : String(error)}`);
+            warnOnce('fallback-locator', `hopcode serve: daemon fallback locator update failed; use ${activeFallbackFamily.activePath}: ${error instanceof Error ? error.message : String(error)}`);
         }
         return fallbackLogger;
     }
     catch (error) {
         issues.add('init_failed');
         await fallbackFamily?.releaseLease().catch(() => { });
-        warnOnce('fallback-init', `qwen serve: daemon log disabled — fallback init failed: ${error instanceof Error ? error.message : String(error)}`);
+        warnOnce('fallback-init', `hopcode serve: daemon log disabled — fallback init failed: ${error instanceof Error ? error.message : String(error)}`);
         return createStderrOnlyLogger({
             runId,
             daemonId: computeDaemonId(pid),

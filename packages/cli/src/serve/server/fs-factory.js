@@ -68,7 +68,7 @@ export function resolveBoundWorkspacesFromIdeEnv(primaryWorkspace, ideWorkspaceP
         primary = canonicalizeWorkspace(primaryWorkspace);
     }
     catch (err) {
-        writeStderrLine(`qwen serve: failed to canonicalize IDE workspace paths, using primary only: ${err}`);
+        writeStderrLine(`hopcode serve: failed to canonicalize IDE workspace paths, using primary only: ${err}`);
         return [primary];
     }
     for (const workspace of parseIdeWorkspacePathEnv(ideWorkspacePath)) {
@@ -79,12 +79,12 @@ export function resolveBoundWorkspacesFromIdeEnv(primaryWorkspace, ideWorkspaceP
             envCanonicals.push(canonical);
         }
         catch (err) {
-            writeStderrLine(`qwen serve: skipping IDE workspace root that failed to canonicalize: ${workspace} (${err})`);
+            writeStderrLine(`hopcode serve: skipping IDE workspace root that failed to canonicalize: ${workspace} (${err})`);
         }
     }
     if (envCanonicals.length > 0 &&
         !envCanonicals.some((workspace) => isWithinRoot(primary, workspace) || isWithinRoot(workspace, primary))) {
-        writeStderrLine('qwen serve: ignoring stale IDE workspace paths that do not overlap ' +
+        writeStderrLine('hopcode serve: ignoring stale IDE workspace paths that do not overlap ' +
             'the selected workspace');
         return [primary];
     }
@@ -128,7 +128,7 @@ function dropNestedWorkspacesPreservingPrimary(workspaces) {
             workspace !== other &&
             isWithinRoot(workspace, other)));
     if (filtered.length < workspaces.length) {
-        writeStderrLine('qwen serve: dropping nested IDE workspace roots ' +
+        writeStderrLine('hopcode serve: dropping nested IDE workspace roots ' +
             '(parent folders already cover children)');
     }
     return filtered;

@@ -71,8 +71,8 @@ function checkDuplicateInstance() {
     const existing = readServiceInfo();
     if (existing) {
         if (existing.owner === 'serve') {
-            writeStderrLine(`Error: Channel service is managed by qwen serve (PID ${existing.pid}, started ${existing.startedAt}).`);
-            writeStderrLine('Stop the qwen serve process to stop managed channels.');
+            writeStderrLine(`Error: Channel service is managed by hopcode serve (PID ${existing.pid}, started ${existing.startedAt}).`);
+            writeStderrLine('Stop the hopcode serve process to stop managed channels.');
             process.exit(1);
         }
         writeStderrLine(`Error: Channel service is already running (PID ${existing.pid}, started ${existing.startedAt}).`);

@@ -100,7 +100,7 @@ export class CdpReverseLink {
             const progressTimer = this.armProgressLog(id, method);
             this.pending.set(id, { resolve, reject, timer, progressTimer });
             try {
-                this.log?.(`qwen serve: /cdp forwarded command id=${id} method=${method} to extension`);
+                this.log?.(`hopcode serve: /cdp forwarded command id=${id} method=${method} to extension`);
                 this.sendToExtension({
                     type: CDP_FRAME_TYPES.command,
                     id,
@@ -197,7 +197,7 @@ export class CdpReverseLink {
     handleResult(frame) {
         const id = typeof frame.id === 'number' ? frame.id : undefined;
         if (id === undefined) {
-            this.log?.('qwen serve: /cdp dropped cdp_result with non-numeric id');
+            this.log?.('hopcode serve: /cdp dropped cdp_result with non-numeric id');
             return;
         }
         if (frame.error) {
@@ -213,7 +213,7 @@ export class CdpReverseLink {
         if (!this.emulator)
             return;
         if (typeof frame.method !== 'string') {
-            this.log?.('qwen serve: /cdp dropped cdp_event with non-string method');
+            this.log?.('hopcode serve: /cdp dropped cdp_event with non-string method');
             return;
         }
         this.emulator.emitTabEvent(frame.method, frame.params);
@@ -221,7 +221,7 @@ export class CdpReverseLink {
     handleAttached(frame) {
         const attach = this.pendingAttach;
         if (!attach || attach.id !== frame.id) {
-            this.log?.(`qwen serve: /cdp dropped unexpected cdp_attached (id=${String(frame.id)})`);
+            this.log?.(`hopcode serve: /cdp dropped unexpected cdp_attached (id=${String(frame.id)})`);
             return;
         }
         this.pendingAttach = undefined;
@@ -265,7 +265,7 @@ export class CdpReverseLink {
         if (delay >= this.commandTimeoutMs)
             return undefined;
         const timer = setTimeout(() => {
-            this.log?.(`qwen serve: /cdp still waiting for command id=${id} method=${method} after ${delay}ms`);
+            this.log?.(`hopcode serve: /cdp still waiting for command id=${id} method=${method} after ${delay}ms`);
         }, delay);
         timer.unref?.();
         return timer;

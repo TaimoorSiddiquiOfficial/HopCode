@@ -19,7 +19,7 @@ import type { AuthType, InputModalities } from '@hoptrendy/hopcode-core';
  * Stage 1 daemon mode shape.
  *
  * `http-bridge` (Stage 1): production attempts to preheat the primary
- *   `qwen --acp` child and retries on first use after failure; trusted
+ *   `hopcode --acp` child and retries on first use after failure; trusted
  *   secondaries start one on demand, while untrusted secondaries do not.
  *   Multiple sessions in one runtime multiplex onto its child via the
  *   agent's native `connection.newSession()` (see

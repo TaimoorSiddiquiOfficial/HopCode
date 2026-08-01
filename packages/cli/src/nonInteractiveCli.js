@@ -850,7 +850,7 @@ export async function runNonInteractive(config, settings, input, prompt_id, opti
                 // runs sequentially in original order. This mirrors the
                 // interactive CoreToolScheduler (partitionToolCalls /
                 // runConcurrently) via the shared isToolCallConcurrencySafe rule,
-                // so `qwen -p` and the TUI agree on which tools parallelise — a
+                // so `hopcode -p` and the TUI agree on which tools parallelise — a
                 // model turn that emits N parallel agent calls no longer executes
                 // them one-at-a-time. Regardless of execution order, results are
                 // finalised (emitted, recorded, appended to `toolResponseParts`)

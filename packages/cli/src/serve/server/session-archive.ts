@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -311,7 +311,7 @@ function logSessionArchiveResult(
     `notFound=${result.notFound.length} notFoundIds=${formatSessionIds(result.notFound)}`,
     `errors=${result.errors.length} errorIds=${formatSessionErrors(result.errors)}`,
   ].join(' ');
-  writeStderrLine(`qwen serve: sessions ${action} result ${details}`);
+  writeStderrLine(`hopcode serve: sessions ${action} result ${details}`);
 }
 
 function formatSessionIds(sessionIds: string[]): string {
@@ -334,7 +334,7 @@ function errorMessage(error: unknown): string {
 }
 
 export function logSessionArchiveWarning(message: string): void {
-  writeStderrLine(`qwen serve: ${sanitizeLogLine(message)}`);
+  writeStderrLine(`hopcode serve: ${sanitizeLogLine(message)}`);
 }
 
 // Control characters are intentionally stripped from daemon log lines.

@@ -1,4 +1,4 @@
-﻿# /review Design Document
+# /review Design Document
 
 > Architecture decisions, trade-offs, and rejected alternatives for the `/review` skill.
 
@@ -112,7 +112,7 @@ Chunking itself is unchanged: the plan still tiles every line, tests and generat
 
 Step 3B's chunk agents are defined as "one per entry in `chunks[]`", and only `fetch-pr` produced a chunk plan. A local-diff review, or a cross-repo review in lightweight mode, therefore routed into a topology it had no chunk list for: no receipts, no tiling guarantee, and the orchestrator left to improvise line ranges. Two of the four review paths were promised a mechanism the skill could not deliver.
 
-`qwen review plan-diff <diff-file>` reads a captured diff and emits the same `chunks[]`, `files[]` and topology counts. Redirecting `git diff` or `gh pr diff` to a file already bypasses the 30 000-char shell cap, so all four paths now share one code path. It cannot decide `heavy` — that needs a tree to read the post-change file from — so a bare diff gets chunk agents but no invariant agents.
+`hopcode review plan-diff <diff-file>` reads a captured diff and emits the same `chunks[]`, `files[]` and topology counts. Redirecting `git diff` or `gh pr diff` to a file already bypasses the 30 000-char shell cap, so all four paths now share one code path. It cannot decide `heavy` — that needs a tree to read the post-change file from — so a bare diff gets chunk agents but no invariant agents.
 
 ### Why the topology gate ignores prose
 

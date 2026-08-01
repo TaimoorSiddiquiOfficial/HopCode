@@ -477,7 +477,7 @@ function atomicReplace(standaloneDir, newDir, lockPath) {
         //    move #1 so the user is never left without a working install.
         // 3. Log success/failure to hopcode-update.log for post-mortem (the bat
         //    runs with stdio:ignore — the log is the only diagnostic surface).
-        // 4. Delete the .deferred marker so future `qwen update` calls know the
+        // 4. Delete the .deferred marker so future `hopcode update` calls know the
         //    swap is complete (the lock file alone is insufficient because
         //    acquireLock falls through when the Node PID is dead).
         const script = [
@@ -534,7 +534,7 @@ function atomicReplace(standaloneDir, newDir, lockPath) {
         if (!child.pid) {
             throw new Error('Failed to spawn deferred update script. Update was not applied.');
         }
-        // Write .deferred marker with the bat script PID so future `qwen update`
+        // Write .deferred marker with the bat script PID so future `hopcode update`
         // calls can detect the in-flight swap via isProcessAlive(batPid).
         // acquireLock checks this marker before allowing lock theft.
         fs.writeFileSync(deferredMarker, String(child.pid));

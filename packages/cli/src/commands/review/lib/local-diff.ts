@@ -171,7 +171,7 @@ function describeUndiffable(abs: string, st: Stats): string | null {
  * Two things are wrong with passing it through untouched.
  *
  * It is relative to where the *user* typed it, and every git call below runs
- * with `-C <repoRoot>`. `qwen review capture-local --file src/foo.ts` from
+ * with `-C <repoRoot>`. `hopcode review capture-local --file src/foo.ts` from
  * `packages/cli` would therefore look for `<repo>/src/foo.ts` — a different
  * file, usually a nonexistent one — and report no changes.
  *

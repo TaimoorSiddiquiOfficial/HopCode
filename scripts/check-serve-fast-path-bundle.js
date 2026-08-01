@@ -28,10 +28,10 @@ const SERVE_PRE_LISTEN_ROOTS = [
     ],
   },
   {
-    label: 'run qwen serve entry',
+    label: 'run hopcode serve entry',
     suffixes: [
-      'packages/cli/src/serve/run-qwen-serve.ts',
-      'packages/cli/dist/src/serve/run-qwen-serve.js',
+      'packages/cli/src/serve/run-hopcode-serve.ts',
+      'packages/cli/dist/src/serve/run-hopcode-serve.js',
     ],
   },
 ];

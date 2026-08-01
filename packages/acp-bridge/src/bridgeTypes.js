@@ -11,13 +11,13 @@ export const LOAD_REPLAY_VERSION = 1;
 export const CHANNEL_STARTUP_PROFILE_META_KEY = 'qwen.daemon.channelStartupProfile';
 export const CHANNEL_STARTUP_PROFILE_VERSION = 1;
 /**
- * ACP ext-method the spawned `qwen --acp` child calls between tool batches to
+ * ACP ext-method the spawned `hopcode --acp` child calls between tool batches to
  * pull user messages the browser queued mid-turn. The child-side caller
  * (`cli/src/acp-integration/session/Session.ts`) and the daemon-side answerer
  * (`bridgeClient.ts`) both import THIS single definition, so a rename can't
  * silently desync them into a runtime `-32601 methodNotFound` (which would
  * latch the drain off for the session). The desktop ACP client answers the same
- * method from its own in-memory queue; in `qwen serve` the daemon answers it
+ * method from its own in-memory queue; in `hopcode serve` the daemon answers it
  * from `SessionEntry.midTurnMessageQueue`. Responses may also carry
  * `hasQueuedPrompt` so an armed daemon Todo guard yields to complete FIFO
  * prompts; older clients can omit it.
@@ -33,7 +33,7 @@ export const TODO_STOP_GUARD_QUEUE_RELEASE_METHOD = 'craft/todoStopGuardQueueRel
 /**
  * Reverse tool channel marker (issue #5626, Phase 2). The parent serve process
  * stamps this boolean on a client-hosted (extension) MCP server's
- * runtime-MCP-add config. The `qwen --acp` child reads it in its
+ * runtime-MCP-add config. The `hopcode --acp` child reads it in its
  * `workspaceMcpRuntimeAdd` handler to (1) KEEP `type: 'sdk'` instead of
  * stripping it and (2) let the session `McpClientManager` bind that server's
  * `sendSdkMcpMessage` to the `qwen/control/client_mcp/message` ext-method.

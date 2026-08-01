@@ -1647,7 +1647,7 @@ settingsWatcher) {
         telemetry: telemetrySettings,
         // Ordinary interactive TUI defers telemetry until after first paint. Auth
         // events emitted before the deferred init are an accepted startup-latency
-        // tradeoff. This intentionally differs from IDE deferral: `qwen -i
+        // tradeoff. This intentionally differs from IDE deferral: `hopcode -i
         // "prompt"` must await IDE context before auto-submit, but telemetry can
         // still initialize after render unless an initial prompt is present.
         deferTelemetryInitialization: interactive && !isAcpMode && !question,
@@ -1704,7 +1704,7 @@ settingsWatcher) {
             // Surface the override when it contradicts an explicit opt-in, so the
             // effective config isn't a silent surprise during debugging.
             if (tunnelOn && settings.tools?.computerUse?.enabled === true) {
-                writeStderrLine('qwen serve: ignoring tools.computerUse.enabled=true — the CDP ' +
+                writeStderrLine('hopcode serve: ignoring tools.computerUse.enabled=true — the CDP ' +
                     'tunnel (QWEN_SERVE_CDP_TUNNEL_OVER_WS) routes browser automation ' +
                     'through the CDP tunnel, so computer-use stays disabled.');
             }

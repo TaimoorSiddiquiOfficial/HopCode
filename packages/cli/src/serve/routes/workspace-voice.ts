@@ -407,7 +407,7 @@ function handleVoiceStatus(
       );
   } catch (err) {
     writeStderrLine(
-      `qwen serve: ${route} error: ${
+      `hopcode serve: ${route} error: ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -458,7 +458,7 @@ async function handleVoiceUpdate(
     );
   } catch (err) {
     writeStderrLine(
-      `qwen serve: ${route} persist error (workspace=${deps.boundWorkspace}): ${
+      `hopcode serve: ${route} persist error (workspace=${deps.boundWorkspace}): ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -476,7 +476,7 @@ async function handleVoiceUpdate(
       );
   } catch (err) {
     writeStderrLine(
-      `qwen serve: ${route} reload error after persist (workspace=${deps.boundWorkspace}): ${
+      `hopcode serve: ${route} reload error after persist (workspace=${deps.boundWorkspace}): ${
         err instanceof Error ? err.message : String(err)
       }`,
     );
@@ -579,7 +579,7 @@ async function handleVoiceTranscription(
       err instanceof Error ? err.message : String(err),
     );
     writeStderrLine(
-      `qwen serve: ${route} error (workspace=${deps.boundWorkspace}): ${message}`,
+      `hopcode serve: ${route} error (workspace=${deps.boundWorkspace}): ${message}`,
     );
     res.status(502).json({
       error: 'Voice transcription failed',

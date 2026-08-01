@@ -57,7 +57,7 @@ Options:
   --openwork-dir <path>      Path to a clean OpenWork checkout
   --openwork-ref <ref>       OpenWork ref to read or branch from (default: main)
   --base <ref>               Alias for --openwork-ref
-  --qwen-base <ref>          hopcode base for import branches (default: HEAD)
+  --hopcode-base <ref>          hopcode base for import branches (default: HEAD)
   --source-base <ref>        Source-side base ref for the commit range
   --branch <name>            Target branch name in the repo being changed
   --overlay <path[,path]>    Do not migrate these source paths (repeatable)
@@ -106,7 +106,7 @@ function parseArgs(argv) {
             case '--base':
                 openworkRef = next();
                 break;
-            case '--qwen-base':
+            case '--hopcode-base':
                 hopcodeBase = next();
                 break;
             case '--source-base':

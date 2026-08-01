@@ -1210,7 +1210,7 @@ describe('HistoryReplayer', () => {
 
     it('survives a broken stderr instead of abandoning the transcript', async () => {
       // The empty-condition card writes a diagnostic. `process.stderr.write`
-      // throws on EPIPE (`qwen … | head`, or a daemon whose stderr reader went
+      // throws on EPIPE (`hopcode … | head`, or a daemon whose stderr reader went
       // away), and a raw `writeStderrLine` would take that throw out through the
       // item loop and the record loop, aborting the whole replay: the user loses
       // their transcript because we failed to *complain* about one bad card.

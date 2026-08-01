@@ -138,7 +138,7 @@ function getServeFastPathValidationError(parsed) {
         (!Number.isSafeInteger(compactedReplayMaxBytes) ||
             compactedReplayMaxBytes < 1 ||
             compactedReplayMaxBytes > MAX_COMPACTED_REPLAY_MAX_BYTES)) {
-        return ('qwen serve: --compacted-replay-max-bytes must be a positive ' +
+        return ('hopcode serve: --compacted-replay-max-bytes must be a positive ' +
             `safe integer in [1, ${MAX_COMPACTED_REPLAY_MAX_BYTES}].`);
     }
     return null;

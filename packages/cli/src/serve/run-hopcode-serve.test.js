@@ -1030,7 +1030,7 @@ describe('runHopCodeServe pre-listen bridge option validation', () => {
             mode: 'http-bridge',
             workspace: [primary, secondary],
         }, { bridge: makeRuntimeBridge() })).rejects.toThrow(/Injected bridge dependencies/);
-        expect(stdoutWrites.join('')).not.toContain('qwen serve listening on');
+        expect(stdoutWrites.join('')).not.toContain('hopcode serve listening on');
     });
 });
 describe('runHopCodeServe session reaper timeout validation', () => {
@@ -1102,7 +1102,7 @@ describe('runHopCodeServe runtime startup failures', () => {
             fs.rmSync(tmpDir, { recursive: true, force: true });
         }
     });
-    async function readBrowserMcpFeatureFlagsForEnv(raw, origin = 'chrome-extension://qwen-test-extension', cdpMcpCommand) {
+    async function readBrowserMcpFeatureFlagsForEnv(raw, origin = 'chrome-extension://hopcode-test-extension', cdpMcpCommand) {
         tmpDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-fail-')));
         const originalClientMcpOverWs = process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
         const originalCdpTunnelOverWs = process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
@@ -1221,7 +1221,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         expect(features).not.toContain('browser_automation_mcp');
     });
     it('advertises browser automation MCP when the external CDP adapter command is set', async () => {
-        const features = await readBrowserMcpFeatureFlagsForEnv(undefined, 'chrome-extension://qwen-test-extension', '/opt/qwen-cdp-mcp-adapter');
+        const features = await readBrowserMcpFeatureFlagsForEnv(undefined, 'chrome-extension://hopcode-test-extension', '/opt/qwen-cdp-mcp-adapter');
         expect(features).toContain('cdp_tunnel_over_ws');
         expect(features).toContain('browser_automation_mcp');
         expect(features).not.toContain('client_mcp_over_ws');
@@ -1253,7 +1253,7 @@ describe('runHopCodeServe runtime startup failures', () => {
             workspace: tmpDir,
             maxSessions: 1,
             serveWebShell: false,
-            allowOrigins: ['chrome-extension://qwen-test-extension'],
+            allowOrigins: ['chrome-extension://hopcode-test-extension'],
         }, { resolveOnListen: true });
         try {
             await handle.runtimeReady;
@@ -5606,7 +5606,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
             bridge: makeFakeBridge(),
             channelWorkerSupervisorFactory: workerFactory,
             channelServicePidfile: pidfile,
-        })).rejects.toThrow('Channel service is already running under qwen serve');
+        })).rejects.toThrow('Channel service is already running under hopcode serve');
         expect(workerFactory).not.toHaveBeenCalled();
         expect(pidfile.reserveServeServiceInfo).not.toHaveBeenCalled();
     });
@@ -5960,14 +5960,14 @@ describe('runHopCodeServe startup observability', () => {
             workspace: tmpDir,
             maxSessions: 1,
             serveWebShell: false,
-            allowOrigins: ['chrome-extension://qwen-test-extension'],
+            allowOrigins: ['chrome-extension://hopcode-test-extension'],
         }, { bridge: makeFakeBridge() });
         try {
             expect(stdoutWrites).toEqual(expect.arrayContaining([
                 expect.stringMatching(/^hopcode serve listening on http:\/\/127\.0\.0\.1:\d+ \(mode=http-bridge, workspace=/),
             ]));
             expect(stderrWrites.join('')).toMatch(/hopcode serve: startup timing: processToListenMs=\d+ runHopCodeServeToListenMs=\d+/);
-            expect(stderrWrites.join('')).not.toContain('qwen serve: client-hosted MCP tools are accepted over the WebSocket without auth.');
+            expect(stderrWrites.join('')).not.toContain('hopcode serve: client-hosted MCP tools are accepted over the WebSocket without auth.');
             expect(await readStartup(handle)).toMatchObject({
                 processStartedAt: expect.any(String),
                 listenerReadyAt: expect.any(String),

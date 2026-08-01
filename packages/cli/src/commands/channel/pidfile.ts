@@ -28,7 +28,7 @@ export interface ServiceInfo {
   servePid?: number;
   workerPid?: number;
   /**
-   * Per-workspace channel workers for a multi-workspace `qwen serve`. Additive
+   * Per-workspace channel workers for a multi-workspace `hopcode serve`. Additive
    * to the single-worker `channels` / `workerPid` fields, which stay populated
    * (union of channels; primary worker pid) for older readers.
    */

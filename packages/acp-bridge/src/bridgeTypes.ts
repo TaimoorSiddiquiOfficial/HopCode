@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -409,7 +409,7 @@ export interface BridgeSessionSummary {
 }
 
 /**
- * A session's live `/goal` state, as reported by the `qwen --acp` child.
+ * A session's live `/goal` state, as reported by the `hopcode --acp` child.
  *
  * Only the active goal crosses the bridge. The child also caches the most
  * recent goal that ended on its own, but nothing on this side reads it, so it
@@ -448,7 +448,7 @@ export interface BridgeClientRequestContext {
    *
    * **Security**: this is NOT computed from `X-Forwarded-For` or any
    * other forwardable HTTP header — those are forgeable. Callers that
-   * reverse-proxy `qwen serve` should not rely on `local-only` (use a
+   * reverse-proxy `hopcode serve` should not rely on `local-only` (use a
    * dedicated daemon or `designated` policy instead).
    */
   fromLoopback?: boolean;
@@ -495,13 +495,13 @@ export interface BridgeHeartbeatState {
 }
 
 /**
- * ACP ext-method the spawned `qwen --acp` child calls between tool batches to
+ * ACP ext-method the spawned `hopcode --acp` child calls between tool batches to
  * pull user messages the browser queued mid-turn. The child-side caller
  * (`cli/src/acp-integration/session/Session.ts`) and the daemon-side answerer
  * (`bridgeClient.ts`) both import THIS single definition, so a rename can't
  * silently desync them into a runtime `-32601 methodNotFound` (which would
  * latch the drain off for the session). The desktop ACP client answers the same
- * method from its own in-memory queue; in `qwen serve` the daemon answers it
+ * method from its own in-memory queue; in `hopcode serve` the daemon answers it
  * from `SessionEntry.midTurnMessageQueue`. Responses may also carry
  * `hasQueuedPrompt` so an armed daemon Todo guard yields to complete FIFO
  * prompts; older clients can omit it.
@@ -520,7 +520,7 @@ export const TODO_STOP_GUARD_QUEUE_RELEASE_METHOD =
 /**
  * Reverse tool channel marker (issue #5626, Phase 2). The parent serve process
  * stamps this boolean on a client-hosted (extension) MCP server's
- * runtime-MCP-add config. The `qwen --acp` child reads it in its
+ * runtime-MCP-add config. The `hopcode --acp` child reads it in its
  * `workspaceMcpRuntimeAdd` handler to (1) KEEP `type: 'sdk'` instead of
  * stripping it and (2) let the session `McpClientManager` bind that server's
  * `sendSdkMcpMessage` to the `qwen/control/client_mcp/message` ext-method.

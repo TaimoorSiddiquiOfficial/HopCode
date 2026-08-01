@@ -68,7 +68,7 @@ export function serializedBridgeEventByteLength(event) {
 }
 function logEventSizingFailed(type) {
     try {
-        process.stderr.write(`qwen serve: EventBus event sizing failed ${JSON.stringify({ type })}\n`);
+        process.stderr.write(`hopcode serve: EventBus event sizing failed ${JSON.stringify({ type })}\n`);
     }
     catch {
         // Best-effort diagnostic; logging must not break publish()'s never-throws contract.
@@ -76,7 +76,7 @@ function logEventSizingFailed(type) {
 }
 function logSubscriberEvicted(data) {
     try {
-        process.stderr.write(`qwen serve: EventBus subscriber evicted ${JSON.stringify(data)}\n`);
+        process.stderr.write(`hopcode serve: EventBus subscriber evicted ${JSON.stringify(data)}\n`);
     }
     catch {
         // Best-effort diagnostic; logging must not break publish()'s never-throws contract.
@@ -84,7 +84,7 @@ function logSubscriberEvicted(data) {
 }
 function logSlowClientWarning(data) {
     try {
-        process.stderr.write(`qwen serve: EventBus slow_client_warning ${JSON.stringify(data)}\n`);
+        process.stderr.write(`hopcode serve: EventBus slow_client_warning ${JSON.stringify(data)}\n`);
     }
     catch {
         // Best-effort diagnostic; logging must not break publish()'s never-throws contract.

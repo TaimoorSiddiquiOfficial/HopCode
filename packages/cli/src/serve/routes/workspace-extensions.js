@@ -291,7 +291,7 @@ export function registerWorkspaceExtensionRoutes(app, deps) {
                         appliedGenerationByWorkspaceId.set(workspaceId, generation);
                     }
                     else {
-                        writeStderrLine(`qwen serve: extension generation reconciliation failed for workspace ${runtimes[index].workspaceId}: ${redactUrlCredentials(result.reason instanceof Error
+                        writeStderrLine(`hopcode serve: extension generation reconciliation failed for workspace ${runtimes[index].workspaceId}: ${redactUrlCredentials(result.reason instanceof Error
                             ? result.reason.message
                             : String(result.reason))}`);
                     }
@@ -302,7 +302,7 @@ export function registerWorkspaceExtensionRoutes(app, deps) {
                 }
             }
             catch (error) {
-                writeStderrLine(`qwen serve: extension generation reconciliation failed: ${redactUrlCredentials(error instanceof Error ? error.message : String(error))}`);
+                writeStderrLine(`hopcode serve: extension generation reconciliation failed: ${redactUrlCredentials(error instanceof Error ? error.message : String(error))}`);
             }
             finally {
                 reconciling = false;

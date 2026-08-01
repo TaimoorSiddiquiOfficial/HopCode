@@ -685,7 +685,7 @@ function writeServeChannelReservation(
 }
 
 function channelServicePidfileConflictError(info: ServiceInfo): Error {
-  const owner = info.owner === 'serve' ? 'qwen serve' : 'qwen channel start';
+  const owner = info.owner === 'serve' ? 'hopcode serve' : 'qwen channel start';
   return Object.assign(
     new Error(
       `Channel service is already running under ${owner} (PID ${info.pid}). Stop it before enabling daemon-managed channels.`,
@@ -2168,7 +2168,7 @@ async function runHopCodeServeImpl(
           cwd = validateAndCanonicalizeWorkspace(storedWorkspace);
         } catch (err) {
           writeStderrLine(
-            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+            `hopcode serve: skipping persisted workspace registration ${JSON.stringify(
               storedWorkspace,
             )}: ${err instanceof Error ? err.message : String(err)}`,
           );
@@ -2188,7 +2188,7 @@ async function runHopCodeServeImpl(
         );
         if (nested) {
           writeStderrLine(
-            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+            `hopcode serve: skipping persisted workspace registration ${JSON.stringify(
               storedWorkspace,
             )}: path nests with an explicit or earlier restored workspace`,
           );
@@ -2196,7 +2196,7 @@ async function runHopCodeServeImpl(
         }
         if (workspaceInputs.length >= MAX_REGISTERED_WORKSPACES) {
           writeStderrLine(
-            `qwen serve: skipping persisted workspace registration ${JSON.stringify(
+            `hopcode serve: skipping persisted workspace registration ${JSON.stringify(
               storedWorkspace,
             )}: workspace limit reached`,
           );
@@ -2211,7 +2211,7 @@ async function runHopCodeServeImpl(
       }
     } catch (err) {
       writeStderrLine(
-        `qwen serve: failed to read persisted workspace registrations: ${
+        `hopcode serve: failed to read persisted workspace registrations: ${
           err instanceof Error ? err.message : String(err)
         }; continuing with explicit workspaces only`,
       );
@@ -3563,7 +3563,7 @@ async function runHopCodeServeImpl(
         );
       } catch (err) {
         writeStderrLine(
-          `qwen serve: could not read full settings for secondary workspace ` +
+          `hopcode serve: could not read full settings for secondary workspace ` +
             `${workspaceInput.cwd} (${err instanceof Error ? err.message : String(err)}); ` +
             `falling back to defaults.`,
         );
@@ -3946,7 +3946,7 @@ async function runHopCodeServeImpl(
         // Match the startup secondary-workspace path: surface why full settings
         // couldn't be read instead of silently falling back to defaults.
         writeStderrLine(
-          `qwen serve: could not read full settings for dynamic workspace ` +
+          `hopcode serve: could not read full settings for dynamic workspace ` +
             `${cwd} (${err instanceof Error ? err.message : String(err)}); ` +
             `falling back to defaults.`,
         );
@@ -4691,7 +4691,7 @@ async function runHopCodeServeImpl(
         }
         if (opts.channelSelection?.mode === 'all') {
           writeStderrLine(
-            'qwen serve: --channel all is primary-workspace only; non-primary workspace channels are not hosted.',
+            'hopcode serve: --channel all is primary-workspace only; non-primary workspace channels are not hosted.',
           );
         }
       }
@@ -4724,7 +4724,7 @@ async function runHopCodeServeImpl(
         );
         if (opts.clientMcpOverWs === true) {
           writeStderrLine(
-            `qwen serve: client-hosted MCP tools are accepted over the WebSocket without auth. ` +
+            `hopcode serve: client-hosted MCP tools are accepted over the WebSocket without auth. ` +
               `Set ${HOPCODE_SERVE_CLIENT_MCP_OVER_WS_ENV}=0 to disable.`,
           );
         }
@@ -5546,7 +5546,7 @@ async function runHopCodeServeImpl(
                 if (channelWorkerManager?.state().enabled) {
                   writeDaemonLifecycleBestEffort(() =>
                     daemonLog.error(
-                      'runtime startup failed, but qwen serve remains alive to retain the channel service lease until worker exit is confirmed',
+                      'runtime startup failed, but hopcode serve remains alive to retain the channel service lease until worker exit is confirmed',
                     ),
                   );
                   return;
@@ -5609,13 +5609,13 @@ async function runHopCodeServeImpl(
           attempt < MAX_PORT_ATTEMPTS - 1
         ) {
           writeStderrLine(
-            `qwen serve: port ${attemptPort} is in use, trying ${nextPort}...`,
+            `hopcode serve: port ${attemptPort} is in use, trying ${nextPort}...`,
           );
           tryListen(nextPort, attempt + 1);
         } else {
           if (err.code === 'EADDRINUSE' && attempt > 0) {
             writeStderrLine(
-              `qwen serve: all ports ${opts.port}–${attemptPort} are in use`,
+              `hopcode serve: all ports ${opts.port}–${attemptPort} are in use`,
             );
           }
           removeCurrentServePidfile();

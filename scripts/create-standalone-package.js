@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 
 /**
  * @license
@@ -66,7 +66,7 @@ const DIST_REQUIRED_PATHS = [
 const DIST_ALLOWED_ENTRIES = new Set([
   'cli.js',
   // bin wrapper emitted by prepare-package.js. Standalone shims use it for
-  // `qwen serve` so daemon startup gets the same fast path as npm installs.
+  // `hopcode serve` so daemon startup gets the same fast path as npm installs.
   'cli-entry.js',
   // fzf fuzzy-search worker; esbuild emits it as a standalone entry that must
   // sit next to cli.js so `new URL('./fzfWorker.js', ...)` resolves at runtime.

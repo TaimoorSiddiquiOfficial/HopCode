@@ -766,7 +766,7 @@ describe('serve fast path argument parsing', () => {
     ],
     [
       ['serve', '--compacted-replay-max-bytes=0'],
-      'qwen serve: --compacted-replay-max-bytes must be a positive safe integer in [1, 268435456].',
+      'hopcode serve: --compacted-replay-max-bytes must be a positive safe integer in [1, 268435456].',
     ],
     [
       ['serve', '--rate-limit', '--rate-limit-prompt=0'],
@@ -1052,9 +1052,9 @@ describe('serve fast path environment bootstrap', () => {
 
       expect(stderrWrites.join('')).toContain(HEADLESS_IZN_NO_SANDBOX_WARNING);
       expect(stderrWrites.join('')).toContain(
-        'qwen serve: runtime startup failed after listener was ready: runtime boom',
+        'hopcode serve: runtime startup failed after listener was ready: runtime boom',
       );
-      expect(stderrWrites.join('')).not.toContain('qwen serve: stderr closed');
+      expect(stderrWrites.join('')).not.toContain('hopcode serve: stderr closed');
       expect(close).toHaveBeenCalledTimes(1);
       expect(process.exit).toHaveBeenCalledWith(1);
     } finally {

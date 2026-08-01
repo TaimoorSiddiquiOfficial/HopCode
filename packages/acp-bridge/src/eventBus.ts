@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -152,7 +152,7 @@ export function serializedBridgeEventByteLength(event: BridgeEvent): number {
 function logEventSizingFailed(type: string): void {
   try {
     process.stderr.write(
-      `qwen serve: EventBus event sizing failed ${JSON.stringify({ type })}\n`,
+      `hopcode serve: EventBus event sizing failed ${JSON.stringify({ type })}\n`,
     );
   } catch {
     // Best-effort diagnostic; logging must not break publish()'s never-throws contract.
@@ -162,7 +162,7 @@ function logEventSizingFailed(type: string): void {
 function logSubscriberEvicted(data: Record<string, unknown>): void {
   try {
     process.stderr.write(
-      `qwen serve: EventBus subscriber evicted ${JSON.stringify(data)}\n`,
+      `hopcode serve: EventBus subscriber evicted ${JSON.stringify(data)}\n`,
     );
   } catch {
     // Best-effort diagnostic; logging must not break publish()'s never-throws contract.
@@ -174,7 +174,7 @@ type QueueWarningThreshold = 'frames' | 'bytes' | 'frames_and_bytes';
 function logSlowClientWarning(data: Record<string, unknown>): void {
   try {
     process.stderr.write(
-      `qwen serve: EventBus slow_client_warning ${JSON.stringify(data)}\n`,
+      `hopcode serve: EventBus slow_client_warning ${JSON.stringify(data)}\n`,
     );
   } catch {
     // Best-effort diagnostic; logging must not break publish()'s never-throws contract.

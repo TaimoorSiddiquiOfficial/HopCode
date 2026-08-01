@@ -373,7 +373,7 @@ export function createSubSessionLauncher(opts) {
                             // keeps burning a bridge session and model quota with nobody
                             // watching. `log.debug` is a no-op unless a debug log session is
                             // active — this has to reach stderr or it leaves no trace at all.
-                            writeStderrLine(`qwen serve: sub-session ${sessionId} drain timed out after ` +
+                            writeStderrLine(`hopcode serve: sub-session ${sessionId} drain timed out after ` +
                                 `${Math.round(sentModeDrainTimeoutMs / 60_000)}min; releasing its ` +
                                 `concurrency slot (the sub-session may still be running)`);
                         }
@@ -436,7 +436,7 @@ export function createSubSessionLauncher(opts) {
                     log.debug('sub-session: closeSession threw', spawnedSessionId, closeErr);
                 }
             }
-            writeStderrLine(`qwen serve: create_sub_session failed: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: create_sub_session failed: ${err instanceof Error ? err.message : String(err)}`);
             throw err instanceof Error ? err : new Error(String(err));
         }
     };

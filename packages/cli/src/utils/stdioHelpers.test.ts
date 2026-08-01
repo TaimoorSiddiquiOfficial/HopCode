@@ -40,7 +40,7 @@ describe('writeStderrLineSafe', () => {
   });
 
   it('swallows EPIPE instead of taking the caller down with it', () => {
-    // `qwen … | head`, or a daemon whose stderr reader went away. Callers use
+    // `hopcode … | head`, or a daemon whose stderr reader went away. Callers use
     // this where the write is incidental and a throw would destroy real work —
     // abandoning a transcript replay over a failed diagnostic, say.
     vi.spyOn(process.stderr, 'write').mockImplementation(() => {

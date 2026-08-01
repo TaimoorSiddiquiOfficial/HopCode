@@ -20,7 +20,7 @@
 
 export const PREAPPROVED_HOSTS: ReadonlySet<string> = new Set([
   // Qwen ecosystem
-  'qwenlm.github.io',
+  'hoptrendy.github.io',
   'qwen.readthedocs.io',
   'github.com/QwenLM',
   // Matches QwenLM raw files whether requested directly or via a github.com

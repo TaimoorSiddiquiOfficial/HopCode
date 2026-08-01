@@ -490,7 +490,7 @@ export function renderReleaseNotes({
   repo,
   newContributors = [],
 }) {
-  const lines = ['<!-- qwen-release-notes:v1 -->', '', '## Highlights', ''];
+  const lines = ['<!-- hopcode-release-notes:v1 -->', '', '## Highlights', ''];
   const entriesByNumber = new Map(
     entries.map((entry) => [entry.number, entry]),
   );

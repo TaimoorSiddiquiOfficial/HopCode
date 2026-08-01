@@ -15,8 +15,8 @@ import { ChannelWorkerControlError, } from './channel-worker-manager.js';
 import { runHopCodeServe } from './run-hopcode-serve.js';
 import { resolveWebShellDir, isDocumentNavigation, } from './web-shell-static.js';
 import { CONDITIONAL_SERVE_FEATURES, getAdvertisedServeFeatures, getRegisteredServeFeatures, getServeFeatures, getServeProtocolVersions, SERVE_CAPABILITY_REGISTRY, } from './capabilities.js';
-import { ApprovalMode, BTW_MAX_INPUT_LENGTH, ExtensionManager, ExtensionUpdateState, SessionService, Storage, TrustGateError, } from '@qwen-code/qwen-code-core';
-import * as qwenCore from '@qwen-code/qwen-code-core';
+import { ApprovalMode, BTW_MAX_INPUT_LENGTH, ExtensionManager, ExtensionUpdateState, SessionService, Storage, TrustGateError, } from '@hopcode/qwen-code-core';
+import * as qwenCore from '@hopcode/qwen-code-core';
 import { CancelSentinelCollisionError, InvalidClientIdError, InvalidPermissionOptionError, InvalidSessionMetadataError, MAX_WORKSPACE_PATH_LENGTH, McpServerNotFoundError, McpServerRestartFailedError, PermissionForbiddenError, PermissionPolicyNotImplementedError, PromptQueueFullError, RestoreInProgressError, SessionArtifactAuthorizationError, SessionArtifactValidationError, SessionShellClientRequiredError, SessionShellDisabledError, SessionBusyError, SessionLimitExceededError, SessionNotFoundError, TotalSessionLimitExceededError, WorkspaceDrainingError, WorkspaceMismatchError, } from './acp-session-bridge.js';
 import { CAPABILITIES_SCHEMA_VERSION } from './types.js';
 import { FsError } from './fs/index.js';
@@ -11568,7 +11568,7 @@ describe('GET /session/:id/export', () => {
                     parts: [{ text: 'export response' }],
                 },
                 cwd: wsDir,
-                model: 'qwen-test',
+                model: 'hopcode-test',
             },
         ];
         const body = records.map((record) => JSON.stringify(record)).join('\n');

@@ -1290,7 +1290,7 @@ describe('ContentGenerationPipeline', () => {
       expect(apiCall.enable_thinking).toBeUndefined();
     });
 
-    it('gates on the wire model, not config: qwen config + non-qwen request.model does NOT emit', async () => {
+    it('gates on the wire model, not config: hopcode config + non-qwen request.model does NOT emit', async () => {
       // buildRequest ships `context.model` (= request.model || config.model).
       // A qwen *config* with a non-qwen *request* model must gate on the
       // request model — otherwise the qwen-only field leaks to the non-qwen
@@ -1330,7 +1330,7 @@ describe('ContentGenerationPipeline', () => {
       expect(apiCall.enable_thinking).toBeUndefined();
     });
 
-    it('gates on the wire model, not config: non-qwen config + qwen request.model emits false', async () => {
+    it('gates on the wire model, not config: non-hopcode config + qwen request.model emits false', async () => {
       // The mirror direction: a non-qwen *config* with a qwen *request* model
       // must still emit the disable signal, since the wire model is qwen and
       // would otherwise keep thinking-on (the #4501 regression).

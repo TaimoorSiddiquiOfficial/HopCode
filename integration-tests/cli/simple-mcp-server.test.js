@@ -15,7 +15,7 @@ import { writeFileSync } from 'node:fs';
 import { hashMcpServerConfig } from '@hoptrendy/hopcode-core';
 // Create a minimal MCP server that doesn't require external dependencies
 // This implements the MCP protocol directly using Node.js built-ins
-const INTEGRATION_TOKEN = 'qwen-mcp-tool-token-7f31d0';
+const INTEGRATION_TOKEN = 'hopcode-mcp-tool-token-7f31d0';
 const additionServerConfig = {
     command: 'node',
     args: ['mcp-server.cjs'],

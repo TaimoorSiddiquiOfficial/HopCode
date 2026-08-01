@@ -159,7 +159,7 @@ export function useMouseEvents(
 
   // Never write SGR mouse-mode escapes (?1002h ?1006h) unless stdout is a TTY.
   // `isRawModeSupported` only reflects stdin; with stdout piped/redirected
-  // (`qwen | tee log`) an active, raw-mode-capable surface — e.g. the non-TTY
+  // (`hopcode | tee log`) an active, raw-mode-capable surface — e.g. the non-TTY
   // transcript's focused ScrollableList (`bypassVpGate`) — would otherwise emit
   // raw control bytes into the captured output. Mirrors AlternateScreen's
   // `process.stdout.isTTY` guard so the non-TTY fallback stays byte-clean.

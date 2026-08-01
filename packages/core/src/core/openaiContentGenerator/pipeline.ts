@@ -832,8 +832,8 @@ export class ContentGenerationPipeline {
       // `request.model || contentGeneratorConfig.model` — the same value
       // baseRequest.model is built from above), not on the config model. A
       // request-level model override would otherwise desync the gate from
-      // what actually ships: a qwen config with a non-qwen request model
-      // would leak the field, and a non-qwen config with a qwen request
+      // what actually ships: a hopcode config with a non-qwen request model
+      // would leak the field, and a non-hopcode config with a qwen request
       // model would miss the disable signal (the regression).
       //
       // `coder-model` is the HOPCODE_OAUTH default (DEFAULT_HOPCODE_MODEL in

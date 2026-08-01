@@ -73,7 +73,7 @@ export function registerWorkspaceModelsRoutes(app, deps) {
                 broadcastSettingsChanged(write.key, write.value, scopeToWire(write.scope), clientId);
             }
             catch (err) {
-                writeStderrLine(`qwen serve: DELETE /workspace/models broadcast error (key=${write.key}): ${err instanceof Error ? err.message : String(err)}`);
+                writeStderrLine(`hopcode serve: DELETE /workspace/models broadcast error (key=${write.key}): ${err instanceof Error ? err.message : String(err)}`);
             }
         };
         let writes;
@@ -158,7 +158,7 @@ export function registerWorkspaceModelsRoutes(app, deps) {
             }
         }
         catch (err) {
-            writeStderrLine(`qwen serve: DELETE /workspace/models error (authType=${parsed.authType}, modelId=${parsed.modelId}): ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: DELETE /workspace/models error (authType=${parsed.authType}, modelId=${parsed.modelId}): ${err instanceof Error ? err.message : String(err)}`);
             // On a partial persist, tell the caller which keys committed so it can
             // reconcile (e.g. modelProviders removed but model.name not cleared).
             if (err instanceof WorkspaceSettingsPartialPersistError) {

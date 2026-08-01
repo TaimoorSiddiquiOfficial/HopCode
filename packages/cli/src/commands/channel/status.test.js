@@ -54,7 +54,7 @@ describe('statusCommand', () => {
             throw new Error(`process.exit: ${String(code)}`);
         });
         await expect(invokeStatus()).rejects.toThrow('process.exit: 0');
-        expect(mockWriteStdoutLine).toHaveBeenCalledWith('Channel service: managed by qwen serve (PID 1234)');
+        expect(mockWriteStdoutLine).toHaveBeenCalledWith('Channel service: managed by hopcode serve (PID 1234)');
         expect(mockWriteStdoutLine).toHaveBeenCalledWith('Worker PID:      5678');
     });
     it('omits worker pid when serve-owned metadata has no live worker', async () => {
@@ -69,7 +69,7 @@ describe('statusCommand', () => {
             throw new Error(`process.exit: ${String(code)}`);
         });
         await expect(invokeStatus()).rejects.toThrow('process.exit: 0');
-        expect(mockWriteStdoutLine).toHaveBeenCalledWith('Channel service: managed by qwen serve (PID 1234)');
+        expect(mockWriteStdoutLine).toHaveBeenCalledWith('Channel service: managed by hopcode serve (PID 1234)');
         expect(mockWriteStdoutLine).not.toHaveBeenCalledWith(expect.stringContaining('Worker PID:'));
     });
     it('reads remote daemon manager state without consulting the pidfile', async () => {

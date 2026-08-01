@@ -1,12 +1,12 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
- * `qwen serve` daemon — reverse tool channel (issue #5626, Phase 2),
- * end-to-end against a REAL `qwen --acp` child.
+ * `hopcode serve` daemon — reverse tool channel (issue #5626, Phase 2),
+ * end-to-end against a REAL `hopcode --acp` child.
  *
  * The Chrome extension cannot be a listening MCP server: it hosts MCP tools
  * that the agent (running inside the daemon's ACP child) reaches by carrying
@@ -287,7 +287,7 @@ function answerHandshakeFrame(
   };
 }
 
-describeMaybe('qwen serve — reverse tool channel (client-hosted MCP over WS)', () => {
+describeMaybe('hopcode serve — reverse tool channel (client-hosted MCP over WS)', () => {
   it('discovers a client-hosted tool end-to-end via the ACP child', async () => {
     const ws = new WebSocket(`ws://127.0.0.1:${port}/acp`, {
       headers: { Authorization: `Bearer ${TOKEN}` },

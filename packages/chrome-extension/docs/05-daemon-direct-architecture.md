@@ -1,6 +1,6 @@
 # Daemon-Direct Architecture (issue #5626)
 
-Revival of the Chrome extension on the `qwen serve` daemon, dropping Native
+Revival of the Chrome extension on the `hopcode serve` daemon, dropping Native
 Messaging. This doc is the concrete implementation spec for the two phases.
 
 ```
@@ -12,7 +12,7 @@ Messaging. This doc is the concrete implementation spec for the two phases.
 │  Content scripts (DOM / a11y / network capture)   │ ││
 └───────────────────────────────────────────────────┘ ││
                                                        ▼▼
-                        qwen serve daemon (localhost:4170, loopback auth-free)
+                        hopcode serve daemon (localhost:4170, loopback auth-free)
 ```
 
 ## Phase 1 — chat (no daemon changes)
@@ -25,7 +25,7 @@ bound workspace).
 - `src/daemon/config.ts` — `{ baseUrl, token? }`, default `http://127.0.0.1:4170`,
   overridable via `chrome.storage.local`.
 - `src/daemon/discovery.ts` — `GET /health` probe; gate the chat on reachability,
-  otherwise show a "run `qwen serve`" hint.
+  otherwise show a "run `hopcode serve`" hint.
 - Side panel renders transcript/streaming/permissions from the webui daemon hooks,
   reusing the existing presentational components + `ChromePlatformProvider`.
 
@@ -94,12 +94,12 @@ agent MCP client → SdkControlClientTransport.send
 
 The extension can't spawn a process. Options, lightest-first:
 
-1. Manual `qwen serve` + `/health` discovery (Phase 1 default, zero install).
+1. Manual `hopcode serve` + `/health` discovery (Phase 1 default, zero install).
 2. Opt-in OS service registration so a daemon is always up — reuse the per-OS
    path logic in `native-host/scripts/` (it already writes the NativeMessagingHosts
    manifest per platform), emitting a unit instead:
    - macOS `~/Library/LaunchAgents/*.plist`, Linux `~/.config/systemd/user/*.service`,
-     Windows scheduled task — each running `qwen serve` on loopback with
+     Windows scheduled task — each running `hopcode serve` on loopback with
      `--allow-origin chrome-extension://<id>` (+ token).
 
 No native messaging host in either case.

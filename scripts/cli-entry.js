@@ -70,13 +70,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // The entry a subprocess should call to reach THIS build.
 //
-// A skill that shells out to `qwen …` gets whatever `qwen` PATH resolves to, which
+// A skill that shells out to `hopcode …` gets whatever `hopcode` PATH resolves to, which
 // is not necessarily the code that launched it: with an older global install on the
-// machine, a current-source daemon's `qwen review agent-prompt --role 0` landed in a
+// machine, a current-source daemon's `hopcode review agent-prompt --role 0` landed in a
 // v0.19.10 binary whose `agent-prompt` predates `--role`, and the run died on
 // "Missing required argument: chunk". This file is the executable entry and the one
 // thing that knows its own path, so it publishes it; `getShellContextEnvVars` passes
-// it to every shell subprocess, and a caller prefers it over a bare `qwen`.
+// it to every shell subprocess, and a caller prefers it over a bare `hopcode`.
 //
 // Assignment, not `||=`: an inherited value is another session's CLI — an outer
 // qwen shelling out to this one — and honouring it re-creates the exact skew above,

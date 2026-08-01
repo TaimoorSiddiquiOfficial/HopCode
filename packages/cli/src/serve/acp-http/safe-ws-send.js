@@ -25,7 +25,7 @@ export function safeWsSend(ws, payload, context = 'frame') {
         catch (err) {
             if (isServeDebugMode()) {
                 try {
-                    writeStderrLine(`qwen serve: failed to send ${context} frame on /acp socket: ${err instanceof Error ? err.message : String(err)}`);
+                    writeStderrLine(`hopcode serve: failed to send ${context} frame on /acp socket: ${err instanceof Error ? err.message : String(err)}`);
                 }
                 catch {
                     // stderr gone; preserve the no-throw contract.
@@ -36,7 +36,7 @@ export function safeWsSend(ws, payload, context = 'frame') {
     }
     if (isServeDebugMode()) {
         try {
-            writeStderrLine(`qwen serve: dropped ${context} frame on non-OPEN /acp socket (readyState=${ws.readyState})`);
+            writeStderrLine(`hopcode serve: dropped ${context} frame on non-OPEN /acp socket (readyState=${ws.readyState})`);
         }
         catch {
             // stderr gone (e.g. EPIPE on a piped/closed log) — preserve the no-throw

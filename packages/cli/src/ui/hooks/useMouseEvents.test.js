@@ -136,7 +136,7 @@ describe('useMouseEvents', () => {
     });
     describe('non-TTY stdout', () => {
         it('does NOT enable mouse mode when stdout is not a TTY (piped/redirected)', () => {
-            // Mirrors `qwen | tee log`: stdin is still a raw-mode-capable TTY, but
+            // Mirrors `hopcode | tee log`: stdin is still a raw-mode-capable TTY, but
             // stdout is piped. Even an active bypassVpGate surface (the transcript's
             // focused ScrollableList) must not emit SGR mouse escapes into the
             // captured output.

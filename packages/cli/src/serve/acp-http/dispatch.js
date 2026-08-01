@@ -205,7 +205,7 @@ function parsePermissionResponse(params) {
             // Present but malformed: the bridge would reject it anyway, so it is
             // dropped — but log it, otherwise a client whose answers silently
             // vanished (agent sees none) has no server-side signal to chase.
-            writeStderrLine('qwen serve: /acp session/permission dropping invalid `answers` (expected an object map of string values)');
+            writeStderrLine('hopcode serve: /acp session/permission dropping invalid `answers` (expected an object map of string values)');
         }
     }
     if (isObject(params['_meta'])) {
@@ -1045,7 +1045,7 @@ export class AcpDispatcher {
                                 conn.closeSessionStream(sessionId);
                             }
                             catch (teardownErr) {
-                                writeStderrLine(`qwen serve: /acp session/close local teardown failed (${logSafe(sessionId)}): ${logSafe(errMsg(teardownErr))}`);
+                                writeStderrLine(`hopcode serve: /acp session/close local teardown failed (${logSafe(sessionId)}): ${logSafe(errMsg(teardownErr))}`);
                             }
                         }
                     };
@@ -1146,7 +1146,7 @@ export class AcpDispatcher {
                         // prompt is otherwise undebuggable from the server side (the
                         // legacy `resolveClientResponse` path logs its vote/cancel
                         // failures the same way).
-                        writeStderrLine(`qwen serve: /acp session/permission rejected: \`requestId\` is required`);
+                        writeStderrLine(`hopcode serve: /acp session/permission rejected: \`requestId\` is required`);
                         if (id !== undefined) {
                             conn.sendConn(error(id, RPC.INVALID_PARAMS, '`requestId` is required', {
                                 httpStatus: 400,
@@ -1165,7 +1165,7 @@ export class AcpDispatcher {
                         // this handler — the outer dispatcher catch would otherwise emit a
                         // plain INVALID_PARAMS with no httpStatus for SDK callers.
                         if (err instanceof AcpParamError) {
-                            writeStderrLine(`qwen serve: /acp session/permission invalid params (requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
+                            writeStderrLine(`hopcode serve: /acp session/permission invalid params (requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
                             if (id !== undefined) {
                                 conn.sendConn(error(id, RPC.INVALID_PARAMS, err.message, {
                                     httpStatus: 400,
@@ -1190,7 +1190,7 @@ export class AcpDispatcher {
                     if (sessionIdParam &&
                         pendingRef &&
                         sessionIdParam !== pendingRef.req.sessionId) {
-                        writeStderrLine(`qwen serve: /acp session/permission vote rejected: requestId ${logSafe(requestId)} does not belong to session ${logSafe(sessionIdParam)}`);
+                        writeStderrLine(`hopcode serve: /acp session/permission vote rejected: requestId ${logSafe(requestId)} does not belong to session ${logSafe(sessionIdParam)}`);
                         if (id !== undefined) {
                             conn.sendConn(error(id, RPC.INVALID_PARAMS, 'requestId does not belong to the specified session', { httpStatus: 409, sessionId: sessionIdParam, requestId }));
                         }
@@ -1204,7 +1204,7 @@ export class AcpDispatcher {
                     // DaemonClient/REST treat a missing request as `404 → false` (not an
                     // exception). Reserve 409 for a present entry the bridge still rejects.
                     if (this.registry && !pendingRef) {
-                        writeStderrLine(`qwen serve: /acp session/permission vote dropped: no pending request for requestId ${logSafe(requestId)}`);
+                        writeStderrLine(`hopcode serve: /acp session/permission vote dropped: no pending request for requestId ${logSafe(requestId)}`);
                         if (id !== undefined) {
                             conn.sendConn(error(id, RPC.INVALID_PARAMS, 'No pending permission request', {
                                 httpStatus: 404,
@@ -1217,7 +1217,7 @@ export class AcpDispatcher {
                     // client's `sessionId` only when there is no registry to consult.
                     const sessionId = pendingRef?.req.sessionId ?? sessionIdParam;
                     if (!sessionId) {
-                        writeStderrLine(`qwen serve: /acp session/permission vote dropped: no pending request for requestId ${logSafe(requestId)}`);
+                        writeStderrLine(`hopcode serve: /acp session/permission vote dropped: no pending request for requestId ${logSafe(requestId)}`);
                         if (id !== undefined) {
                             conn.sendConn(error(id, RPC.INVALID_PARAMS, 'No pending permission request', {
                                 httpStatus: 404,
@@ -1233,7 +1233,7 @@ export class AcpDispatcher {
                     // cross-connection failure (right session header, no `session/new` on
                     // this connection).
                     if (!conn.ownsSession(sessionId)) {
-                        writeStderrLine(`qwen serve: /acp session/permission vote rejected: session ${logSafe(sessionId)} not owned by this connection (requestId ${logSafe(requestId)})`);
+                        writeStderrLine(`hopcode serve: /acp session/permission vote rejected: session ${logSafe(sessionId)} not owned by this connection (requestId ${logSafe(requestId)})`);
                         if (id !== undefined) {
                             conn.sendConn(error(id, RPC.INVALID_PARAMS, 'Session not owned by this connection', { httpStatus: 403, sessionId, requestId }));
                         }
@@ -1250,7 +1250,7 @@ export class AcpDispatcher {
                         // is a 400 (the requestId is known, the option isn't), a
                         // policy-denied vote is a 403 (well-formed, authenticated, refused).
                         if (err instanceof InvalidPermissionOptionError) {
-                            writeStderrLine(`qwen serve: /acp session/permission invalid option (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
+                            writeStderrLine(`hopcode serve: /acp session/permission invalid option (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
                             if (id !== undefined) {
                                 conn.sendConn(error(id, RPC.INVALID_PARAMS, err.message, {
                                     httpStatus: 400,
@@ -1262,7 +1262,7 @@ export class AcpDispatcher {
                             return;
                         }
                         if (err instanceof PermissionForbiddenError) {
-                            writeStderrLine(`qwen serve: /acp session/permission forbidden (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
+                            writeStderrLine(`hopcode serve: /acp session/permission forbidden (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
                             if (id !== undefined) {
                                 conn.sendConn(error(id, RPC.INVALID_PARAMS, err.message, {
                                     httpStatus: 403,
@@ -1278,7 +1278,7 @@ export class AcpDispatcher {
                             // Operator's settings name a policy whose mediator hasn't landed
                             // in this build. 501 (not 500) so the SDK can say "daemon older
                             // than your settings expect; upgrade".
-                            writeStderrLine(`qwen serve: /acp session/permission policy not implemented (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
+                            writeStderrLine(`hopcode serve: /acp session/permission policy not implemented (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
                             if (id !== undefined) {
                                 conn.sendConn(error(id, RPC.INTERNAL_ERROR, err.message, {
                                     httpStatus: 501,
@@ -1292,7 +1292,7 @@ export class AcpDispatcher {
                             // Agent/daemon contract violation (agent's option set includes
                             // the cancel sentinel), not a client mistake — 500 with a stable
                             // code so the SDK can distinguish it from unrelated internals.
-                            writeStderrLine(`qwen serve: /acp session/permission cancel-sentinel collision (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
+                            writeStderrLine(`hopcode serve: /acp session/permission cancel-sentinel collision (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(err.message)}`);
                             if (id !== undefined) {
                                 conn.sendConn(error(id, RPC.INTERNAL_ERROR, err.message, {
                                     httpStatus: 500,
@@ -1309,7 +1309,7 @@ export class AcpDispatcher {
                         // entry only if the cancel landed, else keep it for teardown to
                         // retry) — then rethrow so the outer dispatcher catch maps the
                         // error for the wire.
-                        writeStderrLine(`qwen serve: /acp session/permission vote failed (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(errMsg(err))}`);
+                        writeStderrLine(`hopcode serve: /acp session/permission vote failed (${logSafe(sessionId)}, requestId ${logSafe(requestId)}): ${logSafe(errMsg(err))}`);
                         const cancelled = this.cancelAbandonedPermission({ sessionId, bridgeRequestId: requestId }, pendingRef?.conn.sessions.get(sessionId)?.clientId);
                         // Drop only the VOTING connection's own entry (consistent with the
                         // success path) — never `pendingRef`, which may be a sibling/the
@@ -1330,7 +1330,7 @@ export class AcpDispatcher {
                         // would (a) conflate "no pending entry" with "bridge rejected a
                         // present vote" and (b) make a legitimate retry on another
                         // connection fail with a misleading "no pending" error.
-                        writeStderrLine(`qwen serve: /acp session/permission vote not accepted by bridge (${logSafe(sessionId)}, requestId ${logSafe(requestId)})`);
+                        writeStderrLine(`hopcode serve: /acp session/permission vote not accepted by bridge (${logSafe(sessionId)}, requestId ${logSafe(requestId)})`);
                         if (id !== undefined) {
                             conn.sendConn(error(id, RPC.INVALID_PARAMS, 'Permission vote not accepted (request already resolved)', {
                                 httpStatus: 409,
@@ -1352,7 +1352,7 @@ export class AcpDispatcher {
                     // Log the success too (every failure branch logs): an operator
                     // grepping a stuck prompt can then tell "vote accepted here" apart
                     // from "vote never arrived" or "vote landed on another connection".
-                    writeStderrLine(`qwen serve: /acp session/permission vote accepted (${logSafe(sessionId)}, requestId ${logSafe(requestId)}, connection ${logSafe(conn.connectionId.slice(0, 8))})`);
+                    writeStderrLine(`hopcode serve: /acp session/permission vote accepted (${logSafe(sessionId)}, requestId ${logSafe(requestId)}, connection ${logSafe(conn.connectionId.slice(0, 8))})`);
                     this.replyConn(conn, id, {});
                     return;
                 }
@@ -2695,7 +2695,7 @@ export class AcpDispatcher {
                     subscribeFromEventId = Math.max(subscribeFromEventId ?? 0, snapshot.lastEventId);
                 }
                 else {
-                    writeStderrLine(`qwen serve: /acp initial replay skipped (no snapshot) session=${logSafe(sessionId)}`);
+                    writeStderrLine(`hopcode serve: /acp initial replay skipped (no snapshot) session=${logSafe(sessionId)}`);
                     conn.markInitialReplayComplete(sessionId);
                     conn.endReplayDeferral(sessionId, lastDeliveredId, false);
                 }
@@ -2735,7 +2735,7 @@ export class AcpDispatcher {
                     // evicted frames (a gap the replay could not fully backfill).
                     const replayedCount = event.data
                         ?.replayedCount;
-                    writeStderrLine(`qwen serve: /acp replay complete (${logSafe(sessionId)}) ` +
+                    writeStderrLine(`hopcode serve: /acp replay complete (${logSafe(sessionId)}) ` +
                         `from=${lastEventId ?? 'none'} delivered_through=${lastDeliveredId} ` +
                         `count=${replayedCount ?? 'n/a'} evicted=${sawEviction}`);
                 }
@@ -2812,7 +2812,7 @@ export class AcpDispatcher {
                     // permission across grace) belongs with the permission-coordination
                     // follow-up, not this content-stream PR.
                     if (binding?.graceTimer) {
-                        writeStderrLine(`qwen serve: /acp permission cancel during reconnect grace ` +
+                        writeStderrLine(`hopcode serve: /acp permission cancel during reconnect grace ` +
                             `(${logSafe(sessionId)}); vote not deferred (see §1.7 follow-up)`);
                     }
                     const cancelled = this.cancelAbandonedPermission({ sessionId, bridgeRequestId: data.requestId }, 
@@ -2932,7 +2932,7 @@ export class AcpDispatcher {
             // vote silently. The POST already returned 202, so without a log line the
             // operator has no grep-friendly signal to correlate against a permission
             // prompt that stays blocked until teardown's `abandonPendingForSession`.
-            writeStderrLine(`qwen serve: /acp permission vote dropped: responding connection ${logSafe(conn.connectionId.slice(0, 8))} does not own session ${logSafe(pending.sessionId)} (requestId ${logSafe(pending.bridgeRequestId)})`);
+            writeStderrLine(`hopcode serve: /acp permission vote dropped: responding connection ${logSafe(conn.connectionId.slice(0, 8))} does not own session ${logSafe(pending.sessionId)} (requestId ${logSafe(pending.bridgeRequestId)})`);
             return;
         }
         // NOTE: do NOT delete the pending entry yet. Keep it until either the
@@ -3043,7 +3043,7 @@ export class AcpDispatcher {
                 // tell that benign case apart from an unexpected bridge regression that
                 // starts exercising this fallback (which would otherwise be invisible).
                 anchorId = undefined;
-                writeStderrLine(`qwen serve: /acp replySession(${logSafe(sessionId)}) ` +
+                writeStderrLine(`hopcode serve: /acp replySession(${logSafe(sessionId)}) ` +
                     `anchor unavailable, deferring unanchored: ` +
                     logSafe(err instanceof Error ? err.message : String(err)));
             }

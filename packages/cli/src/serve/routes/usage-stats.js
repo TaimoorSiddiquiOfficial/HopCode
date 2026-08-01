@@ -56,7 +56,7 @@ export function registerUsageStatsRoutes(app, deps = {}) {
             res.status(200).json(dashboard);
         }
         catch (err) {
-            writeStderrLine(`qwen serve: GET /usage/dashboard failed: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: GET /usage/dashboard failed: ${err instanceof Error ? err.message : String(err)}`);
             res.status(500).json({
                 error: 'Failed to load usage dashboard',
                 code: 'usage_dashboard_failed',

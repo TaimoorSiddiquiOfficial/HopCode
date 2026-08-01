@@ -6715,7 +6715,7 @@ export class Config {
     }
 
     // create_sub_session: spawn a fresh top-level sub-session and run a prompt
-    // in it. Only functional under `qwen serve` (needs the bridge, wired as a
+    // in it. Only functional under `hopcode serve` (needs the bridge, wired as a
     // spawner by the ACP session); the tool's execute() reports a clear
     // daemon-only error otherwise. Registered unconditionally so the message is
     // available rather than the tool silently missing.

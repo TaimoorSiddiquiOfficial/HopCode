@@ -38,7 +38,7 @@ const CDP_WS_HEARTBEAT_MS = 15_000;
 export function attachCdpClient(ws, registry, log) {
     const bridge = registry.getActive();
     if (!bridge) {
-        log('qwen serve: /cdp rejected — no extension bridge connected');
+        log('hopcode serve: /cdp rejected — no extension bridge connected');
         try {
             ws.close(CLOSE_NO_BRIDGE, 'No browser extension connected to the CDP tunnel');
         }
@@ -51,7 +51,7 @@ export function attachCdpClient(ws, registry, log) {
     // overlapping `/cdp` connection would clobber the first's inbound routing,
     // silently corrupting both — reject it instead so the first keeps working.
     if (bridge.cdpBound) {
-        log('qwen serve: /cdp rejected — a puppeteer client is already bound');
+        log('hopcode serve: /cdp rejected — a puppeteer client is already bound');
         try {
             ws.close(CLOSE_NO_BRIDGE, 'A CDP client is already connected');
         }
@@ -78,7 +78,7 @@ export function attachCdpClient(ws, registry, log) {
     // If the extension reports detach, close the puppeteer socket so puppeteer
     // observes the disconnect (ExtensionTransport has no onDetach of its own).
     link.onDetach = (reason) => {
-        log(`qwen serve: /cdp tab detached (${reason}); closing puppeteer socket`);
+        log(`hopcode serve: /cdp tab detached (${reason}); closing puppeteer socket`);
         try {
             ws.close(CLOSE_NORMAL, `tab detached: ${reason}`);
         }
@@ -92,7 +92,7 @@ export function attachCdpClient(ws, registry, log) {
         if (disposed)
             return;
         if (!heartbeatAlive) {
-            log('qwen serve: /cdp heartbeat missed; closing puppeteer socket');
+            log('hopcode serve: /cdp heartbeat missed; closing puppeteer socket');
             dispose('puppeteer /cdp heartbeat missed');
             try {
                 ws.close(CLOSE_NORMAL, 'cdp heartbeat missed');
@@ -107,7 +107,7 @@ export function attachCdpClient(ws, registry, log) {
             ws.ping();
         }
         catch (err) {
-            log(`qwen serve: /cdp heartbeat ping failed: ${err instanceof Error ? err.message : String(err)}`);
+            log(`hopcode serve: /cdp heartbeat ping failed: ${err instanceof Error ? err.message : String(err)}`);
             dispose('puppeteer /cdp heartbeat ping failed');
             try {
                 ws.close(CLOSE_NORMAL, 'cdp heartbeat failed');
@@ -131,10 +131,10 @@ export function attachCdpClient(ws, registry, log) {
         if (notifyExtension && registry.getActive() === bridge) {
             try {
                 bridge.send({ type: CDP_FRAME_TYPES.release });
-                log(`qwen serve: /cdp sent release to extension (puppeteer disconnected: ${reason})`);
+                log(`hopcode serve: /cdp sent release to extension (puppeteer disconnected: ${reason})`);
             }
             catch (err) {
-                log(`qwen serve: /cdp release send failed: ${err instanceof Error ? err.message : String(err)}`);
+                log(`hopcode serve: /cdp release send failed: ${err instanceof Error ? err.message : String(err)}`);
             }
         }
         link.dispose(reason);
@@ -147,7 +147,7 @@ export function attachCdpClient(ws, registry, log) {
         }
     };
     link.onAttachFailure = (reason) => {
-        log(`qwen serve: /cdp attach failed (${reason}); closing puppeteer socket`);
+        log(`hopcode serve: /cdp attach failed (${reason}); closing puppeteer socket`);
         dispose(`cdp_attach failed: ${reason}`, false);
         try {
             ws.close(CLOSE_NO_BRIDGE, 'cdp attach failed');
@@ -163,7 +163,7 @@ export function attachCdpClient(ws, registry, log) {
     // longer answer page-domain commands, so close the puppeteer socket. Without
     // this, puppeteer hangs until the ~170s CDP command timeout.
     bridge.onExtensionGone = () => {
-        log('qwen serve: extension /acp dropped; closing puppeteer /cdp socket');
+        log('hopcode serve: extension /acp dropped; closing puppeteer /cdp socket');
         // Don't send a release frame here — the extension is already gone.
         dispose('extension /acp disconnected', false);
         try {
@@ -184,16 +184,16 @@ export function attachCdpClient(ws, registry, log) {
             return;
         }
         void emulator.handleFromClient(frame).catch((err) => {
-            log(`qwen serve: /cdp emulator error: ${err instanceof Error ? err.message : String(err)}`);
+            log(`hopcode serve: /cdp emulator error: ${err instanceof Error ? err.message : String(err)}`);
         });
     });
     ws.on('close', () => dispose('puppeteer /cdp socket closed'));
     ws.on('error', (err) => {
-        log(`qwen serve: /cdp WS error: ${err instanceof Error ? err.message : String(err)}`);
+        log(`hopcode serve: /cdp WS error: ${err instanceof Error ? err.message : String(err)}`);
         dispose('puppeteer /cdp socket error');
     });
     // Lazy attach: tools can load over `/cdp` without immediately putting Chrome
     // into debugging mode. The first page-domain command attaches the active tab.
-    log('qwen serve: /cdp puppeteer client bound to extension bridge');
+    log('hopcode serve: /cdp puppeteer client bound to extension bridge');
 }
 //# sourceMappingURL=cdp-ws.js.map

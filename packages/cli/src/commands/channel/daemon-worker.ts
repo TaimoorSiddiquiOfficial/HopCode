@@ -681,7 +681,7 @@ function assertInternalDaemonWorkerInvocation(): void {
   const sentinel = process.env[CHANNEL_DAEMON_WORKER_SENTINEL];
   if (!sentinel || sentinel === '1' || typeof process.send !== 'function') {
     scrubDaemonWorkerEnv();
-    throw new Error('daemon-worker is an internal qwen serve command.');
+    throw new Error('daemon-worker is an internal hopcode serve command.');
   }
 }
 

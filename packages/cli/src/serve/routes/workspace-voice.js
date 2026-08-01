@@ -244,7 +244,7 @@ function handleVoiceStatus(res, deps, route) {
             .json(buildWorkspaceVoiceStatus(deps.boundWorkspace, loadVoiceSettings(deps)));
     }
     catch (err) {
-        writeStderrLine(`qwen serve: ${route} error: ${err instanceof Error ? err.message : String(err)}`);
+        writeStderrLine(`hopcode serve: ${route} error: ${err instanceof Error ? err.message : String(err)}`);
         res.status(500).json({
             error: 'Failed to load voice settings',
             code: 'internal_error',
@@ -282,7 +282,7 @@ async function handleVoiceUpdate(req, res, deps, route) {
         await persistVoiceUpdate(deps, settings, parsed, clientId, workspaceTrusted);
     }
     catch (err) {
-        writeStderrLine(`qwen serve: ${route} persist error (workspace=${deps.boundWorkspace}): ${err instanceof Error ? err.message : String(err)}`);
+        writeStderrLine(`hopcode serve: ${route} persist error (workspace=${deps.boundWorkspace}): ${err instanceof Error ? err.message : String(err)}`);
         res.status(500).json({
             error: 'Failed to persist voice settings',
             code: 'persist_error',
@@ -295,7 +295,7 @@ async function handleVoiceUpdate(req, res, deps, route) {
             .json(buildWorkspaceVoiceStatus(deps.boundWorkspace, loadVoiceSettings(deps)));
     }
     catch (err) {
-        writeStderrLine(`qwen serve: ${route} reload error after persist (workspace=${deps.boundWorkspace}): ${err instanceof Error ? err.message : String(err)}`);
+        writeStderrLine(`hopcode serve: ${route} reload error after persist (workspace=${deps.boundWorkspace}): ${err instanceof Error ? err.message : String(err)}`);
         res.status(500).json({
             error: 'Voice settings persisted but failed to reload',
             code: 'internal_error',
@@ -387,7 +387,7 @@ async function handleVoiceTranscription(req, res, deps, route) {
         if (sendVoiceError(res, err))
             return;
         const message = sanitizeVoiceErrorMessage(err instanceof Error ? err.message : String(err));
-        writeStderrLine(`qwen serve: ${route} error (workspace=${deps.boundWorkspace}): ${message}`);
+        writeStderrLine(`hopcode serve: ${route} error (workspace=${deps.boundWorkspace}): ${message}`);
         res.status(502).json({
             error: 'Voice transcription failed',
             code: 'voice_transcription_failed',

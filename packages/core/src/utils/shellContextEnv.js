@@ -55,7 +55,7 @@ function isUnusableScriptEntry(path) {
         }
     }
     catch {
-        // Unreadable or non-executable is unusable either way; fall back to `qwen`.
+        // Unreadable or non-executable is unusable either way; fall back to `hopcode`.
         unusable = true;
     }
     unusableCache.set(path, unusable);
@@ -85,18 +85,18 @@ export function getShellContextEnvVars() {
     }
     // The CLI a subprocess should call to reach *this* build.
     //
-    // A skill that shells out to `qwen …` gets whatever `qwen` PATH resolves to,
+    // A skill that shells out to `hopcode …` gets whatever `hopcode` PATH resolves to,
     // which is not necessarily the code that launched it: run `npm run dev:daemon`
-    // on a machine with an older global install and every `qwen review …` the
+    // on a machine with an older global install and every `hopcode review …` the
     // /review skill issues lands in the old binary. Measured: a current-source
-    // daemon told its shell to run `qwen review agent-prompt --role 0`, PATH
+    // daemon told its shell to run `hopcode review agent-prompt --role 0`, PATH
     // resolved to a v0.19.10 global whose `agent-prompt` predates `--role`, and the
     // run died on `Missing required argument: chunk` — the skill and the CLI running
     // it were different programs.
     //
     // So the entry is passed down instead of rediscovered. The bin wrapper sets it
     // (it is the executable entry, and knows its own path); a subprocess prefers it
-    // and falls back to `qwen` when it is absent, which is exactly the old behaviour.
+    // and falls back to `hopcode` when it is absent, which is exactly the old behaviour.
     //
     // Passed down only when a shell could actually exec it. The variable predates
     // this mechanism with a SECOND meaning: the desktop app's tooling sets it to a
@@ -111,7 +111,7 @@ export function getShellContextEnvVars() {
     // a key omitted here arrives anyway, inherited through the spread. The first
     // cut omitted, and on exactly the hosts the filter was written for the value
     // leaked through and every `"${HOPCODE_CODE_CLI:-qwen}"` died on exit 126.
-    // Empty is safe for the consumer: the `:-` expansion falls back to `qwen` on
+    // Empty is safe for the consumer: the `:-` expansion falls back to `hopcode` on
     // unset AND on empty.
     const cliEntry = process.env['HOPCODE_CODE_CLI'];
     if (cliEntry) {

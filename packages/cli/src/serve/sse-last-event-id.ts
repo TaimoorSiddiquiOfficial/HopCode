@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -44,7 +44,7 @@ export function parseLastEventId(
   if (typeof raw !== 'string' || !/^\d+$/.test(raw)) {
     if (typeof raw === 'string' && raw.length > 0) {
       writeStderrLine(
-        `qwen serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
+        `hopcode serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
           `(not a decimal integer)`,
       );
     }
@@ -53,7 +53,7 @@ export function parseLastEventId(
   const n = Number.parseInt(raw, 10);
   if (!Number.isFinite(n) || n > Number.MAX_SAFE_INTEGER) {
     writeStderrLine(
-      `qwen serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
+      `hopcode serve: ${logPrefix}rejected Last-Event-ID ${safeLogValue(raw)} ` +
         `(exceeds Number.MAX_SAFE_INTEGER)`,
     );
     return undefined;

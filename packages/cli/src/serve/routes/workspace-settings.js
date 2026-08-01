@@ -281,7 +281,7 @@ export function registerWorkspaceQualifiedSettingsRoutes(app, deps) {
             res.status(200).json(response);
         }
         catch (err) {
-            writeStderrLine(`qwen serve: GET /workspaces/:workspace/settings error: ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: GET /workspaces/:workspace/settings error: ${err instanceof Error ? err.message : String(err)}`);
             res.status(500).json({
                 error: 'Failed to load settings',
                 code: 'internal_error',
@@ -378,7 +378,7 @@ export function registerWorkspaceQualifiedSettingsRoutes(app, deps) {
             }
         }
         catch (err) {
-            writeStderrLine(`qwen serve: POST /workspaces/:workspace/settings persist error (key=${key}, scope=${scope}, workspace=${runtime.workspaceCwd}): ${err instanceof Error ? err.message : String(err)}`);
+            writeStderrLine(`hopcode serve: POST /workspaces/:workspace/settings persist error (key=${key}, scope=${scope}, workspace=${runtime.workspaceCwd}): ${err instanceof Error ? err.message : String(err)}`);
             res.status(500).json({
                 error: 'Failed to persist setting',
                 code: 'persist_error',

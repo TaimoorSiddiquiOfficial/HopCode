@@ -114,7 +114,7 @@ async function renderGlobalBefore(skills) {
         encoding: 'utf-8',
     }).trim();
     const packageRoot = process.env['QWEN_GLOBAL_PACKAGE_ROOT'] ??
-        path.join(npmRoot, '@qwen-code', 'qwen-code');
+        path.join(npmRoot, '@hoptrendy', 'qwen-code');
     const packageJson = JSON.parse(await fs.readFile(path.join(packageRoot, 'package.json'), 'utf-8'));
     const chunksDir = path.join(packageRoot, 'chunks');
     const { content } = await findGlobalInteractiveChunk(chunksDir);

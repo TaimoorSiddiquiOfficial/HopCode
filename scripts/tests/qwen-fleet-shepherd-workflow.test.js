@@ -51,7 +51,7 @@ describe('fleet shepherd workflow', () => {
 
   it('walks only in-repo main-targeting bot PRs', () => {
     expect(workflow).toContain(
-      'AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || \'qwen-code-dev-bot\' }}"',
+      'AUTOFIX_BOT: "${{ vars.AUTOFIX_BOT_LOGIN || \'hopcode-dev-bot\' }}"',
     );
     expect(workflow).toContain('--author "${AUTOFIX_BOT}" --base main');
     expect(workflow).toContain('.isCrossRepository != true');

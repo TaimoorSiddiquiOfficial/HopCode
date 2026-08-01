@@ -1514,7 +1514,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
         expect(p).toContain('.qwen/tmp/review-pr-6766');
         expect(p).toContain('"${QWEN_CODE_CLI:-qwen}" review test-efficacy /tmp/plan.json');
         expect(p).toContain('--base abc123');
-        // No bare executable `qwen` anywhere in this brief. Agent 7 is the one
+        // No bare executable `hopcode` anywhere in this brief. Agent 7 is the one
         // SUBAGENT that shells out to the review CLI — the one call site neither the
         // SKILL.md sweep nor check-coverage's stderr hints can reach — and its shell
         // gets QWEN_CODE_CLI exactly as the orchestrator's does. On the machine that

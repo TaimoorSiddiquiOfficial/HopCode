@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -64,8 +64,8 @@ describe('pr force-push reminder workflow', () => {
       "sender?.type === 'Bot' || KNOWN_AUTOMATION.has(sender?.login)",
     );
     for (const login of [
-      'qwen-code-ci-bot',
-      'qwen-code-dev-bot',
+      'hopcode-ci-bot',
+      'hopcode-dev-bot',
       'github-actions',
       'github-actions[bot]',
       'gemini-cli-robot',

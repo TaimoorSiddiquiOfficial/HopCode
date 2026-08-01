@@ -2561,7 +2561,7 @@ describe('ChatCompressionService.compress cheap-gate uses computeThresholds.auto
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config,
       consecutiveFailures: 0,
       originalTokenCount: 20_000,
@@ -2583,7 +2583,7 @@ describe('ChatCompressionService.compress cheap-gate uses computeThresholds.auto
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config,
       consecutiveFailures: 0,
       originalTokenCount: 20_000,
@@ -2639,7 +2639,7 @@ describe('ChatCompressionService.compress cheap-gate runs against the full windo
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: makeFakeConfig({ contextWindowSize: 131_072 }),
       consecutiveFailures: 0,
       originalTokenCount: 90_000,
@@ -2660,7 +2660,7 @@ describe('ChatCompressionService.compress cheap-gate runs against the full windo
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: makeFakeConfig({ contextWindowSize: 131_072 }),
       consecutiveFailures: 0,
       originalTokenCount: 60_000,
@@ -2678,7 +2678,7 @@ describe('ChatCompressionService.compress cheap-gate runs against the full windo
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: makeFakeConfig({ contextWindowSize: 200_000 }),
       consecutiveFailures: 0,
       originalTokenCount: 160_000,
@@ -2703,7 +2703,7 @@ describe('ChatCompressionService.compress cheap-gate runs against the full windo
     const result = await new ChatCompressionService().compress(makeFakeChat(), {
       promptId: 'p',
       force: false,
-      model: 'qwen-test',
+      model: 'hopcode-test',
       config: makeFakeConfig({ contextWindowSize: 131_072 }),
       consecutiveFailures: 0,
       originalTokenCount: 120_000,

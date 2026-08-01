@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -34,7 +34,7 @@ const PACKAGE_SCAN_FORBIDDEN_LITERALS = [
 export function preparePackage({
   rootDir = defaultRootDir,
   requireNativeAudioCapture = process.env
-    .QWEN_REQUIRE_AUDIO_CAPTURE_PREBUILD === '1',
+    .HOPCODE_REQUIRE_AUDIO_CAPTURE_PREBUILD === '1',
   maxPackageUnpackedBytes = DEFAULT_MAX_NPM_PACKAGE_UNPACKED_BYTES,
 } = {}) {
   const distDir = path.join(rootDir, 'dist');

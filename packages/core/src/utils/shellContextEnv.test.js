@@ -21,7 +21,7 @@ describe('getShellContextEnvVars', () => {
     let originalSessionId;
     // Isolated for the same reason as the session id, and it matters more now: the
     // CLI exports QWEN_CODE_CLI to every shell it spawns, so a `npm test` run started
-    // from inside a qwen session inherits it — and the exact-equality assertion below
+    // from inside a hopcode session inherits it — and the exact-equality assertion below
     // would fail on a variable the test never set.
     let originalCli;
     // And QWEN_CODE_PROJECT_DIR, for the same reason again — the CLI exports it
@@ -58,9 +58,9 @@ describe('getShellContextEnvVars', () => {
             delete process.env['QWEN_CODE_PROJECT_DIR'];
         }
     });
-    it('passes the running CLI down, so a subprocess does not resolve `qwen` off PATH', () => {
-        // A skill that shells out to `qwen …` would otherwise reach whatever the machine
-        // has installed. Dogfooded: a dev-daemon session ran `qwen review agent-prompt
+    it('passes the running CLI down, so a subprocess does not resolve `hopcode` off PATH', () => {
+        // A skill that shells out to `hopcode …` would otherwise reach whatever the machine
+        // has installed. Dogfooded: a dev-daemon session ran `hopcode review agent-prompt
         // --role 0`, PATH found a v0.19.10 whose agent-prompt predates --role, and the
         // review died on "Missing required argument: chunk".
         const dir = mkdtempSync(join(tmpdir(), 'cli-entry-'));
@@ -84,7 +84,7 @@ describe('getShellContextEnvVars', () => {
         // every spawn site composes the child env as `{...process.env, ...vars}`,
         // so a key merely omitted from the returned record arrives anyway, inherited
         // through the spread — reproduced: exit 126 on exactly the hosts the filter
-        // was written for. The `:-` expansion falls back to `qwen` on empty.
+        // was written for. The `:-` expansion falls back to `hopcode` on empty.
         const dir = mkdtempSync(join(tmpdir(), 'cli-nosb-'));
         try {
             const bundle = join(dir, 'cli.js');

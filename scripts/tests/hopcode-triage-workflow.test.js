@@ -84,7 +84,7 @@ describe('hopcode-triage tmux workflow', () => {
     expect(notifyStep).toContain("github.event_name == 'issue_comment'");
     expect(notifyStep).toContain('github.event.issue.pull_request');
     expect(notifyStep).toContain(
-      "startsWith(github.event.comment.body, '@qwen-code /triage')",
+      "startsWith(github.event.comment.body, '@hopcode /triage')",
     );
     expect(notifyStep).toContain('--method GET');
     expect(notifyStep).toContain('--paginate');
@@ -97,7 +97,7 @@ describe('hopcode-triage tmux workflow', () => {
     expect(notifyStep).toContain(
       'gh api "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments"',
     );
-    expect(notifyStep).toContain('<!-- qwen-triage stage=rerun-summary -->');
+    expect(notifyStep).toContain('<!-- hopcode-triage stage=rerun-summary -->');
     expect(notifyStep).toContain(
       'Triage re-run completed without a new review.',
     );

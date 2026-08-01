@@ -3,7 +3,7 @@
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
  *
- * Side panel host. Probes the local `qwen serve` daemon and either frames its
+ * Side panel host. Probes the local `hopcode serve` daemon and either frames its
  * Web Shell (chat + tools) or shows a welcome screen with the exact command to
  * run. The extension has no UI of its own — it's a CDP-tunnel pipe — so the
  * panel just frames the daemon once one is reachable and permits framing.
@@ -22,7 +22,7 @@ const SHELL_AUTH_MESSAGE_TYPE = 'qwen-daemon-auth';
 
 /** The command to start a daemon that allows this extension's own origin. */
 const allowOriginCommand = (extensionId) =>
-  `qwen serve --allow-origin chrome-extension://${extensionId}`;
+  `hopcode serve --allow-origin chrome-extension://${extensionId}`;
 
 const els = {
   iframe: document.getElementById('ui'),
@@ -103,15 +103,15 @@ function showWelcome(state, command) {
   els.welcome.classList.remove('hidden');
   els.cmd.textContent = command;
   if (state === 'down') {
-    els.title.textContent = 'Start qwen serve';
+    els.title.textContent = 'Start hopcode serve';
     els.desc.textContent =
-      'No local qwen serve daemon is reachable. Run this in a terminal and ' +
+      'No local hopcode serve daemon is reachable. Run this in a terminal and ' +
       'leave it running, then this panel connects automatically. Set ' +
       'QWEN_CDP_MCP_COMMAND as well to enable browser automation tools.';
   } else {
     els.title.textContent = 'Allow this extension';
     els.desc.textContent =
-      'qwen serve is running but is not allowed to load its UI here. Restart ' +
+      'hopcode serve is running but is not allowed to load its UI here. Restart ' +
       'it with the flag below (it names this extension), then this panel ' +
       'connects automatically. Set QWEN_CDP_MCP_COMMAND as well to enable ' +
       'browser automation tools.';
