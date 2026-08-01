@@ -1716,12 +1716,12 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-env-reload-')),
     );
-    const originalBase = process.env['QWEN_TEST_BOOT_BASE'];
-    const originalLeak = process.env['QWEN_TEST_RELOAD_LEAK'];
-    const originalRemoved = process.env['QWEN_TEST_REMOVED_FROM_DOTENV'];
-    process.env['QWEN_TEST_BOOT_BASE'] = 'base';
-    process.env['QWEN_TEST_REMOVED_FROM_DOTENV'] = 'stale';
-    delete process.env['QWEN_TEST_RELOAD_LEAK'];
+    const originalBase = process.env['HOPCODE_TEST_BOOT_BASE'];
+    const originalLeak = process.env['HOPCODE_TEST_RELOAD_LEAK'];
+    const originalRemoved = process.env['HOPCODE_TEST_REMOVED_FROM_DOTENV'];
+    process.env['HOPCODE_TEST_BOOT_BASE'] = 'base';
+    process.env['HOPCODE_TEST_REMOVED_FROM_DOTENV'] = 'stale';
+    delete process.env['HOPCODE_TEST_RELOAD_LEAK'];
 
     vi.spyOn(hopcodecore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
@@ -1735,18 +1735,18 @@ describe('runHopCodeServe runtime startup failures', () => {
         return {
           merged: {
             env: {
-              QWEN_TEST_RUNTIME_VALUE: isReload ? 'reloaded' : 'boot',
+              HOPCODE_TEST_RUNTIME_VALUE: isReload ? 'reloaded' : 'boot',
             },
           },
         } as unknown as ReturnType<typeof settingsRuntime.loadSettings>;
       },
     );
     vi.spyOn(settingsRuntime, 'reloadEnvironment').mockImplementation(() => {
-      process.env['QWEN_TEST_RELOAD_LEAK'] = 'workspace-a';
-      delete process.env['QWEN_TEST_REMOVED_FROM_DOTENV'];
+      process.env['HOPCODE_TEST_RELOAD_LEAK'] = 'workspace-a';
+      delete process.env['HOPCODE_TEST_REMOVED_FROM_DOTENV'];
       return {
-        updatedKeys: ['QWEN_TEST_RELOAD_LEAK'],
-        removedKeys: ['QWEN_TEST_REMOVED_FROM_DOTENV'],
+        updatedKeys: ['HOPCODE_TEST_RELOAD_LEAK'],
+        removedKeys: ['HOPCODE_TEST_REMOVED_FROM_DOTENV'],
       };
     });
     vi.spyOn(trustedFoldersRuntime, 'getWorkspaceTrustStatus').mockReturnValue({
@@ -1799,7 +1799,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       expect(workspace).toBeDefined();
       expect(primaryRuntimeEnv?.effectiveEnv).toBeDefined();
       const capturedRuntimeEnv = primaryRuntimeEnv!.effectiveEnv!;
-      expect(capturedRuntimeEnv['QWEN_TEST_RUNTIME_VALUE']).toBe('boot');
+      expect(capturedRuntimeEnv['HOPCODE_TEST_RUNTIME_VALUE']).toBe('boot');
 
       await workspace!.reload({
         route: 'POST /workspace/reload',
@@ -1807,28 +1807,28 @@ describe('runHopCodeServe runtime startup failures', () => {
       });
 
       const reloadBaseEnv = buildRuntimeEnvironment.mock.calls.at(-1)?.[2];
-      expect(reloadBaseEnv?.['QWEN_TEST_BOOT_BASE']).toBe('base');
-      expect(reloadBaseEnv?.['QWEN_TEST_REMOVED_FROM_DOTENV']).toBe('stale');
-      expect(reloadBaseEnv?.['QWEN_TEST_RELOAD_LEAK']).toBeUndefined();
+      expect(reloadBaseEnv?.['HOPCODE_TEST_BOOT_BASE']).toBe('base');
+      expect(reloadBaseEnv?.['HOPCODE_TEST_REMOVED_FROM_DOTENV']).toBe('stale');
+      expect(reloadBaseEnv?.['HOPCODE_TEST_RELOAD_LEAK']).toBeUndefined();
       expect(primaryRuntimeEnv!.effectiveEnv).toBe(capturedRuntimeEnv);
-      expect(capturedRuntimeEnv['QWEN_TEST_RUNTIME_VALUE']).toBe('reloaded');
-      expect(capturedRuntimeEnv['QWEN_TEST_REMOVED_FROM_DOTENV']).toBe('stale');
-      expect(capturedRuntimeEnv['QWEN_TEST_RELOAD_LEAK']).toBeUndefined();
+      expect(capturedRuntimeEnv['HOPCODE_TEST_RUNTIME_VALUE']).toBe('reloaded');
+      expect(capturedRuntimeEnv['HOPCODE_TEST_REMOVED_FROM_DOTENV']).toBe('stale');
+      expect(capturedRuntimeEnv['HOPCODE_TEST_RELOAD_LEAK']).toBeUndefined();
     } finally {
       if (originalBase === undefined) {
-        delete process.env['QWEN_TEST_BOOT_BASE'];
+        delete process.env['HOPCODE_TEST_BOOT_BASE'];
       } else {
-        process.env['QWEN_TEST_BOOT_BASE'] = originalBase;
+        process.env['HOPCODE_TEST_BOOT_BASE'] = originalBase;
       }
       if (originalLeak === undefined) {
-        delete process.env['QWEN_TEST_RELOAD_LEAK'];
+        delete process.env['HOPCODE_TEST_RELOAD_LEAK'];
       } else {
-        process.env['QWEN_TEST_RELOAD_LEAK'] = originalLeak;
+        process.env['HOPCODE_TEST_RELOAD_LEAK'] = originalLeak;
       }
       if (originalRemoved === undefined) {
-        delete process.env['QWEN_TEST_REMOVED_FROM_DOTENV'];
+        delete process.env['HOPCODE_TEST_REMOVED_FROM_DOTENV'];
       } else {
-        process.env['QWEN_TEST_REMOVED_FROM_DOTENV'] = originalRemoved;
+        process.env['HOPCODE_TEST_REMOVED_FROM_DOTENV'] = originalRemoved;
       }
       await handle.close();
     }
@@ -1850,7 +1850,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         return {
           merged: {
             env: {
-              QWEN_TEST_RUNTIME_VALUE: isReload ? 'reloaded' : 'boot',
+              HOPCODE_TEST_RUNTIME_VALUE: isReload ? 'reloaded' : 'boot',
             },
           },
         } as unknown as ReturnType<typeof settingsRuntime.loadSettings>;
@@ -1922,7 +1922,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       expect(workspace).toBeDefined();
       expect(primaryRuntimeEnv?.effectiveEnv).toBeDefined();
       const capturedRuntimeEnv = primaryRuntimeEnv!.effectiveEnv!;
-      expect(capturedRuntimeEnv['QWEN_TEST_RUNTIME_VALUE']).toBe('boot');
+      expect(capturedRuntimeEnv['HOPCODE_TEST_RUNTIME_VALUE']).toBe('boot');
 
       failReloadBuild = true;
       await workspace!.reload({
@@ -1931,7 +1931,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       });
 
       expect(primaryRuntimeEnv!.effectiveEnv).toBe(capturedRuntimeEnv);
-      expect(capturedRuntimeEnv['QWEN_TEST_RUNTIME_VALUE']).toBe('boot');
+      expect(capturedRuntimeEnv['HOPCODE_TEST_RUNTIME_VALUE']).toBe('boot');
       expect(primaryRuntimeEnv!.fallbackReason).toBe(
         'runtime env rebuild failed',
       );
@@ -1942,7 +1942,7 @@ describe('runHopCodeServe runtime startup failures', () => {
         workspaceCwd: tmpDir,
       });
       expect(primaryRuntimeEnv!.effectiveEnv).toBe(capturedRuntimeEnv);
-      expect(capturedRuntimeEnv['QWEN_TEST_RUNTIME_VALUE']).toBe('reloaded');
+      expect(capturedRuntimeEnv['HOPCODE_TEST_RUNTIME_VALUE']).toBe('reloaded');
       expect(primaryRuntimeEnv!.fallbackReason).toBeUndefined();
 
       await handle.close();
@@ -1982,15 +1982,15 @@ describe('runHopCodeServe runtime startup failures', () => {
           merged: {
             env: {
               [isSecondary
-                ? 'QWEN_TEST_SECONDARY_ENV'
-                : 'QWEN_TEST_PRIMARY_ENV']: isReload ? 'reloaded' : 'boot',
+                ? 'HOPCODE_TEST_SECONDARY_ENV'
+                : 'HOPCODE_TEST_PRIMARY_ENV']: isReload ? 'reloaded' : 'boot',
             },
           },
         } as unknown as ReturnType<typeof settingsRuntime.loadSettings>;
       },
     );
     vi.spyOn(settingsRuntime, 'reloadEnvironment').mockReturnValue({
-      updatedKeys: ['QWEN_TEST_SECONDARY_ENV'],
+      updatedKeys: ['HOPCODE_TEST_SECONDARY_ENV'],
       removedKeys: [],
     });
     vi.spyOn(trustedFoldersRuntime, 'getWorkspaceTrustStatus').mockReturnValue({
@@ -2039,7 +2039,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       const overlayKeys = env.overlayKeys;
       const envFilePaths = env.envFilePaths;
       const envFileReadFailures = env.envFileReadFailures;
-      expect(env.effectiveEnv?.['QWEN_TEST_SECONDARY_ENV']).toBe('boot');
+      expect(env.effectiveEnv?.['HOPCODE_TEST_SECONDARY_ENV']).toBe('boot');
 
       await secondaryRuntime!.workspaceService.reload({
         route: 'POST /workspace/reload',
@@ -2049,7 +2049,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       expect(env.overlayKeys).toBe(overlayKeys);
       expect(env.envFilePaths).toBe(envFilePaths);
       expect(env.envFileReadFailures).toBe(envFileReadFailures);
-      expect(env.effectiveEnv?.['QWEN_TEST_SECONDARY_ENV']).toBe('reloaded');
+      expect(env.effectiveEnv?.['HOPCODE_TEST_SECONDARY_ENV']).toBe('reloaded');
     } finally {
       await handle.close();
     }
@@ -3156,12 +3156,12 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-webhook-start-')),
     );
     const previoushopcodeHome = process.env['HOPCODE_HOME'];
-    const previousWebhookSecret = process.env['QWEN_DEFERRED_WEBHOOK_SECRET'];
+    const previousWebhookSecret = process.env['HOPCODE_DEFERRED_WEBHOOK_SECRET'];
     const tempHome = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qws-runtime-webhook-home-'),
     );
     process.env['HOPCODE_HOME'] = tempHome;
-    process.env['QWEN_DEFERRED_WEBHOOK_SECRET'] = 'global-secret';
+    process.env['HOPCODE_DEFERRED_WEBHOOK_SECRET'] = 'global-secret';
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     fs.writeFileSync(
       path.join(tempHome, 'settings.json'),
@@ -3172,7 +3172,7 @@ describe('runHopCodeServe runtime startup failures', () => {
             webhooks: {
               sources: {
                 'github ci': {
-                  secretEnv: 'QWEN_DEFERRED_WEBHOOK_SECRET',
+                  secretEnv: 'HOPCODE_DEFERRED_WEBHOOK_SECRET',
                   targets: {
                     default: {
                       chatId: 'group-1',
@@ -3195,9 +3195,9 @@ describe('runHopCodeServe runtime startup failures', () => {
       (_settings, _workspace, baseEnv) => ({
         effectiveEnv: Object.freeze({
           ...baseEnv,
-          QWEN_DEFERRED_WEBHOOK_SECRET: 'workspace-secret',
+          HOPCODE_DEFERRED_WEBHOOK_SECRET: 'workspace-secret',
         }),
-        overlayKeys: Object.freeze(['QWEN_DEFERRED_WEBHOOK_SECRET']),
+        overlayKeys: Object.freeze(['HOPCODE_DEFERRED_WEBHOOK_SECRET']),
         envFilePaths: Object.freeze([]),
         envFileReadFailed: false,
         envFileReadFailures: Object.freeze([]),
@@ -3288,9 +3288,9 @@ describe('runHopCodeServe runtime startup failures', () => {
         process.env['HOPCODE_HOME'] = previoushopcodeHome;
       }
       if (previousWebhookSecret === undefined) {
-        delete process.env['QWEN_DEFERRED_WEBHOOK_SECRET'];
+        delete process.env['HOPCODE_DEFERRED_WEBHOOK_SECRET'];
       } else {
-        process.env['QWEN_DEFERRED_WEBHOOK_SECRET'] = previousWebhookSecret;
+        process.env['HOPCODE_DEFERRED_WEBHOOK_SECRET'] = previousWebhookSecret;
       }
       settingsRuntime.resetHomeEnvBootstrapForTesting();
     }

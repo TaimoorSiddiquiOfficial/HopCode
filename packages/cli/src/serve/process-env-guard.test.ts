@@ -81,7 +81,7 @@ const allowedProcessEnvAccesses = normalizeAllowances([
     {
       reason: 'Daemon log and runtime locations are process-scoped.',
       accesses: {
-        'key:QWEN_DAEMON_LOG_FILE': 1,
+        'key:HOPCODE_DAEMON_LOG_FILE': 1,
         'key:HOPCODE_RUNTIME_DIR': 1,
       },
     },
@@ -128,7 +128,7 @@ const allowedProcessEnvAccesses = normalizeAllowances([
     'packages/cli/src/serve/fs/audit.ts',
     {
       reason: 'Filesystem audit redaction is a daemon-wide logging policy.',
-      accesses: { 'key:QWEN_AUDIT_RAW_PATHS': 1 },
+      accesses: { 'key:HOPCODE_AUDIT_RAW_PATHS': 1 },
     },
   ],
   [
@@ -144,8 +144,8 @@ const allowedProcessEnvAccesses = normalizeAllowances([
         'computed:HOPCODE_SERVE_WRITER_IDLE_TIMEOUT_MS_ENV': 1,
         'computed:RUNTIME_STARTUP_TIMEOUT_ENV': 1,
         'key:HOPCODE_CODE_IDE_WORKSPACE_PATH': 1,
-        'key:QWEN_SERVE_NO_MCP_POOL': 1,
-        'key:QWEN_SERVE_NO_PERSISTENT_REGISTRATION': 1,
+        'key:HOPCODE_SERVE_NO_MCP_POOL': 1,
+        'key:HOPCODE_SERVE_NO_PERSISTENT_REGISTRATION': 1,
         'key:VITEST_WORKER_ID': 1,
         whole: 4,
       },

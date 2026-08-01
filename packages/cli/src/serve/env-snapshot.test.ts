@@ -47,7 +47,7 @@ afterEach(() => {
 
 describe('buildEnvStatusFromProcess', () => {
   it('snapshots process.env into an independent copy', () => {
-    const key = 'QWEN_TEST_ENV_SNAPSHOT_COPY';
+    const key = 'HOPCODE_TEST_ENV_SNAPSHOT_COPY';
     const previous = process.env[key];
     delete process.env[key];
 

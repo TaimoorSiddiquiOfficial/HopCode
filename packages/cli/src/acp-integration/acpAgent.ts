@@ -320,7 +320,7 @@ import {
 } from './generation.js';
 
 const debugLogger = createDebugLogger('ACP_AGENT');
-const QWEN_ACP_LOCAL_READ_ROOTS_ENV = 'QWEN_ACP_LOCAL_READ_ROOTS';
+const HOPCODE_ACP_LOCAL_READ_ROOTS_ENV = 'HOPCODE_ACP_LOCAL_READ_ROOTS';
 const POSIX_TMP_LOCAL_READ_ROOT = '/tmp';
 // Must be less than SESSION_BTW_TIMEOUT_MS (60s) in bridge.ts so the child
 // aborts before the bridge's backstop timer fires.
@@ -413,7 +413,7 @@ const logWorkspaceMemoryExtractionError =
   createWorkspaceMemoryExtractionErrorLogger(debugLogger);
 
 function parseAcpLocalReadRootsEnv(
-  raw = process.env[QWEN_ACP_LOCAL_READ_ROOTS_ENV],
+  raw = process.env[HOPCODE_ACP_LOCAL_READ_ROOTS_ENV],
 ): string[] {
   if (!raw) return [];
 
@@ -2801,7 +2801,7 @@ export function createWorkspaceMcpBudget(
   onEvent: (event: McpBudgetEvent) => void,
 ): WorkspaceMcpBudget | undefined {
   const rawBudget = process.env['HOPCODE_SERVE_MCP_CLIENT_BUDGET'];
-  const rawMode = process.env['QWEN_SERVE_MCP_BUDGET_MODE'];
+  const rawMode = process.env['HOPCODE_SERVE_MCP_BUDGET_MODE'];
   // Match `McpClientManager.readBudgetFromEnv`'s parsing exactly: only plain
   // decimal digits set a budget. A loose `Number(...)` would silently accept
   // `0x10`=16, `1e2`=100, and `1.0`=1 (all pass `isInteger`); the strict
@@ -2925,7 +2925,7 @@ class hopcodeagent implements Agent {
    * Workspace-shared MCP transport pool. Eagerly constructed; lazy
    * w.r.t. actual MCP work — spawns nothing until `pool.acquire`.
    *
-   * `undefined` when `QWEN_SERVE_NO_MCP_POOL=1` (kill switch); sessions
+   * `undefined` when `HOPCODE_SERVE_NO_MCP_POOL=1` (kill switch); sessions
    * then fall back to per-session McpClient spawn.
    */
   private readonly mcpPool?: McpTransportPool;
@@ -3293,7 +3293,7 @@ class hopcodeagent implements Agent {
     // Pool kill switch via env var so operators can A/B compare or
     // roll back without rebuilding. `run-hopcode-serve.ts` sets this when
     // `--no-mcp-pool` is passed at daemon startup.
-    if (process.env['QWEN_SERVE_NO_MCP_POOL'] === '1') {
+    if (process.env['HOPCODE_SERVE_NO_MCP_POOL'] === '1') {
       this.mcpPool = undefined;
       this.workspaceMcpBudget = undefined;
     } else {
@@ -3313,7 +3313,7 @@ class hopcodeagent implements Agent {
         // wiring; pool-mode discoverAllMcpToolsViaPool delegates SDK
         // MCP to that bypass.
         pooledTransports: parsePooledTransports(
-          process.env['QWEN_SERVE_MCP_POOL_TRANSPORTS'],
+          process.env['HOPCODE_SERVE_MCP_POOL_TRANSPORTS'],
         ),
         drainDelayMs: parsePoolDrainMs(
           process.env['HOPCODE_SERVE_MCP_POOL_DRAIN_MS'],

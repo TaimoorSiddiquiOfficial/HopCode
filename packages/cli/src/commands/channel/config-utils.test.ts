@@ -447,14 +447,14 @@ describe('parseChannelConfig', () => {
   });
 
   it('parses webhook source targets and resolves secret env refs', async () => {
-    process.env['QWEN_TEST_WEBHOOK_SECRET'] = 'env-secret';
+    process.env['HOPCODE_TEST_WEBHOOK_SECRET'] = 'env-secret';
     const config = await parseChannelConfig('dingtalk-main', {
       type: 'bare',
       token: 'token',
       webhooks: {
         sources: {
           'github-ci': {
-            secretEnv: 'QWEN_TEST_WEBHOOK_SECRET',
+            secretEnv: 'HOPCODE_TEST_WEBHOOK_SECRET',
             targets: {
               default: {
                 chatId: 'group-1',
@@ -483,18 +483,18 @@ describe('parseChannelConfig', () => {
         },
       },
     });
-    delete process.env['QWEN_TEST_WEBHOOK_SECRET'];
+    delete process.env['HOPCODE_TEST_WEBHOOK_SECRET'];
   });
 
   it('accepts webhook secretEnv refs with the standard $ prefix', async () => {
-    process.env['QWEN_TEST_WEBHOOK_SECRET'] = 'env-secret';
+    process.env['HOPCODE_TEST_WEBHOOK_SECRET'] = 'env-secret';
     const config = await parseChannelConfig('dingtalk-main', {
       type: 'bare',
       token: 'token',
       webhooks: {
         sources: {
           'github-ci': {
-            secretEnv: '$QWEN_TEST_WEBHOOK_SECRET',
+            secretEnv: '$HOPCODE_TEST_WEBHOOK_SECRET',
             targets: {
               default: {
                 chatId: 'group-1',
@@ -509,7 +509,7 @@ describe('parseChannelConfig', () => {
     expect(config).toMatchObject({
       webhooks: { sources: { 'github-ci': { secret: 'env-secret' } } },
     });
-    delete process.env['QWEN_TEST_WEBHOOK_SECRET'];
+    delete process.env['HOPCODE_TEST_WEBHOOK_SECRET'];
   });
 
   it('accepts webhook secretEnv refs that are bare env var names without underscores', async () => {
@@ -618,7 +618,7 @@ describe('parseChannelConfig', () => {
   });
 
   it('rejects webhook secretEnv refs when the environment variable is empty', async () => {
-    process.env['QWEN_EMPTY_WEBHOOK_SECRET'] = '';
+    process.env['HOPCODE_EMPTY_WEBHOOK_SECRET'] = '';
     try {
       await expect(
         parseChannelConfig('dingtalk-main', {
@@ -627,7 +627,7 @@ describe('parseChannelConfig', () => {
           webhooks: {
             sources: {
               custom: {
-                secretEnv: 'QWEN_EMPTY_WEBHOOK_SECRET',
+                secretEnv: 'HOPCODE_EMPTY_WEBHOOK_SECRET',
                 targets: {
                   default: {
                     chatId: 'group-1',
@@ -642,7 +642,7 @@ describe('parseChannelConfig', () => {
         'Channel "dingtalk-main" field "webhooks.sources.custom.secretEnv" references an empty environment variable.',
       );
     } finally {
-      delete process.env['QWEN_EMPTY_WEBHOOK_SECRET'];
+      delete process.env['HOPCODE_EMPTY_WEBHOOK_SECRET'];
     }
   });
 
@@ -746,7 +746,7 @@ describe('parseChannelConfig', () => {
           sources: {
             custom: {
               secret: 'secret-value',
-              secretEnv: 'QWEN_TEST_WEBHOOK_SECRET',
+              secretEnv: 'HOPCODE_TEST_WEBHOOK_SECRET',
               targets: {
                 default: {
                   chatId: 'group-1',

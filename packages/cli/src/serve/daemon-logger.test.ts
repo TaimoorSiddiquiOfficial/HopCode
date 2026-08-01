@@ -142,8 +142,8 @@ describe('initDaemonLogger opt-out', () => {
   });
 
   for (const val of ['0', 'false', 'off', 'no', 'False', ' OFF ']) {
-    it(`returns stderr-only logger when QWEN_DAEMON_LOG_FILE=${JSON.stringify(val)}`, async () => {
-      process.env['QWEN_DAEMON_LOG_FILE'] = val;
+    it(`returns stderr-only logger when HOPCODE_DAEMON_LOG_FILE=${JSON.stringify(val)}`, async () => {
+      process.env['HOPCODE_DAEMON_LOG_FILE'] = val;
       const stderr: string[] = [];
       const root = mkdtempSync(path.join(os.tmpdir(), 'daemon-log-optout-'));
       const baseDir = path.join(root, 'must-not-exist');

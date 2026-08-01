@@ -2151,7 +2151,7 @@ async function runHopCodeServeImpl(
   let workspaceRegistrationStore = deps.workspaceRegistrationStore;
   if (
     workspaceRegistrationStore === undefined &&
-    process.env['QWEN_SERVE_NO_PERSISTENT_REGISTRATION'] !== '1'
+    process.env['HOPCODE_SERVE_NO_PERSISTENT_REGISTRATION'] !== '1'
   ) {
     const { WorkspaceRegistrationStore } = await import(
       './workspace-registration-store.js'
