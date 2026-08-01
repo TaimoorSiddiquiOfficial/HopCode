@@ -217,7 +217,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
     const extraBody = this.contentGeneratorConfig.extra_body;
 
     // When the user picks a reasoning effort (/effort), turn thinking on for
-    // hopcode hybrid models. hopcode has no per-tier `reasoning_effort` field yet, so
+    // qwen hybrid models. qwen has no per-tier `reasoning_effort` field yet, so
     // the unified effort maps onto the on/off `enable_thinking` switch — extend
     // this to a real tier mapping when hopcode ships one. User extra_body wins
     // (merged last); the disable path (reasoning: false) is handled upstream in
@@ -243,7 +243,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
         ...(this.buildMetadata(userPromptId) || {}),
         ...dashscopeExtras,
       };
-      // hopcode drives thinking via `enable_thinking`, not the OpenAI-style nested
+      // qwen drives thinking via `enable_thinking`, not the OpenAI-style nested
       // `reasoning` object the pipeline injects from /effort. Drop it so we
       // don't ship two competing knobs (mirrors deepseek.ts / zai.ts). User
       // extra_body still wins (merged last).
@@ -300,7 +300,7 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
       this.contentGeneratorConfig.model ??
       ''
     ).toLowerCase();
-    return wireModel.startsWith('hopcode') || wireModel === 'coder-model';
+    return wireModel.startsWith('qwen') || wireModel === 'coder-model';
   }
 
   buildMetadata(userPromptId: string): DashScopeRequestMetadata {
@@ -507,7 +507,6 @@ export class DashScopeOpenAICompatibleProvider extends DefaultOpenAICompatiblePr
   private static readonly VISION_MODEL_EXACT_MATCHES = new Set(['coder-model']);
 
   private static readonly VISION_MODEL_PREFIX_PATTERNS = [
-    'hopcode-vl', // HopCode-branded VL models
     'qwen-vl', // qwen-vl-max, qwen-vl-max-latest, etc.
     'qwen3-vl-plus', // qwen3-vl-plus variants
     'qwen3.5-plus', // qwen3.5-plus (has built-in vision capabilities)

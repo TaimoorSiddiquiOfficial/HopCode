@@ -79,7 +79,7 @@ export function isOpusModel(_modelId: string): boolean {
 }
 
 export function isHopCodeModel(modelId: string): boolean {
-  return modelId.toLowerCase().includes('hopcode');
+  return modelId.toLowerCase().includes('qwen');
 }
 
 export function getModelProvider(modelId: string): ModelProvider | undefined {

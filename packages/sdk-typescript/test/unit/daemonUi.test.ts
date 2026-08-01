@@ -3061,7 +3061,7 @@ describe('daemon UI time schema (PR-B)', () => {
       v: 1,
       type: 'model_switched',
       serverTimestamp: 1_777_777_777_777,
-      data: { sessionId: 's', modelId: 'HopCode-flash' },
+      data: { sessionId: 's', modelId: 'qwen-flash' },
     } as never);
     expect(events[0]).toMatchObject({
       type: 'model.changed',

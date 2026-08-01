@@ -1114,7 +1114,7 @@ describe('ContentGenerationPipeline', () => {
       expect(apiCall.enable_thinking).toBeUndefined();
     });
 
-    it('disables hopcode thinking via chat_template_kwargs on a non-DashScope endpoint (vLLM/SGLang)', async () => {
+    it('disables qwen thinking via chat_template_kwargs on a non-DashScope endpoint (vLLM/SGLang)', async () => {
       // Self-hosted OpenAI-compatible servers render the chat template
       // server-side and read the thinking switch from `chat_template_kwargs`,
       // silently ignoring a top-level `enable_thinking`. A hopcode model on such
@@ -1290,7 +1290,7 @@ describe('ContentGenerationPipeline', () => {
       expect(apiCall.enable_thinking).toBeUndefined();
     });
 
-    it('gates on the wire model, not config: hopcode config + non-qwen request.model does NOT emit', async () => {
+    it('gates on the wire model, not config: qwen config + non-qwen request.model does NOT emit', async () => {
       // buildRequest ships `context.model` (= request.model || config.model).
       // A hopcode *config* with a non-qwen *request* model must gate on the
       // request model — otherwise the qwen-only field leaks to the non-qwen
@@ -1330,7 +1330,7 @@ describe('ContentGenerationPipeline', () => {
       expect(apiCall.enable_thinking).toBeUndefined();
     });
 
-    it('gates on the wire model, not config: non-hopcode config + hopcode request.model emits false', async () => {
+    it('gates on the wire model, not config: non-qwen config + qwen request.model emits false', async () => {
       // The mirror direction: a non-qwen *config* with a hopcode *request* model
       // must still emit the disable signal, since the wire model is hopcode and
       // would otherwise keep thinking-on (the #4501 regression).
@@ -1346,7 +1346,7 @@ describe('ContentGenerationPipeline', () => {
       pipeline = new ContentGenerationPipeline(mockConfig);
 
       const request: GenerateContentParameters = {
-        model: 'qwen3.5-flash', // request-level override to a hopcode wire model
+        model: 'qwen3.5-flash', // request-level override to a qwen wire model
         contents: [{ parts: [{ text: 'Summarize' }], role: 'user' }],
         config: { thinkingConfig: { includeThoughts: false } },
       };
@@ -4254,7 +4254,7 @@ describe('ContentGenerationPipeline', () => {
       expect(err).toBeInstanceOf(StreamInactivityTimeoutError);
       expect((err as Error).message).toBe(
         'No stream activity for 1000ms after 0 chunks ' +
-          '(stream lifetime: 1000ms). Set QWEN_STREAM_IDLE_TIMEOUT_MS ' +
+          '(stream lifetime: 1000ms). Set HOPCODE_STREAM_IDLE_TIMEOUT_MS ' +
           'to increase this window (or 0 to disable it).',
       );
       expect(err).toMatchObject({ code: 'ETIMEDOUT' });
@@ -4284,7 +4284,7 @@ describe('ContentGenerationPipeline', () => {
       expect(err).toBeInstanceOf(StreamInactivityTimeoutError);
       const message = (err as Error).message;
       expect(message).toContain('No stream activity for 1000ms after 0 chunks');
-      expect(message).toContain('QWEN_STREAM_IDLE_TIMEOUT_MS');
+      expect(message).toContain('HOPCODE_STREAM_IDLE_TIMEOUT_MS');
     });
 
     it('uses the default stream idle timeout when no override is configured', async () => {

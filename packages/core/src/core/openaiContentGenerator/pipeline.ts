@@ -844,7 +844,7 @@ export class ContentGenerationPipeline {
       // We also keep the legacy `qwen*` guard so raw hopcode model names and
       // existing test fixtures continue to emit the disable signal.
       const model = (context.model ?? '').toLowerCase();
-      if (model.startsWith('hopcode') || model === 'coder-model') {
+      if (model.startsWith('qwen') || model === 'coder-model') {
         if (
           DashScopeOpenAICompatibleProvider.isDashScopeProvider(
             this.contentGeneratorConfig,

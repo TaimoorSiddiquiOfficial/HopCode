@@ -8001,7 +8001,7 @@ describe('createAcpSessionBridge', () => {
             if (method === 'hopcode/status/session/context') {
               statusReads += 1;
               return Promise.resolve({
-                state: { models: { currentModelId: 'hopcode-turbo' } },
+                state: { models: { currentModelId: 'qwen-turbo' } },
               });
             }
             return Promise.resolve({});
@@ -11350,7 +11350,7 @@ describe('createAcpSessionBridge', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-max',
+          currentModelId: 'qwen-max',
         },
       );
 
@@ -11363,7 +11363,7 @@ describe('createAcpSessionBridge', () => {
       expect(collected[0]?.type).toBe('model_switched');
       expect(collected[0]?.data).toEqual({
         sessionId: session.sessionId,
-        modelId: 'hopcode-max',
+        modelId: 'qwen-max',
       });
       abort.abort();
       await bridge.shutdown();
@@ -11416,7 +11416,7 @@ describe('createAcpSessionBridge', () => {
       const modelChange = bridge
         .setSessionModel(
           session.sessionId,
-          { sessionId: session.sessionId, modelId: 'hopcode-max' },
+          { sessionId: session.sessionId, modelId: 'qwen-max' },
           undefined,
         )
         .catch(() => {});
@@ -11428,7 +11428,7 @@ describe('createAcpSessionBridge', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-turbo',
+          currentModelId: 'qwen-turbo',
         },
       );
       await new Promise((r) => setTimeout(r, 10));
@@ -11442,11 +11442,11 @@ describe('createAcpSessionBridge', () => {
         collected.push({ type: e.type, data: e.data });
         if (collected.length === 1) break;
       }
-      // Exactly the bridge's model_switched (hopcode-max) — the suppressed
-      // hopcode-turbo notification did NOT produce a second model_switched.
+      // Exactly the bridge's model_switched (qwen-max) — the suppressed
+      // qwen-turbo notification did NOT produce a second model_switched.
       expect(collected[0]?.type).toBe('model_switched');
       expect((collected[0]?.data as { modelId?: string }).modelId).toBe(
-        'hopcode-max',
+        'qwen-max',
       );
       abort.abort();
       await bridge.shutdown();
@@ -11494,7 +11494,7 @@ describe('createAcpSessionBridge', () => {
         'hopcode/notify/session/model-update',
         {
           v: 1,
-          currentModelId: 'hopcode-max',
+          currentModelId: 'qwen-max',
         },
       );
       await new Promise((r) => setTimeout(r, 10));
@@ -11538,7 +11538,7 @@ describe('createAcpSessionBridge', () => {
         {
           v: 1,
           sessionId: 'nonexistent-session',
-          currentModelId: 'hopcode-max',
+          currentModelId: 'qwen-max',
         },
       );
       await new Promise((r) => setTimeout(r, 10));
@@ -11603,7 +11603,7 @@ describe('createAcpSessionBridge', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-max',
+          currentModelId: 'qwen-max',
         },
       );
 
@@ -13639,7 +13639,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
 
       await bridge.setSessionModel(
         session.sessionId,
-        { sessionId: session.sessionId, modelId: 'hopcode-max' },
+        { sessionId: session.sessionId, modelId: 'qwen-max' },
         undefined,
       );
 
@@ -13647,7 +13647,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       const next = await it2.next();
       expect(next.value?.type).toBe('model_switched');
       expect((next.value?.data as { modelId: string }).modelId).toBe(
-        'hopcode-max',
+        'qwen-max',
       );
       abort.abort();
       await bridge.shutdown();
@@ -14004,7 +14004,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-max',
+          currentModelId: 'qwen-max',
         },
       );
 
@@ -14059,7 +14059,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-max',
+          currentModelId: 'qwen-max',
         },
       );
 
@@ -14171,7 +14171,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-max',
+          currentModelId: 'qwen-max',
         },
       );
 
@@ -14213,7 +14213,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-turbo',
+          currentModelId: 'qwen-turbo',
         },
       );
       await new Promise((r) => setTimeout(r, 20));
@@ -14238,7 +14238,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       expect(collected.indexOf(snap!)).toBeGreaterThan(collected.indexOf(rc!));
       expect(
         (snap!.data as { currentModelId: string | null }).currentModelId,
-      ).toBe('hopcode-turbo');
+      ).toBe('qwen-turbo');
       abort.abort();
       await bridge.shutdown();
     });
@@ -14322,7 +14322,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-turbo',
+          currentModelId: 'qwen-turbo',
         },
       );
       await new Promise((r) => setTimeout(r, 20));
@@ -14343,7 +14343,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
           {
             v: 1,
             sessionId: session.sessionId,
-            currentModelId: 'hopcode-max',
+            currentModelId: 'qwen-max',
           },
         );
       }, 30);
@@ -14393,7 +14393,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         {
           v: 1,
           sessionId: session.sessionId,
-          currentModelId: 'hopcode-turbo',
+          currentModelId: 'qwen-turbo',
         },
       );
       await new Promise((r) => setTimeout(r, 20));
@@ -14411,7 +14411,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       expect(first.value?.type).toBe('session_snapshot');
       expect(
         (first.value?.data as { currentModelId: string | null }).currentModelId,
-      ).toBe('hopcode-turbo');
+      ).toBe('qwen-turbo');
       abort.abort();
       await bridge.shutdown();
     });
@@ -14426,9 +14426,9 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
             Promise.resolve({
               sessionId: `sess:${p.cwd}`,
               models: {
-                currentModelId: 'hopcode-plus',
+                currentModelId: 'qwen-plus',
                 availableModels: [
-                  { modelId: 'hopcode-plus', name: 'hopcode Plus' },
+                  { modelId: 'qwen-plus', name: 'hopcode Plus' },
                 ],
               },
               modes: {
@@ -14466,7 +14466,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
         currentModelId: string | null;
         currentApprovalMode: string | null;
       };
-      expect(data.currentModelId).toBe('hopcode-plus');
+      expect(data.currentModelId).toBe('qwen-plus');
       expect(data.currentApprovalMode).toBe('auto-edit');
       abort.abort();
       await bridge.shutdown();
@@ -14516,11 +14516,11 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       };
 
     it('publishes a corrective model_switched when the agent state drifted from cache', async () => {
-      // Switch to hopcode-max, but the agent's real state is hopcode-turbo (e.g.
+      // Switch to qwen-max, but the agent's real state is qwen-turbo (e.g.
       // an agent-side override). Reconciliation must emit a corrective
       // model_switched so peers converge on the agent's truth.
       const bridge = makeBridge({
-        channelFactory: makeReconcileFactory('hopcode-turbo'),
+        channelFactory: makeReconcileFactory('qwen-turbo'),
       });
       const session = await bridge.spawnOrAttach({ workspaceCwd: WS_A });
       const abort = new AbortController();
@@ -14530,7 +14530,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
 
       await bridge.setSessionModel(
         session.sessionId,
-        { sessionId: session.sessionId, modelId: 'hopcode-max' },
+        { sessionId: session.sessionId, modelId: 'qwen-max' },
         undefined,
       );
 
@@ -14546,8 +14546,8 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       }
       const switches = seen.filter((s) => s.type === 'model_switched');
       // First the requested change, then the corrective one from reconcile.
-      expect(switches[0]?.modelId).toBe('hopcode-max');
-      expect(switches[1]?.modelId).toBe('hopcode-turbo');
+      expect(switches[0]?.modelId).toBe('qwen-max');
+      expect(switches[1]?.modelId).toBe('qwen-turbo');
       abort.abort();
       await bridge.shutdown();
     });
@@ -14602,14 +14602,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
 
       await bridge.setSessionModel(
         session.sessionId,
-        { sessionId: session.sessionId, modelId: 'hopcode-max' },
+        { sessionId: session.sessionId, modelId: 'qwen-max' },
         undefined,
       );
       // Second distinct change terminates the iterator; a spurious
       // corrective would surface as a duplicate model_switched.
       await bridge.setSessionModel(
         session.sessionId,
-        { sessionId: session.sessionId, modelId: 'hopcode-plus' },
+        { sessionId: session.sessionId, modelId: 'qwen-plus' },
         undefined,
       );
 
@@ -14617,10 +14617,10 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       for await (const e of iter) {
         if (e.type === 'model_switched') {
           switches.push((e.data as { modelId: string }).modelId);
-          if (switches.includes('hopcode-plus')) break;
+          if (switches.includes('qwen-plus')) break;
         }
       }
-      expect(switches).toEqual(['hopcode-max', 'hopcode-plus']);
+      expect(switches).toEqual(['qwen-max', 'qwen-plus']);
       abort.abort();
       await bridge.shutdown();
     });
@@ -14640,7 +14640,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       await expect(
         bridge.setSessionModel(
           session.sessionId,
-          { sessionId: session.sessionId, modelId: 'hopcode-max' },
+          { sessionId: session.sessionId, modelId: 'qwen-max' },
           undefined,
         ),
       ).resolves.toBeDefined();
@@ -14651,7 +14651,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       // the operator log (no bus event the SDK cannot decode).
       expect(next.value?.type).toBe('model_switched');
       expect((next.value?.data as { modelId: string }).modelId).toBe(
-        'hopcode-max',
+        'qwen-max',
       );
       abort.abort();
       await bridge.shutdown();
@@ -14670,7 +14670,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
             if (method === 'hopcode/status/session/context') {
               statusReads += 1;
               return Promise.resolve({
-                state: { models: { currentModelId: 'hopcode-turbo' } },
+                state: { models: { currentModelId: 'qwen-turbo' } },
               });
             }
             return Promise.resolve({});
@@ -14708,7 +14708,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       await expect(
         bridge.setSessionModel(
           session.sessionId,
-          { sessionId: session.sessionId, modelId: 'hopcode-max' },
+          { sessionId: session.sessionId, modelId: 'qwen-max' },
           undefined,
         ),
       ).rejects.toThrow();
@@ -14745,7 +14745,7 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
               // Agent truth drifts from both A and B, so the post-rerun
               // read produces an observable corrective.
               const payload = {
-                state: { models: { currentModelId: 'hopcode-turbo' } },
+                state: { models: { currentModelId: 'qwen-turbo' } },
               };
               return statusReads === 1
                 ? firstStatusGate.then(() => payload)
@@ -14784,14 +14784,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       // A: publishes gen=1; its reconcile starts and blocks on the gate.
       await bridge.setSessionModel(
         session.sessionId,
-        { sessionId: session.sessionId, modelId: 'hopcode-max' },
+        { sessionId: session.sessionId, modelId: 'qwen-max' },
         undefined,
       );
       // B: publishes gen=2 while A's reconcile is still awaiting the gated
       // status read; B's own reconcile bails on the in-flight guard.
       await bridge.setSessionModel(
         session.sessionId,
-        { sessionId: session.sessionId, modelId: 'hopcode-plus' },
+        { sessionId: session.sessionId, modelId: 'qwen-plus' },
         undefined,
       );
       // Now let A's status read resolve — it must detect the generation
@@ -14802,14 +14802,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
       for await (const e of iter) {
         if (e.type === 'model_switched') {
           switches.push((e.data as { modelId: string }).modelId);
-          if (switches.includes('hopcode-turbo')) break;
+          if (switches.includes('qwen-turbo')) break;
         }
       }
       // The two requested changes, then ONE corrective from the rerun.
       expect(switches).toEqual([
-        'hopcode-max',
-        'hopcode-plus',
-        'hopcode-turbo',
+        'qwen-max',
+        'qwen-plus',
+        'qwen-turbo',
       ]);
       // Two reads total: the gated (discarded) one + the rerun.
       expect(statusReads).toBe(2);

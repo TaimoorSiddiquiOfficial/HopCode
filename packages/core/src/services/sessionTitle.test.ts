@@ -33,7 +33,7 @@ function makeConfig(opts: MockOptions): {
 
   const config = {
     getFastModel: vi.fn(() => opts.fastModel ?? undefined),
-    getModel: vi.fn(() => 'hopcode-plus'),
+    getModel: vi.fn(() => 'qwen-plus'),
     getGeminiClient: vi.fn(() => ({
       getHistoryShallow: () => opts.history ?? [],
       getChat: () => ({
@@ -72,7 +72,7 @@ describe('tryGenerateSessionTitle', () => {
 
   it('returns {ok:false, reason:"empty_history"} for a fresh session', async () => {
     const { config } = makeConfig({
-      fastModel: 'hopcode-turbo',
+      fastModel: 'qwen-turbo',
       history: [],
     });
     const outcome = await tryGenerateSessionTitle(
@@ -90,7 +90,7 @@ describe('tryGenerateSessionTitle', () => {
     // like "初始化项目上下文" instead of one based on the user's actual
     // first message.
     const { config, generateJson } = makeConfig({
-      fastModel: 'hopcode-turbo',
+      fastModel: 'qwen-turbo',
       history: [
         {
           role: 'user',
@@ -116,7 +116,7 @@ describe('tryGenerateSessionTitle', () => {
   });
   it('returns {ok:false, reason:"model_error"} when the LLM throws', async () => {
     const { config } = makeConfig({
-      fastModel: 'hopcode-turbo',
+      fastModel: 'qwen-turbo',
       history: DIALOG_HISTORY,
       generateJsonResult: () => Promise.reject(new Error('API down')),
     });
@@ -130,7 +130,7 @@ describe('tryGenerateSessionTitle', () => {
   it('returns {ok:false, reason:"aborted"} when the user cancels', async () => {
     const controller = new AbortController();
     const { config } = makeConfig({
-      fastModel: 'hopcode-turbo',
+      fastModel: 'qwen-turbo',
       history: DIALOG_HISTORY,
       generateJsonResult: async () => {
         controller.abort();
@@ -143,7 +143,7 @@ describe('tryGenerateSessionTitle', () => {
 
   it('returns {ok:false, reason:"empty_result"} when the model returns junk', async () => {
     const { config } = makeConfig({
-      fastModel: 'hopcode-turbo',
+      fastModel: 'qwen-turbo',
       history: DIALOG_HISTORY,
       generateJsonResult: { title: '   ...  ' },
     });
@@ -156,7 +156,7 @@ describe('tryGenerateSessionTitle', () => {
 
   it('returns {ok:true, title, modelUsed} on success', async () => {
     const { config, generateJson } = makeConfig({
-      fastModel: 'hopcode-turbo',
+      fastModel: 'qwen-turbo',
       history: DIALOG_HISTORY,
       generateJsonResult: { title: 'Fix login button on mobile' },
     });
@@ -167,7 +167,7 @@ describe('tryGenerateSessionTitle', () => {
     expect(outcome).toEqual({
       ok: true,
       title: 'Fix login button on mobile',
-      modelUsed: 'hopcode-turbo',
+      modelUsed: 'qwen-turbo',
     });
     // Schema call must use the fast model (not the main model) and the
     // canonical title schema with required:['title'] and maxAttempts:1.
@@ -181,7 +181,7 @@ describe('tryGenerateSessionTitle', () => {
       };
       maxAttempts: number;
     };
-    expect(callOpts.model).toBe('hopcode-turbo');
+    expect(callOpts.model).toBe('qwen-turbo');
     expect(callOpts.schema.type).toBe('object');
     expect(callOpts.schema.required).toEqual(['title']);
     expect(callOpts.schema.properties.title.type).toBe('string');
@@ -190,7 +190,7 @@ describe('tryGenerateSessionTitle', () => {
 
   it('sanitizes residual markdown and trailing punctuation from the model result', async () => {
     const { config } = makeConfig({
-      fastModel: 'hopcode-turbo',
+      fastModel: 'qwen-turbo',
       history: DIALOG_HISTORY,
       generateJsonResult: { title: '**Fix login button.**' },
     });
@@ -239,8 +239,8 @@ describe('tryGenerateSessionTitle', () => {
       return { title: 'Audit auth middleware' };
     });
     const config = {
-      getFastModel: vi.fn(() => 'hopcode-turbo'),
-      getModel: vi.fn(() => 'hopcode-plus'),
+      getFastModel: vi.fn(() => 'qwen-turbo'),
+      getModel: vi.fn(() => 'qwen-plus'),
       getGeminiClient: vi.fn(() => ({
         getHistoryShallow: () => history,
         getChat: () => ({
@@ -386,8 +386,8 @@ describe('tryGenerateSessionTitle', () => {
       return { title: 'Long session' };
     });
     const config = {
-      getFastModel: vi.fn(() => 'hopcode-turbo'),
-      getModel: vi.fn(() => 'hopcode-plus'),
+      getFastModel: vi.fn(() => 'qwen-turbo'),
+      getModel: vi.fn(() => 'qwen-plus'),
       getGeminiClient: vi.fn(() => ({
         getHistoryShallow: () => history,
         getChat: () => ({

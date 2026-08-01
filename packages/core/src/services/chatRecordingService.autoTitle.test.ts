@@ -29,7 +29,7 @@ vi.mock('./sessionTitle.js', () => ({
  * to repeat it everywhere. Failure outcomes are spelled out where they
  * exercise distinct reasons.
  */
-function mockOk(title: string, modelUsed = 'hopcode-turbo'): void {
+function mockOk(title: string, modelUsed = 'qwen-turbo'): void {
   tryGenerateSessionTitleMock.mockResolvedValue({
     ok: true,
     title,
@@ -81,7 +81,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
 
   beforeEach(() => {
     uuidCounter = 0;
-    fastModelValue = 'hopcode-turbo';
+    fastModelValue = 'qwen-turbo';
     tryGenerateSessionTitleMock.mockReset();
 
     mockConfig = {
@@ -96,7 +96,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
           .fn()
           .mockReturnValue('/test/project/root/.hopcode/projects/test-project'),
       },
-      getModel: vi.fn().mockReturnValue('hopcode-plus'),
+      getModel: vi.fn().mockReturnValue('qwen-plus'),
       getFastModel: vi.fn(() => fastModelValue),
       isInteractive: vi.fn().mockReturnValue(true),
       getExperimentalZedIntegration: vi.fn().mockReturnValue(false),
@@ -148,7 +148,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     mockOk('Fix login button');
 
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'Looking at the button handler now.' }],
     });
 
@@ -168,7 +168,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     fastModelValue = undefined;
 
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'hi' }],
     });
     await flushMicrotasks();
@@ -182,7 +182,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     vi.mocked(jsonl.writeLine).mockClear();
 
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'reply' }],
     });
     await flushMicrotasks();
@@ -203,7 +203,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
 
     for (let i = 0; i < 5; i++) {
       chatRecordingService.recordAssistantTurn({
-        model: 'hopcode-plus',
+        model: 'qwen-plus',
         message: [{ text: `turn ${i}` }],
       });
       await flushMicrotasks();
@@ -223,16 +223,16 @@ describe('ChatRecordingService - auto-title trigger', () => {
       .mockResolvedValueOnce({
         ok: true,
         title: 'Recovered title',
-        modelUsed: 'hopcode-turbo',
+        modelUsed: 'qwen-turbo',
       });
 
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'turn 1' }],
     });
     await flushMicrotasks();
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'turn 2' }],
     });
     await flushMicrotasks();
@@ -250,7 +250,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     process.env['HOPCODE_DISABLE_AUTO_TITLE'] = '1';
     try {
       chatRecordingService.recordAssistantTurn({
-        model: 'hopcode-plus',
+        model: 'qwen-plus',
         message: [{ text: 'reply' }],
       });
       await flushMicrotasks();
@@ -268,7 +268,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     process.env['HOPCODE_DISABLE_AUTO_TITLE'] = '0';
     try {
       chatRecordingService.recordAssistantTurn({
-        model: 'hopcode-plus',
+        model: 'qwen-plus',
         message: [{ text: 'reply' }],
       });
       await flushMicrotasks();
@@ -283,7 +283,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     vi.mocked(mockConfig.isInteractive).mockReturnValue(false);
 
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'reply' }],
     });
     await flushMicrotasks();
@@ -331,7 +331,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
 
     for (let i = 0; i < 5; i++) {
       chatRecordingService.recordAssistantTurn({
-        model: 'hopcode-plus',
+        model: 'qwen-plus',
         message: [{ text: `turn ${i}` }],
       });
       await flushMicrotasks();
@@ -464,7 +464,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     } as never);
 
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'reply' }],
     });
     await flushMicrotasks();
@@ -498,7 +498,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     );
 
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'turn' }],
     });
     await flushMicrotasks();
@@ -529,7 +529,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     );
 
     chatRecordingService.recordAssistantTurn({
-      model: 'hopcode-plus',
+      model: 'qwen-plus',
       message: [{ text: 'turn' }],
     });
     await flushMicrotasks();
@@ -539,7 +539,7 @@ describe('ChatRecordingService - auto-title trigger', () => {
     vi.mocked(jsonl.writeLine).mockClear();
 
     // Now the LLM call returns a title.
-    resolveLlm({ ok: true, title: 'Auto Title', modelUsed: 'hopcode-turbo' });
+    resolveLlm({ ok: true, title: 'Auto Title', modelUsed: 'qwen-turbo' });
     await flushMicrotasks();
 
     // No auto-title record should have been written.

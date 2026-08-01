@@ -53,20 +53,20 @@ describe('flattenModelsBySource', () => {
   it('collapses to plain label when no non-main source exists in the session', () => {
     const entries = flattenModelsBySource({
       'glm-5': makeModel({ [MAIN_SOURCE]: coreWithRequests(3) }),
-      'hopcode-max': makeModel({ [MAIN_SOURCE]: coreWithRequests(2) }),
+      'qwen-max': makeModel({ [MAIN_SOURCE]: coreWithRequests(2) }),
     });
-    expect(entries.map((e) => e.label)).toEqual(['glm-5', 'hopcode-max']);
-    expect(entries.map((e) => e.key)).toEqual(['glm-5', 'hopcode-max']);
+    expect(entries.map((e) => e.label)).toEqual(['glm-5', 'qwen-max']);
+    expect(entries.map((e) => e.key)).toEqual(['glm-5', 'qwen-max']);
   });
 
   it('splits every row when any model has a non-main source (session-wide rule)', () => {
     const entries = flattenModelsBySource({
       'glm-5': makeModel({ [MAIN_SOURCE]: coreWithRequests(2) }),
-      'hopcode-plus': makeModel({ researcher: coreWithRequests(1) }),
+      'qwen-plus': makeModel({ researcher: coreWithRequests(1) }),
     });
     expect(entries.map((e) => e.label)).toEqual([
       'glm-5 (main)',
-      'hopcode-plus (researcher)',
+      'qwen-plus (researcher)',
     ]);
   });
 
@@ -105,7 +105,7 @@ describe('flattenModelsBySource', () => {
         [MAIN_SOURCE]: coreWithRequests(1),
         alpha: coreWithRequests(1),
       }),
-      'hopcode-plus': makeModel({
+      'qwen-plus': makeModel({
         alpha: coreWithRequests(1),
       }),
     });
@@ -114,7 +114,7 @@ describe('flattenModelsBySource', () => {
     expect(keys).toEqual([
       'glm-5::main',
       'glm-5::alpha',
-      'hopcode-plus::alpha',
+      'qwen-plus::alpha',
     ]);
   });
 

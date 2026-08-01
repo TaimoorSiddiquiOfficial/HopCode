@@ -345,7 +345,7 @@ export namespace ProviderTransform {
 
   export function temperature(model: Provider.Model) {
     const id = model.id.toLowerCase();
-    if (id.includes('hopcode')) return 0.55;
+    if (id.includes('qwen')) return 0.55;
     if (id.includes('claude')) return undefined;
     if (id.includes('gemini')) return 1.0;
     if (id.includes('glm-4.6')) return 1.0;
@@ -363,7 +363,7 @@ export namespace ProviderTransform {
 
   export function topP(model: Provider.Model) {
     const id = model.id.toLowerCase();
-    if (id.includes('hopcode')) return 1;
+    if (id.includes('qwen')) return 1;
     if (
       ['minimax-m2', 'gemini', 'kimi-k2.5', 'kimi-k2p5', 'kimi-k2-5'].some(
         (s) => id.includes(s),

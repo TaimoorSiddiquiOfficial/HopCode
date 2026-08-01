@@ -505,7 +505,7 @@ Symlinked skill body.
 
   describe('parseModelField', () => {
     it('should return the model string for a valid model', () => {
-      expect(parseModelField({ model: 'hopcode-max' })).toBe('hopcode-max');
+      expect(parseModelField({ model: 'qwen-max' })).toBe('qwen-max');
     });
 
     it('should return undefined when model is omitted', () => {
@@ -793,7 +793,7 @@ Symlinked skill body.
       mockParseYaml.mockReturnValue({
         name: 'model-test',
         description: 'Test skill with model',
-        model: 'hopcode-max',
+        model: 'qwen-max',
       });
 
       const config = parseSkillContent(
@@ -801,7 +801,7 @@ Symlinked skill body.
         testFilePath,
       );
 
-      expect(config.model).toBe('hopcode-max');
+      expect(config.model).toBe('qwen-max');
     });
 
     it('should set model to undefined when omitted', () => {

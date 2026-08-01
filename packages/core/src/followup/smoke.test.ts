@@ -138,12 +138,12 @@ describe('SMOKE TESTS � E2E Verification', () => {
       saveCacheSafeParams(
         config,
         [{ role: 'user' as const, parts: [{ text: 'hi' }] }],
-        'hopcode-max',
+        'qwen-max',
       );
 
       const p = getCacheSafeParams();
       expect(p).not.toBeNull();
-      expect(p!.model).toBe('hopcode-max');
+      expect(p!.model).toBe('qwen-max');
 
       (
         config.tools[0] as { functionDeclarations: unknown[] }

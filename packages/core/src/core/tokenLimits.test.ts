@@ -67,8 +67,8 @@ describe('normalize', () => {
   });
 
   it('should not remove "-latest" from specific hopcode model names', () => {
-    expect(normalize('hopcode-plus-latest')).toBe('hopcode-plus-latest');
-    expect(normalize('hopcode-flash-latest')).toBe('hopcode-flash-latest');
+    expect(normalize('qwen-plus-latest')).toBe('qwen-plus-latest');
+    expect(normalize('qwen-flash-latest')).toBe('qwen-flash-latest');
     expect(normalize('hopcode-vl-max-latest')).toBe('hopcode-vl-max-latest');
   });
 
@@ -175,13 +175,13 @@ describe('tokenLimit', () => {
     });
 
     it('should return 1M for studio latest models', () => {
-      expect(tokenLimit('hopcode-plus-latest')).toBe(1000000);
-      expect(tokenLimit('hopcode-flash-latest')).toBe(1000000);
+      expect(tokenLimit('qwen-plus-latest')).toBe(1000000);
+      expect(tokenLimit('qwen-flash-latest')).toBe(1000000);
     });
 
     it('should return 256K for hopcode fallback', () => {
-      expect(tokenLimit('hopcode-plus')).toBe(262144);
-      expect(tokenLimit('hopcode-turbo')).toBe(262144);
+      expect(tokenLimit('qwen-plus')).toBe(262144);
+      expect(tokenLimit('qwen-turbo')).toBe(262144);
       expect(tokenLimit('qwen2.5')).toBe(262144);
       expect(tokenLimit('hopcode-vl-max-latest')).toBe(262144);
     });

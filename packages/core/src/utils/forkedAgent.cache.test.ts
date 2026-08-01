@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2026 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -59,11 +59,11 @@ describe('CacheSafeParams', () => {
         tools: [{ functionDeclarations: [] }],
       };
 
-      saveCacheSafeParams(config, [], 'hopcode-max');
+      saveCacheSafeParams(config, [], 'qwen-max');
 
       const params = getCacheSafeParams();
       expect(params).not.toBeNull();
-      expect(params!.model).toBe('hopcode-max');
+      expect(params!.model).toBe('qwen-max');
       expect(params!.history).toEqual([]);
       expect(params!.version).toBeGreaterThan(0);
     });
