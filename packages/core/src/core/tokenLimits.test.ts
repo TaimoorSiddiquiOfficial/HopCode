@@ -69,7 +69,7 @@ describe('normalize', () => {
   it('should not remove "-latest" from specific hopcode model names', () => {
     expect(normalize('qwen-plus-latest')).toBe('qwen-plus-latest');
     expect(normalize('qwen-flash-latest')).toBe('qwen-flash-latest');
-    expect(normalize('hopcode-vl-max-latest')).toBe('hopcode-vl-max-latest');
+    expect(normalize('qwen-vl-max-latest')).toBe('qwen-vl-max-latest');
   });
 
   it('should preserve date suffixes for Kimi K2 models', () => {
@@ -183,7 +183,7 @@ describe('tokenLimit', () => {
       expect(tokenLimit('qwen-plus')).toBe(262144);
       expect(tokenLimit('qwen-turbo')).toBe(262144);
       expect(tokenLimit('qwen2.5')).toBe(262144);
-      expect(tokenLimit('hopcode-vl-max-latest')).toBe(262144);
+      expect(tokenLimit('qwen-vl-max-latest')).toBe(262144);
     });
   });
 

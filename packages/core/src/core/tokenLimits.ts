@@ -129,7 +129,7 @@ export function normalize(model: string): string {
   // - dates (e.g., -20250219), -v1, version numbers, 'latest', 'preview' etc.
   s = s.replace(/-preview/g, '');
   // Special handling for model names that include date/version as part of the model identifier
-  // - HopCode models: qwen-plus-latest, qwen-flash-latest, hopcode-vl-max-latest
+  // - HopCode models: qwen-plus-latest, qwen-flash-latest, qwen-vl-max-latest
   // - Kimi models: kimi-k2-0905, kimi-k2-0711, etc. (keep date for version distinction)
   if (
     !s.match(/^(?:qwen|hopcode)-(?:plus|flash|vl-max)-latest$/) &&

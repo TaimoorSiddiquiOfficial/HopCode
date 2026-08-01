@@ -461,7 +461,7 @@ describe('Model-specific tool call formats', () => {
 
   it('should use JSON format for qwen-vl model', () => {
     vi.mocked(isGitRepository).mockReturnValue(false);
-    const prompt = getCoreSystemPrompt(undefined, 'hopcode-vl-max');
+    const prompt = getCoreSystemPrompt(undefined, 'qwen-vl-max');
 
     // Should contain JSON-style tool calls
     expect(prompt).toContain('<tool_call>');

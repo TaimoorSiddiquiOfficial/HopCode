@@ -1527,7 +1527,7 @@ describe('DashScopeOpenAICompatibleProvider', () => {
       );
 
       const request: OpenAI.Chat.ChatCompletionCreateParams = {
-        model: 'hopcode-vl-max',
+        model: 'qwen-vl-max',
         messages: [{ role: 'user', content: 'Hello' }],
       };
 
