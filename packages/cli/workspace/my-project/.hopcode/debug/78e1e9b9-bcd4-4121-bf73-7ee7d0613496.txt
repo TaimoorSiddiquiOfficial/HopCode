@@ -1,0 +1,1 @@
+2026-08-01T14:56:36.353Z [WARN] [WORKSPACE] [trace_id=5ece1e4390405552ab7758d17b60bd51 span_id=7c8ff1dd6a6cd495] Skipping unreadable directory: D:\HopCode\packages\cli\workspace\my-project (Directory does not exist: D:\HopCode\packages\cli\workspace\my-project)

@@ -49,13 +49,13 @@ export const LOOP_SENTINEL_DYNAMIC = '<<loop.md-dynamic>>';
 export interface LoopTickResolverDeps {
   /** Pass `config.getWorkingDir()` — loop.md is resolved against the cwd. */
   projectRoot: string;
-  /** Home-candidate confinement root: `$hopcode_home` when set, else `$HOME`. */
+  /** Home-candidate confinement root: `$HOPCODE_HOME` when set, else `$HOME`. */
   homeDir: string;
   /**
-   * hopcode_home-aware global dir holding the home `loop.md` (`Storage.getGlobalhopcodeDir()`).
+   * HOPCODE_HOME-aware global dir holding the home `loop.md` (`Storage.getGlobalHopCodeDir()`).
    * Omitted → defaults to `<homeDir>/.hopcode` inside readLoopTaskFile.
    */
-  homehopcodeDir?: string;
+  homeHopcodeDir?: string;
   /**
    * Pass `() => config.isTrustedFolder()`. Re-evaluated on every `resolve()`,
    * never captured once: `isTrustedFolder()` is not process-stable in IDE
@@ -259,36 +259,36 @@ export class LoopTickResolver {
   }
 
   /** MODEL-FACING label for the home loop.md location. Mirrors
-   * readLoopTaskFile's home candidate (`<homehopcodeDir>/loop.md`) so the absent
+   * readLoopTaskFile's home candidate (`<homeHopcodeDir>/loop.md`) so the absent
    * reminder — and the caller's sanitized resolve-error — names the location
-   * actually checked (hopcode_home-aware), but must NEVER surface a raw absolute
+   * actually checked (HOPCODE_HOME-aware), but must NEVER surface a raw absolute
    * path: it flows into model/API text, leaking the host's filesystem layout.
    *   - under $HOME             → tilde-abbreviated `~/.hopcode/loop.md`;
-   *   - relocated via $hopcode_home → the literal `$hopcode_home/loop.md`, not the
+   *   - relocated via $HOPCODE_HOME → the literal `$HOPCODE_HOME/loop.md`, not the
    *     resolved dir (`tildeifyPath` only abbreviates $HOME, so it's a no-op for
-   *     a $hopcode_home outside $HOME and would otherwise pass the path through);
+   *     a $HOPCODE_HOME outside $HOME and would otherwise pass the path through);
    *   - any other out-of-$HOME dir → a generic placeholder, never the path.
    * The real absolute path stays in LOCAL debug logs only. */
   homeLoopLabel(): string {
-    const homehopcodeDir =
-      this.deps.homehopcodeDir ?? path.join(this.deps.homeDir, '.hopcode');
-    const homeLoopPath = path.join(homehopcodeDir, 'loop.md');
+    const homeHopcodeDir =
+      this.deps.homeHopcodeDir ?? path.join(this.deps.homeDir, '.hopcode');
+    const homeLoopPath = path.join(homeHopcodeDir, 'loop.md');
 
     const tildeified = tildeifyPath(homeLoopPath);
     if (tildeified !== homeLoopPath) {
       return tildeified.replace(/\\/g, '/');
     }
-    // Outside $HOME: tildeifyPath was a no-op. When $hopcode_home relocated the
-    // global dir (homehopcodeDir is its resolved value), report the literal env-var
+    // Outside $HOME: tildeifyPath was a no-op. When $HOPCODE_HOME relocated the
+    // global dir (homeHopcodeDir is its resolved value), report the literal env-var
     // name — never the absolute path. The home candidate is always
-    // `<homehopcodeDir>/loop.md`, so swap the whole resolved dir for `$hopcode_home` and
+    // `<homeHopcodeDir>/loop.md`, so swap the whole resolved dir for `$HOPCODE_HOME` and
     // re-attach the user-facing POSIX slash + basename directly. Deriving the tail from the
     // resolved path's length instead mishandles edge dirs: a trailing slash
-    // (`$hopcode_home=/x/.hopcode/`) over-counts the separator, and a filesystem-root
-    // homehopcodeDir (`$hopcode_home=/` → homeLoopPath `/loop.md`, dirname `/`) drops the
-    // leading separator — both garbling the tail into `$hopcode_homeloop.md`.
-    if (process.env['hopcode_home']) {
-      return '$hopcode_home/loop.md';
+    // (`$HOPCODE_HOME=/x/.hopcode/`) over-counts the separator, and a filesystem-root
+    // homeHopcodeDir (`$HOPCODE_HOME=/` → homeLoopPath `/loop.md`, dirname `/`) drops the
+    // leading separator — both garbling the tail into `$HOPCODE_HOMEloop.md`.
+    if (process.env['HOPCODE_HOME']) {
+      return '$HOPCODE_HOME/loop.md';
     }
     return 'the configured global loop.md';
   }
