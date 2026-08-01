@@ -888,7 +888,7 @@ function canManageHopCodeProviders(
   )
 }
 
-function isQwenNativeHistoryMessageId(
+function isHopCodeNativeHistoryMessageId(
   messageId: string,
   sdkSessionId?: string,
 ): boolean {
@@ -1356,7 +1356,7 @@ type StoredSessionWithHeaderOptions = StoredSession & {
   preserveSessionTimestamps?: boolean
 }
 
-function isQwenCanonicalManagedSession(
+function isHopCodeCanonicalManagedSession(
   managed: Pick<ManagedSession, 'sdkSessionId' | 'llmConnection'>,
 ): boolean {
   return (
@@ -1397,7 +1397,7 @@ function managedToSession(
     (message) => message.role !== 'status',
   )
   const derivedHeader =
-    persistableMessages.length > 0 && !isQwenCanonicalManagedSession(m)
+    persistableMessages.length > 0 && !isHopCodeCanonicalManagedSession(m)
       ? createSessionHeader({
           ...pickSessionFields(m),
           workspaceRootPath: m.workspace.rootPath,
@@ -1412,7 +1412,7 @@ function managedToSession(
     preview: derivedHeader?.preview ?? m.preview,
     lastMessageRole: derivedHeader?.lastMessageRole ?? m.lastMessageRole,
     tokenUsage: m.tokenUsage,
-    messageCount: isQwenCanonicalManagedSession(m)
+    messageCount: isHopCodeCanonicalManagedSession(m)
       ? undefined
       : (derivedHeader?.messageCount ?? m.messageCount),
     lastFinalMessageId:
@@ -1729,7 +1729,7 @@ export class SessionManager implements ISessionManager {
     // headers. Treat an absent local name as "unknown", not as a delete.
     if (
       !(
-        header.name === undefined && this.isQwenCanonicalMessageSession(managed)
+        header.name === undefined && this.isHopCodeCanonicalMessageSession(managed)
       ) &&
       managed.name !== header.name
     ) {
@@ -2604,8 +2604,8 @@ export class SessionManager implements ISessionManager {
     return undefined
   }
 
-  private isQwenCanonicalMessageSession(managed: ManagedSession): boolean {
-    return isQwenCanonicalManagedSession({
+  private isHopCodeCanonicalMessageSession(managed: ManagedSession): boolean {
+    return isHopCodeCanonicalManagedSession({
       sdkSessionId: managed.sdkSessionId,
       llmConnection: this.resolveExternalSessionConnectionSlug(managed),
     })
@@ -3047,7 +3047,7 @@ export class SessionManager implements ISessionManager {
     messages: Message[],
   ): void {
     const usesQwenCanonicalMessages =
-      this.isQwenCanonicalMessageSession(managed)
+      this.isHopCodeCanonicalMessageSession(managed)
     managed.messages = usesQwenCanonicalMessages
       ? mergehopcodeCanonicalLocalVisualMessages(messages, [
           ...managed.messages,
@@ -3062,7 +3062,7 @@ export class SessionManager implements ISessionManager {
     managed.preview = this.extractMessagePreview(managed.messages)
 
     const firstMessage = managed.messages[0]
-    if (firstMessage && this.isQwenCanonicalMessageSession(managed)) {
+    if (firstMessage && this.isHopCodeCanonicalMessageSession(managed)) {
       managed.createdAt = firstMessage.timestamp
     }
 
@@ -3078,7 +3078,7 @@ export class SessionManager implements ISessionManager {
       ) {
         managed.lastMessageRole = lastMessage.role
       }
-      managed.lastUsedAt = this.isQwenCanonicalMessageSession(managed)
+      managed.lastUsedAt = this.isHopCodeCanonicalMessageSession(managed)
         ? lastMessage.timestamp
         : Math.max(managed.lastUsedAt ?? 0, lastMessage.timestamp)
     }
@@ -3426,7 +3426,7 @@ export class SessionManager implements ISessionManager {
   private persistSession(managed: ManagedSession): void {
     try {
       const usesQwenCanonicalMessages =
-        this.isQwenCanonicalMessageSession(managed)
+        this.isHopCodeCanonicalMessageSession(managed)
       // Filter out transient status messages (progress indicators like "Compacting...")
       // Error messages are now persisted with rich fields for diagnostics
       const persistableMessages = usesQwenCanonicalMessages
@@ -3501,7 +3501,7 @@ export class SessionManager implements ISessionManager {
       >
     >,
   ): Promise<void> {
-    if (this.isQwenCanonicalMessageSession(managed)) {
+    if (this.isHopCodeCanonicalMessageSession(managed)) {
       this.persistSession(managed)
       await this.flushSession(managed.id)
       return
@@ -4061,7 +4061,7 @@ export class SessionManager implements ISessionManager {
       // names must not clear the in-memory provider title.
       if (
         storedSession.name !== undefined ||
-        !this.isQwenCanonicalMessageSession(managed)
+        !this.isHopCodeCanonicalMessageSession(managed)
       ) {
         managed.name = storedSession.name
       }
@@ -4071,7 +4071,7 @@ export class SessionManager implements ISessionManager {
       managed.transferredSessionSummaryApplied =
         storedSession.transferredSessionSummaryApplied
       const usesQwenCanonicalMessages =
-        this.isQwenCanonicalMessageSession(managed)
+        this.isHopCodeCanonicalMessageSession(managed)
       managed.messages = usesQwenCanonicalMessages
         ? hopcodeCanonicalLocalVisualMessages(storedMessages)
         : storedMessages
@@ -4128,7 +4128,7 @@ export class SessionManager implements ISessionManager {
   }
 
   private shouldAttemptExternalMessageLoad(managed: ManagedSession): boolean {
-    if (this.isQwenCanonicalMessageSession(managed)) {
+    if (this.isHopCodeCanonicalMessageSession(managed)) {
       if (managed.isProcessing) return false
 
       const externalUpdatedAt =
@@ -4184,8 +4184,8 @@ export class SessionManager implements ISessionManager {
     }
 
     if (
-      this.isQwenCanonicalMessageSession(managed) &&
-      isQwenNativeHistoryMessageId(messageId, managed.sdkSessionId)
+      this.isHopCodeCanonicalMessageSession(managed) &&
+      isHopCodeNativeHistoryMessageId(messageId, managed.sdkSessionId)
     ) {
       const latestUserIndex = managed.messages.findLastIndex(
         (m) => m.role === 'user',
@@ -7679,7 +7679,7 @@ export class SessionManager implements ISessionManager {
       managed.messages,
     )
     managed.lastMessageAt = rerunTimestamp
-    if (this.isQwenCanonicalMessageSession(managed)) {
+    if (this.isHopCodeCanonicalMessageSession(managed)) {
       this.markExternalMessagesLoadedThrough(managed)
     }
 
@@ -8181,7 +8181,7 @@ export class SessionManager implements ISessionManager {
 
       this.persistSession(managed)
       if (
-        this.isQwenCanonicalMessageSession(managed) &&
+        this.isHopCodeCanonicalMessageSession(managed) &&
         hasQwenCanonicalLocalVisualState(userMessage)
       ) {
         await this.flushSession(managed.id)
@@ -8304,7 +8304,7 @@ export class SessionManager implements ISessionManager {
     }
 
     if (
-      this.isQwenCanonicalMessageSession(managed) &&
+      this.isHopCodeCanonicalMessageSession(managed) &&
       hasQwenCanonicalLocalVisualState(userMessage)
     ) {
       this.persistSession(managed)
@@ -9155,7 +9155,7 @@ export class SessionManager implements ISessionManager {
       )
       this.applyExternalSessionMetadata(managed, pendingHeader)
     }
-    if (this.isQwenCanonicalMessageSession(managed)) {
+    if (this.isHopCodeCanonicalMessageSession(managed)) {
       this.markExternalMessagesLoadedThrough(managed)
     }
 

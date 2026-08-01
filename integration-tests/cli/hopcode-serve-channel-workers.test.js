@@ -481,7 +481,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
         expect(JSON.stringify(current)).not.toContain('startupFailures');
     }, 60_000);
     it('starts real workers for primary and secondary workspaces', async () => {
-        testRoot = realpathSync(mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-workers-')));
+        testRoot = realpathSync(mkdtempSync(path.join(tmpdir(), 'hopcode-serve-channel-workers-')));
         const qwenHome = path.join(testRoot, 'qwen-home');
         const runtimeDir = path.join(testRoot, 'runtime');
         const primaryWorkspace = path.join(testRoot, 'primary');

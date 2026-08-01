@@ -391,7 +391,7 @@ describe('SessionService - rename and custom title', () => {
         workDir: '/test/project/root',
         hostname: 'host',
         startedAt: 1,
-        qwenVersion: null,
+        hopcodeVersion: null,
       });
       vi.mocked(getProjectHash).mockImplementation((cwd: string) =>
         cwd === '/test/project/root'

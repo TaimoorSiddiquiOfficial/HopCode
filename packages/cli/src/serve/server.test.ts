@@ -2892,11 +2892,11 @@ describe('createServeApp', () => {
 
   describe('GET /workspace/channel/observed-contacts', () => {
     it('is assembled behind bearer authentication', async () => {
-      const previousQwenHome = process.env['HOPCODE_HOME'];
-      const qwenHome = await fsp.mkdtemp(
+      const previoushopcodeHome = process.env['HOPCODE_HOME'];
+      const hopcodeHome = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-observed-contact-server-'),
       );
-      process.env['HOPCODE_HOME'] = qwenHome;
+      process.env['HOPCODE_HOME'] = hopcodeHome;
       try {
         const app = createServeApp({
           ...baseOpts,
@@ -2917,9 +2917,9 @@ describe('createServeApp', () => {
         expect(authenticated.status).toBe(200);
         expect(authenticated.body).toEqual({ users: [], groups: [] });
       } finally {
-        if (previousQwenHome === undefined) delete process.env['HOPCODE_HOME'];
-        else process.env['HOPCODE_HOME'] = previousQwenHome;
-        await fsp.rm(qwenHome, { recursive: true, force: true });
+        if (previoushopcodeHome === undefined) delete process.env['HOPCODE_HOME'];
+        else process.env['HOPCODE_HOME'] = previoushopcodeHome;
+        await fsp.rm(hopcodeHome, { recursive: true, force: true });
       }
     });
   });
@@ -2944,7 +2944,7 @@ describe('createServeApp', () => {
     });
 
     it('returns the v1 envelope', async () => {
-      const previousQwenHome = process.env['HOPCODE_HOME'];
+      const previoushopcodeHome = process.env['HOPCODE_HOME'];
       const tempHome = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-capabilities-'),
       );
@@ -2979,7 +2979,7 @@ describe('createServeApp', () => {
         });
       } finally {
         await fsp.rm(tempHome, { recursive: true, force: true });
-        restoreEnv('HOPCODE_HOME', previousQwenHome);
+        restoreEnv('HOPCODE_HOME', previoushopcodeHome);
         resetHomeEnvBootstrapForTesting();
       }
     });
@@ -3086,7 +3086,7 @@ describe('createServeApp', () => {
     });
 
     it('loads workspace environment for direct-embed Voice capability checks', async () => {
-      const previousQwenHome = process.env['HOPCODE_HOME'];
+      const previoushopcodeHome = process.env['HOPCODE_HOME'];
       const previousWorkspaceAsrKey = process.env['WORKSPACE_ASR_KEY'];
       const tempHome = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-voice-capability-env-'),
@@ -3126,7 +3126,7 @@ describe('createServeApp', () => {
         expect(res.body.features).toContain('workspace_voice_transcription');
       } finally {
         await fsp.rm(tempHome, { recursive: true, force: true });
-        restoreEnv('HOPCODE_HOME', previousQwenHome);
+        restoreEnv('HOPCODE_HOME', previoushopcodeHome);
         restoreEnv('WORKSPACE_ASR_KEY', previousWorkspaceAsrKey);
         resetHomeEnvBootstrapForTesting();
       }
@@ -17689,7 +17689,7 @@ describe('createServeApp', () => {
 
   describe('POST /channels/:channelName/webhooks/:source', () => {
     it('isolates webhook configs across workspace sources', async () => {
-      const previousQwenHome = process.env['HOPCODE_HOME'];
+      const previoushopcodeHome = process.env['HOPCODE_HOME'];
       const previousWebhookSecret = process.env['HOPCODE_SHARED_WEBHOOK_SECRET'];
       const tempHome = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-channel-webhooks-multi-home-'),
@@ -17706,10 +17706,10 @@ describe('createServeApp', () => {
           [primary, 'primary-channel'],
           [secondary, 'secondary-channel'],
         ]) {
-          const qwenDir = path.join(workspace, '.hopcode');
-          await fsp.mkdir(qwenDir);
+          const hopcodeDir = path.join(workspace, '.hopcode');
+          await fsp.mkdir(hopcodeDir);
           await fsp.writeFile(
-            path.join(qwenDir, 'settings.json'),
+            path.join(hopcodeDir, 'settings.json'),
             JSON.stringify({
               channels: {
                 [channel]: {
@@ -17801,14 +17801,14 @@ describe('createServeApp', () => {
           fsp.rm(primary, { recursive: true, force: true }),
           fsp.rm(secondary, { recursive: true, force: true }),
         ]);
-        restoreEnv('HOPCODE_HOME', previousQwenHome);
+        restoreEnv('HOPCODE_HOME', previoushopcodeHome);
         restoreEnv('HOPCODE_SHARED_WEBHOOK_SECRET', previousWebhookSecret);
         resetHomeEnvBootstrapForTesting();
       }
     });
 
     it('refreshes webhook authentication when the manager config version changes', async () => {
-      const previousQwenHome = process.env['HOPCODE_HOME'];
+      const previoushopcodeHome = process.env['HOPCODE_HOME'];
       const tempHome = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-channel-webhooks-runtime-home-'),
       );
@@ -17905,13 +17905,13 @@ describe('createServeApp', () => {
           fsp.rm(tempHome, { recursive: true, force: true }),
           fsp.rm(workspace, { recursive: true, force: true }),
         ]);
-        restoreEnv('HOPCODE_HOME', previousQwenHome);
+        restoreEnv('HOPCODE_HOME', previoushopcodeHome);
         resetHomeEnvBootstrapForTesting();
       }
     });
 
     it('is only mounted when enqueueChannelWebhookTask is available', async () => {
-      const previousQwenHome = process.env['HOPCODE_HOME'];
+      const previoushopcodeHome = process.env['HOPCODE_HOME'];
       const tempHome = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-channel-webhooks-'),
       );
@@ -18097,13 +18097,13 @@ describe('createServeApp', () => {
       } finally {
         await fsp.rm(tempHome, { recursive: true, force: true });
         await fsp.rm(workspace, { recursive: true, force: true });
-        restoreEnv('HOPCODE_HOME', previousQwenHome);
+        restoreEnv('HOPCODE_HOME', previoushopcodeHome);
         resetHomeEnvBootstrapForTesting();
       }
     });
 
     it('skips malformed webhook config instead of crashing the server', async () => {
-      const previousQwenHome = process.env['HOPCODE_HOME'];
+      const previoushopcodeHome = process.env['HOPCODE_HOME'];
       const tempHome = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-channel-webhooks-bad-'),
       );
@@ -18159,13 +18159,13 @@ describe('createServeApp', () => {
         stderrSpy.mockRestore();
         await fsp.rm(tempHome, { recursive: true, force: true });
         await fsp.rm(workspace, { recursive: true, force: true });
-        restoreEnv('HOPCODE_HOME', previousQwenHome);
+        restoreEnv('HOPCODE_HOME', previoushopcodeHome);
         resetHomeEnvBootstrapForTesting();
       }
     });
 
     it('keeps valid webhook sources when a sibling source is malformed', async () => {
-      const previousQwenHome = process.env['HOPCODE_HOME'];
+      const previoushopcodeHome = process.env['HOPCODE_HOME'];
       const tempHome = await fsp.mkdtemp(
         path.join(os.tmpdir(), 'qwen-channel-webhooks-bad-source-'),
       );
@@ -18242,7 +18242,7 @@ describe('createServeApp', () => {
         stderrSpy.mockRestore();
         await fsp.rm(tempHome, { recursive: true, force: true });
         await fsp.rm(workspace, { recursive: true, force: true });
-        restoreEnv('HOPCODE_HOME', previousQwenHome);
+        restoreEnv('HOPCODE_HOME', previoushopcodeHome);
         resetHomeEnvBootstrapForTesting();
       }
     });

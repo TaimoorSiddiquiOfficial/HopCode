@@ -62,7 +62,7 @@ export declare class Storage {
     static getGlobalTempDir(): string;
     static getGlobalDebugDir(): string;
     static getDebugLogPath(sessionId: string): string;
-    static getGlobalQwenDir(): string;
+    static getGlobalhopcodeDir(): string;
     /**
      * Resolves pathToResolve by realpathing its deepest existing ancestor and
      * appending the not-yet-created remainder.

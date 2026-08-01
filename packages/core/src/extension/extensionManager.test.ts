@@ -132,10 +132,10 @@ describe('extension tests', () => {
   let tempHomeDir: string;
   let tempWorkspaceDir: string;
   let userExtensionsDir: string;
-  let savedQwenHome: string | undefined;
+  let savedHopcodeHome: string | undefined;
 
   beforeEach(() => {
-    savedQwenHome = process.env['QWEN_HOME'];
+    savedHopcodeHome = process.env['QWEN_HOME'];
     delete process.env['QWEN_HOME'];
     tempHomeDir = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qwen-code-test-home-'),
@@ -155,10 +155,10 @@ describe('extension tests', () => {
 
   afterEach(() => {
     fs.rmSync(tempHomeDir, { recursive: true, force: true });
-    if (savedQwenHome === undefined) {
+    if (savedHopcodeHome === undefined) {
       delete process.env['QWEN_HOME'];
     } else {
-      process.env['QWEN_HOME'] = savedQwenHome;
+      process.env['QWEN_HOME'] = savedHopcodeHome;
     }
     vi.restoreAllMocks();
   });

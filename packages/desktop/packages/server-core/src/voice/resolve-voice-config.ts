@@ -69,14 +69,14 @@ export function normalizeBaseUrl(raw: string): string {
 
 /**
  * Resolve the global hopcode config dir, mirroring core's
- * `Storage.getGlobalQwenDir()` so desktop voice reads the SAME `~/.hopcode`
+ * `Storage.getGlobalhopcodeDir()` so desktop voice reads the SAME `~/.hopcode`
  * credentials the qwen CLI writes. QWEN_HOME is normalized exactly as core does:
  * a leading `~`/`~/` expands to homedir() and a relative value resolves to an
  * absolute path; an unset/empty value falls back to `~/.hopcode`. Reading the raw
  * env value would point voice at a different dir than the rest of Qwen.
  * Exported for tests.
  */
-export function getQwenConfigDir(): string {
+export function gethopcodeConfigDir(): string {
   const envDir = process.env.hopcode_HOME;
   if (envDir) {
     let resolved = envDir;
@@ -100,7 +100,7 @@ export function getQwenConfigDir(): string {
 async function readQwenJsonFromDisk<T>(file: string): Promise<T | undefined> {
   try {
     return JSON.parse(
-      await readFile(join(getQwenConfigDir(), file), 'utf-8'),
+      await readFile(join(gethopcodeConfigDir(), file), 'utf-8'),
     ) as T;
   } catch {
     return undefined;

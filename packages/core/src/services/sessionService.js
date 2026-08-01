@@ -235,7 +235,7 @@ export class SessionService {
         }
     }
     removeFileHistoryBackups(sessionId) {
-        fs.rmSync(path.join(Storage.getGlobalQwenDir(), FILE_HISTORY_DIR, sessionId), { recursive: true, force: true });
+        fs.rmSync(path.join(Storage.getGlobalhopcodeDir(), FILE_HISTORY_DIR, sessionId), { recursive: true, force: true });
     }
     async removeSessionOrganization(sessionId) {
         try {

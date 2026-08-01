@@ -23,17 +23,17 @@ export interface ReadLoopTaskFileOptions {
      * Confinement root for the home candidate's resolved (symlink-followed)
      * target — a target escaping this dir (e.g. `-> /etc/passwd`) is refused while
      * an in-root dotfile symlink is followed. Pass `$QWEN_HOME` when set, else
-     * `$HOME` (see `homeQwenDir`).
+     * `$HOME` (see `homehopcodeDir`).
      */
     homeDir: string;
     /**
-     * Directory holding the home/global `loop.md` candidate (`<homeQwenDir>/loop.md`).
-     * Pass the QWEN_HOME-aware global dir (`Storage.getGlobalQwenDir()`) so a
+     * Directory holding the home/global `loop.md` candidate (`<homehopcodeDir>/loop.md`).
+     * Pass the QWEN_HOME-aware global dir (`Storage.getGlobalhopcodeDir()`) so a
      * relocated config home is honored instead of always reading the real OS home.
      * Defaults to `<homeDir>/.hopcode` so a direct barrel caller keeps the `~/.hopcode`
      * layout.
      */
-    homeQwenDir?: string;
+    homehopcodeDir?: string;
     /**
      * When false, the project `.hopcode/loop.md` candidate is skipped entirely — it
      * is repo-controlled, so an untrusted workspace must not read it and feed it
@@ -73,7 +73,7 @@ export interface ReadLoopTaskFileOptions {
  * final-component `lstat` cannot see. When `allowProjectFile` is false (untrusted
  * folder) the candidate is dropped entirely.
  *
- * Home candidate: `<homeQwenDir>/loop.md` (the QWEN_HOME-aware global dir, not
+ * Home candidate: `<homehopcodeDir>/loop.md` (the QWEN_HOME-aware global dir, not
  * always the real `~/.hopcode`). It is the user's own dotfile, so a symlink IS
  * followed (a common, legitimate setup — e.g. into a synced dotfiles repo), but
  * the resolved target must be a regular file AND stay within the home
@@ -81,4 +81,4 @@ export interface ReadLoopTaskFileOptions {
  * can't hang the tick and an escaping symlink (e.g. `-> /etc/passwd`) can't be
  * exfiltrated.
  */
-export declare function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir, allowProjectFile, realDirCache, }: ReadLoopTaskFileOptions): Promise<LoopTaskFileResult>;
+export declare function readLoopTaskFile({ projectRoot, homeDir, homehopcodeDir, allowProjectFile, realDirCache, }: ReadLoopTaskFileOptions): Promise<LoopTaskFileResult>;

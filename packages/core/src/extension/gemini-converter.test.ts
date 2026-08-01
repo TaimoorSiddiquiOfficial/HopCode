@@ -119,7 +119,7 @@ describe('convertGeminiToHopCodeConfig', () => {
       '/outside/extension/gemini-extension.json',
     );
 
-    expect(() => convertGeminiToQwenConfig(mockDir)).toThrow(
+    expect(() => convertGeminiTohopcodeConfig(mockDir)).toThrow(
       /resolves through a symlink outside the extension/,
     );
   });

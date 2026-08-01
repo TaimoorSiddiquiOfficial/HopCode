@@ -235,24 +235,24 @@ describe('hopcode serve multi-workspace channel workers', () => {
     testRoot = realpathSync(
       mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-runtime-')),
     );
-    const qwenHome = path.join(testRoot, 'qwen-home');
+    const hopcodeHome = path.join(testRoot, 'qwen-home');
     const runtimeDir = path.join(testRoot, 'runtime');
     const workspace = path.join(testRoot, 'workspace');
     mkdirSync(workspace);
     mkdirSync(runtimeDir);
     primaryServer = await createMockServer({ httpPort: 0, wsPort: 0 });
 
-    const extensionDir = path.join(qwenHome, 'extensions');
+    const extensionDir = path.join(hopcodeHome, 'extensions');
     mkdirSync(extensionDir, { recursive: true });
     symlinkSync(
       path.join(REPO_ROOT, 'packages', 'channels', 'plugin-example'),
       path.join(extensionDir, 'qwen-channel-plugin-example'),
       process.platform === 'win32' ? 'junction' : 'dir',
     );
-    writeJson(path.join(qwenHome, 'settings.json'), {
+    writeJson(path.join(hopcodeHome, 'settings.json'), {
       security: { folderTrust: { enabled: true } },
     });
-    const trustedFoldersPath = path.join(qwenHome, 'trustedFolders.json');
+    const trustedFoldersPath = path.join(hopcodeHome, 'trustedFolders.json');
     writeJson(trustedFoldersPath, { [workspace]: 'TRUST_FOLDER' });
     writeJson(path.join(workspace, '.hopcode', 'settings.json'), {
       channels: {
@@ -267,7 +267,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
     });
     const env = {
       ...process.env,
-      HOPCODE_HOME: qwenHome,
+      HOPCODE_HOME: hopcodeHome,
       HOPCODE_RUNTIME_DIR: runtimeDir,
       HOPCODE_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
       OPENAI_API_KEY: 'fake-key',
@@ -373,7 +373,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
     testRoot = realpathSync(
       mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-partial-')),
     );
-    const qwenHome = path.join(testRoot, 'qwen-home');
+    const hopcodeHome = path.join(testRoot, 'qwen-home');
     const runtimeDir = path.join(testRoot, 'runtime');
     const workspace = path.join(testRoot, 'workspace');
     mkdirSync(workspace);
@@ -381,17 +381,17 @@ describe('hopcode serve multi-workspace channel workers', () => {
     primaryServer = await createMockServer({ httpPort: 0, wsPort: 0 });
     const unreachableWsUrl = await createClosedWebSocketUrl();
 
-    const extensionDir = path.join(qwenHome, 'extensions');
+    const extensionDir = path.join(hopcodeHome, 'extensions');
     mkdirSync(extensionDir, { recursive: true });
     symlinkSync(
       path.join(REPO_ROOT, 'packages', 'channels', 'plugin-example'),
       path.join(extensionDir, 'qwen-channel-plugin-example'),
       process.platform === 'win32' ? 'junction' : 'dir',
     );
-    writeJson(path.join(qwenHome, 'settings.json'), {
+    writeJson(path.join(hopcodeHome, 'settings.json'), {
       security: { folderTrust: { enabled: true } },
     });
-    const trustedFoldersPath = path.join(qwenHome, 'trustedFolders.json');
+    const trustedFoldersPath = path.join(hopcodeHome, 'trustedFolders.json');
     writeJson(trustedFoldersPath, { [workspace]: 'TRUST_FOLDER' });
     writeJson(path.join(workspace, '.hopcode', 'settings.json'), {
       channels: {
@@ -430,7 +430,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
           ...process.env,
-          HOPCODE_HOME: qwenHome,
+          HOPCODE_HOME: hopcodeHome,
           HOPCODE_RUNTIME_DIR: runtimeDir,
           HOPCODE_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
           OPENAI_API_KEY: 'fake-key',
@@ -509,24 +509,24 @@ describe('hopcode serve multi-workspace channel workers', () => {
     testRoot = realpathSync(
       mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-failed-')),
     );
-    const qwenHome = path.join(testRoot, 'qwen-home');
+    const hopcodeHome = path.join(testRoot, 'qwen-home');
     const runtimeDir = path.join(testRoot, 'runtime');
     const workspace = path.join(testRoot, 'workspace');
     mkdirSync(workspace);
     mkdirSync(runtimeDir);
     const unreachableWsUrl = await createClosedWebSocketUrl();
 
-    const extensionDir = path.join(qwenHome, 'extensions');
+    const extensionDir = path.join(hopcodeHome, 'extensions');
     mkdirSync(extensionDir, { recursive: true });
     symlinkSync(
       path.join(REPO_ROOT, 'packages', 'channels', 'plugin-example'),
       path.join(extensionDir, 'qwen-channel-plugin-example'),
       process.platform === 'win32' ? 'junction' : 'dir',
     );
-    writeJson(path.join(qwenHome, 'settings.json'), {
+    writeJson(path.join(hopcodeHome, 'settings.json'), {
       security: { folderTrust: { enabled: true } },
     });
-    const trustedFoldersPath = path.join(qwenHome, 'trustedFolders.json');
+    const trustedFoldersPath = path.join(hopcodeHome, 'trustedFolders.json');
     writeJson(trustedFoldersPath, { [workspace]: 'TRUST_FOLDER' });
     writeJson(path.join(workspace, '.hopcode', 'settings.json'), {
       channels: {
@@ -558,7 +558,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
           ...process.env,
-          HOPCODE_HOME: qwenHome,
+          HOPCODE_HOME: hopcodeHome,
           HOPCODE_RUNTIME_DIR: runtimeDir,
           HOPCODE_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
           OPENAI_API_KEY: 'fake-key',
@@ -617,9 +617,9 @@ describe('hopcode serve multi-workspace channel workers', () => {
 
   it('starts real workers for primary and secondary workspaces', async () => {
     testRoot = realpathSync(
-      mkdtempSync(path.join(tmpdir(), 'qwen-serve-channel-workers-')),
+      mkdtempSync(path.join(tmpdir(), 'hopcode-serve-channel-workers-')),
     );
-    const qwenHome = path.join(testRoot, 'qwen-home');
+    const hopcodeHome = path.join(testRoot, 'qwen-home');
     const runtimeDir = path.join(testRoot, 'runtime');
     const primaryWorkspace = path.join(testRoot, 'primary');
     const secondaryWorkspace = path.join(testRoot, 'secondary');
@@ -630,17 +630,17 @@ describe('hopcode serve multi-workspace channel workers', () => {
     primaryServer = await createMockServer({ httpPort: 0, wsPort: 0 });
     secondaryServer = await createMockServer({ httpPort: 0, wsPort: 0 });
 
-    const extensionDir = path.join(qwenHome, 'extensions');
+    const extensionDir = path.join(hopcodeHome, 'extensions');
     mkdirSync(extensionDir, { recursive: true });
     symlinkSync(
       path.join(REPO_ROOT, 'packages', 'channels', 'plugin-example'),
       path.join(extensionDir, 'qwen-channel-plugin-example'),
       process.platform === 'win32' ? 'junction' : 'dir',
     );
-    writeJson(path.join(qwenHome, 'settings.json'), {
+    writeJson(path.join(hopcodeHome, 'settings.json'), {
       security: { folderTrust: { enabled: true } },
     });
-    const trustedFoldersPath = path.join(qwenHome, 'trustedFolders.json');
+    const trustedFoldersPath = path.join(hopcodeHome, 'trustedFolders.json');
     writeJson(trustedFoldersPath, {
       [primaryWorkspace]: 'TRUST_FOLDER',
       [secondaryWorkspace]: 'TRUST_FOLDER',
@@ -693,7 +693,7 @@ describe('hopcode serve multi-workspace channel workers', () => {
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
           ...process.env,
-          HOPCODE_HOME: qwenHome,
+          HOPCODE_HOME: hopcodeHome,
           HOPCODE_RUNTIME_DIR: runtimeDir,
           HOPCODE_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
           OPENAI_API_KEY: 'fake-key',

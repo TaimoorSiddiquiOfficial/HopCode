@@ -26,7 +26,7 @@ function createAgent(cwd) {
 }
 describe('QwenAgent tool_call_update handling', () => {
     it('ignores in_progress heartbeat frames and only emits tool_result on completion', async () => {
-        const cwd = mkdtempSync(join(tmpdir(), 'qwen-agent-tool-updates-'));
+        const cwd = mkdtempSync(join(tmpdir(), 'hopcode-agent-tool-updates-'));
         const agent = createAgent(cwd);
         const internals = agent;
         // A silent-shell liveness heartbeat: in_progress, meta-only. Converting
@@ -64,7 +64,7 @@ describe('QwenAgent tool_call_update handling', () => {
         expect(first.value?.result).toBe('done');
     });
     it('does not drop an in_progress frame that carries a kind', async () => {
-        const cwd = mkdtempSync(join(tmpdir(), 'qwen-agent-tool-updates-'));
+        const cwd = mkdtempSync(join(tmpdir(), 'hopcode-agent-tool-updates-'));
         const agent = createAgent(cwd);
         const internals = agent;
         // The drop guard is scoped to kind-less heartbeats (matching the

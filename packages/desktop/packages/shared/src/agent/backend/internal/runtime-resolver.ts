@@ -37,7 +37,7 @@ function hopcodeSourceCliCandidates(root: string): string[] {
   ];
 }
 
-function isQwenSourceRoot(root: string): boolean {
+function isHopCodeSourceRoot(root: string): boolean {
   return (
     existsSync(join(root, 'packages', 'cli', 'package.json')) &&
     existsSync(join(root, 'packages', 'desktop', 'package.json'))
@@ -50,7 +50,7 @@ function resolveQwenSourceCliFromAncestors(
 ): { path?: string; foundSourceRoot: boolean } {
   let dir = resolve(base);
   for (let i = 0; i <= maxLevels; i++) {
-    if (isQwenSourceRoot(dir)) {
+    if (isHopCodeSourceRoot(dir)) {
       return {
         path: firstExistingPath(hopcodeSourceCliCandidates(dir)),
         foundSourceRoot: true,

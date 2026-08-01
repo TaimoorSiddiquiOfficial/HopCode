@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'bun:test'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import {
-  getQwenConfigDir,
+  gethopcodeConfigDir,
   normalizeBaseUrl,
   resolveDesktopVoiceConfig,
 } from './resolve-voice-config'
@@ -137,7 +137,7 @@ describe('resolveDesktopVoiceConfig', () => {
   })
 })
 
-describe('getQwenConfigDir', () => {
+describe('gethopcodeConfigDir', () => {
   const original = process.env.hopcode_HOME
 
   afterEach(() => {
@@ -145,31 +145,31 @@ describe('getQwenConfigDir', () => {
     else process.env.hopcode_HOME = original
   })
 
-  // QWEN_HOME must be normalized the same way core's Storage.getGlobalQwenDir
+  // QWEN_HOME must be normalized the same way core's Storage.getGlobalhopcodeDir
   // does, so desktop voice reads the same dir the qwen CLI writes to.
   it('expands a leading ~ to the home directory', () => {
     process.env.hopcode_HOME = '~/custom-qwen'
-    expect(getQwenConfigDir()).toBe(join(homedir(), 'custom-qwen'))
+    expect(gethopcodeConfigDir()).toBe(join(homedir(), 'custom-qwen'))
   })
 
   it('resolves a relative value to an absolute path', () => {
     process.env.hopcode_HOME = 'relative/config'
-    expect(getQwenConfigDir()).toBe(resolve('relative/config'))
+    expect(gethopcodeConfigDir()).toBe(resolve('relative/config'))
   })
 
   it('falls back to ~/.hopcode when QWEN_HOME is empty', () => {
     process.env.hopcode_HOME = ''
-    expect(getQwenConfigDir()).toBe(join(homedir(), '.hopcode'))
+    expect(gethopcodeConfigDir()).toBe(join(homedir(), '.hopcode'))
   })
 
   it('falls back to ~/.hopcode when QWEN_HOME is unset', () => {
     delete process.env.hopcode_HOME
-    expect(getQwenConfigDir()).toBe(join(homedir(), '.hopcode'))
+    expect(gethopcodeConfigDir()).toBe(join(homedir(), '.hopcode'))
   })
 
   it('passes an absolute QWEN_HOME through unchanged', () => {
     process.env.hopcode_HOME = '/opt/qwen-home'
-    expect(getQwenConfigDir()).toBe('/opt/qwen-home')
+    expect(gethopcodeConfigDir()).toBe('/opt/qwen-home')
   })
 })
 

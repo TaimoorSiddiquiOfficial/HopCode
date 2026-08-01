@@ -892,7 +892,7 @@ function readRequiredString(value: unknown, fieldName: string): string {
   return stringValue;
 }
 
-// Skill slugs are used to build filesystem paths under `<globalQwenDir>/skills`.
+// Skill slugs are used to build filesystem paths under `<globalhopcodeDir>/skills`.
 // The character allowlist below already excludes `/` and `\`, but `.` and `..`
 // would still slip through and let `path.join` traverse out of the skills dir
 // (e.g. slug `..` resolves to the global config dir). Reject them explicitly.
@@ -1614,7 +1614,7 @@ function resolveSkillInstallPath(
 
 // Builds the per-skill directory and asserts (defense-in-depth, on top of
 // validateSkillSlug) that it stays strictly under the managed skills root, so a
-// crafted slug can never make install/delete operate on `<globalQwenDir>` itself.
+// crafted slug can never make install/delete operate on `<globalhopcodeDir>` itself.
 function resolveManagedSkillDir(skillsBaseDir: string, slug: string): string {
   const root = path.resolve(skillsBaseDir);
   const skillDir = path.resolve(skillsBaseDir, slug);

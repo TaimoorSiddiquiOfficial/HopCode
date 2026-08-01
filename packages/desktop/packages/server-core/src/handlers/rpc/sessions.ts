@@ -496,7 +496,7 @@ export function registerSessionsHandlers(
             command.ruleType,
             command.rules,
           );
-        case 'getQwenCoreSettings':
+        case 'getHopCodeCoreSettings':
           return sessionManager.getSessionQwenCoreSettings(sessionId);
         case 'setQwenCoreSetting':
           return sessionManager.setSessionQwenCoreSetting(

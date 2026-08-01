@@ -254,7 +254,7 @@ async function rebuildFromSessionJsonl(
     sinceMs,
     skipSessionIds,
   } = options;
-  const projectsDir = path.join(Storage.getGlobalQwenDir(), 'projects');
+  const projectsDir = path.join(Storage.getGlobalhopcodeDir(), 'projects');
   try {
     if (!fs.existsSync(projectsDir)) return [];
   } catch (e) {

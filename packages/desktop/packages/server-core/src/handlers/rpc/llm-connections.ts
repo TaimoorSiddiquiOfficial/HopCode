@@ -92,7 +92,7 @@ function ensurehopcodeConnection(slug = HOPCODE_CODE_CONNECTION_SLUG): LlmConnec
   );
 }
 
-async function getQwenWorkspaceAcpOptions(
+async function getHopCodeWorkspaceAcpOptions(
   deps: HandlerDeps,
   ctx: RequestContext,
 ) {
@@ -127,7 +127,7 @@ export function registerLlmConnectionsHandlers(
   server.handle(
     RPC_CHANNELS.settings.LIST_HOPCODE_PROVIDERS,
     async (ctx): Promise<HopCodeProviderCatalog> =>
-      listHopCodeProvidersViaAcp(await getQwenWorkspaceAcpOptions(deps, ctx)),
+      listHopCodeProvidersViaAcp(await getHopCodeWorkspaceAcpOptions(deps, ctx)),
   );
 
   server.handle(
@@ -143,7 +143,7 @@ export function registerLlmConnectionsHandlers(
           scope: 'user',
         };
         const result = await connectHopCodeProviderViaAcp(
-          await getQwenWorkspaceAcpOptions(deps, ctx),
+          await getHopCodeWorkspaceAcpOptions(deps, ctx),
           scopedParams,
         );
         if (!result.success) return result;

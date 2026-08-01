@@ -9,7 +9,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-const originalQwenHome = process.env['HOPCODE_HOME'];
+const originalhopcodeHome = process.env['HOPCODE_HOME'];
 const originalSystemSettingsPath =
   process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'];
 const originalSystemDefaultsPath =
@@ -18,23 +18,23 @@ const originalTrustedFoldersPath =
   process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
 
 describe('serve fast path --open import boundary', () => {
-  let tempQwenHome: string | undefined;
+  let temphopcodeHome: string | undefined;
 
-  function useTempQwenHome(): void {
-    tempQwenHome = fs.realpathSync(
+  function useTemphopcodeHome(): void {
+    temphopcodeHome = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-fast-path-open-')),
     );
-    process.env['HOPCODE_HOME'] = tempQwenHome;
+    process.env['HOPCODE_HOME'] = temphopcodeHome;
     process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'] = path.join(
-      tempQwenHome,
+      temphopcodeHome,
       'system-settings.json',
     );
     process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'] = path.join(
-      tempQwenHome,
+      temphopcodeHome,
       'system-defaults.json',
     );
     process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = path.join(
-      tempQwenHome,
+      temphopcodeHome,
       'trustedFolders.json',
     );
   }
@@ -44,10 +44,10 @@ describe('serve fast path --open import boundary', () => {
     vi.doUnmock('./run-hopcode-serve.js');
     vi.doUnmock('../commands/serve.js');
     vi.resetModules();
-    if (originalQwenHome === undefined) {
+    if (originalhopcodeHome === undefined) {
       delete process.env['HOPCODE_HOME'];
     } else {
-      process.env['HOPCODE_HOME'] = originalQwenHome;
+      process.env['HOPCODE_HOME'] = originalhopcodeHome;
     }
     if (originalSystemSettingsPath === undefined) {
       delete process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'];
@@ -67,14 +67,14 @@ describe('serve fast path --open import boundary', () => {
       process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] =
         originalTrustedFoldersPath;
     }
-    if (tempQwenHome) {
-      fs.rmSync(tempQwenHome, { recursive: true, force: true });
-      tempQwenHome = undefined;
+    if (temphopcodeHome) {
+      fs.rmSync(temphopcodeHome, { recursive: true, force: true });
+      temphopcodeHome = undefined;
     }
   });
 
   it('defers importing the full serve command opener until runtime is ready', async () => {
-    useTempQwenHome();
+    useTemphopcodeHome();
 
     let resolveRuntime: (() => void) | undefined;
     const runtimeReady = new Promise<void>((resolve) => {
@@ -117,7 +117,7 @@ describe('serve fast path --open import boundary', () => {
   });
 
   it('skips importing the full serve command opener when runtime startup fails', async () => {
-    useTempQwenHome();
+    useTemphopcodeHome();
 
     let rejectRuntime: ((err: Error) => void) | undefined;
     const runtimeReady = new Promise<void>((_resolve, reject) => {

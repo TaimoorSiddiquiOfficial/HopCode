@@ -1202,7 +1202,7 @@ export class AcpDispatcher {
           const loadMeta = isObject(loadState._meta)
             ? loadState._meta
             : undefined;
-          const loadQwenMeta = isObject(loadMeta?.[HOPCODE_META_KEY])
+          const loadHopCodeMeta = isObject(loadMeta?.[HOPCODE_META_KEY])
             ? loadMeta[HOPCODE_META_KEY]
             : undefined;
           const replayStatus =
@@ -1221,7 +1221,7 @@ export class AcpDispatcher {
                   _meta: {
                     ...(loadMeta ?? {}),
                     [HOPCODE_META_KEY]: {
-                      ...(loadQwenMeta ?? {}),
+                      ...(loadHopCodeMeta ?? {}),
                       sessionLoadReplay: replayStatus,
                     },
                   },

@@ -67,10 +67,10 @@ export function workspaceRegistrationId(workspace: string): string {
 
 export function getWorkspaceRegistrationStorePath(
   primaryWorkspace: string,
-  qwenHome = getGlobalhopcodeDirLite(),
+  hopcodeHome = getGlobalhopcodeDirLite(),
 ): string {
   return path.join(
-    qwenHome,
+    hopcodeHome,
     'daemon',
     'workspaces',
     `${workspaceRegistrationScopeHash(primaryWorkspace)}.json`,
@@ -220,12 +220,12 @@ export class WorkspaceRegistrationStore {
 
   constructor(
     readonly primaryWorkspace: string,
-    qwenHome?: string,
+    hopcodeHome?: string,
   ) {
     validateWorkspacePath(primaryWorkspace, 'primaryWorkspace');
     this.filePath = getWorkspaceRegistrationStorePath(
       primaryWorkspace,
-      qwenHome,
+      hopcodeHome,
     );
   }
 

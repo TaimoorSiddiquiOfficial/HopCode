@@ -16,7 +16,7 @@ const fsFds = vi.hoisted(() => {
   };
   return fds;
 });
-const mockGlobalQwenDir = vi.hoisted(() => '/tmp/qwen-pidfile-test/.hopcode');
+const mockGlobalhopcodeDir = vi.hoisted(() => '/tmp/qwen-pidfile-test/.hopcode');
 const fsControls = vi.hoisted(() => ({ failUnlink: false }));
 
 vi.mock('node:fs', () => {
@@ -91,7 +91,7 @@ vi.mock('node:fs', () => {
 
 vi.mock('@hoptrendy/hopcode-core', () => ({
   Storage: {
-    getGlobalQwenDir: () => mockGlobalQwenDir,
+    getGlobalhopcodeDir: () => mockGlobalhopcodeDir,
   },
 }));
 

@@ -37,7 +37,7 @@ function createAgent(cwd: string): QwenAgent {
 
 describe('QwenAgent tool_call_update handling', () => {
   it('ignores in_progress heartbeat frames and only emits tool_result on completion', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-agent-tool-updates-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-agent-tool-updates-'));
     const agent = createAgent(cwd);
     const internals = agent as unknown as QwenToolUpdateInternals;
 
@@ -80,7 +80,7 @@ describe('QwenAgent tool_call_update handling', () => {
   });
 
   it('does not drop an in_progress frame that carries a kind', async () => {
-    const cwd = mkdtempSync(join(tmpdir(), 'qwen-agent-tool-updates-'));
+    const cwd = mkdtempSync(join(tmpdir(), 'hopcode-agent-tool-updates-'));
     const agent = createAgent(cwd);
     const internals = agent as unknown as QwenToolUpdateInternals;
 

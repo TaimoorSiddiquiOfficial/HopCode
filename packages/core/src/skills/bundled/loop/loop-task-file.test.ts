@@ -419,10 +419,10 @@ describe('readLoopTaskFile', () => {
     });
   });
 
-  it('reads the home loop.md from a relocated homeQwenDir (QWEN_HOME)', async () => {
+  it('reads the home loop.md from a relocated homehopcodeDir (QWEN_HOME)', async () => {
     // The home candidate lives in the QWEN_HOME-aware global dir, not always
     // <homeDir>/.hopcode — write loop.md into a relocated global dir and confirm it
-    // is read as the `home` source from <homeQwenDir>/loop.md.
+    // is read as the `home` source from <homehopcodeDir>/loop.md.
     const relocated = path.join(tempDir, 'relocated-qwen');
     await fs.mkdir(relocated, { recursive: true });
     await fs.writeFile(path.join(relocated, 'loop.md'), 'relocated user tasks');
@@ -432,7 +432,7 @@ describe('readLoopTaskFile', () => {
       // Caller passes the global dir as both candidate dir and confinement root
       // when QWEN_HOME is set (see Session.#getLoopTickResolver).
       homeDir: relocated,
-      homeQwenDir: relocated,
+      homehopcodeDir: relocated,
       allowProjectFile: true,
     });
 
@@ -445,7 +445,7 @@ describe('readLoopTaskFile', () => {
     });
   });
 
-  it('keeps confinement for a relocated homeQwenDir (escaping symlink refused)', async () => {
+  it('keeps confinement for a relocated homehopcodeDir (escaping symlink refused)', async () => {
     // Relocation must not loosen the earlier confinement: a symlink whose target
     // escapes the home confinement root is still refused, not read.
     const relocated = path.join(tempDir, 'relocated-qwen');
@@ -457,7 +457,7 @@ describe('readLoopTaskFile', () => {
     const result = await readLoopTaskFile({
       projectRoot,
       homeDir: relocated,
-      homeQwenDir: relocated,
+      homehopcodeDir: relocated,
       allowProjectFile: true,
     });
 

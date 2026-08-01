@@ -84,12 +84,12 @@ async function needsCatchUp(markerPath: string): Promise<boolean> {
   }
 }
 
-function getSubagentMarkerPath(qwenDir: string, projectDir: string): string {
+function getSubagentMarkerPath(hopcodeDir: string, projectDir: string): string {
   const projectKey = createHash('sha256')
     .update(projectDir)
     .digest('hex')
     .slice(0, 16);
-  return join(qwenDir, `${SUBAGENT_MARKER}-${projectKey}`);
+  return join(hopcodeDir, `${SUBAGENT_MARKER}-${projectKey}`);
 }
 
 async function runPass(
@@ -153,13 +153,13 @@ async function runHousekeeping(
   // active session uses a brand-new sessionId/dir, so it's never aliased
   // against any sweep target. Not a bug — slightly conservative is fine.
   const currentSessionId = config.getSessionId();
-  const qwenDir = Storage.getGlobalHopCodeDir();
+  const hopcodeDir = Storage.getGlobalHopCodeDir();
 
   await runThrottledOnce(
     {
       name: 'file-history-cleanup',
-      markerPath: join(qwenDir, FILE_HISTORY_MARKER),
-      lockPath: join(qwenDir, FILE_HISTORY_MARKER + '.lock'),
+      markerPath: join(hopcodeDir, FILE_HISTORY_MARKER),
+      lockPath: join(hopcodeDir, FILE_HISTORY_MARKER + '.lock'),
     },
     async () => {
       const r = await cleanupOldFileHistoryBackups({
@@ -178,7 +178,7 @@ async function runHousekeeping(
   // optional chain keeps housekeeping best-effort if a caller doesn't.
   const projectDir = config.storage?.getProjectDir?.();
   if (projectDir) {
-    const markerPath = getSubagentMarkerPath(qwenDir, projectDir);
+    const markerPath = getSubagentMarkerPath(hopcodeDir, projectDir);
     await runThrottledOnce(
       {
         name: 'subagent-cleanup',

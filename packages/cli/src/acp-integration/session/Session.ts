@@ -763,20 +763,20 @@ export function isExistingFile(
 }
 
 export function resolveHomeLoopResolverRoots({
-  homeQwenDir = Storage.getGlobalQwenDir(),
+  homehopcodeDir = Storage.getGlobalhopcodeDir(),
   homeDir = os.homedir(),
-  qwenHome = process.env['HOPCODE_HOME'],
+  hopcodeHome = process.env['HOPCODE_HOME'],
 }: {
-  homeQwenDir?: string;
+  homehopcodeDir?: string;
   homeDir?: string;
-  qwenHome?: string;
-} = {}): { homeConfineRoot: string; homeQwenDir: string } {
-  // qwenHome truthy → HOPCODE_HOME is itself the global dir, so confine within
-  // homeQwenDir; the homeDir param is only consulted when qwenHome is unset.
+  hopcodeHome?: string;
+} = {}): { homeConfineRoot: string; homehopcodeDir: string } {
+  // hopcodeHome truthy → HOPCODE_HOME is itself the global dir, so confine within
+  // homehopcodeDir; the homeDir param is only consulted when hopcodeHome is unset.
   return {
     homeConfineRoot:
-      (qwenHome ? homeQwenDir : homeDir) || path.dirname(homeQwenDir),
-    homeQwenDir,
+      (hopcodeHome ? homehopcodeDir : homeDir) || path.dirname(homehopcodeDir),
+    homehopcodeDir,
   };
 }
 
@@ -4174,11 +4174,11 @@ export class Session implements SessionContext {
       // Resolve the home/global loop.md from the HOPCODE_HOME-aware global dir (the
       // rest of Qwen honors HOPCODE_HOME for `.hopcode`); reading raw os.homedir() here
       // would always hit the real `~/.hopcode` and ignore a relocated config home.
-      const { homeConfineRoot, homeQwenDir } = resolveHomeLoopResolverRoots();
+      const { homeConfineRoot, homehopcodeDir } = resolveHomeLoopResolverRoots();
       this.loopTickResolver = new LoopTickResolver({
         projectRoot: root,
         homeDir: homeConfineRoot,
-        homeQwenDir,
+        homehopcodeDir,
         // The project `.hopcode/loop.md` is repo-controlled, so an untrusted folder
         // must not read it and feed it to the model (mirrors getProjectHooks()'s
         // trust gate). The home/global `~/.hopcode/loop.md` is user-owned and stays

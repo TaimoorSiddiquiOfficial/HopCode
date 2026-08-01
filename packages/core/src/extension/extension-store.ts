@@ -236,7 +236,7 @@ export class ExtensionStore {
       options.extensionsDir ?? Storage.getUserExtensionsDir();
     this.storeDir =
       options.storeDir ??
-      path.join(Storage.getGlobalQwenDir(), 'extension-store');
+      path.join(Storage.getGlobalhopcodeDir(), 'extension-store');
     this.enablementPath =
       options.enablementPath ??
       path.join(this.extensionsDir, 'extension-enablement.json');

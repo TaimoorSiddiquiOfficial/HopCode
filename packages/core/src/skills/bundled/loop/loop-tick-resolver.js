@@ -173,7 +173,7 @@ export class LoopTickResolver {
         return this.#autonomousTick(autonomousTickText(mode));
     }
     /** MODEL-FACING label for the home loop.md location. Mirrors
-     * readLoopTaskFile's home candidate (`<homeQwenDir>/loop.md`) so the absent
+     * readLoopTaskFile's home candidate (`<homehopcodeDir>/loop.md`) so the absent
      * reminder — and the caller's sanitized resolve-error — names the location
      * actually checked (QWEN_HOME-aware), but must NEVER surface a raw absolute
      * path: it flows into model/API text, leaking the host's filesystem layout.
@@ -184,20 +184,20 @@ export class LoopTickResolver {
      *   - any other out-of-$HOME dir → a generic placeholder, never the path.
      * The real absolute path stays in LOCAL debug logs only. */
     homeLoopLabel() {
-        const homeQwenDir = this.deps.homeQwenDir ?? path.join(this.deps.homeDir, '.hopcode');
-        const homeLoopPath = path.join(homeQwenDir, 'loop.md');
+        const homehopcodeDir = this.deps.homehopcodeDir ?? path.join(this.deps.homeDir, '.hopcode');
+        const homeLoopPath = path.join(homehopcodeDir, 'loop.md');
         const tildeified = tildeifyPath(homeLoopPath);
         if (tildeified !== homeLoopPath) {
             return tildeified.replace(/\\/g, '/');
         }
         // Outside $HOME: tildeifyPath was a no-op. When $QWEN_HOME relocated the
-        // global dir (homeQwenDir is its resolved value), report the literal env-var
+        // global dir (homehopcodeDir is its resolved value), report the literal env-var
         // name — never the absolute path. The home candidate is always
-        // `<homeQwenDir>/loop.md`, so swap the whole resolved dir for `$QWEN_HOME` and
+        // `<homehopcodeDir>/loop.md`, so swap the whole resolved dir for `$QWEN_HOME` and
         // re-attach the user-facing POSIX slash + basename directly. Deriving the tail from the
         // resolved path's length instead mishandles edge dirs: a trailing slash
         // (`$QWEN_HOME=/x/.hopcode/`) over-counts the separator, and a filesystem-root
-        // homeQwenDir (`$QWEN_HOME=/` → homeLoopPath `/loop.md`, dirname `/`) drops the
+        // homehopcodeDir (`$QWEN_HOME=/` → homeLoopPath `/loop.md`, dirname `/`) drops the
         // leading separator — both garbling the tail into `$QWEN_HOMEloop.md`.
         if (process.env['QWEN_HOME']) {
             return '$QWEN_HOME/loop.md';
@@ -264,7 +264,7 @@ export class LoopTickResolver {
         const result = await readLoopTaskFile({
             projectRoot: this.deps.projectRoot,
             homeDir: this.deps.homeDir,
-            homeQwenDir: this.deps.homeQwenDir,
+            homehopcodeDir: this.deps.homehopcodeDir,
             allowProjectFile,
             realDirCache: this.#realDirCache,
         });

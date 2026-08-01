@@ -374,14 +374,14 @@ export function ModelDialog({
               ? snapshotId
               : buildModelSelectionKey(t2, model.id, model.baseUrl);
 
-          const isQwenOAuth = t2 === AuthType.HOPCODE_OAUTH;
+          const isHopCodeOAuth = t2 === AuthType.HOPCODE_OAUTH;
 
           const title = (
             <Text>
               <Text
                 bold
                 color={
-                  isQwenOAuth
+                  isHopCodeOAuth
                     ? theme.status.warning
                     : isRuntime
                       ? theme.status.warning
@@ -400,7 +400,7 @@ export function ModelDialog({
               {isRuntime && (
                 <Text color={theme.status.warning}> (Runtime)</Text>
               )}
-              {isQwenOAuth && !isRuntime && (
+              {isHopCodeOAuth && !isRuntime && (
                 <Text color={theme.status.warning}> ({t('Discontinued')})</Text>
               )}
             </Text>
@@ -413,7 +413,7 @@ export function ModelDialog({
               ? `${description} (Runtime)`
               : 'Runtime model';
           }
-          if (isQwenOAuth && !isRuntime) {
+          if (isHopCodeOAuth && !isRuntime) {
             description = t('Discontinued — switch to Coding Plan or API Key');
           }
 
@@ -733,14 +733,14 @@ export function ModelDialog({
       // Block selection of discontinued qwen-oauth models
       // (only block non-runtime OAuth; runtime OAuth models from existing
       //  cached tokens are still allowed to work until the server rejects them)
-      const isQwenOAuthSelection =
+      const isHopCodeOAuthSelection =
         selected.startsWith(`${AuthType.HOPCODE_OAUTH}::`) ||
         (selected.startsWith('$runtime|') &&
           selected.split('|')[1] === AuthType.HOPCODE_OAUTH);
       const isRuntimeOAuthSelection = selected.startsWith(
         `$runtime|${AuthType.HOPCODE_OAUTH}|`,
       );
-      if (isQwenOAuthSelection && !isRuntimeOAuthSelection) {
+      if (isHopCodeOAuthSelection && !isRuntimeOAuthSelection) {
         setErrorMessage(
           t(
             'Qwen OAuth free tier was discontinued on 2026-04-15. Please select a model from another provider or run /auth to switch.',

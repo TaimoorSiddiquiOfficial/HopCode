@@ -107,7 +107,7 @@ async function readBoundedTaskFile(filePath) {
  * final-component `lstat` cannot see. When `allowProjectFile` is false (untrusted
  * folder) the candidate is dropped entirely.
  *
- * Home candidate: `<homeQwenDir>/loop.md` (the QWEN_HOME-aware global dir, not
+ * Home candidate: `<homehopcodeDir>/loop.md` (the QWEN_HOME-aware global dir, not
  * always the real `~/.hopcode`). It is the user's own dotfile, so a symlink IS
  * followed (a common, legitimate setup — e.g. into a synced dotfiles repo), but
  * the resolved target must be a regular file AND stay within the home
@@ -115,7 +115,7 @@ async function readBoundedTaskFile(filePath) {
  * can't hang the tick and an escaping symlink (e.g. `-> /etc/passwd`) can't be
  * exfiltrated.
  */
-export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = path.join(homeDir, '.hopcode'), allowProjectFile = false, realDirCache = moduleRealDirCache, }) {
+export async function readLoopTaskFile({ projectRoot, homeDir, homehopcodeDir = path.join(homeDir, '.hopcode'), allowProjectFile = false, realDirCache = moduleRealDirCache, }) {
     if (!allowProjectFile) {
         // Repo-controlled file in an untrusted folder — never read it (the
         // candidate is dropped below; this is the trace for why).
@@ -130,7 +130,7 @@ export async function readLoopTaskFile({ projectRoot, homeDir, homeQwenDir = pat
                 },
             ]
             : []),
-        { source: 'home', path: path.join(homeQwenDir, 'loop.md') },
+        { source: 'home', path: path.join(homehopcodeDir, 'loop.md') },
     ];
     for (const { source, path: filePath } of candidates) {
         let buffer;

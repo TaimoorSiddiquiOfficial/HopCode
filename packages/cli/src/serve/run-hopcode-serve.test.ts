@@ -143,15 +143,15 @@ vi.mock('@hoptrendy/acp-bridge/spawnChannel', async (importOriginal) => {
 describe('workspace skill settings persistence', () => {
   let handle: RunHandle | undefined;
   let workspace = '';
-  let qwenHome = '';
-  let previousQwenHome: string | undefined;
+  let hopcodeHome = '';
+  let previoushopcodeHome: string | undefined;
 
   afterEach(async () => {
     await handle?.close();
     if (workspace) fs.rmSync(workspace, { recursive: true, force: true });
-    if (qwenHome) fs.rmSync(qwenHome, { recursive: true, force: true });
-    if (previousQwenHome === undefined) delete process.env['HOPCODE_HOME'];
-    else process.env['HOPCODE_HOME'] = previousQwenHome;
+    if (hopcodeHome) fs.rmSync(hopcodeHome, { recursive: true, force: true });
+    if (previoushopcodeHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = previoushopcodeHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     vi.restoreAllMocks();
   });
@@ -160,11 +160,11 @@ describe('workspace skill settings persistence', () => {
     workspace = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-skill-settings-')),
     );
-    qwenHome = fs.realpathSync(
+    hopcodeHome = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-skill-home-')),
     );
-    previousQwenHome = process.env['HOPCODE_HOME'];
-    process.env['HOPCODE_HOME'] = qwenHome;
+    previoushopcodeHome = process.env['HOPCODE_HOME'];
+    process.env['HOPCODE_HOME'] = hopcodeHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     fs.mkdirSync(path.join(workspace, '.hopcode'), { recursive: true });
     fs.writeFileSync(
@@ -174,7 +174,7 @@ describe('workspace skill settings persistence', () => {
       }),
     );
     fs.writeFileSync(
-      path.join(qwenHome, 'settings.json'),
+      path.join(hopcodeHome, 'settings.json'),
       JSON.stringify({ skills: { disabled: ['locked-skill'] } }),
     );
 
@@ -3155,7 +3155,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-webhook-start-')),
     );
-    const previousQwenHome = process.env['HOPCODE_HOME'];
+    const previoushopcodeHome = process.env['HOPCODE_HOME'];
     const previousWebhookSecret = process.env['QWEN_DEFERRED_WEBHOOK_SECRET'];
     const tempHome = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qws-runtime-webhook-home-'),
@@ -3282,10 +3282,10 @@ describe('runHopCodeServe runtime startup failures', () => {
     } finally {
       await handle.close();
       fs.rmSync(tempHome, { recursive: true, force: true });
-      if (previousQwenHome === undefined) {
+      if (previoushopcodeHome === undefined) {
         delete process.env['HOPCODE_HOME'];
       } else {
-        process.env['HOPCODE_HOME'] = previousQwenHome;
+        process.env['HOPCODE_HOME'] = previoushopcodeHome;
       }
       if (previousWebhookSecret === undefined) {
         delete process.env['QWEN_DEFERRED_WEBHOOK_SECRET'];
@@ -3301,7 +3301,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-webhook-auth-')),
     );
     const logBaseDir = path.join(tmpDir, 'debug');
-    const previousQwenHome = process.env['HOPCODE_HOME'];
+    const previoushopcodeHome = process.env['HOPCODE_HOME'];
     const tempHome = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qws-runtime-webhook-home-'),
     );
@@ -3404,10 +3404,10 @@ describe('runHopCodeServe runtime startup failures', () => {
         await handle.close();
       }
       fs.rmSync(tempHome, { recursive: true, force: true });
-      if (previousQwenHome === undefined) {
+      if (previoushopcodeHome === undefined) {
         delete process.env['HOPCODE_HOME'];
       } else {
-        process.env['HOPCODE_HOME'] = previousQwenHome;
+        process.env['HOPCODE_HOME'] = previoushopcodeHome;
       }
       settingsRuntime.resetHomeEnvBootstrapForTesting();
     }
@@ -3417,7 +3417,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-webhook-log-')),
     );
-    const previousQwenHome = process.env['HOPCODE_HOME'];
+    const previoushopcodeHome = process.env['HOPCODE_HOME'];
     const previousSecret = process.env['HOPCODE_MISSING_WEBHOOK_SECRET'];
     const tempHome = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qws-runtime-webhook-home-'),
@@ -3515,10 +3515,10 @@ describe('runHopCodeServe runtime startup failures', () => {
       } else {
         process.env['HOPCODE_MISSING_WEBHOOK_SECRET'] = previousSecret;
       }
-      if (previousQwenHome === undefined) {
+      if (previoushopcodeHome === undefined) {
         delete process.env['HOPCODE_HOME'];
       } else {
-        process.env['HOPCODE_HOME'] = previousQwenHome;
+        process.env['HOPCODE_HOME'] = previoushopcodeHome;
       }
       settingsRuntime.resetHomeEnvBootstrapForTesting();
     }

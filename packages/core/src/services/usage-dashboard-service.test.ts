@@ -74,18 +74,18 @@ function dayKey(ts: number): string {
 
 describe('loadUsageDashboard', () => {
   let tmpHome: string;
-  let originalQwenHome: string | undefined;
+  let originalhopcodeHome: string | undefined;
 
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-dashboard-'));
-    originalQwenHome = process.env['QWEN_HOME'];
+    originalhopcodeHome = process.env['QWEN_HOME'];
     process.env['QWEN_HOME'] = path.join(tmpHome, '.hopcode');
     fs.mkdirSync(process.env['QWEN_HOME'], { recursive: true });
   });
 
   afterEach(() => {
-    if (originalQwenHome === undefined) delete process.env['QWEN_HOME'];
-    else process.env['QWEN_HOME'] = originalQwenHome;
+    if (originalhopcodeHome === undefined) delete process.env['QWEN_HOME'];
+    else process.env['QWEN_HOME'] = originalhopcodeHome;
     fs.rmSync(tmpHome, { recursive: true, force: true });
   });
 

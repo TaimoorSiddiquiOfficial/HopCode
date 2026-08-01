@@ -28,10 +28,10 @@ export interface LoopTickResolverDeps {
     /** Home-candidate confinement root: `$QWEN_HOME` when set, else `$HOME`. */
     homeDir: string;
     /**
-     * QWEN_HOME-aware global dir holding the home `loop.md` (`Storage.getGlobalQwenDir()`).
+     * QWEN_HOME-aware global dir holding the home `loop.md` (`Storage.getGlobalhopcodeDir()`).
      * Omitted → defaults to `<homeDir>/.hopcode` inside readLoopTaskFile.
      */
-    homeQwenDir?: string;
+    homehopcodeDir?: string;
     /**
      * Pass `() => config.isTrustedFolder()`. Re-evaluated on every `resolve()`,
      * never captured once: `isTrustedFolder()` is not process-stable in IDE
@@ -76,7 +76,7 @@ export declare class LoopTickResolver {
      * Synchronous — the preamble is static; only the dedup state is consulted. */
     resolveAutonomous(mode: LoopMode): LoopTickResult;
     /** MODEL-FACING label for the home loop.md location. Mirrors
-     * readLoopTaskFile's home candidate (`<homeQwenDir>/loop.md`) so the absent
+     * readLoopTaskFile's home candidate (`<homehopcodeDir>/loop.md`) so the absent
      * reminder — and the caller's sanitized resolve-error — names the location
      * actually checked (QWEN_HOME-aware), but must NEVER surface a raw absolute
      * path: it flows into model/API text, leaking the host's filesystem layout.

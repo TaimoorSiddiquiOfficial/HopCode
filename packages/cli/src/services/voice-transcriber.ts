@@ -94,7 +94,7 @@ function readSettingsEnv(
     : undefined;
 }
 
-function isQwenBaseUrl(baseUrl: string): boolean {
+function isHopCodeBaseUrl(baseUrl: string): boolean {
   try {
     const hostname = new URL(baseUrl).hostname.toLowerCase();
     return (
@@ -267,7 +267,7 @@ function readApiKey(
   baseUrl: string,
   env: Readonly<Record<string, string | undefined>> | undefined,
 ): string | undefined {
-  if (!model.envKey && !isQwenBaseUrl(baseUrl)) {
+  if (!model.envKey && !isHopCodeBaseUrl(baseUrl)) {
     return undefined;
   }
   const envKey = model.envKey ?? DEFAULT_OPENAI_API_KEY;
@@ -279,7 +279,7 @@ function readApiKey(
   if (settingsEnvValue) {
     return settingsEnvValue;
   }
-  if (!model.envKey && isQwenBaseUrl(baseUrl)) {
+  if (!model.envKey && isHopCodeBaseUrl(baseUrl)) {
     const authApiKey = settings.merged.security?.auth?.apiKey;
     return typeof authApiKey === 'string' && authApiKey.trim().length > 0
       ? authApiKey.trim()
@@ -518,7 +518,7 @@ function transcriptionAbortSignal(abortSignal?: AbortSignal): AbortSignal {
  * `/audio/transcriptions` endpoint — it 404s.) Keyterm biasing goes in a leading
  * system message with structured content; language/itn go in `asr_options`.
  */
-async function transcribeViaQwenAsr(
+async function transcribeViaHopCodeAsr(
   audio: RecordedVoiceAudio,
   voiceConfig: VoiceTranscriptionConfig,
   options: {
@@ -650,7 +650,7 @@ export async function transcribeVoiceAudio(
   const transport = resolveVoiceTransport(voiceConfig.model);
   switch (transport) {
     case 'qwen-asr-chat':
-      return transcribeViaQwenAsr(
+      return transcribeViaHopCodeAsr(
         audio,
         voiceConfig,
         {

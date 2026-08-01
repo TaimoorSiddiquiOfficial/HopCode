@@ -998,7 +998,7 @@ export interface ElectronAPI {
   setDefaultThinkingLevel(
     level: ThinkingLevel,
   ): Promise<{ success: boolean; error?: string }>;
-  getQwenCoreSettings(): Promise<HopCodeCoreSettingsSnapshot>;
+  getHopCodeCoreSettings(): Promise<HopCodeCoreSettingsSnapshot>;
   setQwenCoreSetting(
     scope: HopCodeSettingsScope,
     key: HopCodeCoreSettingKey,

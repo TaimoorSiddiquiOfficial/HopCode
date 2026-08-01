@@ -453,7 +453,7 @@ export class IdeClient {
         const cwd = process.cwd();
         if (portFromEnv) {
             try {
-                const ideDir = Storage.getGlobalQwenDir();
+                const ideDir = Storage.getGlobalhopcodeDir();
                 const lockFile = path.join(ideDir, `${portFromEnv}.lock`);
                 const lockFileContents = await fs.promises.readFile(lockFile, 'utf8');
                 const config = JSON.parse(lockFileContents);
@@ -482,7 +482,7 @@ export class IdeClient {
             }
             debugLogger.debug(`Ignoring legacy IDE connection config: workspace "${legacyConfig.workspacePath}" does not match cwd "${cwd}".`);
         }
-        const ideDir = Storage.getGlobalQwenDir();
+        const ideDir = Storage.getGlobalhopcodeDir();
         const configs = await this.getAllConnectionConfigs(ideDir);
         for (const config of configs) {
             if (config.workspacePath === undefined) {
@@ -617,7 +617,7 @@ export class IdeClient {
     async tryFallbackPorts() {
         const cwd = process.cwd();
         const currentPort = this.connectionConfig?.port;
-        const configs = await this.getAllConnectionConfigs(Storage.getGlobalQwenDir());
+        const configs = await this.getAllConnectionConfigs(Storage.getGlobalhopcodeDir());
         const workspaceMatches = [];
         const otherConfigs = [];
         for (const config of configs) {

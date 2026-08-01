@@ -78,10 +78,10 @@ export function isOpusModel(_modelId: string): boolean {
   return false;
 }
 
-export function isQwenModel(modelId: string): boolean {
+export function isHopCodeModel(modelId: string): boolean {
   return modelId.toLowerCase().includes('hopcode');
 }
 
 export function getModelProvider(modelId: string): ModelProvider | undefined {
-  return getModelById(modelId)?.provider ?? (isQwenModel(modelId) ? 'hopcode' : undefined);
+  return getModelById(modelId)?.provider ?? (isHopCodeModel(modelId) ? 'hopcode' : undefined);
 }

@@ -175,7 +175,7 @@ export const CHANNEL_MAP = {
   setDefaultThinkingLevel: invoke(
     RPC_CHANNELS.settings.SET_DEFAULT_THINKING_LEVEL,
   ),
-  getQwenCoreSettings: invoke(RPC_CHANNELS.settings.GET_HOPCODE_CORE_SETTINGS),
+  getHopCodeCoreSettings: invoke(RPC_CHANNELS.settings.GET_HOPCODE_CORE_SETTINGS),
   setQwenCoreSetting: invoke(RPC_CHANNELS.settings.SET_HOPCODE_CORE_SETTING),
   setQwenMcpServer: invoke(RPC_CHANNELS.settings.SET_HOPCODE_MCP_SERVER),
   removeQwenMcpServer: invoke(RPC_CHANNELS.settings.REMOVE_HOPCODE_MCP_SERVER),

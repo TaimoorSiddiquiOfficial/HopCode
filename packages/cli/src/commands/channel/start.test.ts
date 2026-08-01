@@ -10,7 +10,7 @@ const mockEnvHttpProxyAgent = vi.hoisted(() =>
   })),
 );
 const mockNormalizeProxyUrl = vi.hoisted(() => vi.fn((url?: string) => url));
-const mockStorageGetGlobalQwenDir = vi.hoisted(() =>
+const mockStorageGetGlobalhopcodeDir = vi.hoisted(() =>
   vi.fn(() => '/tmp/qwen-home'),
 );
 const mockReadChannelMemory = vi.hoisted(() => vi.fn());
@@ -116,7 +116,7 @@ vi.mock('@hoptrendy/hopcode-core', () => ({
   removeChannelMemoryEntries: mockRemoveChannelMemoryEntries,
   updateChannelMemoryEntry: mockUpdateChannelMemoryEntry,
   Storage: {
-    getGlobalQwenDir: mockStorageGetGlobalQwenDir,
+    getGlobalhopcodeDir: mockStorageGetGlobalhopcodeDir,
   },
 }));
 
@@ -211,7 +211,7 @@ beforeEach(() => {
   mockReadServiceInfo.mockReturnValue(null);
   mockRouterGetTarget.mockReturnValue(undefined);
   mockRouterRestoreSessions.mockResolvedValue({ failed: 0, restored: 0 });
-  mockStorageGetGlobalQwenDir.mockReturnValue('/tmp/qwen-home');
+  mockStorageGetGlobalhopcodeDir.mockReturnValue('/tmp/qwen-home');
   mockChannelLoopStoreCreate.mockResolvedValue({ id: 'job-1' });
   mockChannelLoopStoreCreateForTarget.mockResolvedValue({ id: 'job-1' });
   mockChannelLoopStoreListForTarget.mockResolvedValue([]);

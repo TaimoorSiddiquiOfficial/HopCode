@@ -20,7 +20,7 @@ vi.mock('../../config/storage.js', async (importOriginal) => {
     ...original,
     Storage: {
       ...original.Storage,
-      getGlobalQwenDir: () => mockGlobalDir,
+      getGlobalhopcodeDir: () => mockGlobalDir,
       __setMockGlobalDir: (dir: string) => {
         mockGlobalDir = dir;
       },

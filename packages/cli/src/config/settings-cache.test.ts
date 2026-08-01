@@ -42,10 +42,10 @@ const TEST_ENV_PREFIX = 'SETTINGS_CACHE_TEST_';
 describe('loadSettingsCached', () => {
   let tmpRoot: string;
   let homeDir: string;
-  let qwenHome: string;
+  let hopcodeHome: string;
   let workspaceDir: string;
 
-  const userSettingsPath = () => path.join(qwenHome, 'settings.json');
+  const userSettingsPath = () => path.join(hopcodeHome, 'settings.json');
   const workspaceSettingsPath = (ws = workspaceDir) =>
     path.join(ws, '.hopcode', 'settings.json');
 
@@ -77,16 +77,16 @@ describe('loadSettingsCached', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'settings-cache-test-')),
     );
     homeDir = path.join(tmpRoot, 'home');
-    qwenHome = path.join(tmpRoot, 'qwen-home');
+    hopcodeHome = path.join(tmpRoot, 'qwen-home');
     workspaceDir = path.join(tmpRoot, 'project', 'app');
     fs.mkdirSync(homeDir, { recursive: true });
-    fs.mkdirSync(qwenHome, { recursive: true });
+    fs.mkdirSync(hopcodeHome, { recursive: true });
     fs.mkdirSync(workspaceDir, { recursive: true });
     mockHome.dir = homeDir;
 
     // Sandbox every settings path inside tmpRoot: user/workspace via
     // HOPCODE_HOME + cwd, system/system-defaults via their test overrides.
-    vi.stubEnv('HOPCODE_HOME', qwenHome);
+    vi.stubEnv('HOPCODE_HOME', hopcodeHome);
     vi.stubEnv(
       'HOPCODE_CODE_SYSTEM_SETTINGS_PATH',
       path.join(tmpRoot, 'system', 'settings.json'),
@@ -166,7 +166,7 @@ describe('loadSettingsCached', () => {
   });
 
   it('reloads when a discovered home .env file changes', () => {
-    const homeEnvPath = path.join(qwenHome, '.env');
+    const homeEnvPath = path.join(hopcodeHome, '.env');
     fs.writeFileSync(homeEnvPath, `${TEST_ENV_PREFIX}A=1\n`);
 
     const first = loadSettingsCached(workspaceDir);
@@ -188,12 +188,12 @@ describe('loadSettingsCached', () => {
     const first = loadSettingsCached(workspaceDir);
     expect(first.merged.model?.name).toBe('home-one');
 
-    const otherQwenHome = path.join(tmpRoot, 'qwen-home-2');
+    const otherhopcodeHome = path.join(tmpRoot, 'qwen-home-2');
     writeJson(
-      path.join(otherQwenHome, 'settings.json'),
+      path.join(otherhopcodeHome, 'settings.json'),
       versioned({ model: { name: 'home-two' } }),
     );
-    vi.stubEnv('HOPCODE_HOME', otherQwenHome);
+    vi.stubEnv('HOPCODE_HOME', otherhopcodeHome);
 
     const second = loadSettingsCached(workspaceDir);
     expect(second).not.toBe(first);

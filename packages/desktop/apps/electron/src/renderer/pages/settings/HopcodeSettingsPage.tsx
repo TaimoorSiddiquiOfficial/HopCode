@@ -367,8 +367,8 @@ async function runSharedhopcodeSettingsCommand(
   if (!window.electronAPI) return null;
 
   switch (command.type) {
-    case 'getQwenCoreSettings':
-      return window.electronAPI.getQwenCoreSettings();
+    case 'getHopCodeCoreSettings':
+      return window.electronAPI.getHopCodeCoreSettings();
     case 'setQwenCoreSetting':
       return window.electronAPI.setQwenCoreSetting(
         command.scope,
@@ -439,7 +439,7 @@ export default function HopCodeSettingsPage({ tab }: { tab: hopcodeSettingsTab }
     setLoading(true);
     setError(null);
     try {
-      const result = await runCommand({ type: 'getQwenCoreSettings' });
+      const result = await runCommand({ type: 'getHopCodeCoreSettings' });
       setSnapshot(result);
     } catch (loadError) {
       setError(

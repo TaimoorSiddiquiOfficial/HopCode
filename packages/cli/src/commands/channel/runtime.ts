@@ -1,4 +1,4 @@
-﻿import * as path from 'node:path';
+import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { hashDaemonWorkspace, Storage } from '@hoptrendy/hopcode-core';
 import type {
@@ -28,12 +28,12 @@ export interface ParsedChannel {
 }
 
 export function sessionsPath(): string {
-  return path.join(Storage.getGlobalQwenDir(), 'channels', 'sessions.json');
+  return path.join(Storage.getGlobalhopcodeDir(), 'channels', 'sessions.json');
 }
 
 export function daemonSessionRoutesPath(workspaceCwd: string): string {
   return path.join(
-    Storage.getGlobalQwenDir(),
+    Storage.getGlobalhopcodeDir(),
     'channels',
     'daemon',
     hashDaemonWorkspace(workspaceCwd),
@@ -43,7 +43,7 @@ export function daemonSessionRoutesPath(workspaceCwd: string): string {
 
 export function daemonObservedContactsPath(workspaceCwd: string): string {
   return path.join(
-    Storage.getGlobalQwenDir(),
+    Storage.getGlobalhopcodeDir(),
     'channels',
     'daemon',
     hashDaemonWorkspace(workspaceCwd),
@@ -52,7 +52,7 @@ export function daemonObservedContactsPath(workspaceCwd: string): string {
 }
 
 export function channelLoopPath(): string {
-  return path.join(Storage.getGlobalQwenDir(), 'channels', 'cron.json');
+  return path.join(Storage.getGlobalhopcodeDir(), 'channels', 'cron.json');
 }
 
 export function loadChannelsConfig(

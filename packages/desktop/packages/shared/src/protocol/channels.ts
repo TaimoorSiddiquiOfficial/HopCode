@@ -199,7 +199,7 @@ export const RPC_CHANNELS = {
     CONNECT_HOPCODE_PROVIDER: 'settings:connectHopCodeProvider',
     GET_DEFAULT_THINKING_LEVEL: 'settings:getDefaultThinkingLevel',
     SET_DEFAULT_THINKING_LEVEL: 'settings:setDefaultThinkingLevel',
-    GET_HOPCODE_CORE_SETTINGS: 'settings:getQwenCoreSettings',
+    GET_HOPCODE_CORE_SETTINGS: 'settings:getHopCodeCoreSettings',
     SET_HOPCODE_CORE_SETTING: 'settings:setQwenCoreSetting',
     SET_HOPCODE_MCP_SERVER: 'settings:setQwenMcpServer',
     REMOVE_HOPCODE_MCP_SERVER: 'settings:removeQwenMcpServer',

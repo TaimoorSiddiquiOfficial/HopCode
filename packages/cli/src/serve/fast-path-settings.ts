@@ -257,7 +257,7 @@ export function loadServeFastPathEnvironment(
         settings.advanced?.excludedEnvVars ?? DEFAULT_EXCLUDED_ENV_VARS;
       const normalizedEnvFilePath = path.normalize(envFilePath);
       const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
-      const isQwenScopedEnvFile =
+      const isHopCodeScopedEnvFile =
         isHomeScopedEnvFile ||
         path.basename(path.dirname(normalizedEnvFilePath)) ===
           SETTINGS_DIRECTORY_NAME;
@@ -270,7 +270,7 @@ export function loadServeFastPathEnvironment(
         ) {
           continue;
         }
-        if (!isQwenScopedEnvFile && excludedVars.includes(key)) {
+        if (!isHopCodeScopedEnvFile && excludedVars.includes(key)) {
           continue;
         }
         if (!Object.hasOwn(process.env, key)) {

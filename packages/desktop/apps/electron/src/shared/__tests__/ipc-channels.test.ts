@@ -233,7 +233,7 @@ const EXPECTED_CHANNELS: string[] = [
   'settings:getDefaultThinkingLevel',
   'settings:getGlobalPermissionMode',
   'settings:getNetworkProxy',
-  'settings:getQwenCoreSettings',
+  'settings:getHopCodeCoreSettings',
   'settings:getHopCodePermissionSettings',
   'settings:getServerConfig',
   'settings:getServerStatus',

@@ -73,7 +73,7 @@ function readDefaultHopCodeVersion(): string | undefined {
   }
 }
 
-function isQwenSourceRoot(root: string): boolean {
+function isHopCodeSourceRoot(root: string): boolean {
   return (
     existsSync(join(root, 'packages', 'cli', 'package.json')) &&
     existsSync(join(root, 'package.json'))
@@ -94,7 +94,7 @@ async function ensureQwenRuntimeForDev(): Promise<void> {
     process.env.HOPCODE_CODE_TARBALL || process.env.HOPCODE_CODE_VERSION,
   );
   const monorepoRoot = join(ROOT_DIR, '..', '..');
-  if (!requestedExternalArtifact && isQwenSourceRoot(monorepoRoot)) {
+  if (!requestedExternalArtifact && isHopCodeSourceRoot(monorepoRoot)) {
     console.log('🧭 Using HopCode CLI from the local monorepo checkout');
     return;
   }

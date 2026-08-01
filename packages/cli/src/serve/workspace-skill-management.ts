@@ -690,7 +690,7 @@ async function filesFromFolder(
 function skillBaseDir(workspace: string, scope: WorkspaceSkillScope): string {
   return scope === 'workspace'
     ? path.join(workspace, '.hopcode', 'skills')
-    : path.join(Storage.getGlobalQwenDir(), 'skills');
+    : path.join(Storage.getGlobalhopcodeDir(), 'skills');
 }
 
 async function removeInstallArtifacts(

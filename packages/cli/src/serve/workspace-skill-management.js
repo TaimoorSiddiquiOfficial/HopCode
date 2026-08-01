@@ -486,7 +486,7 @@ async function filesFromFolder(folderPath) {
 function skillBaseDir(workspace, scope) {
     return scope === 'workspace'
         ? path.join(workspace, '.hopcode', 'skills')
-        : path.join(Storage.getGlobalQwenDir(), 'skills');
+        : path.join(Storage.getGlobalhopcodeDir(), 'skills');
 }
 async function removeInstallArtifacts(baseDir, skillName) {
     const workDir = path.dirname(baseDir);

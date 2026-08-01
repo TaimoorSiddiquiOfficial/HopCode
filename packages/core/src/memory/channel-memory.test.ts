@@ -141,8 +141,8 @@ vi.mock('node:fs/promises', async (importOriginal) => {
 });
 
 describe('channel memory', () => {
-  const originalQwenHome = process.env['QWEN_HOME'];
-  let qwenHome: string;
+  const originalhopcodeHome = process.env['QWEN_HOME'];
+  let hopcodeHome: string;
 
   const target: ChannelMemoryTarget = {
     channelName: 'prod',
@@ -150,8 +150,8 @@ describe('channel memory', () => {
   };
 
   beforeEach(() => {
-    qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-channel-memory-'));
-    process.env['QWEN_HOME'] = qwenHome;
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-channel-memory-'));
+    process.env['QWEN_HOME'] = hopcodeHome;
   });
 
   afterEach(() => {
@@ -165,12 +165,12 @@ describe('channel memory', () => {
     lockObservation.path = undefined;
     lockObservation.attempted = undefined;
     vi.restoreAllMocks();
-    if (originalQwenHome === undefined) {
+    if (originalhopcodeHome === undefined) {
       delete process.env['QWEN_HOME'];
     } else {
-      process.env['QWEN_HOME'] = originalQwenHome;
+      process.env['QWEN_HOME'] = originalhopcodeHome;
     }
-    fs.rmSync(qwenHome, { recursive: true, force: true });
+    fs.rmSync(hopcodeHome, { recursive: true, force: true });
   });
 
   function writeLegacy(text: string): string {
@@ -213,7 +213,7 @@ describe('channel memory', () => {
     const filePath = getChannelMemoryFilePath(target);
     const legacyPath = getLegacyChannelMemoryFilePath(target);
 
-    expect(filePath.startsWith(qwenHome + path.sep)).toBe(true);
+    expect(filePath.startsWith(hopcodeHome + path.sep)).toBe(true);
     expect(filePath.endsWith(path.join('', CHANNEL_MEMORY_FILE_NAME))).toBe(
       true,
     );
@@ -227,7 +227,7 @@ describe('channel memory', () => {
       chatId: 'raw-chat-id',
       threadId: 'raw-thread-id',
     });
-    const relativePath = path.relative(qwenHome, filePath);
+    const relativePath = path.relative(hopcodeHome, filePath);
 
     expect(relativePath.split(path.sep)).not.toContain('..');
     expect(filePath).not.toContain('raw-chat-id');
@@ -239,7 +239,7 @@ describe('channel memory', () => {
       channelName: 'team..bot',
       chatId: 'chat-1',
     });
-    const relativeSegments = path.relative(qwenHome, filePath).split(path.sep);
+    const relativeSegments = path.relative(hopcodeHome, filePath).split(path.sep);
 
     expect(relativeSegments[2]).toMatch(/^team\.\.bot-[a-f0-9]{16}$/u);
   });
@@ -252,7 +252,7 @@ describe('channel memory', () => {
         chatId: 'chat-1',
       });
       const relativeSegments = path
-        .relative(qwenHome, filePath)
+        .relative(hopcodeHome, filePath)
         .split(path.sep);
 
       expect(relativeSegments).not.toContain('.');
@@ -279,7 +279,7 @@ describe('channel memory', () => {
     const second = await getChannelMemoryRevision(target);
 
     expect(second).toBe(first);
-    expect(first).not.toContain(qwenHome);
+    expect(first).not.toContain(hopcodeHome);
     expect(first).not.toContain('CHANNEL.json');
     expect(first).not.toContain('CHANNEL.md');
   });

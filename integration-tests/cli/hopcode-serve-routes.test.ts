@@ -68,8 +68,8 @@ function writePersistedTranscript(
   records: ChatRecord[],
   state: 'active' | 'archived' = 'active',
 ): string {
-  const qwenHome = path.join(homeDir, '.hopcode');
-  const projectDir = Storage.runWithRuntimeBaseDir(qwenHome, REPO_ROOT, () =>
+  const hopcodeHome = path.join(homeDir, '.hopcode');
+  const projectDir = Storage.runWithRuntimeBaseDir(hopcodeHome, REPO_ROOT, () =>
     new Storage(REPO_ROOT).getProjectDir(),
   );
   const chatsDir = path.join(
@@ -520,8 +520,8 @@ describe('hopcode serve — transcript paging route', () => {
     // `chats/` dir. Remove them so later suites (e.g. PATCH metadata's
     // listWorkspaceSessions readback) start from a clean session list: extra
     // persisted sessions widen a pre-existing listing race and flake them.
-    const qwenHome = path.join(homeDir, '.hopcode');
-    const projectDir = Storage.runWithRuntimeBaseDir(qwenHome, REPO_ROOT, () =>
+    const hopcodeHome = path.join(homeDir, '.hopcode');
+    const projectDir = Storage.runWithRuntimeBaseDir(hopcodeHome, REPO_ROOT, () =>
       new Storage(REPO_ROOT).getProjectDir(),
     );
     rmSync(path.join(projectDir, 'chats'), { recursive: true, force: true });

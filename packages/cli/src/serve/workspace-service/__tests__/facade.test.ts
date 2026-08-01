@@ -155,7 +155,7 @@ function makeCtx(
   };
 }
 
-async function withIsolatedQwenHome<T>(fn: () => Promise<T>): Promise<T> {
+async function withIsolatedhopcodeHome<T>(fn: () => Promise<T>): Promise<T> {
   return withIsolatedWorkspace(() => fn());
 }
 
@@ -170,7 +170,7 @@ async function withIsolatedWorkspace<T>(
   const scratch = await fs.mkdtemp(path.join(os.tmpdir(), 'facade-ws-'));
   const home = path.join(scratch, 'home');
   const workspace = path.join(scratch, 'workspace');
-  const originalQwenHome = process.env['HOPCODE_HOME'];
+  const originalhopcodeHome = process.env['HOPCODE_HOME'];
   const originalTrustedFoldersPath =
     process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
   await fs.mkdir(home, { recursive: true });
@@ -186,10 +186,10 @@ async function withIsolatedWorkspace<T>(
     return await fn({ home, workspace });
   } finally {
     await fs.rm(scratch, { recursive: true, force: true });
-    if (originalQwenHome === undefined) {
+    if (originalhopcodeHome === undefined) {
       delete process.env['HOPCODE_HOME'];
     } else {
-      process.env['HOPCODE_HOME'] = originalQwenHome;
+      process.env['HOPCODE_HOME'] = originalhopcodeHome;
     }
     if (originalTrustedFoldersPath === undefined) {
       delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
@@ -231,7 +231,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('persists voice settings through batch persistence and publishes events', async () => {
-      await withIsolatedQwenHome(async () => {
+      await withIsolatedhopcodeHome(async () => {
         const persistSettings = vi.fn(async () => {});
         const publishWorkspaceEvent = vi.fn();
         const svc = createDaemonWorkspaceService(
@@ -275,7 +275,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('forces qualified ACP Voice writes into the workspace scope', async () => {
-      await withIsolatedQwenHome(async () => {
+      await withIsolatedhopcodeHome(async () => {
         const persistSettings = vi.fn(async () => {});
         const svc = createDaemonWorkspaceService(
           makeDeps({
@@ -312,7 +312,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('rejects invalid voice settings before persisting', async () => {
-      await withIsolatedQwenHome(async () => {
+      await withIsolatedhopcodeHome(async () => {
         const persistSettings = vi.fn(async () => {});
         const publishWorkspaceEvent = vi.fn();
         const svc = createDaemonWorkspaceService(
@@ -334,7 +334,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('publishes committed fallback voice writes when a later write fails', async () => {
-      await withIsolatedQwenHome(async () => {
+      await withIsolatedhopcodeHome(async () => {
         const persistSetting = vi.fn(
           async (
             _workspace: string,
@@ -466,7 +466,7 @@ describe('createDaemonWorkspaceService', () => {
     });
 
     it('rejects permission updates when ACP has no live session', async () => {
-      await withIsolatedQwenHome(async () => {
+      await withIsolatedhopcodeHome(async () => {
         const invokeWorkspaceCommand = vi
           .fn()
           .mockRejectedValue(new SessionNotFoundError('session-1'));

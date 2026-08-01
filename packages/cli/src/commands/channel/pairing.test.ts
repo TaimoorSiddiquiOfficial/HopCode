@@ -28,14 +28,14 @@ type ListArgs = Parameters<
 // uses (#7017): `--cwd` selects the scope, and two workspaces sharing a
 // channel name never see each other's requests through the CLI.
 describe('channel pairing CLI (--cwd scoping)', () => {
-  let qwenHome: string;
+  let hopcodeHome: string;
   let wsA: string;
   let wsB: string;
-  const originalQwenHome = process.env['HOPCODE_HOME'];
+  const originalhopcodeHome = process.env['HOPCODE_HOME'];
 
   beforeEach(() => {
-    qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-pairing-cli-'));
-    process.env['HOPCODE_HOME'] = qwenHome;
+    hopcodeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-pairing-cli-'));
+    process.env['HOPCODE_HOME'] = hopcodeHome;
     wsA = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-a-'));
     wsB = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-b-'));
     vi.mocked(writeStdoutLine).mockClear();
@@ -43,12 +43,12 @@ describe('channel pairing CLI (--cwd scoping)', () => {
   });
 
   afterEach(() => {
-    if (originalQwenHome !== undefined) {
-      process.env['HOPCODE_HOME'] = originalQwenHome;
+    if (originalhopcodeHome !== undefined) {
+      process.env['HOPCODE_HOME'] = originalhopcodeHome;
     } else {
       delete process.env['HOPCODE_HOME'];
     }
-    for (const dir of [qwenHome, wsA, wsB]) {
+    for (const dir of [hopcodeHome, wsA, wsB]) {
       fs.rmSync(dir, { recursive: true, force: true });
     }
   });

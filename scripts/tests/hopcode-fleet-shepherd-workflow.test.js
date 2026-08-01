@@ -17,7 +17,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const workflow = readFileSync(
-  '.github/workflows/qwen-fleet-shepherd.yml',
+  '.github/workflows/hopcode-fleet-shepherd.yml',
   'utf8',
 );
 

@@ -515,7 +515,7 @@ describe('SessionService', () => {
         workDir: '/test/project/root',
         hostname: 'host',
         startedAt: 1,
-        qwenVersion: null,
+        hopcodeVersion: null,
       });
       vi.mocked(getProjectHash).mockImplementation((cwd: string) =>
         cwd === '/test/project/root'
@@ -1292,7 +1292,7 @@ describe('SessionService', () => {
         workDir: '/test/project/root',
         hostname: 'host',
         startedAt: 1,
-        qwenVersion: null,
+        hopcodeVersion: null,
       });
       vi.mocked(getProjectHash).mockImplementation((cwd: string) =>
         cwd === '/test/project/root'
@@ -1506,7 +1506,7 @@ describe('SessionService', () => {
         workDir: '/test/project/root',
         hostname: 'host',
         startedAt: 1,
-        qwenVersion: null,
+        hopcodeVersion: null,
       });
       vi.mocked(getProjectHash).mockImplementation((cwd: string) =>
         cwd === '/test/project/root'
@@ -2152,7 +2152,7 @@ describe('SessionService', () => {
         workDir: '/test/project/root',
         hostname: 'host',
         startedAt: 1,
-        qwenVersion: null,
+        hopcodeVersion: null,
       });
       vi.mocked(getProjectHash).mockImplementation((cwd) =>
         cwd === '/test/project/root' ? 'test-project-hash' : 'other-hash',
@@ -2302,7 +2302,7 @@ describe('SessionService', () => {
         workDir: '/test/project/root',
         hostname: 'host',
         startedAt: 1,
-        qwenVersion: null,
+        hopcodeVersion: null,
       });
       vi.mocked(getProjectHash).mockImplementation((cwd: string) =>
         cwd === '/test/project/root'
@@ -2909,7 +2909,7 @@ describe('SessionService', () => {
     let realPath: typeof import('node:path');
     let service: SessionService;
     let cwd: string;
-    let originalQwenHome: string | undefined;
+    let originalhopcodeHome: string | undefined;
 
     beforeEach(async () => {
       realOs = await import('node:os');
@@ -2956,7 +2956,7 @@ describe('SessionService', () => {
       realTmpDir = fs.mkdtempSync(
         realPath.join(realOs.tmpdir(), 'fork-session-'),
       );
-      originalQwenHome = process.env['QWEN_HOME'];
+      originalhopcodeHome = process.env['QWEN_HOME'];
       process.env['QWEN_HOME'] = realTmpDir;
       process.env['QWEN_RUNTIME_DIR'] = realTmpDir;
       cwd = process.cwd();
@@ -2965,10 +2965,10 @@ describe('SessionService', () => {
 
     afterEach(() => {
       delete process.env['QWEN_RUNTIME_DIR'];
-      if (originalQwenHome === undefined) {
+      if (originalhopcodeHome === undefined) {
         delete process.env['QWEN_HOME'];
       } else {
-        process.env['QWEN_HOME'] = originalQwenHome;
+        process.env['QWEN_HOME'] = originalhopcodeHome;
       }
       try {
         fs.rmSync(realTmpDir, { recursive: true, force: true });
@@ -3598,7 +3598,7 @@ describe('SessionService', () => {
         workDir: cwd,
         hostname: 'host',
         startedAt: 1,
-        qwenVersion: null,
+        hopcodeVersion: null,
       });
 
       const result = await service.forkSession(oldId, newId);

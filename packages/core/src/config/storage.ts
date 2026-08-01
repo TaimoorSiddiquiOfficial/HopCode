@@ -199,7 +199,7 @@ export class Storage {
     return path.join(Storage.getGlobalDebugDir(), `${sessionId}.txt`);
   }
 
-  static getGlobalQwenDir(): string {
+  static getGlobalhopcodeDir(): string {
     // Pinned to the global HopCode dir so the VS Code companion (which only
     // sees env vars, not settings-based runtimeOutputDir) finds the same
     // lock-file location as the CLI.

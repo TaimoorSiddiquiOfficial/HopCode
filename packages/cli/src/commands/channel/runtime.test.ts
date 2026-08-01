@@ -10,7 +10,7 @@ import {
 } from './runtime.js';
 
 vi.mock('@hoptrendy/hopcode-core', () => ({
-  Storage: { getGlobalQwenDir: () => '/tmp/qwen' },
+  Storage: { getGlobalhopcodeDir: () => '/tmp/qwen' },
   hashDaemonWorkspace: (workspace: string) =>
     workspace === '/workspace' ? 'workspace-hash' : 'other-hash',
 }));

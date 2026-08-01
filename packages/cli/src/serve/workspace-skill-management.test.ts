@@ -103,7 +103,7 @@ describe('workspace Skill management', () => {
   it('installs a ZIP into the global Skill directory', async () => {
     const workspace = await temporaryDirectory('qwen-skill-workspace-');
     const globalDirectory = await temporaryDirectory('qwen-skill-global-');
-    vi.spyOn(Storage, 'getGlobalQwenDir').mockReturnValue(globalDirectory);
+    vi.spyOn(Storage, 'getGlobalhopcodeDir').mockReturnValue(globalDirectory);
 
     const result = await installWorkspaceSkill(workspace, {
       name: 'zip-skill',

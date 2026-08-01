@@ -9,7 +9,7 @@ import {
   getModelDisplayName,
   getModelContextWindow,
   getModelProvider,
-  isQwenModel,
+  isHopCodeModel,
 } from '../src/config/models.ts';
 
 describe('Qwen model registry', () => {
@@ -19,9 +19,9 @@ describe('Qwen model registry', () => {
   });
 
   it('detects Qwen model IDs', () => {
-    expect(isQwenModel('qwen3-coder')).toBe(true);
-    expect(isQwenModel('HOPCODE_MAX')).toBe(true);
-    expect(isQwenModel('gpt-4o')).toBe(false);
+    expect(isHopCodeModel('qwen3-coder')).toBe(true);
+    expect(isHopCodeModel('HOPCODE_MAX')).toBe(true);
+    expect(isHopCodeModel('gpt-4o')).toBe(false);
   });
 
   it('resolves provider metadata for Qwen models', () => {

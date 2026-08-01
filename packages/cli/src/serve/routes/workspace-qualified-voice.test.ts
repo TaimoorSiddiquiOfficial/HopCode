@@ -144,7 +144,7 @@ async function enableSecondaryVoice(runtime: WorkspaceRuntime): Promise<void> {
 }
 
 describe('workspace-qualified Voice routes', () => {
-  const originalQwenHome = process.env['HOPCODE_HOME'];
+  const originalhopcodeHome = process.env['HOPCODE_HOME'];
 
   afterEach(async () => {
     await Promise.all(
@@ -152,8 +152,8 @@ describe('workspace-qualified Voice routes', () => {
         .splice(0)
         .map((home) => fsp.rm(home, { recursive: true, force: true })),
     );
-    if (originalQwenHome === undefined) delete process.env['HOPCODE_HOME'];
-    else process.env['HOPCODE_HOME'] = originalQwenHome;
+    if (originalhopcodeHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = originalhopcodeHome;
     resetHomeEnvBootstrapForTesting();
   });
 

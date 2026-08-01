@@ -7657,35 +7657,35 @@ describe('Session', () => {
         // anyPath) is trivially true, so an empty root lets a home
         // `~/.hopcode/loop.md` symlink resolve anywhere and bypass the confinement.
         // The guard falls back to the parent of the global qwen dir
-        // (Storage.getGlobalQwenDir(), itself empty-home-safe), which is the
-        // homeQwenDir Session passes to the resolver.
-        const homeQwenDir = path.join(os.tmpdir(), '.hopcode');
+        // (Storage.getGlobalhopcodeDir(), itself empty-home-safe), which is the
+        // homehopcodeDir Session passes to the resolver.
+        const homehopcodeDir = path.join(os.tmpdir(), '.hopcode');
 
         const roots = resolveHomeLoopResolverRoots({
           homeDir: '',
-          homeQwenDir,
-          qwenHome: '',
+          homehopcodeDir,
+          hopcodeHome: '',
         });
 
-        // Without the `|| path.dirname(homeQwenDir)` guard this would be ''
+        // Without the `|| path.dirname(homehopcodeDir)` guard this would be ''
         // (os.homedir()); the guard makes it the non-empty parent of the
         // empty-home-safe global qwen dir.
         expect(roots.homeConfineRoot).not.toBe('');
-        expect(roots.homeConfineRoot).toBe(path.dirname(homeQwenDir));
-        expect(roots.homeQwenDir).toBe(homeQwenDir);
+        expect(roots.homeConfineRoot).toBe(path.dirname(homehopcodeDir));
+        expect(roots.homehopcodeDir).toBe(homehopcodeDir);
       });
 
       it('confines the home loop resolver within HOPCODE_HOME when set', () => {
-        const homeQwenDir = path.join(os.tmpdir(), '.hopcode-home');
+        const homehopcodeDir = path.join(os.tmpdir(), '.hopcode-home');
 
         const roots = resolveHomeLoopResolverRoots({
           homeDir: path.join(os.tmpdir(), 'real-home'),
-          homeQwenDir,
-          qwenHome: homeQwenDir,
+          homehopcodeDir,
+          hopcodeHome: homehopcodeDir,
         });
 
-        expect(roots.homeConfineRoot).toBe(homeQwenDir);
-        expect(roots.homeQwenDir).toBe(homeQwenDir);
+        expect(roots.homeConfineRoot).toBe(homehopcodeDir);
+        expect(roots.homehopcodeDir).toBe(homehopcodeDir);
       });
 
       it('reads the home loop.md from HOPCODE_HOME, not the real ~/.hopcode', async () => {
@@ -7694,22 +7694,22 @@ describe('Session', () => {
         // dir holding loop.md, leave the project dir and fake $HOME empty, and
         // confirm the relocated file's block reaches the model.
         const tmpDir = await fs.mkdtemp(
-          path.join(os.tmpdir(), 'loop-md-qwenhome-proj-'),
+          path.join(os.tmpdir(), 'loop-md-hopcodeHome-proj-'),
         );
         const fakeHome = await fs.mkdtemp(
-          path.join(os.tmpdir(), 'loop-md-qwenhome-home-'),
+          path.join(os.tmpdir(), 'loop-md-hopcodeHome-home-'),
         );
-        const qwenHome = await fs.mkdtemp(
-          path.join(os.tmpdir(), 'loop-md-qwenhome-dir-'),
+        const hopcodeHome = await fs.mkdtemp(
+          path.join(os.tmpdir(), 'loop-md-hopcodeHome-dir-'),
         );
         await fs.writeFile(
-          path.join(qwenHome, 'loop.md'),
+          path.join(hopcodeHome, 'loop.md'),
           '- relocated home task',
         );
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
         const restoreHome = setFakeHome(fakeHome);
-        const prevQwenHome = process.env['HOPCODE_HOME'];
-        process.env['HOPCODE_HOME'] = qwenHome;
+        const prevhopcodeHome = process.env['HOPCODE_HOME'];
+        process.env['HOPCODE_HOME'] = hopcodeHome;
 
         const scheduler = {
           size: 1,
@@ -7766,11 +7766,11 @@ describe('Session', () => {
           });
         } finally {
           restoreHome();
-          if (prevQwenHome === undefined) delete process.env['HOPCODE_HOME'];
-          else process.env['HOPCODE_HOME'] = prevQwenHome;
+          if (prevhopcodeHome === undefined) delete process.env['HOPCODE_HOME'];
+          else process.env['HOPCODE_HOME'] = prevhopcodeHome;
           await fs.rm(tmpDir, { recursive: true, force: true });
           await fs.rm(fakeHome, { recursive: true, force: true });
-          await fs.rm(qwenHome, { recursive: true, force: true });
+          await fs.rm(hopcodeHome, { recursive: true, force: true });
         }
       });
 
@@ -7900,14 +7900,14 @@ describe('Session', () => {
         const fakeHome = await fs.mkdtemp(
           path.join(os.tmpdir(), 'loop-md-err-home-'),
         );
-        const qwenHome = await fs.mkdtemp(
-          path.join(os.tmpdir(), 'loop-md-err-qwenhome-'),
+        const hopcodeHome = await fs.mkdtemp(
+          path.join(os.tmpdir(), 'loop-md-err-hopcodeHome-'),
         );
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
         const restoreHome = setFakeHome(fakeHome);
-        const prevQwenHome = process.env['HOPCODE_HOME'];
-        process.env['HOPCODE_HOME'] = qwenHome;
-        // qwenHome is under os.tmpdir() (not the OS home), so tildeifyPath is a
+        const prevhopcodeHome = process.env['HOPCODE_HOME'];
+        process.env['HOPCODE_HOME'] = hopcodeHome;
+        // hopcodeHome is under os.tmpdir() (not the OS home), so tildeifyPath is a
         // no-op there. The label is MODEL/client-facing, so it must read as the
         // literal `$HOPCODE_HOME/loop.md`, never the resolved absolute path.
         const expectedHomeLabel = `$HOPCODE_HOME/loop.md (home)`;
@@ -7978,16 +7978,16 @@ describe('Session', () => {
             // Still leak-safe: neither the absolute project path nor the
             // resolved $HOPCODE_HOME global dir reaches the client/API.
             expect(text).not.toContain(path.join(tmpDir, '.hopcode', 'loop.md'));
-            expect(text).not.toContain(path.join(qwenHome, 'loop.md'));
+            expect(text).not.toContain(path.join(hopcodeHome, 'loop.md'));
           }
         } finally {
           resolveSpy.mockRestore();
           restoreHome();
-          if (prevQwenHome === undefined) delete process.env['HOPCODE_HOME'];
-          else process.env['HOPCODE_HOME'] = prevQwenHome;
+          if (prevhopcodeHome === undefined) delete process.env['HOPCODE_HOME'];
+          else process.env['HOPCODE_HOME'] = prevhopcodeHome;
           await fs.rm(tmpDir, { recursive: true, force: true });
           await fs.rm(fakeHome, { recursive: true, force: true });
-          await fs.rm(qwenHome, { recursive: true, force: true });
+          await fs.rm(hopcodeHome, { recursive: true, force: true });
         }
       });
 

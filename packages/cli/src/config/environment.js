@@ -278,12 +278,12 @@ function parseEnvFiles(envFilePaths, userLevelPaths) {
             const parsedEnv = dotenv.parse(envFileContent);
             const normalizedEnvFilePath = path.normalize(envFilePath);
             const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
-            const isQwenScopedEnvFile = isHomeScopedEnvFile ||
+            const isHopCodeScopedEnvFile = isHomeScopedEnvFile ||
                 path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
             files.push({
                 parsedEnv,
                 isHomeScopedEnvFile,
-                isQwenScopedEnvFile,
+                isHopCodeScopedEnvFile,
             });
         }
         catch (err) {
@@ -304,7 +304,7 @@ function canApplyParsedEnvKey(envFile, key, excludedVars, options = {}) {
         PROJECT_ENV_HARDCODED_EXCLUSIONS.includes(key)) {
         return false;
     }
-    return envFile.isQwenScopedEnvFile || !excludedVars.includes(key);
+    return envFile.isHopCodeScopedEnvFile || !excludedVars.includes(key);
 }
 function isEffectivelyUnset(env, key) {
     const existingValue = env[key];

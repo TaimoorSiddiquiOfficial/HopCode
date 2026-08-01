@@ -4865,7 +4865,7 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
     const scratch = await fs.mkdtemp(path.join(os.tmpdir(), 'qwen-acp-'));
     const workspace = path.join(scratch, 'workspace');
     const home = path.join(scratch, 'home');
-    const originalQwenHome = process.env['HOPCODE_HOME'];
+    const originalhopcodeHome = process.env['HOPCODE_HOME'];
     const setSpy = vi.spyOn(fakeWorkspace, 'setWorkspacePermissionRules');
     try {
       process.env['HOPCODE_HOME'] = home;
@@ -4898,10 +4898,10 @@ describe('ACP Streamable HTTP transport (over the wire)', () => {
         rules: ['Bash(git *', 'Bash(git status)'],
       });
     } finally {
-      if (originalQwenHome === undefined) {
+      if (originalhopcodeHome === undefined) {
         delete process.env['HOPCODE_HOME'];
       } else {
-        process.env['HOPCODE_HOME'] = originalQwenHome;
+        process.env['HOPCODE_HOME'] = originalhopcodeHome;
       }
       resetHomeEnvBootstrapForTesting();
       setSpy.mockRestore();

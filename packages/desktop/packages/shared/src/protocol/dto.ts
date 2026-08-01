@@ -453,7 +453,7 @@ export type SessionCommand =
       ruleType: PermissionRuleType
       rules: string[]
     }
-  | { type: 'getQwenCoreSettings' }
+  | { type: 'getHopCodeCoreSettings' }
   | {
       type: 'setQwenCoreSetting'
       scope: HopCodeSettingsScope

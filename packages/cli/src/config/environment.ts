@@ -319,7 +319,7 @@ function setUpCloudShellEnvironmentInEnv(
 interface ParsedEnvFile {
   readonly parsedEnv: Record<string, string>;
   readonly isHomeScopedEnvFile: boolean;
-  readonly isQwenScopedEnvFile: boolean;
+  readonly isHopCodeScopedEnvFile: boolean;
 }
 
 interface ParsedEnvFilesResult {
@@ -346,14 +346,14 @@ function parseEnvFiles(
       const parsedEnv = dotenv.parse(envFileContent);
       const normalizedEnvFilePath = path.normalize(envFilePath);
       const isHomeScopedEnvFile = userLevelPaths.has(normalizedEnvFilePath);
-      const isQwenScopedEnvFile =
+      const isHopCodeScopedEnvFile =
         isHomeScopedEnvFile ||
         path.basename(path.dirname(normalizedEnvFilePath)) === HOPCODE_DIR;
 
       files.push({
         parsedEnv,
         isHomeScopedEnvFile,
-        isQwenScopedEnvFile,
+        isHopCodeScopedEnvFile,
       });
     } catch (err) {
       readFailures.push({
@@ -380,7 +380,7 @@ function canApplyParsedEnvKey(
   ) {
     return false;
   }
-  return envFile.isQwenScopedEnvFile || !excludedVars.includes(key);
+  return envFile.isHopCodeScopedEnvFile || !excludedVars.includes(key);
 }
 
 export interface RuntimeEnvironmentSnapshot {

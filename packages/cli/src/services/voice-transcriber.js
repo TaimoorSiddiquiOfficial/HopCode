@@ -27,7 +27,7 @@ function readSettingsEnv(settings, envKey) {
         ? value.trim()
         : undefined;
 }
-function isQwenBaseUrl(baseUrl) {
+function isHopCodeBaseUrl(baseUrl) {
     try {
         const hostname = new URL(baseUrl).hostname.toLowerCase();
         return (hostname === 'dashscope.aliyuncs.com' ||
@@ -175,7 +175,7 @@ export async function assertVoiceBaseUrlNetworkAllowed(voiceConfig, lookupHost, 
     }
 }
 function readApiKey(settings, model, baseUrl, env) {
-    if (!model.envKey && !isQwenBaseUrl(baseUrl)) {
+    if (!model.envKey && !isHopCodeBaseUrl(baseUrl)) {
         return undefined;
     }
     const envKey = model.envKey ?? DEFAULT_OPENAI_API_KEY;
@@ -187,7 +187,7 @@ function readApiKey(settings, model, baseUrl, env) {
     if (settingsEnvValue) {
         return settingsEnvValue;
     }
-    if (!model.envKey && isQwenBaseUrl(baseUrl)) {
+    if (!model.envKey && isHopCodeBaseUrl(baseUrl)) {
         const authApiKey = settings.merged.security?.auth?.apiKey;
         return typeof authApiKey === 'string' && authApiKey.trim().length > 0
             ? authApiKey.trim()
@@ -367,7 +367,7 @@ function transcriptionAbortSignal(abortSignal) {
  * `/audio/transcriptions` endpoint — it 404s.) Keyterm biasing goes in a leading
  * system message with structured content; language/itn go in `asr_options`.
  */
-async function transcribeViaQwenAsr(audio, voiceConfig, options, fetchFn) {
+async function transcribeViaHopCodeAsr(audio, voiceConfig, options, fetchFn) {
     if (audio.data.byteLength > MAX_AUDIO_BYTES) {
         throw new Error('Recording is too long for transcription (max ~5 minutes / 10 MB). Try a shorter dictation.');
     }
@@ -461,7 +461,7 @@ export async function transcribeVoiceAudio(audio, args) {
     const transport = resolveVoiceTransport(voiceConfig.model);
     switch (transport) {
         case 'qwen-asr-chat':
-            return transcribeViaQwenAsr(audio, voiceConfig, {
+            return transcribeViaHopCodeAsr(audio, voiceConfig, {
                 language,
                 keytermsContext,
                 abortSignal: args.abortSignal,

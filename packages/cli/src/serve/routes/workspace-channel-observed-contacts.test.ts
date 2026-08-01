@@ -37,22 +37,22 @@ function registry(runtimes: WorkspaceRuntime[]): WorkspaceRegistry {
 }
 
 describe('workspace observed channel contact routes', () => {
-  let qwenHome: string;
-  let previousQwenHome: string | undefined;
+  let hopcodeHome: string;
+  let previoushopcodeHome: string | undefined;
 
   beforeEach(async () => {
-    previousQwenHome = process.env['HOPCODE_HOME'];
-    qwenHome = await fsp.mkdtemp(
+    previoushopcodeHome = process.env['HOPCODE_HOME'];
+    hopcodeHome = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-observed-contact-routes-'),
     );
-    process.env['HOPCODE_HOME'] = qwenHome;
+    process.env['HOPCODE_HOME'] = hopcodeHome;
   });
 
   afterEach(async () => {
     vi.restoreAllMocks();
-    if (previousQwenHome === undefined) delete process.env['HOPCODE_HOME'];
-    else process.env['HOPCODE_HOME'] = previousQwenHome;
-    await fsp.rm(qwenHome, { recursive: true, force: true });
+    if (previoushopcodeHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = previoushopcodeHome;
+    await fsp.rm(hopcodeHome, { recursive: true, force: true });
   });
 
   it('returns complete direct users and observed group/topic membership', async () => {

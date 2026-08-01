@@ -179,18 +179,18 @@ describe('usage-stats route (cache + range + clamping)', () => {
 
 describe('usage-stats route (real loader against seeded history)', () => {
   let tmpHome: string;
-  let originalQwenHome: string | undefined;
+  let originalhopcodeHome: string | undefined;
 
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-route-'));
-    originalQwenHome = process.env['HOPCODE_HOME'];
+    originalhopcodeHome = process.env['HOPCODE_HOME'];
     process.env['HOPCODE_HOME'] = path.join(tmpHome, '.hopcode');
     fs.mkdirSync(process.env['HOPCODE_HOME'], { recursive: true });
   });
 
   afterEach(() => {
-    if (originalQwenHome === undefined) delete process.env['HOPCODE_HOME'];
-    else process.env['HOPCODE_HOME'] = originalQwenHome;
+    if (originalhopcodeHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = originalhopcodeHome;
     fs.rmSync(tmpHome, { recursive: true, force: true });
   });
 
