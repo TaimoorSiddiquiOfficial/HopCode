@@ -2994,10 +2994,10 @@ async function runHopCodeServeImpl(
           core.emitDaemonLog(
             `Session ${action}.`,
             {
-              'qwen-code.workspace.hash': workspaceHash,
+              'hopcode.workspace.hash': workspaceHash,
             },
             {
-              eventName: `qwen-code.daemon.session.${action}`,
+              eventName: `hopcode.daemon.session.${action}`,
             },
           );
         },
@@ -3009,11 +3009,11 @@ async function runHopCodeServeImpl(
               : `ACP channel exited (expected=${expected ?? true}).`,
             {
               ...(action === 'exit'
-                ? { 'qwen-code.daemon.channel.expected': expected ?? true }
+                ? { 'hopcode.daemon.channel.expected': expected ?? true }
                 : {}),
             },
             {
-              eventName: `qwen-code.daemon.channel.${action}`,
+              eventName: `hopcode.daemon.channel.${action}`,
               ...(expected === false && action === 'exit'
                 ? { severityNumber: 13 }
                 : {}),

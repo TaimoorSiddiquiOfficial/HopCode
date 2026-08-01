@@ -12,7 +12,7 @@ import {
 import type { BridgeTelemetryAttributes } from './bridgeOptions.js';
 
 const MAX_PROFILE_DURATION_MS = 600_000;
-const ATTRIBUTE_PREFIX = 'qwen-code.daemon.acp_startup';
+const ATTRIBUTE_PREFIX = 'hopcode.daemon.acp_startup';
 
 type ProfileDurations = Record<string, number>;
 

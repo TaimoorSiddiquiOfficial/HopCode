@@ -166,7 +166,7 @@ describe('activate', () => {
 
     const command = vi
       .mocked(vscode.commands.registerCommand)
-      .mock.calls.find(([id]) => id === 'qwen-code.runQwenCode')?.[1] as
+      .mock.calls.find(([id]) => id === 'hopcode.runQwenCode')?.[1] as
       | (() => Promise<void>)
       | undefined;
     expect(command).toBeDefined();

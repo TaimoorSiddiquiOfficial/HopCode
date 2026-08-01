@@ -314,7 +314,7 @@ describe('daemonTelemetryMiddleware — recordRequest seam', () => {
         expect.any(Function),
       );
       expect(coreMocks.spanSetAttribute).toHaveBeenLastCalledWith(
-        'qwen-code.workspace.hash',
+        'hopcode.workspace.hash',
         'hash:/workspace/secondary',
       );
     }
@@ -612,12 +612,12 @@ describe('daemonTelemetryMiddleware — recordRequest seam', () => {
     );
     expect(coreMocks.spanSetAttribute).toHaveBeenNthCalledWith(
       1,
-      'qwen-code.workspace.hash',
+      'hopcode.workspace.hash',
       'hash:/workspace/one',
     );
     expect(coreMocks.spanSetAttribute).toHaveBeenNthCalledWith(
       2,
-      'qwen-code.workspace.hash',
+      'hopcode.workspace.hash',
       'hash:/workspace/two',
     );
   });
@@ -668,7 +668,7 @@ describe('daemonTelemetryMiddleware — recordRequest seam', () => {
 
     expect(resolveWorkspaceCwd).not.toHaveBeenCalled();
     expect(coreMocks.spanSetAttribute).toHaveBeenCalledWith(
-      'qwen-code.workspace.hash',
+      'hopcode.workspace.hash',
       'hash:/workspace/secondary',
     );
   });
@@ -690,7 +690,7 @@ describe('daemonTelemetryMiddleware — recordRequest seam', () => {
 
     expect(coreMocks.spanSetAttribute).toHaveBeenCalledTimes(1);
     expect(coreMocks.spanSetAttribute).toHaveBeenCalledWith(
-      'qwen-code.workspace.hash',
+      'hopcode.workspace.hash',
       'hash:/workspace/first',
     );
   });

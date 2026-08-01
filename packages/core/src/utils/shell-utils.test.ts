@@ -739,7 +739,7 @@ describe('detectSelfKillCommand', () => {
     expect(detectSelfKillCommand('kill -9 $(pgrep -f "node server.js")')).toBe(
       false,
     );
-    expect(detectSelfKillCommand('pkill -F qwen-code.pid vite')).toBe(false);
+    expect(detectSelfKillCommand('pkill -F hopcode.pid vite')).toBe(false);
     expect(detectSelfKillCommand('taskkill /IM notepad.exe')).toBe(false);
   });
 });

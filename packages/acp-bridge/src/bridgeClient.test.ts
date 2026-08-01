@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 hopcode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -117,7 +117,7 @@ describe('BridgeClient — recording degradation ownership', () => {
       Infinity,
     );
 
-    await client.extNotification('qwen/notify/session/recording-degraded', {
+    await client.extNotification('hopcode/notify/session/recording-degraded', {
       v: 1,
       sessionId,
       reason: 'write_failed',
@@ -156,7 +156,7 @@ describe('BridgeClient — recording degradation ownership', () => {
       () => false,
     );
 
-    await client.extNotification('qwen/notify/session/recording-degraded', {
+    await client.extNotification('hopcode/notify/session/recording-degraded', {
       v: 1,
       sessionId,
       reason: 'write_failed',
@@ -179,7 +179,7 @@ describe('BridgeClient — recording degradation ownership', () => {
       Infinity,
     );
     await staleClient.extNotification(
-      'qwen/notify/session/recording-degraded',
+      'hopcode/notify/session/recording-degraded',
       { v: 1, sessionId, reason: 'write_failed' },
     );
 
@@ -960,7 +960,7 @@ describe('BridgeClient — create-sub-session extMethod dispatch', () => {
     );
   }
 
-  const METHOD = 'qwen/control/create-sub-session';
+  const METHOD = 'hopcode/control/create-sub-session';
 
   it('forwards a valid request to the host handler and returns its result', async () => {
     const onCreate = vi.fn(async () => ({
@@ -1471,7 +1471,7 @@ describe('BridgeClient — artifact ingress', () => {
         Infinity,
       );
 
-      await client.extNotification('qwen/notify/session/artifact-event', {
+      await client.extNotification('hopcode/notify/session/artifact-event', {
         sessionId,
         hookEventName: 'PostToolUse',
         artifacts: [
@@ -1551,7 +1551,7 @@ describe('BridgeClient — artifact ingress', () => {
       .mockReturnValue(true as never);
     try {
       await expect(
-        client.extNotification('qwen/notify/session/artifact-event', {
+        client.extNotification('hopcode/notify/session/artifact-event', {
           sessionId: forgedSessionId,
           artifacts: [{ title: 'Forged', url: 'https://example.com/forged' }],
         }),
@@ -1701,7 +1701,7 @@ describe('BridgeClient — artifact ingress', () => {
     );
     client.markRestoreInFlight(sessionId);
     try {
-      await client.extNotification('qwen/notify/session/artifact-event', {
+      await client.extNotification('hopcode/notify/session/artifact-event', {
         sessionId,
         hookEventName: 'PostToolUse',
         artifacts: [
@@ -1756,7 +1756,7 @@ describe('BridgeClient — artifact ingress', () => {
       .mockReturnValue(true as never);
     try {
       await expect(
-        client.extNotification('qwen/notify/session/artifact-event', {
+        client.extNotification('hopcode/notify/session/artifact-event', {
           sessionId,
           artifacts: [{ title: 'Dropped', url: 'https://example.com/drop' }],
         }),
@@ -1804,7 +1804,7 @@ describe('BridgeClient — artifact ingress', () => {
       .spyOn(process.stderr, 'write')
       .mockReturnValue(true as never);
     try {
-      await client.extNotification('qwen/notify/session/artifact-event', {
+      await client.extNotification('hopcode/notify/session/artifact-event', {
         sessionId,
         artifacts: [
           { title: 'One', url: 'https://example.com/1' },
@@ -1855,7 +1855,7 @@ describe('BridgeClient — artifact ingress', () => {
     );
     try {
       await expect(
-        client.extNotification('qwen/notify/session/artifact-event', {
+        client.extNotification('hopcode/notify/session/artifact-event', {
           sessionId,
           source: 'hook',
           hookEventName: 'PostToolUse',
@@ -1898,7 +1898,7 @@ describe('BridgeClient — artifact ingress', () => {
       .mockReturnValue(true as never);
     try {
       await expect(
-        client.extNotification('qwen/notify/session/artifact-event', {
+        client.extNotification('hopcode/notify/session/artifact-event', {
           sessionId: 'sess:missing',
           artifacts: [{ title: 'Lost', url: 'https://example.com/lost' }],
         }),
@@ -1937,12 +1937,12 @@ describe('BridgeClient — artifact ingress', () => {
       .mockReturnValue(true as never);
     try {
       await expect(
-        client.extNotification('qwen/notify/session/artifact-event', {
+        client.extNotification('hopcode/notify/session/artifact-event', {
           artifacts: [{ title: 'Missing session' }],
         }),
       ).resolves.toBeUndefined();
       await expect(
-        client.extNotification('qwen/notify/session/artifact-event', {
+        client.extNotification('hopcode/notify/session/artifact-event', {
           sessionId: 'sess:malformed',
           artifacts: 'not-array',
         }),
@@ -2503,7 +2503,7 @@ describe('BridgeClient — mid-turn queue drain (craft/drainMidTurnQueue)', () =
  * Reverse tool channel (issue #5626, Phase 2). The ACP child's session
  * `McpClientManager` routes a client-hosted (extension) MCP server's
  * `sendSdkMcpMessage` UP to the parent via the
- * `qwen/control/client_mcp/message` ext-method. `BridgeClient.extMethod`
+ * `hopcode/control/client_mcp/message` ext-method. `BridgeClient.extMethod`
  * answers it by reaching the per-WS-connection `ClientMcpRegistrar` (looked up
  * by `server` name through the injected `clientMcpSender`), which carries the
  * JSON-RPC frame down the daemon WS and resolves with the correlated response.
@@ -2515,7 +2515,7 @@ describe('BridgeClient — mid-turn queue drain (craft/drainMidTurnQueue)', () =
  * `resolveMessage`). Server-name routing + the `{ payload }` envelope are
  * the contract this method owns.
  */
-describe('BridgeClient — reverse tool channel (qwen/control/client_mcp/message)', () => {
+describe('BridgeClient — reverse tool channel (hopcode/control/client_mcp/message)', () => {
   const thrower = () => {
     throw new Error('test: permission flow should not run');
   };
@@ -2558,7 +2558,7 @@ describe('BridgeClient — reverse tool channel (qwen/control/client_mcp/message
     const client = makeClientWithRegistrar(registrar);
 
     // Simulate the child's `buildClientMcpSender` call shape exactly.
-    const callP = client.extMethod('qwen/control/client_mcp/message', {
+    const callP = client.extMethod('hopcode/control/client_mcp/message', {
       server: 'chrome-tools',
       payload: { jsonrpc: '2.0', id: 7, method: 'tools/list' },
     });
@@ -2598,7 +2598,7 @@ describe('BridgeClient — reverse tool channel (qwen/control/client_mcp/message
 
     // `notifications/initialized` has no JSON-RPC id — the registrar
     // fire-and-forgets and resolves with a synthetic ack (no WS response).
-    const result = await client.extMethod('qwen/control/client_mcp/message', {
+    const result = await client.extMethod('hopcode/control/client_mcp/message', {
       server: 'chrome-tools',
       payload: { jsonrpc: '2.0', method: 'notifications/initialized' },
     });
@@ -2611,7 +2611,7 @@ describe('BridgeClient — reverse tool channel (qwen/control/client_mcp/message
     // No registerServer call — the lookup returns undefined.
     const client = makeClientWithRegistrar(registrar);
     const err = await client
-      .extMethod('qwen/control/client_mcp/message', {
+      .extMethod('hopcode/control/client_mcp/message', {
         server: 'gone',
         payload: { jsonrpc: '2.0', id: 1, method: 'tools/list' },
       })
@@ -2624,7 +2624,7 @@ describe('BridgeClient — reverse tool channel (qwen/control/client_mcp/message
     const registrar = new ClientMcpRegistrar({ sendFrame: () => {} });
     const client = makeClientWithRegistrar(registrar);
     const err = await client
-      .extMethod('qwen/control/client_mcp/message', {
+      .extMethod('hopcode/control/client_mcp/message', {
         payload: { jsonrpc: '2.0', id: 1, method: 'tools/list' },
       })
       .catch((e: unknown) => e);
@@ -2642,7 +2642,7 @@ describe('BridgeClient — reverse tool channel (qwen/control/client_mcp/message
       Infinity,
     );
     const err = await client
-      .extMethod('qwen/control/client_mcp/message', {
+      .extMethod('hopcode/control/client_mcp/message', {
         server: 'chrome-tools',
         payload: { jsonrpc: '2.0', id: 1, method: 'tools/list' },
       })

@@ -2043,7 +2043,7 @@ export function registerSessionRoutes(
         delete forwardedBody['deadlineMs'];
 
         const lastEventId = ownerBridge.getSessionLastEventId(sessionId);
-        addDaemonRequestAttribute('qwen-code.prompt_id', promptId);
+        addDaemonRequestAttribute('hopcode.prompt_id', promptId);
 
         const abort = new AbortController();
         let responseFinished = false;

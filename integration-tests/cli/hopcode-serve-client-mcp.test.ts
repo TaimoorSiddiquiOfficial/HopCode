@@ -18,7 +18,7 @@
  *   1. `initialize` the ACP WS connection.
  *   2. `session/new` → spawns the real ACP child; the child's session
  *      `McpClientManager` binds `sendSdkMcpMessage` to the
- *      `qwen/control/client_mcp/message` ext-method (child → parent).
+ *      `hopcode/control/client_mcp/message` ext-method (child → parent).
  *   3. `mcp_register { server }` → the serve provider adds an SDK-type runtime
  *      MCP server in the child; the child runs the MCP `initialize` /
  *      `tools/list` handshake, which round-trips back over the WS as

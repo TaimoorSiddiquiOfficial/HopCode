@@ -715,7 +715,7 @@ export function daemonTelemetryMiddleware(
               delete telemetryRes[daemonTelemetryResponseContext];
               if (context?.workspaceCwd !== undefined) {
                 span?.setAttribute(
-                  'qwen-code.workspace.hash',
+                  'hopcode.workspace.hash',
                   resolveWorkspaceHash(context.workspaceCwd),
                 );
               }

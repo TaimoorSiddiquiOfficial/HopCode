@@ -121,7 +121,7 @@ export declare const LOAD_REPLAY_META_KEY = "hopcode.session.loadReplay";
 export declare const LOAD_REPLAY_PAGE_SIZE_META_KEY = "hopcode.session.loadReplayPageSize";
 export declare const LOAD_REPLAY_BULK_MODE = "bulk";
 export declare const LOAD_REPLAY_VERSION: 1;
-export declare const CHANNEL_STARTUP_PROFILE_META_KEY = "qwen.daemon.channelStartupProfile";
+export declare const CHANNEL_STARTUP_PROFILE_META_KEY = "hopcode.daemon.channelStartupProfile";
 export declare const CHANNEL_STARTUP_PROFILE_VERSION: 1;
 export interface ChannelStartupProfileV1 {
     v: typeof CHANNEL_STARTUP_PROFILE_VERSION;
@@ -446,7 +446,7 @@ export declare const TODO_STOP_GUARD_QUEUE_RELEASE_METHOD = "craft/todoStopGuard
  * runtime-MCP-add config. The `qwen --acp` child reads it in its
  * `workspaceMcpRuntimeAdd` handler to (1) KEEP `type: 'sdk'` instead of
  * stripping it and (2) let the session `McpClientManager` bind that server's
- * `sendSdkMcpMessage` to the `qwen/control/client_mcp/message` ext-method.
+ * `sendSdkMcpMessage` to the `hopcode/control/client_mcp/message` ext-method.
  * Defined here — the single contract package both the parent provider
  * (`cli/src/serve/acp-http`) and the child handler (`cli/src/acp-integration`)
  * import — so a rename can't silently break the handshake.
@@ -895,7 +895,7 @@ export interface AcpSessionBridge {
     }>;
     /**
      * Generate a one-sentence "where did I leave off" recap of a live
-     * session. Forwards through `qwen/control/session/recap`, which
+     * session. Forwards through `hopcode/control/session/recap`, which
      * invokes `generateSessionRecap` (`core/services/sessionRecap.ts`) in
      * the ACP child against the per-session chat history.
      *

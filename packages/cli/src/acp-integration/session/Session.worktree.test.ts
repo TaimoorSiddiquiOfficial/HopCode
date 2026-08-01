@@ -299,7 +299,7 @@ describe('Session.pendingWorktreeNotice', () => {
     await session.prompt({
       sessionId: SESSION_ID,
       prompt: [],
-      _meta: { 'qwen.daemon.continueLastTurn': true },
+      _meta: { 'hopcode.daemon.continueLastTurn': true },
     } as unknown as PromptRequest);
 
     expect(capturedMessages.length).toBeGreaterThanOrEqual(1);

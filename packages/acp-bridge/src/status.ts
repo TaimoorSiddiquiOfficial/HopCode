@@ -128,47 +128,47 @@ export const SERVE_STATUS_EXT_METHODS = {
  * which then mutates Config / ToolRegistry / McpClientManager state.
  */
 export const SERVE_CONTROL_EXT_METHODS = {
-  sessionClose: 'qwen/control/session/close',
-  sessionApprovalMode: 'qwen/control/session/approval_mode',
-  sessionBranch: 'qwen/control/session/branch',
-  sessionForkAgent: 'qwen/control/session/fork_agent',
-  sessionRecap: 'qwen/control/session/recap',
-  sessionGenerationStart: 'qwen/control/session/generation/start',
-  sessionGenerationCancel: 'qwen/control/session/generation/cancel',
-  sessionBtw: 'qwen/control/session/btw',
-  sessionShellHistory: 'qwen/control/session/shell_history',
-  sessionLanguage: 'qwen/control/session/language',
-  sessionRewind: 'qwen/control/session/rewind',
-  sessionContinue: 'qwen/control/session/continue',
-  sessionTitle: 'qwen/control/session/title',
-  sessionParent: 'qwen/control/session/parent',
-  sessionSource: 'qwen/control/session/source',
-  sessionArtifactsPersist: 'qwen/control/session/artifacts/persist',
-  workspaceMcpRestart: 'qwen/control/workspace/mcp/restart',
-  workspaceMcpManage: 'qwen/control/workspace/mcp/manage',
-  workspaceMcpInitialize: 'qwen/control/workspace/mcp/initialize',
-  workspaceMcpReload: 'qwen/control/workspace/mcp/reload',
-  workspaceAgentGenerate: 'qwen/control/workspace/agents/generate',
+  sessionClose: 'hopcode/control/session/close',
+  sessionApprovalMode: 'hopcode/control/session/approval_mode',
+  sessionBranch: 'hopcode/control/session/branch',
+  sessionForkAgent: 'hopcode/control/session/fork_agent',
+  sessionRecap: 'hopcode/control/session/recap',
+  sessionGenerationStart: 'hopcode/control/session/generation/start',
+  sessionGenerationCancel: 'hopcode/control/session/generation/cancel',
+  sessionBtw: 'hopcode/control/session/btw',
+  sessionShellHistory: 'hopcode/control/session/shell_history',
+  sessionLanguage: 'hopcode/control/session/language',
+  sessionRewind: 'hopcode/control/session/rewind',
+  sessionContinue: 'hopcode/control/session/continue',
+  sessionTitle: 'hopcode/control/session/title',
+  sessionParent: 'hopcode/control/session/parent',
+  sessionSource: 'hopcode/control/session/source',
+  sessionArtifactsPersist: 'hopcode/control/session/artifacts/persist',
+  workspaceMcpRestart: 'hopcode/control/workspace/mcp/restart',
+  workspaceMcpManage: 'hopcode/control/workspace/mcp/manage',
+  workspaceMcpInitialize: 'hopcode/control/workspace/mcp/initialize',
+  workspaceMcpReload: 'hopcode/control/workspace/mcp/reload',
+  workspaceAgentGenerate: 'hopcode/control/workspace/agents/generate',
   workspaceMemoryRememberAvailability:
     'hopcode/control/workspace/memory/remember/availability',
   workspaceMemoryRemember: 'hopcode/control/workspace/memory/remember',
   workspaceMemoryForget: 'hopcode/control/workspace/memory/forget',
   workspaceMemoryDream: 'hopcode/control/workspace/memory/dream',
   // Runtime MCP server mutation ext-methods
-  sessionTaskCancel: 'qwen/control/session/task/cancel',
-  sessionGoalClear: 'qwen/control/session/goal/clear',
+  sessionTaskCancel: 'hopcode/control/session/task/cancel',
+  sessionGoalClear: 'hopcode/control/session/goal/clear',
   /**
    * Read a live session's `/goal` state. The active goal lives only in the
    * child's in-memory store, so this is the sole authoritative source for the
    * condition, its running turn count and the judge's last verdict. Params:
    * `{ sessionId }`; result: `{ active: ActiveGoalView | null }`.
    */
-  sessionGoalGet: 'qwen/control/session/goal/get',
-  workspaceMcpRuntimeAdd: 'qwen/control/workspace/mcp/runtime-add',
-  workspaceMcpRuntimeRemove: 'qwen/control/workspace/mcp/runtime-remove',
-  workspaceReload: 'qwen/control/workspace/reload',
-  workspaceSkillsRefresh: 'qwen/control/workspace/skills/refresh',
-  workspaceExtensionsRefresh: 'qwen/control/workspace/extensions/refresh',
+  sessionGoalGet: 'hopcode/control/session/goal/get',
+  workspaceMcpRuntimeAdd: 'hopcode/control/workspace/mcp/runtime-add',
+  workspaceMcpRuntimeRemove: 'hopcode/control/workspace/mcp/runtime-remove',
+  workspaceReload: 'hopcode/control/workspace/reload',
+  workspaceSkillsRefresh: 'hopcode/control/workspace/skills/refresh',
+  workspaceExtensionsRefresh: 'hopcode/control/workspace/extensions/refresh',
   /**
    * Reverse tool channel (issue #5626, Phase 2). Unlike every other entry
    * here — which the PARENT serve process calls DOWN into the `hopcode --acp`
@@ -179,8 +179,8 @@ export const SERVE_CONTROL_EXT_METHODS = {
    * client and returns the correlated response. Params: `{ server, payload }`;
    * result: `{ payload }`.
    */
-  clientMcpMessage: 'qwen/control/client_mcp/message',
-  sessionCd: 'qwen/control/session/cd',
+  clientMcpMessage: 'hopcode/control/client_mcp/message',
+  sessionCd: 'hopcode/control/session/cd',
   /**
    * Also called by the CHILD UP into the parent (like `clientMcpMessage`): the
    * `create_sub_session` tool, running inside a child's agent turn, asks the
@@ -189,7 +189,7 @@ export const SERVE_CONTROL_EXT_METHODS = {
    * result: `{ sessionId, result?, stopReason? }` (result present only for the
    * `first-turn` mode, which waits for the sub-session's first turn to finish).
    */
-  createSubSession: 'qwen/control/create-sub-session',
+  createSubSession: 'hopcode/control/create-sub-session',
 } as const;
 
 export type ServeStatus =

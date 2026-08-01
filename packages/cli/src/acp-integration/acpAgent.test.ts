@@ -1690,15 +1690,15 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
     const request = {
       cwd: '/tmp',
       mcpServers: [],
-      _meta: { 'qwen.telemetry.traceparent': 'daemon-parent' },
+      _meta: { 'hopcode.telemetry.traceparent': 'daemon-parent' },
     };
 
     await agent.newSession(request);
 
     expect(mockExtractDaemonTraceContext).toHaveBeenCalledWith(request);
     expect(mockWithDaemonSpan).toHaveBeenCalledWith(
-      'qwen-code.daemon.session_start',
-      { 'qwen-code.daemon.operation': 'acp_session_new' },
+      'hopcode.daemon.session_start',
+      { 'hopcode.daemon.operation': 'acp_session_new' },
       expect.any(Function),
       { parentContext },
     );
@@ -1713,7 +1713,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
       'session_register',
       'response_build',
     ]) {
-      expect(attributes[`qwen-code.daemon.session_start.${stage}_ms`]).toEqual(
+      expect(attributes[`hopcode.daemon.session_start.${stage}_ms`]).toEqual(
         expect.any(Number),
       );
     }
@@ -1785,7 +1785,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
       agent.newSession({ cwd: '/tmp', mcpServers: [] }),
     ).rejects.toBe(configError);
     expect(mockSessionStartSpan.setAttribute).toHaveBeenCalledWith(
-      'qwen-code.daemon.session_start.failed_stage',
+      'hopcode.daemon.session_start.failed_stage',
       'config_setup',
     );
 
@@ -1831,7 +1831,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
         agent.newSession({ cwd: '/tmp', mcpServers: [] }),
       ).rejects.toBe(fileSystemError);
       expect(mockSessionStartSpan.setAttribute).toHaveBeenCalledWith(
-        'qwen-code.daemon.session_start.failed_stage',
+        'hopcode.daemon.session_start.failed_stage',
         'file_system_setup',
       );
     } finally {
@@ -10520,7 +10520,7 @@ describe('QwenAgent extMethod renameSession routing', () => {
     await agentPromise;
   });
 
-  it('returns the durable result from qwen/control/session/title without an extra flush', async () => {
+  it('returns the durable result from hopcode/control/session/title without an extra flush', async () => {
     const recording = makeRecordingService();
     recording.recordCustomTitle.mockResolvedValue(false);
     const innerConfig = makeLiveSessionInnerConfig(recording);
@@ -10584,7 +10584,7 @@ describe('QwenAgent extMethod renameSession routing', () => {
     await agent.newSession({ cwd: '/tmp', mcpServers: [] });
 
     await expect(
-      agent.extMethod('qwen/control/session/close', {
+      agent.extMethod('hopcode/control/session/close', {
         sessionId: liveSessionId,
         requireFlush: true,
       }),
@@ -10603,7 +10603,7 @@ describe('QwenAgent extMethod renameSession routing', () => {
     expect(toolRegistry.stop).not.toHaveBeenCalled();
 
     await expect(
-      agent.extMethod('qwen/control/session/close', {
+      agent.extMethod('hopcode/control/session/close', {
         sessionId: liveSessionId,
         requireFlush: true,
       }),
@@ -10613,7 +10613,7 @@ describe('QwenAgent extMethod renameSession routing', () => {
     expect(toolRegistry.stop).not.toHaveBeenCalled();
 
     await expect(
-      agent.extMethod('qwen/control/session/close', {
+      agent.extMethod('hopcode/control/session/close', {
         sessionId: liveSessionId,
         requireFlush: false,
       }),
@@ -12940,7 +12940,7 @@ describe('sessionLanguage multi-session propagation', () => {
     vi.mocked(updateOutputLanguageFile).mockClear();
     vi.mocked(writeOutputLanguageAndRegisterPath).mockClear();
 
-    await agent.extMethod('qwen/control/session/language', {
+    await agent.extMethod('hopcode/control/session/language', {
       sessionId: 's-a',
       language: 'zh',
       syncOutputLanguage: true,
@@ -13043,7 +13043,7 @@ describe('sessionLanguage multi-session propagation', () => {
     vi.mocked(updateOutputLanguageFile).mockClear();
     vi.mocked(writeOutputLanguageAndRegisterPath).mockClear();
 
-    const result = await agent.extMethod('qwen/control/session/language', {
+    const result = await agent.extMethod('hopcode/control/session/language', {
       sessionId: 's-a',
       language: 'auto',
       syncOutputLanguage: true,
@@ -13131,7 +13131,7 @@ describe('sessionLanguage multi-session propagation', () => {
       },
     );
 
-    await agent.extMethod('qwen/control/session/language', {
+    await agent.extMethod('hopcode/control/session/language', {
       sessionId: 's-ok',
       language: 'zh',
       syncOutputLanguage: true,

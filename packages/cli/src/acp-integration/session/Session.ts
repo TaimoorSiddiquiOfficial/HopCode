@@ -252,8 +252,8 @@ import {
 
 const debugLogger = createDebugLogger('SESSION');
 const USER_CANCEL_ABORT_REASON = 'qwen:user-cancel';
-const DAEMON_RETRY_META_KEY = 'qwen.daemon.retry';
-const DAEMON_CONTINUE_META_KEY = 'qwen.daemon.continueLastTurn';
+const DAEMON_RETRY_META_KEY = 'hopcode.daemon.retry';
+const DAEMON_CONTINUE_META_KEY = 'hopcode.daemon.continueLastTurn';
 const TODO_STOP_GUARD_PROMPT_PREFIX = '[Todo Stop Guard] ';
 const TODO_STOP_GUARD_PROMPT_BODY_SUFFIX =
   ' todo item(s) are still pending or in progress. Continue executing the current task now. Do not ask the user whether to continue. If progress requires user input, use the structured question or permission flow. If progress depends on external state, report the blocker explicitly.';
@@ -1970,7 +1970,7 @@ export class Session implements SessionContext {
    * accepted, the daemon bridge drives the continuation through the normal
    * prompt-admission path (`sendPrompt` with the trusted continue meta) so it is
    * tracked like any other prompt; `prompt()` then re-detects/strips
-   * authoritatively. Powers `qwen/control/session/continue`.
+   * authoritatively. Powers `hopcode/control/session/continue`.
    */
   async continueLastTurn(): Promise<{
     accepted: boolean;
@@ -4653,7 +4653,7 @@ export class Session implements SessionContext {
       this.unsubscribeChatRecordingFailure = this.config.onChatRecordingFailure(
         (event) =>
           this.client.extNotification(
-            'qwen/notify/session/recording-degraded',
+            'hopcode/notify/session/recording-degraded',
             {
               v: 1,
               sessionId: event.sessionId,
@@ -5334,7 +5334,7 @@ export class Session implements SessionContext {
     // legacy frame for this change, not two. `setMode` omits the flag, so
     // its dual-emit still fires (it has no `sendUpdate`).
     try {
-      await this.client.extNotification('qwen/notify/session/mode-update', {
+      await this.client.extNotification('hopcode/notify/session/mode-update', {
         v: 1,
         sessionId: this.sessionId,
         currentModeId: newModeId,
@@ -7596,7 +7596,7 @@ export class Session implements SessionContext {
     }
 
     try {
-      await this.client.extNotification('qwen/notify/session/artifact-event', {
+      await this.client.extNotification('hopcode/notify/session/artifact-event', {
         v: 1,
         sessionId: this.sessionId,
         source: 'hook',

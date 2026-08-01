@@ -79,45 +79,45 @@ export declare const SERVE_STATUS_EXT_METHODS: {
  * which then mutates Config / ToolRegistry / McpClientManager state.
  */
 export declare const SERVE_CONTROL_EXT_METHODS: {
-    readonly sessionClose: "qwen/control/session/close";
-    readonly sessionApprovalMode: "qwen/control/session/approval_mode";
-    readonly sessionBranch: "qwen/control/session/branch";
-    readonly sessionForkAgent: "qwen/control/session/fork_agent";
-    readonly sessionRecap: "qwen/control/session/recap";
-    readonly sessionGenerationStart: "qwen/control/session/generation/start";
-    readonly sessionGenerationCancel: "qwen/control/session/generation/cancel";
-    readonly sessionBtw: "qwen/control/session/btw";
-    readonly sessionShellHistory: "qwen/control/session/shell_history";
-    readonly sessionLanguage: "qwen/control/session/language";
-    readonly sessionRewind: "qwen/control/session/rewind";
-    readonly sessionContinue: "qwen/control/session/continue";
-    readonly sessionTitle: "qwen/control/session/title";
-    readonly sessionParent: "qwen/control/session/parent";
-    readonly sessionSource: "qwen/control/session/source";
-    readonly sessionArtifactsPersist: "qwen/control/session/artifacts/persist";
-    readonly workspaceMcpRestart: "qwen/control/workspace/mcp/restart";
-    readonly workspaceMcpManage: "qwen/control/workspace/mcp/manage";
-    readonly workspaceMcpInitialize: "qwen/control/workspace/mcp/initialize";
-    readonly workspaceMcpReload: "qwen/control/workspace/mcp/reload";
-    readonly workspaceAgentGenerate: "qwen/control/workspace/agents/generate";
+    readonly sessionClose: "hopcode/control/session/close";
+    readonly sessionApprovalMode: "hopcode/control/session/approval_mode";
+    readonly sessionBranch: "hopcode/control/session/branch";
+    readonly sessionForkAgent: "hopcode/control/session/fork_agent";
+    readonly sessionRecap: "hopcode/control/session/recap";
+    readonly sessionGenerationStart: "hopcode/control/session/generation/start";
+    readonly sessionGenerationCancel: "hopcode/control/session/generation/cancel";
+    readonly sessionBtw: "hopcode/control/session/btw";
+    readonly sessionShellHistory: "hopcode/control/session/shell_history";
+    readonly sessionLanguage: "hopcode/control/session/language";
+    readonly sessionRewind: "hopcode/control/session/rewind";
+    readonly sessionContinue: "hopcode/control/session/continue";
+    readonly sessionTitle: "hopcode/control/session/title";
+    readonly sessionParent: "hopcode/control/session/parent";
+    readonly sessionSource: "hopcode/control/session/source";
+    readonly sessionArtifactsPersist: "hopcode/control/session/artifacts/persist";
+    readonly workspaceMcpRestart: "hopcode/control/workspace/mcp/restart";
+    readonly workspaceMcpManage: "hopcode/control/workspace/mcp/manage";
+    readonly workspaceMcpInitialize: "hopcode/control/workspace/mcp/initialize";
+    readonly workspaceMcpReload: "hopcode/control/workspace/mcp/reload";
+    readonly workspaceAgentGenerate: "hopcode/control/workspace/agents/generate";
     readonly workspaceMemoryRememberAvailability: "hopcode/control/workspace/memory/remember/availability";
     readonly workspaceMemoryRemember: "hopcode/control/workspace/memory/remember";
     readonly workspaceMemoryForget: "hopcode/control/workspace/memory/forget";
     readonly workspaceMemoryDream: "hopcode/control/workspace/memory/dream";
-    readonly sessionTaskCancel: "qwen/control/session/task/cancel";
-    readonly sessionGoalClear: "qwen/control/session/goal/clear";
+    readonly sessionTaskCancel: "hopcode/control/session/task/cancel";
+    readonly sessionGoalClear: "hopcode/control/session/goal/clear";
     /**
      * Read a live session's `/goal` state. The active goal lives only in the
      * child's in-memory store, so this is the sole authoritative source for the
      * condition, its running turn count and the judge's last verdict. Params:
      * `{ sessionId }`; result: `{ active: ActiveGoalView | null }`.
      */
-    readonly sessionGoalGet: "qwen/control/session/goal/get";
-    readonly workspaceMcpRuntimeAdd: "qwen/control/workspace/mcp/runtime-add";
-    readonly workspaceMcpRuntimeRemove: "qwen/control/workspace/mcp/runtime-remove";
-    readonly workspaceReload: "qwen/control/workspace/reload";
-    readonly workspaceSkillsRefresh: "qwen/control/workspace/skills/refresh";
-    readonly workspaceExtensionsRefresh: "qwen/control/workspace/extensions/refresh";
+    readonly sessionGoalGet: "hopcode/control/session/goal/get";
+    readonly workspaceMcpRuntimeAdd: "hopcode/control/workspace/mcp/runtime-add";
+    readonly workspaceMcpRuntimeRemove: "hopcode/control/workspace/mcp/runtime-remove";
+    readonly workspaceReload: "hopcode/control/workspace/reload";
+    readonly workspaceSkillsRefresh: "hopcode/control/workspace/skills/refresh";
+    readonly workspaceExtensionsRefresh: "hopcode/control/workspace/extensions/refresh";
     /**
      * Reverse tool channel (issue #5626, Phase 2). Unlike every other entry
      * here — which the PARENT serve process calls DOWN into the `qwen --acp`
@@ -128,8 +128,8 @@ export declare const SERVE_CONTROL_EXT_METHODS: {
      * client and returns the correlated response. Params: `{ server, payload }`;
      * result: `{ payload }`.
      */
-    readonly clientMcpMessage: "qwen/control/client_mcp/message";
-    readonly sessionCd: "qwen/control/session/cd";
+    readonly clientMcpMessage: "hopcode/control/client_mcp/message";
+    readonly sessionCd: "hopcode/control/session/cd";
     /**
      * Also called by the CHILD UP into the parent (like `clientMcpMessage`): the
      * `create_sub_session` tool, running inside a child's agent turn, asks the
@@ -138,7 +138,7 @@ export declare const SERVE_CONTROL_EXT_METHODS: {
      * result: `{ sessionId, result?, stopReason? }` (result present only for the
      * `first-turn` mode, which waits for the sub-session's first turn to finish).
      */
-    readonly createSubSession: "qwen/control/create-sub-session";
+    readonly createSubSession: "hopcode/control/create-sub-session";
 };
 export type ServeStatus = 'ok' | 'warning' | 'error' | 'disabled' | 'not_started' | 'unknown';
 export interface ServeStatusCell {

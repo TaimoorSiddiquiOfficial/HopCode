@@ -291,10 +291,10 @@ describe('daemon-tracing', () => {
           'http.request.method': 'POST',
           'http.route': 'POST /session/:id/permission/:requestId',
           'session.id': 'sess-1',
-          'qwen-code.client_id': 'client-42',
-          'qwen-code.daemon.permission.request_id': 'perm-99',
-          'qwen-code.daemon.runtime.wait_ms': 42.5,
-          'qwen-code.daemon.runtime.path': 'joined',
+          'hopcode.client_id': 'client-42',
+          'hopcode.daemon.permission.request_id': 'perm-99',
+          'hopcode.daemon.runtime.wait_ms': 42.5,
+          'hopcode.daemon.runtime.path': 'joined',
         }),
         startTime,
       }),
@@ -315,10 +315,10 @@ describe('daemon-tracing', () => {
         attributes: Record<string, unknown>;
       }
     ).attributes;
-    expect(attrs).not.toHaveProperty('qwen-code.client_id');
-    expect(attrs).not.toHaveProperty('qwen-code.daemon.permission.request_id');
-    expect(attrs).not.toHaveProperty('qwen-code.daemon.runtime.wait_ms');
-    expect(attrs).not.toHaveProperty('qwen-code.daemon.runtime.path');
+    expect(attrs).not.toHaveProperty('hopcode.client_id');
+    expect(attrs).not.toHaveProperty('hopcode.daemon.permission.request_id');
+    expect(attrs).not.toHaveProperty('hopcode.daemon.runtime.wait_ms');
+    expect(attrs).not.toHaveProperty('hopcode.daemon.runtime.path');
   });
 
   it('addDaemonRequestAttribute sets attribute on the active span', () => {
@@ -349,11 +349,11 @@ describe('daemon-tracing', () => {
     } as unknown as Span);
 
     createDaemonBridgeTelemetry().setActiveSpanAttributes?.({
-      'qwen-code.daemon.acp_startup.profile.version': 1,
+      'hopcode.daemon.acp_startup.profile.version': 1,
     });
 
     expect(setAttributes).toHaveBeenCalledWith({
-      'qwen-code.daemon.acp_startup.profile.version': 1,
+      'hopcode.daemon.acp_startup.profile.version': 1,
     });
   });
 });

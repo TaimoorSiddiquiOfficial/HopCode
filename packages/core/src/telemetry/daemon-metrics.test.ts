@@ -141,7 +141,7 @@ describe('Daemon Metrics', () => {
         expect.any(Object),
       );
       expect(mockCreateHistogramFn).toHaveBeenCalledWith(
-        'qwen-code.daemon.pipe.message_bytes',
+        'hopcode.daemon.pipe.message_bytes',
         expect.objectContaining({ unit: 'By' }),
       );
     });

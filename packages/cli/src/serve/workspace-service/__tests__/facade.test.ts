@@ -1358,7 +1358,7 @@ describe('createDaemonWorkspaceService', () => {
       );
       expect(invalidate).toHaveBeenCalledWith('/workspace');
       expect(invokeWorkspaceCommand).toHaveBeenCalledWith(
-        'qwen/control/workspace/skills/refresh',
+        'hopcode/control/workspace/skills/refresh',
         { cwd: '/workspace' },
       );
       expect(result).toEqual({
@@ -1792,7 +1792,7 @@ describe('createDaemonWorkspaceService', () => {
       await svc.restartMcpServer(makeCtx(), 'myServer');
 
       expect(invokeWorkspaceCommand).toHaveBeenCalledWith(
-        'qwen/control/workspace/mcp/restart',
+        'hopcode/control/workspace/mcp/restart',
         { serverName: 'myServer' },
         { timeoutMs: 300_000 },
       );
@@ -1811,7 +1811,7 @@ describe('createDaemonWorkspaceService', () => {
       await svc.restartMcpServer(makeCtx(), 'poolServer', { entryIndex: 3 });
 
       expect(invokeWorkspaceCommand).toHaveBeenCalledWith(
-        'qwen/control/workspace/mcp/restart',
+        'hopcode/control/workspace/mcp/restart',
         { serverName: 'poolServer', entryIndex: 3 },
         { timeoutMs: 300_000 },
       );

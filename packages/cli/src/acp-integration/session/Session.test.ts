@@ -641,7 +641,7 @@ describe('Session', () => {
     });
 
     expect(mockClient.extNotification).toHaveBeenCalledWith(
-      'qwen/notify/session/recording-degraded',
+      'hopcode/notify/session/recording-degraded',
       {
         v: 1,
         sessionId: 'failed-session-id',
@@ -661,7 +661,7 @@ describe('Session', () => {
     callback?.('Durable title', 'auto', 'persisted-session-id');
 
     expect(mockClient.extNotification).toHaveBeenCalledWith(
-      'qwen/notify/session/title-update',
+      'hopcode/notify/session/title-update',
       {
         v: 1,
         sessionId: 'persisted-session-id',
@@ -763,7 +763,7 @@ describe('Session', () => {
       const continueRequest = {
         prompt: [],
         sessionId: 'test-session-id',
-        _meta: { 'qwen.daemon.continueLastTurn': true },
+        _meta: { 'hopcode.daemon.continueLastTurn': true },
       } as unknown as Parameters<typeof session.prompt>[0];
       const result = await session.prompt(continueRequest);
 
@@ -800,7 +800,7 @@ describe('Session', () => {
       const continueRequest = {
         prompt: [],
         sessionId: 'test-session-id',
-        _meta: { 'qwen.daemon.continueLastTurn': true },
+        _meta: { 'hopcode.daemon.continueLastTurn': true },
       } as unknown as Parameters<typeof session.prompt>[0];
 
       await expect(session.prompt(continueRequest)).rejects.toThrow(
@@ -929,7 +929,7 @@ describe('Session', () => {
       ).sendCurrentModeUpdateNotification();
 
       expect(mockClient.extNotification).toHaveBeenCalledWith(
-        'qwen/notify/session/mode-update',
+        'hopcode/notify/session/mode-update',
         expect.objectContaining({
           currentModeId: ApprovalMode.DEFAULT,
           legacyFrameSent: false,
@@ -1379,7 +1379,7 @@ describe('Session', () => {
         'https://two.example/v1',
       );
       expect(mockClient.extNotification).toHaveBeenCalledWith(
-        'qwen/notify/session/model-update',
+        'hopcode/notify/session/model-update',
         expect.objectContaining({ currentModelId: routeId }),
       );
       expect(response).toMatchObject({
@@ -1432,7 +1432,7 @@ describe('Session', () => {
         '',
       );
       expect(mockClient.extNotification).toHaveBeenCalledWith(
-        'qwen/notify/session/model-update',
+        'hopcode/notify/session/model-update',
         expect.objectContaining({ currentModelId: routeId }),
       );
       expect(response).toMatchObject({
@@ -11690,7 +11690,7 @@ describe('Session', () => {
             expect.anything(),
           );
           expect(mockClient.extNotification).toHaveBeenCalledWith(
-            'qwen/notify/session/artifact-event',
+            'hopcode/notify/session/artifact-event',
             expect.objectContaining({
               sessionId: 'test-session-id',
               source: 'hook',
@@ -11846,7 +11846,7 @@ describe('Session', () => {
             expect.anything(),
           );
           expect(mockClient.extNotification).toHaveBeenCalledWith(
-            'qwen/notify/session/artifact-event',
+            'hopcode/notify/session/artifact-event',
             expect.objectContaining({
               sessionId: 'test-session-id',
               source: 'hook',
@@ -12740,7 +12740,7 @@ describe('Session', () => {
         ),
       ).toBe(false);
       expect(mockClient.extNotification).not.toHaveBeenCalledWith(
-        'qwen/notify/session/artifact-event',
+        'hopcode/notify/session/artifact-event',
         expect.objectContaining({ hookEventName: 'PostToolBatch' }),
       );
     });
@@ -15107,7 +15107,7 @@ describe('Session', () => {
       await session.prompt({
         sessionId: 'test-session-id',
         prompt: [{ type: 'text', text: 'retry the failed stream' }],
-        _meta: { 'qwen.daemon.retry': true },
+        _meta: { 'hopcode.daemon.retry': true },
       } as Parameters<typeof session.prompt>[0]);
 
       expect(mockChat.sendMessageStream).toHaveBeenCalledTimes(5);
@@ -15290,7 +15290,7 @@ describe('Session', () => {
       await session.prompt({
         sessionId: 'test-session-id',
         prompt: [{ type: 'text', text: 'trusted retry after trust clear' }],
-        _meta: { 'qwen.daemon.retry': true },
+        _meta: { 'hopcode.daemon.retry': true },
       } as Parameters<typeof session.prompt>[0]);
 
       expect(mockChat.sendMessageStream).toHaveBeenCalledTimes(4);
@@ -16846,7 +16846,7 @@ describe('Session', () => {
       await session.prompt({
         sessionId: 'test-session-id',
         prompt: [{ type: 'text', text: 'trusted queued retry' }],
-        _meta: { 'qwen.daemon.retry': true },
+        _meta: { 'hopcode.daemon.retry': true },
       } as Parameters<typeof session.prompt>[0]);
 
       expect(mockChat.sendMessageStream).toHaveBeenCalledTimes(5);

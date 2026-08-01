@@ -153,7 +153,7 @@ export declare class BridgeClient implements Client {
     /**
      * Reverse tool channel (issue #5626, Phase 2). Resolves the
      * `sendSdkMcpMessage`-shaped sender for a client-hosted MCP server name so
-     * the `qwen/control/client_mcp/message` ext-method (child → parent) can
+     * the `hopcode/control/client_mcp/message` ext-method (child → parent) can
      * deliver a JSON-RPC frame to the extension and return the response.
      * Omitted by tests / Mode A consumers — the method then rejects with
      * `methodNotFound` (no client-hosted server can exist without it).
@@ -247,7 +247,7 @@ export declare class BridgeClient implements Client {
     /**
      * Reverse tool channel (issue #5626, Phase 2). Resolves the
      * `sendSdkMcpMessage`-shaped sender for a client-hosted MCP server name so
-     * the `qwen/control/client_mcp/message` ext-method (child → parent) can
+     * the `hopcode/control/client_mcp/message` ext-method (child → parent) can
      * deliver a JSON-RPC frame to the extension and return the response.
      * Omitted by tests / Mode A consumers — the method then rejects with
      * `methodNotFound` (no client-hosted server can exist without it).
@@ -343,8 +343,8 @@ export declare class BridgeClient implements Client {
     /**
      * Handle child->bridge ACP `extMethod` requests (calls that expect a
      * response, unlike `extNotification`). Served methods:
-     * `qwen/control/client_mcp/message` (reverse tool channel),
-     * `qwen/control/create-sub-session` (the `create_sub_session` tool → daemon
+     * `hopcode/control/client_mcp/message` (reverse tool channel),
+     * `hopcode/control/create-sub-session` (the `create_sub_session` tool → daemon
      * spawns a sub-session and, for `'first-turn'`, returns its first-turn
      * result), and `craft/drainMidTurnQueue`: the ACP child calls the last one
      * between tool batches to pull any messages the browser queued mid-turn. We splice the per-session
@@ -359,7 +359,7 @@ export declare class BridgeClient implements Client {
     extMethod(method: string, params: Record<string, unknown>): Promise<Record<string, unknown>>;
     /**
      * Reverse tool channel (issue #5626, Phase 2) — answer the child's
-     * `qwen/control/client_mcp/message` ext-method. The child's session
+     * `hopcode/control/client_mcp/message` ext-method. The child's session
      * `McpClientManager` calls this when its agent drives a client-hosted
      * (extension) MCP server: `params` carries the advertised `server` name and
      * the JSON-RPC `payload` (initialize / tools/list / tools/call / a
@@ -384,14 +384,14 @@ export declare class BridgeClient implements Client {
     private handleCreateSubSession;
     /**
      * Handle child->bridge ACP `extNotification` calls. Recognized methods are
-     * `qwen/notify/session/model-update`,
-     * `qwen/notify/session/mode-update`,
-     * `qwen/notify/session/title-update` (auto/in-process session titles),
-     * `qwen/notify/session/recording-degraded`,
-     * `qwen/notify/session/prompt-suggestion` (followup assist),
-     * `qwen/notify/session/artifact-event` (hook artifacts),
-     * `qwen/notify/session/terminal-sequence`, and
-     * `qwen/notify/session/mcp-budget-event` — each translated into a
+     * `hopcode/notify/session/model-update`,
+     * `hopcode/notify/session/mode-update`,
+     * `hopcode/notify/session/title-update` (auto/in-process session titles),
+     * `hopcode/notify/session/recording-degraded`,
+     * `hopcode/notify/session/prompt-suggestion` (followup assist),
+     * `hopcode/notify/session/artifact-event` (hook artifacts),
+     * `hopcode/notify/session/terminal-sequence`, and
+     * `hopcode/notify/session/mcp-budget-event` — each translated into a
      * session-scoped SSE frame. Unknown methods are dropped silently for
      * forward-compat.
      */

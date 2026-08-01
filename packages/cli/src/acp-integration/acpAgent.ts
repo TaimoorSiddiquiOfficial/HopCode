@@ -356,13 +356,13 @@ function createAcpSessionStartProfiler(span: AcpSessionStartSpan | undefined) {
   const recordStage = (stage: AcpSessionStartStage, start: number): void => {
     const durationMs = Math.round((performance.now() - start) * 100) / 100;
     if (Number.isFinite(durationMs) && durationMs >= 0) {
-      setAttribute(`qwen-code.daemon.session_start.${stage}_ms`, durationMs);
+      setAttribute(`hopcode.daemon.session_start.${stage}_ms`, durationMs);
     }
   };
   const recordFailure = (stage: AcpSessionStartStage): void => {
     if (failedStage !== undefined) return;
     failedStage = stage;
-    setAttribute('qwen-code.daemon.session_start.failed_stage', stage);
+    setAttribute('hopcode.daemon.session_start.failed_stage', stage);
   };
 
   return {
@@ -2501,7 +2501,7 @@ async function resolveQwenMemoryPaths(params: {
 /**
  * Reverse tool channel (issue #5626, Phase 2). Deliver one JSON-RPC MCP frame
  * for a client-hosted (extension) MCP server UP to the parent serve process
- * over the `qwen/control/client_mcp/message` ext-method, returning the
+ * over the `hopcode/control/client_mcp/message` ext-method, returning the
  * client-hosted server's correlated reply. Shared by the bootstrap
  * (workspace-level) sender in `runAcpAgent` and the per-session sender
  * (`buildClientMcpSender`).
@@ -3457,8 +3457,8 @@ class QwenAgent implements Agent {
     const { cwd, mcpServers } = params;
     const parentContext = extractDaemonTraceContext(params);
     return await withDaemonSpan(
-      'qwen-code.daemon.session_start',
-      { 'qwen-code.daemon.operation': 'acp_session_new' },
+      'hopcode.daemon.session_start',
+      { 'hopcode.daemon.operation': 'acp_session_new' },
       async (span) => {
         const profiler = createAcpSessionStartProfiler(span);
         // Per-request settings: session handlers run concurrently, and
@@ -7857,7 +7857,7 @@ class QwenAgent implements Agent {
             signal,
             async (event) => {
               await this.connection.extNotification(
-                'qwen/notify/session/generation/event',
+                'hopcode/notify/session/generation/event',
                 { v: 1, sessionId, requestId, event },
               );
             },
@@ -9275,7 +9275,7 @@ class QwenAgent implements Agent {
    * `McpClientManager`'s `sendSdkMcpMessage` callback. Client-hosted
    * (extension) MCP servers are registered SDK-type, so the manager routes
    * their JSON-RPC through this callback. We forward each frame UP to the
-   * parent serve process via the `qwen/control/client_mcp/message` ext-method;
+   * parent serve process via the `hopcode/control/client_mcp/message` ext-method;
    * the parent's `BridgeClient.extMethod` hands it to the per-WS-connection
    * `ClientMcpRegistrar`, which carries it down the daemon WS to the extension
    * and returns the correlated response (the `payload` field). All SDK-type

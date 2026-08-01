@@ -117,7 +117,7 @@ describe('doctorCommand', () => {
     });
     vi.mocked(cpuProfilerModule.stopCpuProfile).mockResolvedValue({
       ok: true,
-      filePath: '/tmp/qwen-code.cpuprofile',
+      filePath: '/tmp/hopcode.cpuprofile',
     });
     vi.mocked(collectMemoryDiagnostics).mockResolvedValue({
       timestamp: '2026-05-01T10:00:00.000Z',

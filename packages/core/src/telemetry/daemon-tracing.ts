@@ -147,11 +147,11 @@ export async function withDaemonRequestSpan<T>(
         : {}),
       ...(options.deferredRuntimeWaitMs !== undefined
         ? {
-            'qwen-code.daemon.runtime.wait_ms': options.deferredRuntimeWaitMs,
+            'hopcode.daemon.runtime.wait_ms': options.deferredRuntimeWaitMs,
           }
         : {}),
       ...(options.deferredRuntimePath
-        ? { 'qwen-code.daemon.runtime.path': options.deferredRuntimePath }
+        ? { 'hopcode.daemon.runtime.path': options.deferredRuntimePath }
         : {}),
     },
     fn,

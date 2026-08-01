@@ -12,7 +12,7 @@
  * that carries `mcp_message` JSON-RPC frames down to the extension. But the
  * agent's `McpClientManager` — where the matching `sendSdkMcpMessage` binds —
  * runs in the `hopcode --acp` CHILD process. The child reaches back up via the
- * `qwen/control/client_mcp/message` ext-method, which `BridgeClient.extMethod`
+ * `hopcode/control/client_mcp/message` ext-method, which `BridgeClient.extMethod`
  * answers by looking up a sender for the named server.
  *
  * This module is the glue:
