@@ -7658,34 +7658,34 @@ describe('Session', () => {
         // `~/.hopcode/loop.md` symlink resolve anywhere and bypass the confinement.
         // The guard falls back to the parent of the global hopcode dir
         // (Storage.getGlobalhopcodeDir(), itself empty-home-safe), which is the
-        // homehopcodeDir Session passes to the resolver.
-        const homehopcodeDir = path.join(os.tmpdir(), '.hopcode');
+        // homeHopcodeDir Session passes to the resolver.
+        const homeHopcodeDir = path.join(os.tmpdir(), '.hopcode');
 
         const roots = resolveHomeLoopResolverRoots({
           homeDir: '',
-          homehopcodeDir,
+          homeHopcodeDir,
           hopcodeHome: '',
         });
 
-        // Without the `|| path.dirname(homehopcodeDir)` guard this would be ''
+        // Without the `|| path.dirname(homeHopcodeDir)` guard this would be ''
         // (os.homedir()); the guard makes it the non-empty parent of the
         // empty-home-safe global hopcode dir.
         expect(roots.homeConfineRoot).not.toBe('');
-        expect(roots.homeConfineRoot).toBe(path.dirname(homehopcodeDir));
-        expect(roots.homehopcodeDir).toBe(homehopcodeDir);
+        expect(roots.homeConfineRoot).toBe(path.dirname(homeHopcodeDir));
+        expect(roots.homeHopcodeDir).toBe(homeHopcodeDir);
       });
 
       it('confines the home loop resolver within HOPCODE_HOME when set', () => {
-        const homehopcodeDir = path.join(os.tmpdir(), '.hopcode-home');
+        const homeHopcodeDir = path.join(os.tmpdir(), '.hopcode-home');
 
         const roots = resolveHomeLoopResolverRoots({
           homeDir: path.join(os.tmpdir(), 'real-home'),
-          homehopcodeDir,
-          hopcodeHome: homehopcodeDir,
+          homeHopcodeDir,
+          hopcodeHome: homeHopcodeDir,
         });
 
-        expect(roots.homeConfineRoot).toBe(homehopcodeDir);
-        expect(roots.homehopcodeDir).toBe(homehopcodeDir);
+        expect(roots.homeConfineRoot).toBe(homeHopcodeDir);
+        expect(roots.homeHopcodeDir).toBe(homeHopcodeDir);
       });
 
       it('reads the home loop.md from HOPCODE_HOME, not the real ~/.hopcode', async () => {

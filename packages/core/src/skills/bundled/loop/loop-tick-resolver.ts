@@ -367,7 +367,7 @@ export class LoopTickResolver {
     const result = await readLoopTaskFile({
       projectRoot: this.deps.projectRoot,
       homeDir: this.deps.homeDir,
-      homehopcodeDir: this.deps.homehopcodeDir,
+      homeHopcodeDir: this.deps.homeHopcodeDir,
       allowProjectFile,
       realDirCache: this.#realDirCache,
     });
