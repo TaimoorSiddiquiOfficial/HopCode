@@ -1,0 +1,266 @@
+/**
+ * @license
+ * Copyright 2026 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useHopCodeAuth } from './useHopCodeAuth.js';
+import { AuthType, HopCodeOAuth2Events, HopCodeOAuth2Event, } from '@hoptrendy/hopcode-core';
+// Mock the HopCodeOAuth2Events
+vi.mock('@hoptrendy/hopcode-core', async () => {
+    const actual = await vi.importActual('@hoptrendy/hopcode-core');
+    const mockEmitter = {
+        on: vi.fn().mockReturnThis(),
+        off: vi.fn().mockReturnThis(),
+        emit: vi.fn().mockReturnThis(),
+    };
+    return {
+        ...actual,
+        HopCodeOAuth2Events: mockEmitter,
+        HopCodeOAuth2Event: {
+            AuthUri: 'authUri',
+            AuthProgress: 'authProgress',
+        },
+    };
+});
+const mockHopCodeOAuth2Events = vi.mocked(HopCodeOAuth2Events);
+describe('useHopCodeAuth', () => {
+    const mockDeviceAuth = {
+        verification_uri: 'https://oauth.hopcode.com/device',
+        verification_uri_complete: 'https://oauth.hopcode.com/device?user_code=ABC123',
+        user_code: 'ABC123',
+        expires_in: 1800,
+        device_code: 'device_code_123',
+    };
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+    it('should initialize with default state when not HopCode OAuth auth', () => {
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.USE_GEMINI, false));
+        expect(result.current.hopCodeAuthState).toEqual({
+            deviceAuth: null,
+            authStatus: 'idle',
+            authMessage: null,
+        });
+        expect(result.current.cancelHopCodeAuth).toBeInstanceOf(Function);
+    });
+    it('should initialize with default state when HopCode OAuth auth but not authenticating', () => {
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, false));
+        expect(result.current.hopCodeAuthState).toEqual({
+            deviceAuth: null,
+            authStatus: 'idle',
+            authMessage: null,
+        });
+        expect(result.current.cancelHopCodeAuth).toBeInstanceOf(Function);
+    });
+    it('should set up event listeners when HopCode OAuth auth and authenticating', () => {
+        renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        expect(mockHopCodeOAuth2Events.on).toHaveBeenCalledWith(HopCodeOAuth2Event.AuthUri, expect.any(Function));
+        expect(mockHopCodeOAuth2Events.on).toHaveBeenCalledWith(HopCodeOAuth2Event.AuthProgress, expect.any(Function));
+    });
+    it('should handle device auth event', () => {
+        let handleDeviceAuth;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthUri) {
+                handleDeviceAuth = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        act(() => {
+            handleDeviceAuth(mockDeviceAuth);
+        });
+        expect(result.current.hopCodeAuthState.deviceAuth).toEqual(mockDeviceAuth);
+        expect(result.current.hopCodeAuthState.authStatus).toBe('polling');
+    });
+    it('should handle auth progress event - success', () => {
+        let handleAuthProgress;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthProgress) {
+                handleAuthProgress = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        act(() => {
+            handleAuthProgress('success', 'Authentication successful!');
+        });
+        expect(result.current.hopCodeAuthState.authStatus).toBe('success');
+        expect(result.current.hopCodeAuthState.authMessage).toBe('Authentication successful!');
+    });
+    it('should handle auth progress event - error', () => {
+        let handleAuthProgress;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthProgress) {
+                handleAuthProgress = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        act(() => {
+            handleAuthProgress('error', 'Authentication failed');
+        });
+        expect(result.current.hopCodeAuthState.authStatus).toBe('error');
+        expect(result.current.hopCodeAuthState.authMessage).toBe('Authentication failed');
+    });
+    it('should handle auth progress event - polling', () => {
+        let handleAuthProgress;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthProgress) {
+                handleAuthProgress = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        act(() => {
+            handleAuthProgress('polling', 'Waiting for user authorization...');
+        });
+        expect(result.current.hopCodeAuthState.authStatus).toBe('polling');
+        expect(result.current.hopCodeAuthState.authMessage).toBe('Waiting for user authorization...');
+    });
+    it('should handle auth progress event - rate_limit', () => {
+        let handleAuthProgress;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthProgress) {
+                handleAuthProgress = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        act(() => {
+            handleAuthProgress('rate_limit', 'Too many requests. The server is rate limiting our requests. Please select a different authentication method or try again later.');
+        });
+        expect(result.current.hopCodeAuthState.authStatus).toBe('rate_limit');
+        expect(result.current.hopCodeAuthState.authMessage).toBe('Too many requests. The server is rate limiting our requests. Please select a different authentication method or try again later.');
+    });
+    it('should handle auth progress event without message', () => {
+        let handleAuthProgress;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthProgress) {
+                handleAuthProgress = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        act(() => {
+            handleAuthProgress('success');
+        });
+        expect(result.current.hopCodeAuthState.authStatus).toBe('success');
+        expect(result.current.hopCodeAuthState.authMessage).toBe(null);
+    });
+    it('should clean up event listeners when auth type changes', () => {
+        const { rerender } = renderHook(({ pendingAuthType, isAuthenticating }) => useHopCodeAuth(pendingAuthType, isAuthenticating), {
+            initialProps: {
+                pendingAuthType: AuthType.HOPCODE_OAUTH,
+                isAuthenticating: true,
+            },
+        });
+        // Change to non-HopCode OAuth auth
+        rerender({ pendingAuthType: AuthType.USE_GEMINI, isAuthenticating: true });
+        expect(mockHopCodeOAuth2Events.off).toHaveBeenCalledWith(HopCodeOAuth2Event.AuthUri, expect.any(Function));
+        expect(mockHopCodeOAuth2Events.off).toHaveBeenCalledWith(HopCodeOAuth2Event.AuthProgress, expect.any(Function));
+    });
+    it('should clean up event listeners when authentication stops', () => {
+        const { rerender } = renderHook(({ isAuthenticating }) => useHopCodeAuth(AuthType.HOPCODE_OAUTH, isAuthenticating), { initialProps: { isAuthenticating: true } });
+        // Stop authentication
+        rerender({ isAuthenticating: false });
+        expect(mockHopCodeOAuth2Events.off).toHaveBeenCalledWith(HopCodeOAuth2Event.AuthUri, expect.any(Function));
+        expect(mockHopCodeOAuth2Events.off).toHaveBeenCalledWith(HopCodeOAuth2Event.AuthProgress, expect.any(Function));
+    });
+    it('should clean up event listeners on unmount', () => {
+        const { unmount } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        unmount();
+        expect(mockHopCodeOAuth2Events.off).toHaveBeenCalledWith(HopCodeOAuth2Event.AuthUri, expect.any(Function));
+        expect(mockHopCodeOAuth2Events.off).toHaveBeenCalledWith(HopCodeOAuth2Event.AuthProgress, expect.any(Function));
+    });
+    it('should reset state when switching from HopCode OAuth auth to another auth type', () => {
+        let handleDeviceAuth;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthUri) {
+                handleDeviceAuth = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result, rerender } = renderHook(({ pendingAuthType, isAuthenticating }) => useHopCodeAuth(pendingAuthType, isAuthenticating), {
+            initialProps: {
+                pendingAuthType: AuthType.HOPCODE_OAUTH,
+                isAuthenticating: true,
+            },
+        });
+        // Simulate device auth
+        act(() => {
+            handleDeviceAuth(mockDeviceAuth);
+        });
+        expect(result.current.hopCodeAuthState.deviceAuth).toEqual(mockDeviceAuth);
+        expect(result.current.hopCodeAuthState.authStatus).toBe('polling');
+        // Switch to different auth type
+        rerender({ pendingAuthType: AuthType.USE_GEMINI, isAuthenticating: true });
+        expect(result.current.hopCodeAuthState.deviceAuth).toBe(null);
+        expect(result.current.hopCodeAuthState.authStatus).toBe('idle');
+        expect(result.current.hopCodeAuthState.authMessage).toBe(null);
+    });
+    it('should reset state when authentication stops', () => {
+        let handleDeviceAuth;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthUri) {
+                handleDeviceAuth = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result, rerender } = renderHook(({ isAuthenticating }) => useHopCodeAuth(AuthType.HOPCODE_OAUTH, isAuthenticating), { initialProps: { isAuthenticating: true } });
+        // Simulate device auth
+        act(() => {
+            handleDeviceAuth(mockDeviceAuth);
+        });
+        expect(result.current.hopCodeAuthState.deviceAuth).toEqual(mockDeviceAuth);
+        expect(result.current.hopCodeAuthState.authStatus).toBe('polling');
+        // Stop authentication
+        rerender({ isAuthenticating: false });
+        expect(result.current.hopCodeAuthState.deviceAuth).toBe(null);
+        expect(result.current.hopCodeAuthState.authStatus).toBe('idle');
+        expect(result.current.hopCodeAuthState.authMessage).toBe(null);
+    });
+    it('should handle cancelHopCodeAuth function', () => {
+        let handleDeviceAuth;
+        mockHopCodeOAuth2Events.on.mockImplementation((event, handler) => {
+            if (event === HopCodeOAuth2Event.AuthUri) {
+                handleDeviceAuth = handler;
+            }
+            return mockHopCodeOAuth2Events;
+        });
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        // Set up some state
+        act(() => {
+            handleDeviceAuth(mockDeviceAuth);
+        });
+        expect(result.current.hopCodeAuthState.deviceAuth).toEqual(mockDeviceAuth);
+        // Cancel auth
+        act(() => {
+            result.current.cancelHopCodeAuth();
+        });
+        expect(result.current.hopCodeAuthState.deviceAuth).toBe(null);
+        expect(result.current.hopCodeAuthState.authStatus).toBe('idle');
+        expect(result.current.hopCodeAuthState.authMessage).toBe(null);
+    });
+    it('should handle different auth types correctly', () => {
+        // Test with HopCode OAuth - should set up event listeners when authenticating
+        const { result: hopcodeResult } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        expect(hopcodeResult.current.hopCodeAuthState.authStatus).toBe('idle');
+        expect(mockHopCodeOAuth2Events.on).toHaveBeenCalled();
+        // Test with other auth types - should not set up event listeners
+        const { result: geminiResult } = renderHook(() => useHopCodeAuth(AuthType.USE_GEMINI, true));
+        expect(geminiResult.current.hopCodeAuthState.authStatus).toBe('idle');
+        const { result: oauthResult } = renderHook(() => useHopCodeAuth(AuthType.USE_OPENAI, true));
+        expect(oauthResult.current.hopCodeAuthState.authStatus).toBe('idle');
+    });
+    it('should initialize with idle status when starting authentication with HopCode OAuth auth', () => {
+        const { result } = renderHook(() => useHopCodeAuth(AuthType.HOPCODE_OAUTH, true));
+        expect(result.current.hopCodeAuthState.authStatus).toBe('idle');
+        expect(mockHopCodeOAuth2Events.on).toHaveBeenCalled();
+    });
+});
+//# sourceMappingURL=useHopCodeAuth.test.js.map

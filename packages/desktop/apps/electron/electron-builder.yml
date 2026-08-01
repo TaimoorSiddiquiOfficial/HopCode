@@ -73,7 +73,7 @@ mac:
   extendInfo:
     CFBundleIconName: AppIcon
     # Voice dictation: shown in the macOS microphone permission prompt.
-    NSMicrophoneUsageDescription: Qwen Code uses the microphone for voice dictation in the prompt composer.
+    NSMicrophoneUsageDescription: HopCode uses the microphone for voice dictation in the prompt composer.
   target:
     - target: dmg
       arch:

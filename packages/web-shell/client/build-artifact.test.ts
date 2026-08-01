@@ -104,13 +104,13 @@ describe('build artifact — package boundary', () => {
       const name = atRule.name.toLowerCase();
       if (
         name.endsWith('keyframes') &&
-        !atRule.params.startsWith('qwen-web-shell-')
+        !atRule.params.startsWith('hopcode-web-shell-')
       ) {
         unscoped.push(`@${atRule.name} ${atRule.params}`);
       }
       if (
         name === 'property' &&
-        !atRule.params.startsWith('--qwen-web-shell-')
+        !atRule.params.startsWith('--hopcode-web-shell-')
       ) {
         unscoped.push(`@property ${atRule.params}`);
       }

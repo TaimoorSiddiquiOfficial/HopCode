@@ -622,7 +622,7 @@ function getModeLabel(modeId: string, t: (key: string) => string): string {
     default: t('mode.label.default'),
     'auto-edit': t('mode.label.auto-edit'),
     auto: t('mode.label.auto'),
-    yolo: t('mode.label.yolo'),
+    izn: t('mode.label.izn'),
   };
   return labels[modeId] ?? modeId;
 }
@@ -633,7 +633,7 @@ function getModeListLabel(modeId: string, t: (key: string) => string): string {
     default: t('mode.listLabel.default'),
     'auto-edit': t('mode.listLabel.auto-edit'),
     auto: t('mode.listLabel.auto'),
-    yolo: t('mode.listLabel.yolo'),
+    izn: t('mode.listLabel.izn'),
   };
   return labels[modeId] ?? getModeLabel(modeId, t);
 }

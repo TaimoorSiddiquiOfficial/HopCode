@@ -441,7 +441,7 @@ describe('AuthDialog', { timeout: 15000 }, () => {
 
   describe('HOPCODE_DEFAULT_AUTH_TYPE environment variable', () => {
     it('should select the auth type specified by HOPCODE_DEFAULT_AUTH_TYPE', () => {
-      // QWEN_OAUTH is the only valid AuthType that can be selected via env var
+      // HOPCODE_OAUTH is the only valid AuthType that can be selected via env var
       // API-KEY is not an AuthType enum value, so it cannot be selected this way
       process.env['HOPCODE_DEFAULT_AUTH_TYPE'] = AuthType.HOPCODE_OAUTH;
 

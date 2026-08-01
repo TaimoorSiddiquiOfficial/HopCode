@@ -112,7 +112,7 @@ import { InvalidStreamError } from './invalid-stream-error.js';
 
 export { InvalidStreamError };
 
-const debugLogger = createDebugLogger('QWEN_CODE_CHAT');
+const debugLogger = createDebugLogger('HOPCODE_CODE_CHAT');
 // Gemini can emit this filler after tool results; filtering and validation
 // must stay in sync.
 const GEMINI_EMPTY_CONTENT_PLACEHOLDER = '(empty content)';
@@ -1941,14 +1941,14 @@ export class GeminiChat {
     //
     // The ceiling is the explicit user/subagent value when one is set
     // (params.config.maxOutputTokens from subagents, samplingParams.max_tokens
-    // or QWEN_CODE_MAX_OUTPUT_TOKENS from user config), else
+    // or HOPCODE_CODE_MAX_OUTPUT_TOKENS from user config), else
     // defaultOutputCeiling(model) (the model's output limit clipped to
     // OUTPUT_TOKEN_CEILING).
     const cgConfigForThresholds =
       exactRoute?.contentGeneratorConfig ??
       this.config.getContentGeneratorConfig();
     const parsedEnvMaxTokensForClamp = parsePositiveIntegerEnvValue(
-      process.env['QWEN_CODE_MAX_OUTPUT_TOKENS'],
+      process.env['HOPCODE_CODE_MAX_OUTPUT_TOKENS'],
     );
     const explicitOutputCeiling: number | undefined =
       params.config?.maxOutputTokens ??
@@ -2276,7 +2276,7 @@ export class GeminiChat {
         // the model hits MAX_TOKENS, retry once with the escalated limit.
         let maxTokensEscalated = false;
         const parsedEnvMaxTokens = parsePositiveIntegerEnvValue(
-          process.env['QWEN_CODE_MAX_OUTPUT_TOKENS'],
+          process.env['HOPCODE_CODE_MAX_OUTPUT_TOKENS'],
         );
         const hasUserMaxTokensOverride =
           (cgConfig?.samplingParams?.max_tokens !== undefined &&
@@ -2975,7 +2975,7 @@ export class GeminiChat {
           //
           // Constraints:
           // - Do NOT trigger fallback when persistent mode is active
-          //   (QWEN_CODE_UNATTENDED_RETRY) — persistent mode retries the primary
+          //   (HOPCODE_CODE_UNATTENDED_RETRY) — persistent mode retries the primary
           //   model indefinitely by design.
           // - Maximum 3 fallback transitions (capped by config normalization).
           // - Fallback is only for capacity/availability errors (429/503/529),

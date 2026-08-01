@@ -41,11 +41,11 @@
  *   npx tsx table-pending-height-scroll-lock-regression.ts
  *
  * Env:
- *   QWEN_TUI_E2E_MAX_FULL_CLEARS   pass threshold on clearTerminalTriples (default 20)
- *   QWEN_TUI_E2E_EXPECT_PASS       set to "false" to assert the ratchet FAILS
- *                                  (use when running against pre-fix code)
- *   QWEN_TUI_E2E_OUT               output dir (default under os.tmpdir())
- *   QWEN_TUI_E2E_REPO              repo root whose dist/cli.js is launched
+ *   HOPCODE_TUI_E2E_MAX_FULL_CLEARS   pass threshold on clearTerminalTriples (default 20)
+ *   HOPCODE_TUI_E2E_EXPECT_PASS       set to "false" to assert the ratchet FAILS
+ *                                     (use when running against pre-fix code)
+ *   HOPCODE_TUI_E2E_OUT               output dir (default under os.tmpdir())
+ *   HOPCODE_TUI_E2E_REPO              repo root whose dist/cli.js is launched
  */
 import { createServer, type AddressInfo } from 'node:http';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -174,12 +174,12 @@ function envNumber(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function qwenArgs(baseUrl: string): string[] {
+function hopcodeArgs(baseUrl: string): string[] {
   return [
     'dist/cli.js',
     '--no-chat-recording',
     '--approval-mode',
-    'yolo',
+    'izn',
     '--auth-type',
     'openai',
     '--openai-api-key',
@@ -194,14 +194,14 @@ function qwenArgs(baseUrl: string): string[] {
 async function main(): Promise<void> {
   const scriptDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = resolve(
-    process.env['QWEN_TUI_E2E_REPO'] ?? resolve(scriptDir, '../..'),
+    process.env['HOPCODE_TUI_E2E_REPO'] ?? resolve(scriptDir, '../..'),
   );
   const outputDir = resolve(
-    process.env['QWEN_TUI_E2E_OUT'] ??
-      join(tmpdir(), 'qwen-table-scroll-lock', basename(repoRoot)),
+    process.env['HOPCODE_TUI_E2E_OUT'] ??
+      join(tmpdir(), 'hopcode-table-scroll-lock', basename(repoRoot)),
   );
-  const maxFullClears = envNumber('QWEN_TUI_E2E_MAX_FULL_CLEARS', 20);
-  const expectedPass = process.env['QWEN_TUI_E2E_EXPECT_PASS'] !== 'false';
+  const maxFullClears = envNumber('HOPCODE_TUI_E2E_MAX_FULL_CLEARS', 20);
+  const expectedPass = process.env['HOPCODE_TUI_E2E_EXPECT_PASS'] !== 'false';
 
   if (existsSync(outputDir)) rmSync(outputDir, { recursive: true });
   mkdirSync(outputDir, { recursive: true });
@@ -216,13 +216,13 @@ async function main(): Promise<void> {
     HOME: homeDir,
     USERPROFILE: homeDir,
     NODE_NO_WARNINGS: '1',
-    QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
-    QWEN_CODE_NO_RELAUNCH: '1',
-    QWEN_SANDBOX: 'false',
+    HOPCODE_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
+    HOPCODE_CODE_NO_RELAUNCH: '1',
+    HOPCODE_SANDBOX: 'false',
     TERM: 'xterm-256color',
   };
   delete env['NO_COLOR'];
-  delete env['QWEN_CODE_SIMPLE'];
+  delete env['HOPCODE_CODE_SIMPLE'];
   for (const key of [
     'HTTP_PROXY',
     'http_proxy',
@@ -247,10 +247,10 @@ async function main(): Promise<void> {
   });
 
   try {
-    await terminal.spawn('node', qwenArgs(server.baseUrl));
+    await terminal.spawn('node', hopcodeArgs(server.baseUrl));
     // The TUI's input hint is localized; match on a stable ASCII marker of the
     // ready prompt instead. The '❯' prompt glyph shows once input is ready.
-    await terminal.waitFor('YOLO', { timeout: 30000 });
+    await terminal.waitFor('IZN', { timeout: 30000 });
     await terminal.type(PROMPT_TEXT, { delay: 8, slow: true });
     await terminal.idle(300, 4000);
     await terminal.type('\n');

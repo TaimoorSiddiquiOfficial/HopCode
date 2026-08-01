@@ -1,0 +1,148 @@
+import { jsx as _jsx } from "react/jsx-runtime";
+/**
+ * @license
+ * Copyright 2025 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { render } from 'ink-testing-library';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { Header, AuthDisplayType } from './Header.js';
+import * as useTerminalSize from '../hooks/useTerminalSize.js';
+vi.mock('../hooks/useTerminalSize.js');
+const useTerminalSizeMock = vi.mocked(useTerminalSize.useTerminalSize);
+const defaultProps = {
+    version: '1.0.0',
+    authDisplayType: AuthDisplayType.HOPCODE_OAUTH,
+    model: 'hopcoder-plus',
+    workingDirectory: '/home/user/projects/test',
+};
+describe('<Header />', () => {
+    const originalNoColor = process.env['NO_COLOR'];
+    beforeEach(() => {
+        delete process.env['NO_COLOR'];
+        useTerminalSizeMock.mockReturnValue({ columns: 120, rows: 24 });
+    });
+    afterEach(() => {
+        if (originalNoColor === undefined) {
+            delete process.env['NO_COLOR'];
+        }
+        else {
+            process.env['NO_COLOR'] = originalNoColor;
+        }
+    });
+    it('renders the ASCII logo on wide terminal', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        expect(lastFrame()).toContain('██╔═══██╗');
+    });
+    it('hides the ASCII logo on narrow terminal', () => {
+        useTerminalSizeMock.mockReturnValue({ columns: 60, rows: 24 });
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        expect(lastFrame()).not.toContain('██╔═══██╗');
+        expect(lastFrame()).toContain('>_ HopCode');
+    });
+    it('displays the version number', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        expect(lastFrame()).toContain('v1.0.0');
+    });
+    it('shows a non-semver fallback like "unknown" without a bogus "v" prefix', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, version: "unknown" }));
+        const frame = lastFrame() ?? '';
+        expect(frame).toContain('(unknown)');
+        expect(frame).not.toContain('vunknown');
+    });
+    it('displays auth type and model', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        expect(lastFrame()).toContain('HopCode OAuth');
+        expect(lastFrame()).toContain('hopcoder-plus');
+    });
+    it('displays Coding Plan auth type', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, authDisplayType: AuthDisplayType.CODING_PLAN }));
+        expect(lastFrame()).toContain('Coding Plan');
+    });
+    it('displays API Key auth type', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, authDisplayType: AuthDisplayType.API_KEY }));
+        expect(lastFrame()).toContain('API Key');
+    });
+    it('displays custom provider auth labels as-is', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, authDisplayType: "OpenRouter" }));
+        expect(lastFrame()).toContain('OpenRouter');
+        expect(lastFrame()).not.toContain('Unknown');
+    });
+    it('displays Unknown when auth type is not set', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, authDisplayType: undefined }));
+        expect(lastFrame()).toContain('Unknown');
+    });
+    it('displays working directory', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        expect(lastFrame()).toContain('/home/user/projects/test');
+    });
+    it('renders with border around info panel', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        expect(lastFrame()).toContain('┌');
+        expect(lastFrame()).toContain('┐');
+    });
+    it('renders plain text when NO_COLOR disables gradient colors', () => {
+        process.env['NO_COLOR'] = '1';
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        expect(lastFrame()).toContain('██╔═══██╗');
+    });
+    it('renders the custom subtitle in place of the blank spacer row', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, customBannerSubtitle: "Built-in DataWorks Official Skills" }));
+        const frame = lastFrame() ?? '';
+        expect(frame).toContain('Built-in DataWorks Official Skills');
+        // Subtitle sits between the title and the auth line.
+        const titleIdx = frame.indexOf('>_ HopCode');
+        const subtitleIdx = frame.indexOf('Built-in DataWorks Official Skills');
+        const authIdx = frame.indexOf('HopCode OAuth');
+        expect(titleIdx).toBeLessThan(subtitleIdx);
+        expect(subtitleIdx).toBeLessThan(authIdx);
+    });
+    it('keeps the blank spacer row when no subtitle is set (back-compat)', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        const frame = lastFrame() ?? '';
+        // Title and auth still both render at their usual positions; the
+        // spacer between them is just whitespace-padding, so we assert the
+        // visible chrome the user sees.
+        expect(frame).toContain('>_ HopCode');
+        expect(frame).toContain('HopCode OAuth');
+    });
+    it('renders the custom banner title in place of the default brand', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, customBannerTitle: "Acme CLI" }));
+        expect(lastFrame()).toContain('Acme CLI');
+        expect(lastFrame()).not.toContain('>_ HopCode');
+        // version suffix is still appended
+        expect(lastFrame()).toContain('v1.0.0');
+    });
+    it('renders the custom large tier when it fits', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, customAsciiArt: { small: 'SMALL', large: 'LARGE_LOGO' } }));
+        expect(lastFrame()).toContain('LARGE_LOGO');
+        expect(lastFrame()).not.toContain('██╔═══██╗');
+    });
+    it('falls back to the small tier when the large one does not fit', () => {
+        useTerminalSizeMock.mockReturnValue({ columns: 70, rows: 24 });
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, customAsciiArt: {
+                small: 'sm',
+                large: 'X'.repeat(60),
+            } }));
+        expect(lastFrame()).toContain('sm');
+        expect(lastFrame()).not.toContain('X'.repeat(60));
+    });
+    it('hides the logo column when neither custom tier fits — does NOT fall back to the default HopCode logo (preserves white-label intent)', () => {
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps, customAsciiArt: { small: 'X'.repeat(150), large: 'Y'.repeat(150) } }));
+        expect(lastFrame()).not.toContain('██╔═══██╗');
+        expect(lastFrame()).not.toContain('X'.repeat(150));
+        expect(lastFrame()).not.toContain('Y'.repeat(150));
+        // Info panel still renders.
+        expect(lastFrame()).toContain('HopCode OAuth');
+    });
+    it('falls back to the default HopCode logo when no custom art was provided at all', () => {
+        useTerminalSizeMock.mockReturnValue({ columns: 60, rows: 24 });
+        const { lastFrame } = render(_jsx(Header, { ...defaultProps }));
+        // With no customAsciiArt, narrow widths still hide the HopCode logo, but a
+        // wide enough terminal would show it — the previous test already covers
+        // the wide case. This one just confirms the no-custom-art path doesn't
+        // incidentally hide the logo.
+        expect(lastFrame()).toContain('>_ HopCode');
+    });
+});
+//# sourceMappingURL=Header.test.js.map

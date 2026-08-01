@@ -1,0 +1,48 @@
+/**
+ * @license
+ * Copyright 2025 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * Stage 1 HTTP→ACP bridge — backward-compat re-export shim.
+ *
+ * #4175 PR F1 lifted the bridge core (`BridgeClient`,
+ * `defaultSpawnChannelFactory`, `createAcpSessionBridge` factory closure,
+ * plus the supporting types/errors/options/status) to
+ * `@hoptrendy/acp-bridge`. This shim preserves every existing relative
+ * import path (`./acpSessionBridge.js`) so `server.ts`, `runHopCodeServe.ts`,
+ * `workspaceAgents.ts`, `workspaceMemory.ts`, `index.ts`, plus the
+ * bridge test suite, keep resolving without any call-site changes.
+ *
+ * The implementation now lives at:
+ *   - `@hoptrendy/acp-bridge/bridge` — `createAcpSessionBridge` factory
+ *   - `@hoptrendy/acp-bridge/bridgeClient` — `BridgeClient` class +
+ *     permission record types
+ *   - `@hoptrendy/acp-bridge/spawnChannel` — `defaultSpawnChannelFactory`
+ *   - `@hoptrendy/acp-bridge/bridgeOptions` — `BridgeOptions` +
+ *     `DaemonStatusProvider` interfaces
+ *   - `@hoptrendy/acp-bridge/bridgeTypes` — bridge session + heartbeat
+ *     types + `AcpSessionBridge` interface
+ *   - `@hoptrendy/acp-bridge/bridgeErrors` — typed bridge error classes
+ *   - `@hoptrendy/acp-bridge/workspacePaths` — `canonicalizeWorkspace`
+ *     + `MAX_WORKSPACE_PATH_LENGTH`
+ *   - `@hoptrendy/acp-bridge/status` — protocol-versioned status types
+ *     + idle envelope helpers
+ *   - `@hoptrendy/acp-bridge/channel` — `AcpChannel` + `ChannelFactory`
+ *
+ * The bridge is bound to a single canonical workspace
+ * (`BridgeOptions.boundWorkspace`); multi-workspace deployments use
+ * multiple daemon processes. See the module docstring on `bridge.ts`
+ * in the lifted package for the full Stage 1/Stage 2 contract.
+ */
+export { createAcpSessionBridge, createHttpAcpBridge, } from '@hoptrendy/acp-bridge/bridge';
+export { defaultSpawnChannelFactory } from '@hoptrendy/acp-bridge/spawnChannel';
+export { BridgeClient } from '@hoptrendy/acp-bridge/bridgeClient';
+export type { BridgeClientSessionEntry } from '@hoptrendy/acp-bridge/bridgeClient';
+export type { AcpChannel, AcpChannelExitInfo, ChannelFactory, } from '@hoptrendy/acp-bridge';
+export type { BridgeFreshSessionAdmission, BridgeFreshSessionAdmissionContext, BridgeFreshSessionReservation, BridgeSessionLifecycle, BridgeSessionLifecycleEvent, BridgeOptions, DaemonStatusProvider, } from '@hoptrendy/acp-bridge/bridgeOptions';
+export type { BridgeFileSystem } from '@hoptrendy/acp-bridge/bridgeFileSystem';
+export type { BridgeSpawnRequest, BridgeSession, BridgeRestoreSessionRequest, BridgeSessionState, BridgeRestoredSession, BridgeSessionTranscriptPage, BridgeSessionTranscriptPageRequest, BridgeGenerationModelSource, BridgeGenerationStreamEvent, BridgeSessionSummary, SessionMetadataUpdate, BridgeClientRequestContext, BridgeHeartbeatResult, BridgeHeartbeatState, BridgeWorkspaceMemoryRememberContextMode, BridgeWorkspaceMemoryRememberRequest, BridgeWorkspaceMemoryRememberResult, BridgeAutoMemoryTopic, BridgeWorkspaceMemoryForgetRequest, BridgeWorkspaceMemoryForgetMatch, BridgeWorkspaceMemoryForgetResult, BridgeWorkspaceMemoryDreamResult, BridgeDaemonStatusLimits, BridgeDaemonSessionDiagnostic, BridgeDaemonStatusSnapshot, BridgeShutdownOptions, AcpSessionBridge, HttpAcpBridge, } from '@hoptrendy/acp-bridge/bridgeTypes';
+export { BranchWhilePromptActiveError, CdWhilePromptActiveError, SessionNotFoundError, RestoreInProgressError, SessionArchivedError, SessionNotArchivedError, SessionConflictError, SessionArchivingError, InvalidSessionScopeError, SessionLimitExceededError, PromptQueueFullError, WorkspaceMismatchError, InvalidClientIdError, InvalidPermissionOptionError, InvalidSessionMetadataError, WorkspaceInitConflictError, WorkspaceInitPathEscapeError, WorkspaceInitSymlinkError, WorkspaceInitRaceError, McpServerNotFoundError, McpServerRestartFailedError, SessionBusyError, WorkspaceDrainingError, InvalidRewindTargetError, TotalSessionLimitExceededError, NOT_CURRENTLY_GENERATING_CANCEL_MESSAGE, CancelSentinelCollisionError, PermissionForbiddenError, PermissionPolicyNotImplementedError, SessionShellClientRequiredError, SessionShellDisabledError, } from '@hoptrendy/acp-bridge/bridgeErrors';
+export { MAX_WORKSPACE_PATH_LENGTH, canonicalizeWorkspace, } from '@hoptrendy/acp-bridge/workspacePaths';
+export { SessionArtifactAuthorizationError, SessionArtifactValidationError, } from '@hoptrendy/acp-bridge/sessionArtifacts';

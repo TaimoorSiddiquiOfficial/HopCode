@@ -267,13 +267,13 @@ describe('qwen serve multi-workspace channel workers', () => {
     });
     const env = {
       ...process.env,
-      QWEN_HOME: qwenHome,
-      QWEN_RUNTIME_DIR: runtimeDir,
-      QWEN_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
+      HOPCODE_HOME: qwenHome,
+      HOPCODE_RUNTIME_DIR: runtimeDir,
+      HOPCODE_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
       OPENAI_API_KEY: 'fake-key',
       OPENAI_BASE_URL: 'http://127.0.0.1:9/v1',
       OPENAI_MODEL: 'fake-model',
-      QWEN_MODEL: 'fake-model',
+      HOPCODE_MODEL: 'fake-model',
     };
     const spawnDaemon = () =>
       spawn(
@@ -430,13 +430,13 @@ describe('qwen serve multi-workspace channel workers', () => {
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
           ...process.env,
-          QWEN_HOME: qwenHome,
-          QWEN_RUNTIME_DIR: runtimeDir,
-          QWEN_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
+          HOPCODE_HOME: qwenHome,
+          HOPCODE_RUNTIME_DIR: runtimeDir,
+          HOPCODE_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
           OPENAI_API_KEY: 'fake-key',
           OPENAI_BASE_URL: 'http://127.0.0.1:9/v1',
           OPENAI_MODEL: 'fake-model',
-          QWEN_MODEL: 'fake-model',
+          HOPCODE_MODEL: 'fake-model',
         },
       },
     );
@@ -558,13 +558,13 @@ describe('qwen serve multi-workspace channel workers', () => {
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
           ...process.env,
-          QWEN_HOME: qwenHome,
-          QWEN_RUNTIME_DIR: runtimeDir,
-          QWEN_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
+          HOPCODE_HOME: qwenHome,
+          HOPCODE_RUNTIME_DIR: runtimeDir,
+          HOPCODE_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
           OPENAI_API_KEY: 'fake-key',
           OPENAI_BASE_URL: 'http://127.0.0.1:9/v1',
           OPENAI_MODEL: 'fake-model',
-          QWEN_MODEL: 'fake-model',
+          HOPCODE_MODEL: 'fake-model',
         },
       },
     );
@@ -693,13 +693,13 @@ describe('qwen serve multi-workspace channel workers', () => {
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
           ...process.env,
-          QWEN_HOME: qwenHome,
-          QWEN_RUNTIME_DIR: runtimeDir,
-          QWEN_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
+          HOPCODE_HOME: qwenHome,
+          HOPCODE_RUNTIME_DIR: runtimeDir,
+          HOPCODE_CODE_TRUSTED_FOLDERS_PATH: trustedFoldersPath,
           OPENAI_API_KEY: 'fake-key',
           OPENAI_BASE_URL: 'http://127.0.0.1:9/v1',
           OPENAI_MODEL: 'fake-model',
-          QWEN_MODEL: 'fake-model',
+          HOPCODE_MODEL: 'fake-model',
         },
       },
     );

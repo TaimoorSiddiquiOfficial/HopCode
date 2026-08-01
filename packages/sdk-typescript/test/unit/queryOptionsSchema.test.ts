@@ -46,7 +46,7 @@ describe('QueryOptionsSchema', () => {
     '-m',
     '--auth-type',
     '--approval-mode',
-    '--yolo',
+    '--izn',
     '-y',
     '--insecure',
     '--allowed-tools',
@@ -169,7 +169,7 @@ describe('QueryOptionsSchema', () => {
   it.each([
     '--model=qwen-max',
     '--auth-type=openai',
-    '--approval-mode=yolo',
+    '--approval-mode=izn',
     '--insecure=true',
     '--proxy=http://localhost:8080',
   ])('rejects extraArgs with --flag=value syntax: %s', (flag) => {
@@ -181,7 +181,7 @@ describe('QueryOptionsSchema', () => {
   });
 
   it.each([
-    '--yolo',
+    '--izn',
     '-y',
     '--openai-base-url',
     '--openai-api-key',

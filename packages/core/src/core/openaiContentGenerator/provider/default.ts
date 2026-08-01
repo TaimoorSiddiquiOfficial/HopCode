@@ -139,7 +139,7 @@ export class DefaultOpenAICompatibleProvider
    *    - For unknown models (deployment aliases, self-hosted): respect user's
    *      configured value entirely (backend may support larger limits)
    * 2. If user didn't configure max_tokens:
-   *    - Check QWEN_CODE_MAX_OUTPUT_TOKENS env var first
+   *    - Check HOPCODE_CODE_MAX_OUTPUT_TOKENS env var first
    *    - Otherwise use the model's output limit, clipped to
    *      OUTPUT_TOKEN_CEILING (64K)
    * 3. If model has no specific limit (tokenLimit returns default):

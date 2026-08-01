@@ -155,7 +155,7 @@ describe('serve rate limit env parsing', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env = { ...originalEnv, HOPCODE_CODE_SUPPRESS_YOLO_WARNING: '1' };
+    process.env = { ...originalEnv, HOPCODE_CODE_SUPPRESS_IZN_WARNING: '1' };
   });
 
   afterEach(() => {
@@ -414,7 +414,7 @@ describe('serve startup import boundary', () => {
     const childEnv: NodeJS.ProcessEnv = {
       ...process.env,
       HOPCODE_CODE_NO_RELAUNCH: '1',
-      HOPCODE_CODE_SUPPRESS_YOLO_WARNING: '1',
+      HOPCODE_CODE_SUPPRESS_IZN_WARNING: '1',
       HOPCODE_HOME: hopcodeHome,
       HOPCODE_RUNTIME_DIR: workspace,
       HOPCODE_SERVE_RATE_LIMIT: '0',

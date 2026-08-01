@@ -471,7 +471,7 @@ export const serveCommand: CommandModule<unknown, ServeArgs> = {
     // sessions will load. Per-session override (the ACP client flipping
     // approval mode mid-session) is out of scope here; this warns about
     // a deployment that's wide-open at boot. Suppress with
-    // QWEN_CODE_SUPPRESS_YOLO_WARNING=1.
+    // HOPCODE_CODE_SUPPRESS_IZN_WARNING=1.
     try {
       const loaded = loadSettings(
         primaryWorkspaceArg(argv.workspace) ?? process.cwd(),

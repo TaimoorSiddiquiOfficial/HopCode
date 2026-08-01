@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -183,21 +183,21 @@ describe('usage-stats route (real loader against seeded history)', () => {
 
   beforeEach(() => {
     tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-usage-route-'));
-    originalQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = path.join(tmpHome, '.qwen');
-    fs.mkdirSync(process.env['QWEN_HOME'], { recursive: true });
+    originalQwenHome = process.env['HOPCODE_HOME'];
+    process.env['HOPCODE_HOME'] = path.join(tmpHome, '.qwen');
+    fs.mkdirSync(process.env['HOPCODE_HOME'], { recursive: true });
   });
 
   afterEach(() => {
-    if (originalQwenHome === undefined) delete process.env['QWEN_HOME'];
-    else process.env['QWEN_HOME'] = originalQwenHome;
+    if (originalQwenHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = originalQwenHome;
     fs.rmSync(tmpHome, { recursive: true, force: true });
   });
 
   it('returns real aggregated totals from usage_record.jsonl', async () => {
     const now = Date.now();
     fs.writeFileSync(
-      path.join(process.env['QWEN_HOME']!, 'usage_record.jsonl'),
+      path.join(process.env['HOPCODE_HOME']!, 'usage_record.jsonl'),
       JSON.stringify(
         rec({
           sessionId: 's1',

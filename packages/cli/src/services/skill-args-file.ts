@@ -51,7 +51,7 @@ function safe(s: string): string {
  * The current session id.
  *
  * Prefers the async-local `sessionIdContext` over the process-global
- * `QWEN_CODE_SESSION_ID`, and in that order for a reason: in daemon mode a single
+ * `HOPCODE_CODE_SESSION_ID`, and in that order for a reason: in daemon mode a single
  * process serves many sessions, the env var holds whichever `Config` booted
  * first, and each turn binds its own session through `sessionIdContext.run(...)`.
  * Reading only the env would make a later session write under the first
@@ -65,7 +65,7 @@ function safe(s: string): string {
 export function currentSessionId(): string {
   return (
     sessionIdContext.getStore()?.trim() ||
-    process.env['QWEN_CODE_SESSION_ID']?.trim() ||
+    process.env['HOPCODE_CODE_SESSION_ID']?.trim() ||
     ''
   );
 }

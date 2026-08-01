@@ -1016,7 +1016,7 @@ describe('DingtalkChannel parsed-message logging', () => {
         senderStaffId: 'staff-1',
         senderId: 'sender-1',
         isInAtList: true,
-        text: { content: '@qwen-code hello' },
+        text: { content: '@hopcode hello' },
       }),
       headers: { messageId: 'group-name-m1' },
     } as unknown as DWClientDownStream;
@@ -1035,8 +1035,8 @@ describe('DingtalkChannel parsed-message logging', () => {
   });
 
   it('logs debug payloads when enabled for the channel', () => {
-    const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-    process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = 'test-dingtalk';
+    const oldDebugPayload = process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
+    process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = 'test-dingtalk';
     const channel = createChannel();
     const downstream = {
       data: JSON.stringify({
@@ -1049,7 +1049,7 @@ describe('DingtalkChannel parsed-message logging', () => {
         senderStaffId: 'staff-1',
         senderId: 'sender-1',
         isInAtList: true,
-        text: { content: '@qwen-code hello' },
+        text: { content: '@hopcode hello' },
       }),
       headers: { messageId: 'debug-m1' },
     } as unknown as DWClientDownStream;
@@ -1065,9 +1065,9 @@ describe('DingtalkChannel parsed-message logging', () => {
       logged = writeSpy.mock.calls.map((c) => String(c[0])).join('');
     } finally {
       if (oldDebugPayload === undefined) {
-        delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+        delete process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
       } else {
-        process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+        process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
       }
       writeSpy.mockRestore();
     }
@@ -1091,7 +1091,7 @@ describe('DingtalkChannel parsed-message logging', () => {
         senderStaffId: 'staff-1',
         senderId: 'sender-1',
         isInAtList: true,
-        text: { content: '@qwen-code hello' },
+        text: { content: '@hopcode hello' },
       }),
       headers: { messageId: 'm1' },
     } as unknown as DWClientDownStream;
@@ -1323,7 +1323,7 @@ describe('DingtalkChannel sender attribution', () => {
         senderStaffId: 'staff-1',
         senderId: 'sender-1',
         isInAtList: true,
-        text: { content: '@qwen-code hello' },
+        text: { content: '@hopcode hello' },
       }),
       headers: { messageId: 'm1' },
     } as unknown as DWClientDownStream;
@@ -1363,7 +1363,7 @@ describe('DingtalkChannel sender attribution', () => {
         senderStaffId: 'staff-1',
         senderId: 'sender-1',
         isInAtList: true,
-        text: { content: '@qwen-code 查看记忆\u200b' },
+        text: { content: '@hopcode 查看记忆\u200b' },
       }),
       headers: { messageId: 'm1' },
     } as unknown as DWClientDownStream;
@@ -1404,7 +1404,7 @@ describe('DingtalkChannel sender attribution', () => {
         senderStaffId: 'staff-1',
         senderId: 'sender-1',
         isInAtList: true,
-        text: { content: '@qwen-code\u200b查看记忆' },
+        text: { content: '@hopcode\u200b查看记忆' },
       }),
       headers: { messageId: 'm1' },
     } as unknown as DWClientDownStream;
@@ -1445,7 +1445,7 @@ describe('DingtalkChannel sender attribution', () => {
         senderStaffId: ['staff-1'],
         senderId: 123,
         isInAtList: true,
-        text: { content: '@qwen-code hello' },
+        text: { content: '@hopcode hello' },
       }),
       headers: { messageId: 'header-m1' },
     } as unknown as DWClientDownStream;
@@ -1594,7 +1594,7 @@ describe('DingtalkChannel reply mentions', () => {
   });
 
   it('logs the redacted mention delivery result when diagnostics are enabled', async () => {
-    vi.stubEnv('QWEN_CHANNEL_DEBUG_MENTIONS', '1');
+    vi.stubEnv('HOPCODE_CHANNEL_DEBUG_MENTIONS', '1');
     const channel = createChannel({ atSender: true });
     seedWebhook(channel, 'cid123');
     seedMentionTarget(channel, 'm1', 'staff-1');

@@ -1,0 +1,31 @@
+src/serve/acp-http/transport.test.ts(52,3): error TS6133: 'MAX_READ_BYTES' is declared but its value is never read.
+src/serve/acp-http/transport.test.ts(783,18): error TS2304: Cannot find name 'AcpHttpHandle'.
+src/serve/acp-http/transport.test.ts(804,5): error TS2304: Cannot find name 'mountWorkspaceMemoryRememberRoutes'.
+src/serve/acp-http/transport.test.ts(807,22): error TS7006: Parameter '_req' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(807,28): error TS7006: Parameter '_res' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(807,34): error TS7006: Parameter 'next' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(808,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(808,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(821,18): error TS7006: Parameter 'req' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(945,33): error TS2554: Expected 2-3 arguments, but got 1.
+src/serve/acp-http/transport.test.ts(948,5): error TS2322: Type 'void' is not assignable to type 'string | undefined'.
+src/serve/acp-http/transport.test.ts(950,23): error TS2345: Argument of type 'void' is not assignable to parameter of type 'string'.
+src/serve/acp-http/transport.test.ts(957,19): error TS2345: Argument of type 'void' is not assignable to parameter of type 'PathLike'.
+src/serve/acp-http/transport.test.ts(973,32): error TS2353: Object literal may only specify known properties, and 'recursive' does not exist in type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(1022,7): error TS2345: Argument of type 'string' is not assignable to parameter of type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(3444,35): error TS2554: Expected 2-3 arguments, but got 1.
+src/serve/acp-http/transport.test.ts(3447,7): error TS2322: Type 'void' is not assignable to type 'string | undefined'.
+src/serve/acp-http/transport.test.ts(3455,36): error TS2353: Object literal may only specify known properties, and 'recursive' does not exist in type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(3467,11): error TS2345: Argument of type 'string' is not assignable to parameter of type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(3494,21): error TS2345: Argument of type 'void' is not assignable to parameter of type 'PathLike'.
+src/serve/acp-http/transport.test.ts(4845,30): error TS2554: Expected 2-3 arguments, but got 1.
+src/serve/acp-http/transport.test.ts(4846,33): error TS2345: Argument of type 'void' is not assignable to parameter of type 'string'.
+src/serve/acp-http/transport.test.ts(4847,28): error TS2345: Argument of type 'void' is not assignable to parameter of type 'string'.
+src/serve/acp-http/transport.test.ts(4853,35): error TS2353: Object literal may only specify known properties, and 'recursive' does not exist in type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(4854,13): error TS2304: Cannot find name 'writeJson'.
+src/serve/acp-http/transport.test.ts(4888,19): error TS2345: Argument of type 'void' is not assignable to parameter of type 'PathLike'.
+src/serve/acp-http/transport.test.ts(4896,13): error TS2304: Cannot find name 'WorkspacePermissionRulesSessionRequiredError'.
+src/serve/acp-http/transport.test.ts(5022,13): error TS2304: Cannot find name 'WorkspaceSettingsPartialPersistError'.
+src/serve/acp-http/transport.test.ts(5076,40): error TS2304: Cannot find name 'MAX_VOICE_MODEL_LENGTH'.
+src/serve/acp-http/transport.test.ts(5086,48): error TS2304: Cannot find name 'MAX_VOICE_MODEL_LENGTH'.
+src/serve/acp-http/transport.test.ts(7476,38): error TS2304: Cannot find name 'CdpTunnelRegistry'.

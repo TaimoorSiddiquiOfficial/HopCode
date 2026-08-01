@@ -11,7 +11,7 @@ if (!Element.prototype.scrollIntoView) {
 }
 
 vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
-  DAEMON_APPROVAL_MODES: ['plan', 'default', 'yolo'],
+  DAEMON_APPROVAL_MODES: ['plan', 'default', 'izn'],
 }));
 
 const { ApprovalModeDialog } = await import('./ApprovalModeDialog');
@@ -64,7 +64,7 @@ describe('ApprovalModeDialog', () => {
     press('ArrowDown');
     expect(activeDescendant()).toBe('mode-opt-2');
     press('Enter');
-    expect(onSelect).toHaveBeenCalledWith('yolo');
+    expect(onSelect).toHaveBeenCalledWith('izn');
   });
 
   it('binds aria-selected to the current mode, not the roving highlight', () => {
@@ -86,7 +86,7 @@ describe('ApprovalModeDialog', () => {
 
     // Another client sharing the session flips approval mode while the dialog
     // is open: the highlight (and Enter's target) must follow.
-    rerender(<ApprovalModeDialog currentMode="yolo" onSelect={vi.fn()} />);
+    rerender(<ApprovalModeDialog currentMode="izn" onSelect={vi.fn()} />);
     expect(activeDescendant()).toBe('mode-opt-2');
   });
 
@@ -97,7 +97,7 @@ describe('ApprovalModeDialog', () => {
     expect(activeDescendant()).toBe('mode-opt-1');
 
     // The user owns the highlight now — a mode change must not steal it.
-    rerender(<ApprovalModeDialog currentMode="yolo" onSelect={vi.fn()} />);
+    rerender(<ApprovalModeDialog currentMode="izn" onSelect={vi.fn()} />);
     expect(activeDescendant()).toBe('mode-opt-1');
   });
 });

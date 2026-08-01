@@ -454,7 +454,7 @@ export class DingtalkChannel extends ChannelBase {
         }),
       });
 
-      if (isMention && process.env['QWEN_CHANNEL_DEBUG_MENTIONS'] === '1') {
+      if (isMention && process.env['HOPCODE_CHANNEL_DEBUG_MENTIONS'] === '1') {
         const payload = (await resp
           .clone()
           .json()

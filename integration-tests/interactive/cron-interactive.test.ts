@@ -27,14 +27,14 @@ function makeEnv(): NodeJS.ProcessEnv {
   return {
     ...env,
     FORCE_COLOR: '1',
-    QWEN_CODE_LANG: 'en',
+    HOPCODE_CODE_LANG: 'en',
     TERM: 'xterm-256color',
     NODE_NO_WARNINGS: '1',
     // Enable the CronScheduler test seam: newly created session-only
     // jobs auto-fire after 5s instead of waiting for the wall-clock
     // minute boundary. Removes the timing-flakiness from these tests
     // (see #6982).
-    QWEN_CODE_TEST_CRON_FAST: '1',
+    HOPCODE_CODE_TEST_CRON_FAST: '1',
   };
 }
 

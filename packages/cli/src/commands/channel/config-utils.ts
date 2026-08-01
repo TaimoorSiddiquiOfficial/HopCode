@@ -13,7 +13,7 @@ const CHANNEL_APPROVAL_MODES = new Set([
   'default',
   'auto-edit',
   'auto',
-  'yolo',
+  'izn',
 ]);
 
 export { findCliEntryPath } from './cli-entry-path.js';

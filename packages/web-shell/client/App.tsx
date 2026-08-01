@@ -2542,7 +2542,7 @@ export function App({
     // over it so it's visible and actionable instead of trapped behind a
     // backdrop — the panel itself and any DialogShell sub-dialog opened from it
     // (model picker, approval-mode picker). Leaving the approval-mode picker up
-    // is also a security hole: the user could pick "yolo" and silently
+    // is also a security hole: the user could pick "izn" and silently
     // auto-approve a tool call they never saw (handleSetMode auto-approves
     // pendingApprovalRef.current).
     if (activePanel) setActivePanel(null);

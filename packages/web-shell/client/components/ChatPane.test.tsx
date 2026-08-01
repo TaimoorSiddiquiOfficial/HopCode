@@ -54,7 +54,7 @@ let queuedPromptsMock: any[] = [];
 let queuedTextsMock: string[] = [];
 
 vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
-  DAEMON_APPROVAL_MODES: ['default', 'plan', 'auto-edit', 'auto', 'yolo'],
+  DAEMON_APPROVAL_MODES: ['default', 'plan', 'auto-edit', 'auto', 'izn'],
   useActions: () => daemonActions,
   useConnection: () => connectionState,
   useDaemonFollowupSuggestion: (options: any) => {
@@ -146,7 +146,7 @@ vi.mock('./ChatEditor', () => ({
         </button>
         <button
           data-testid="pane-pick-mode"
-          onClick={() => props.onSelectMode?.('yolo')}
+          onClick={() => props.onSelectMode?.('izn')}
         >
           mode
         </button>
@@ -747,7 +747,7 @@ describe('ChatPane', () => {
         new MouseEvent('click', { bubbles: true }),
       ),
     );
-    expect(setApprovalMode).toHaveBeenCalledWith('yolo');
+    expect(setApprovalMode).toHaveBeenCalledWith('izn');
   });
 
   it("switches THIS pane's model when one is picked", () => {
@@ -814,9 +814,9 @@ describe('ChatPane', () => {
     expect(onError).toHaveBeenCalled();
   });
 
-  it('auto-approves a pending tool call when the pane switches to yolo', async () => {
+  it('auto-approves a pending tool call when the pane switches to izn', async () => {
     pendingPermission = {
-      id: 'perm-yolo',
+      id: 'perm-izn',
       toolName: 'write_file',
       toolKind: 'edit',
       options: [{ id: 'allow-1', label: 'Allow once', kind: 'allow_once' }],
@@ -830,7 +830,7 @@ describe('ChatPane', () => {
       await Promise.resolve();
       await Promise.resolve();
     });
-    expect(setApprovalMode).toHaveBeenCalledWith('yolo');
-    expect(submitPermission).toHaveBeenCalledWith('perm-yolo', 'allow-1');
+    expect(setApprovalMode).toHaveBeenCalledWith('izn');
+    expect(submitPermission).toHaveBeenCalledWith('perm-izn', 'allow-1');
   });
 });

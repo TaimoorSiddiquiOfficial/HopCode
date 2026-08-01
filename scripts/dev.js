@@ -120,7 +120,7 @@ const env = {
   // one level up, and silent. Each entry stamps itself; nested sessions each
   // call their own build. This one line also covers `npm run dev:daemon`, which
   // launches serve through this file.
-  QWEN_CODE_CLI: fileURLToPath(import.meta.url),
+  HOPCODE_CODE_CLI: fileURLToPath(import.meta.url),
 };
 
 // On Windows, use tsx.cmd; on Unix, use tsx directly
@@ -166,7 +166,7 @@ child.on('close', (code, signal) => {
     // Ignore cleanup errors
   }
   // A signal-killed child reports `code === null`, and `code ?? 0` read that as
-  // success. This launcher is a QWEN_CODE_CLI entry now: a review gate command
+  // success. This launcher is a HOPCODE_CODE_CLI entry now: a review gate command
   // OOM-killed mid-run must not come back green. Re-raise the signal the way
   // cli-entry.js does, so the caller sees the same death; fall back to a
   // non-zero exit if the signal cannot be re-raised.

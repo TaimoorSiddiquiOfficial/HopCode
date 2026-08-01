@@ -1,7 +1,7 @@
 {
   "name": "@hoptrendy/chrome-bridge",
   "version": "0.30.7",
-  "description": "Chrome extension bridge for Qwen CLI - enables AI-powered browser interactions",
+  "description": "Chrome extension bridge for HopCode CLI - enables AI-powered browser interactions",
   "private": true,
   "repository": {
     "type": "git",

@@ -50,14 +50,14 @@ describe('createAndAttachSessionForPrompt', () => {
     await prepareSession({
       sessionActions: actions,
       modelId: 'qwen3',
-      modeId: 'yolo',
+      modeId: 'izn',
       workspaceCwd: '/ws/secondary',
     });
 
     // Approval mode rides along with creation — no follow-up round-trip.
     expect(actions.createSession).toHaveBeenCalledWith({
       workspaceCwd: '/ws/secondary',
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
       sourceType: 'default',
     });
     // Model is still a post-create call, sequenced after attach.
@@ -130,7 +130,7 @@ describe('createAndAttachSessionForPrompt', () => {
       prepareSession({
         sessionActions: actions,
         modelId: 'qwen3',
-        modeId: 'yolo',
+        modeId: 'izn',
         warn,
       }),
     ).resolves.toBeUndefined();
@@ -158,13 +158,13 @@ describe('createAndAttachSessionForPrompt', () => {
       prepareSession({
         sessionActions: actions,
         modelId: 'qwen3',
-        modeId: 'yolo',
+        modeId: 'izn',
       }),
     ).rejects.toThrow(error);
 
     expect(actions.createSession).toHaveBeenCalledWith({
       workspaceCwd: undefined,
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
       sourceType: 'default',
     });
     expect(actions.attachSession).not.toHaveBeenCalled();
@@ -194,7 +194,7 @@ describe('createAndAttachSessionForPrompt', () => {
       prepareSession({
         sessionActions: actions,
         modelId: 'qwen3',
-        modeId: 'yolo',
+        modeId: 'izn',
         warn,
       }),
     ).rejects.toThrow(error);

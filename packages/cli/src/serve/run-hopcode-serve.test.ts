@@ -54,21 +54,21 @@ import {
 } from './workspace-registration-store.js';
 import { getDeferredRuntimeRequestTiming } from './server/request-helpers.js';
 
-const originalTestRuntimeDir = process.env['QWEN_RUNTIME_DIR'];
+const originalTestRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
 const isolatedTestRuntimeDir = fs.realpathSync(
   fs.mkdtempSync(path.join(os.tmpdir(), 'qws-run-serve-tests-')),
 );
-process.env['QWEN_RUNTIME_DIR'] = isolatedTestRuntimeDir;
+process.env['HOPCODE_RUNTIME_DIR'] = isolatedTestRuntimeDir;
 
 afterEach(() => {
-  process.env['QWEN_RUNTIME_DIR'] = isolatedTestRuntimeDir;
+  process.env['HOPCODE_RUNTIME_DIR'] = isolatedTestRuntimeDir;
 });
 
 afterAll(() => {
   if (originalTestRuntimeDir === undefined) {
-    delete process.env['QWEN_RUNTIME_DIR'];
+    delete process.env['HOPCODE_RUNTIME_DIR'];
   } else {
-    process.env['QWEN_RUNTIME_DIR'] = originalTestRuntimeDir;
+    process.env['HOPCODE_RUNTIME_DIR'] = originalTestRuntimeDir;
   }
   fs.rmSync(isolatedTestRuntimeDir, { recursive: true, force: true });
 });
@@ -150,8 +150,8 @@ describe('workspace skill settings persistence', () => {
     await handle?.close();
     if (workspace) fs.rmSync(workspace, { recursive: true, force: true });
     if (qwenHome) fs.rmSync(qwenHome, { recursive: true, force: true });
-    if (previousQwenHome === undefined) delete process.env['QWEN_HOME'];
-    else process.env['QWEN_HOME'] = previousQwenHome;
+    if (previousQwenHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = previousQwenHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     vi.restoreAllMocks();
   });
@@ -163,8 +163,8 @@ describe('workspace skill settings persistence', () => {
     qwenHome = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-skill-home-')),
     );
-    previousQwenHome = process.env['QWEN_HOME'];
-    process.env['QWEN_HOME'] = qwenHome;
+    previousQwenHome = process.env['HOPCODE_HOME'];
+    process.env['HOPCODE_HOME'] = qwenHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     fs.mkdirSync(path.join(workspace, '.qwen'), { recursive: true });
     fs.writeFileSync(
@@ -1237,8 +1237,8 @@ describe('runHopCodeServe permissionResponseTimeoutMs validation', () => {
       shutdown: vi.fn().mockResolvedValue(undefined),
       killAllSync: vi.fn(),
     } as unknown as HttpAcpBridge;
-    const origEnv = process.env['QWEN_RUNTIME_DIR'];
-    process.env['QWEN_RUNTIME_DIR'] = tmpDir;
+    const origEnv = process.env['HOPCODE_RUNTIME_DIR'];
+    process.env['HOPCODE_RUNTIME_DIR'] = tmpDir;
     const stderr = vi
       .spyOn(process.stderr, 'write')
       .mockImplementation((chunk) => {
@@ -1264,9 +1264,9 @@ describe('runHopCodeServe permissionResponseTimeoutMs validation', () => {
       ).rejects.toThrow(/permissionResponseTimeoutMs/);
     } finally {
       stderr.mockRestore();
-      delete process.env['QWEN_RUNTIME_DIR'];
+      delete process.env['HOPCODE_RUNTIME_DIR'];
       if (origEnv !== undefined) {
-        process.env['QWEN_RUNTIME_DIR'] = origEnv;
+        process.env['HOPCODE_RUNTIME_DIR'] = origEnv;
       }
     }
 
@@ -2417,8 +2417,8 @@ describe('runHopCodeServe runtime startup failures', () => {
       canonicalizeWorkspace(root),
     );
     const originalIdeWorkspacePath =
-      process.env['QWEN_CODE_IDE_WORKSPACE_PATH'];
-    process.env['QWEN_CODE_IDE_WORKSPACE_PATH'] = JSON.stringify(roots);
+      process.env['HOPCODE_CODE_IDE_WORKSPACE_PATH'];
+    process.env['HOPCODE_CODE_IDE_WORKSPACE_PATH'] = JSON.stringify(roots);
     const bridgeFsBoundWorkspaces: string[][] = [];
     vi.spyOn(qwenCore, 'resolveTelemetrySettings').mockResolvedValue({
       enabled: false,
@@ -2468,9 +2468,9 @@ describe('runHopCodeServe runtime startup failures', () => {
       expect(bridgeFsBoundWorkspaces[0]).toEqual([roots[0], roots[2]]);
     } finally {
       if (originalIdeWorkspacePath === undefined) {
-        delete process.env['QWEN_CODE_IDE_WORKSPACE_PATH'];
+        delete process.env['HOPCODE_CODE_IDE_WORKSPACE_PATH'];
       } else {
-        process.env['QWEN_CODE_IDE_WORKSPACE_PATH'] = originalIdeWorkspacePath;
+        process.env['HOPCODE_CODE_IDE_WORKSPACE_PATH'] = originalIdeWorkspacePath;
       }
       await handle.close();
     }
@@ -3155,12 +3155,12 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-webhook-start-')),
     );
-    const previousQwenHome = process.env['QWEN_HOME'];
+    const previousQwenHome = process.env['HOPCODE_HOME'];
     const previousWebhookSecret = process.env['QWEN_DEFERRED_WEBHOOK_SECRET'];
     const tempHome = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qws-runtime-webhook-home-'),
     );
-    process.env['QWEN_HOME'] = tempHome;
+    process.env['HOPCODE_HOME'] = tempHome;
     process.env['QWEN_DEFERRED_WEBHOOK_SECRET'] = 'global-secret';
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     fs.writeFileSync(
@@ -3283,9 +3283,9 @@ describe('runHopCodeServe runtime startup failures', () => {
       await handle.close();
       fs.rmSync(tempHome, { recursive: true, force: true });
       if (previousQwenHome === undefined) {
-        delete process.env['QWEN_HOME'];
+        delete process.env['HOPCODE_HOME'];
       } else {
-        process.env['QWEN_HOME'] = previousQwenHome;
+        process.env['HOPCODE_HOME'] = previousQwenHome;
       }
       if (previousWebhookSecret === undefined) {
         delete process.env['QWEN_DEFERRED_WEBHOOK_SECRET'];
@@ -3301,11 +3301,11 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-webhook-auth-')),
     );
     const logBaseDir = path.join(tmpDir, 'debug');
-    const previousQwenHome = process.env['QWEN_HOME'];
+    const previousQwenHome = process.env['HOPCODE_HOME'];
     const tempHome = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qws-runtime-webhook-home-'),
     );
-    process.env['QWEN_HOME'] = tempHome;
+    process.env['HOPCODE_HOME'] = tempHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     const stderrWrites: string[] = [];
     vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
@@ -3405,9 +3405,9 @@ describe('runHopCodeServe runtime startup failures', () => {
       }
       fs.rmSync(tempHome, { recursive: true, force: true });
       if (previousQwenHome === undefined) {
-        delete process.env['QWEN_HOME'];
+        delete process.env['HOPCODE_HOME'];
       } else {
-        process.env['QWEN_HOME'] = previousQwenHome;
+        process.env['HOPCODE_HOME'] = previousQwenHome;
       }
       settingsRuntime.resetHomeEnvBootstrapForTesting();
     }
@@ -3417,7 +3417,7 @@ describe('runHopCodeServe runtime startup failures', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-webhook-log-')),
     );
-    const previousQwenHome = process.env['QWEN_HOME'];
+    const previousQwenHome = process.env['HOPCODE_HOME'];
     const previousSecret = process.env['QWEN_MISSING_WEBHOOK_SECRET'];
     const tempHome = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qws-runtime-webhook-home-'),
@@ -3428,7 +3428,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       return true;
     });
     delete process.env['QWEN_MISSING_WEBHOOK_SECRET'];
-    process.env['QWEN_HOME'] = tempHome;
+    process.env['HOPCODE_HOME'] = tempHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     fs.writeFileSync(
       path.join(tempHome, 'settings.json'),
@@ -3516,9 +3516,9 @@ describe('runHopCodeServe runtime startup failures', () => {
         process.env['QWEN_MISSING_WEBHOOK_SECRET'] = previousSecret;
       }
       if (previousQwenHome === undefined) {
-        delete process.env['QWEN_HOME'];
+        delete process.env['HOPCODE_HOME'];
       } else {
-        process.env['QWEN_HOME'] = previousQwenHome;
+        process.env['HOPCODE_HOME'] = previousQwenHome;
       }
       settingsRuntime.resetHomeEnvBootstrapForTesting();
     }
@@ -6768,8 +6768,8 @@ describe('runHopCodeServe channel worker supervisor', () => {
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-worker-log-')),
     );
-    const originalRuntimeDir = process.env['QWEN_RUNTIME_DIR'];
-    process.env['QWEN_RUNTIME_DIR'] = tmpDir;
+    const originalRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
+    process.env['HOPCODE_RUNTIME_DIR'] = tmpDir;
     const worker = makeWorker({
       enabled: true,
       state: 'running',
@@ -6834,9 +6834,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
       expect(logContent).not.toContain('secret-token');
     } finally {
       if (originalRuntimeDir === undefined) {
-        delete process.env['QWEN_RUNTIME_DIR'];
+        delete process.env['HOPCODE_RUNTIME_DIR'];
       } else {
-        process.env['QWEN_RUNTIME_DIR'] = originalRuntimeDir;
+        process.env['HOPCODE_RUNTIME_DIR'] = originalRuntimeDir;
       }
     }
   });

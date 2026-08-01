@@ -593,7 +593,7 @@ describe('useGeminiStream', () => {
     });
 
     it('clamps oversized agent-capable image routes before applying a full-turn override', async () => {
-      vi.stubEnv('QWEN_CODE_MAX_INLINE_MEDIA_BYTES', '1');
+      vi.stubEnv('HOPCODE_CODE_MAX_INLINE_MEDIA_BYTES', '1');
       enableBridge();
       mockConfig.getDefaultVisionBridgeModel = vi.fn(() => ({
         id: 'vision-agent',
@@ -6884,7 +6884,7 @@ describe('useGeminiStream', () => {
       const { result } = renderTestHook(awaitingApprovalToolCalls);
 
       await act(async () => {
-        await result.current.handleApprovalModeChange(ApprovalMode.YOLO);
+        await result.current.handleApprovalModeChange(ApprovalMode.IZN);
       });
 
       expect(mockOnConfirm).not.toHaveBeenCalled();

@@ -1,0 +1,250 @@
+/**
+ * @license
+ * Copyright 2026 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { createHash } from 'node:crypto';
+// ---------------------------------------------------------------------------
+// Build model configs from a ProviderConfig + user inputs
+// ---------------------------------------------------------------------------
+function resolveEnvKey(config, inputs) {
+    const protocol = inputs.protocol ?? config.protocol;
+    return typeof config.envKey === 'function'
+        ? config.envKey(protocol, inputs.baseUrl)
+        : config.envKey;
+}
+function resolveModelNamePrefix(config, baseUrl) {
+    return typeof config.modelNamePrefix === 'function'
+        ? config.modelNamePrefix(baseUrl)
+        : config.modelNamePrefix;
+}
+export function resolveOwnsModel(config) {
+    if (config.ownsModel)
+        return config.ownsModel;
+    if (typeof config.envKey !== 'string' ||
+        typeof config.modelNamePrefix !== 'string') {
+        return undefined;
+    }
+    const envKey = config.envKey;
+    const prefix = config.modelNamePrefix;
+    if (!prefix)
+        return (model) => model.envKey === envKey;
+    const namePrefix = `[${prefix}] `;
+    return (model) => model.envKey === envKey &&
+        typeof model.name === 'string' &&
+        model.name.startsWith(namePrefix);
+}
+function buildGenerationConfig(spec) {
+    const parts = {};
+    let hasAny = false;
+    if (spec.enableThinking) {
+        parts.extra_body = { enable_thinking: true };
+        hasAny = true;
+    }
+    if (spec.contextWindowSize) {
+        parts.contextWindowSize = spec.contextWindowSize;
+        hasAny = true;
+    }
+    if (spec.modalities && Object.values(spec.modalities).some(Boolean)) {
+        parts.modalities = spec.modalities;
+        hasAny = true;
+    }
+    return hasAny ? parts : undefined;
+}
+function specToModelConfig(spec, prefix, baseUrl, envKey) {
+    const genConfig = buildGenerationConfig(spec);
+    return {
+        id: spec.id,
+        name: prefix ? `[${prefix}] ${spec.id}` : spec.id,
+        ...(spec.description ? { description: spec.description } : {}),
+        baseUrl,
+        envKey,
+        ...(genConfig ? { generationConfig: genConfig } : {}),
+    };
+}
+function buildModelConfigs(config, inputs) {
+    const envKey = resolveEnvKey(config, inputs);
+    const prefix = resolveModelNamePrefix(config, inputs.baseUrl);
+    // Fixed ModelSpec[] (not editable) — use specs directly
+    if (config.models && !config.modelsEditable) {
+        return config.models.map((spec) => specToModelConfig(spec, prefix, inputs.baseUrl, envKey));
+    }
+    // Editable ModelSpec[] — look up per-model metadata for known IDs
+    if (config.models && config.modelsEditable) {
+        const specMap = new Map(config.models.map((s) => [s.id, s]));
+        return inputs.modelIds.map((id) => {
+            const spec = specMap.get(id);
+            if (spec) {
+                return specToModelConfig(spec, prefix, inputs.baseUrl, envKey);
+            }
+            return {
+                id,
+                name: prefix ? `[${prefix}] ${id}` : id,
+                baseUrl: inputs.baseUrl,
+                envKey,
+            };
+        });
+    }
+    // No predefined models (custom provider) — use advancedConfig
+    const advCfg = inputs.advancedConfig;
+    function buildCustomGenConfig() {
+        const cfg = {};
+        let hasAny = false;
+        if (advCfg?.enableThinking) {
+            cfg.extra_body = { enable_thinking: true };
+            hasAny = true;
+        }
+        if (advCfg?.multimodal && Object.values(advCfg.multimodal).some(Boolean)) {
+            cfg.modalities = advCfg.multimodal;
+            hasAny = true;
+        }
+        if (advCfg?.contextWindowSize && advCfg.contextWindowSize > 0) {
+            cfg.contextWindowSize = advCfg.contextWindowSize;
+            hasAny = true;
+        }
+        if (advCfg?.maxTokens && advCfg.maxTokens > 0) {
+            cfg.samplingParams = { max_tokens: advCfg.maxTokens };
+            hasAny = true;
+        }
+        return hasAny ? cfg : undefined;
+    }
+    const displayName = (id) => (prefix ? `[${prefix}] ${id}` : id);
+    return inputs.modelIds.map((id) => {
+        const genConfig = buildCustomGenConfig();
+        return {
+            id,
+            name: displayName(id),
+            baseUrl: inputs.baseUrl,
+            envKey,
+            ...(genConfig ? { generationConfig: genConfig } : {}),
+        };
+    });
+}
+// ---------------------------------------------------------------------------
+// Version tracking — auto-derived for providers with static model lists
+// ---------------------------------------------------------------------------
+/**
+ * Returns the provider's metadata key (same as `config.id`).
+ * Only defined for providers with a static `models` list.
+ */
+export function resolveMetadataKey(config) {
+    if (config.models)
+        return config.id;
+    return undefined;
+}
+/**
+ * Namespace prefix used for all provider metadata in settings.
+ * e.g. `providerMetadata.coding-plan.version`
+ */
+export const PROVIDER_METADATA_NS = 'providerMetadata';
+function resolveProviderState(config, baseUrl, models) {
+    const key = resolveMetadataKey(config);
+    if (key) {
+        return {
+            [`${PROVIDER_METADATA_NS}.${key}`]: {
+                version: computeModelListVersion(models),
+                baseUrl,
+            },
+        };
+    }
+    return undefined;
+}
+// ---------------------------------------------------------------------------
+// Build ProviderInstallPlan from config + inputs
+// ---------------------------------------------------------------------------
+export function buildInstallPlan(config, inputs) {
+    const protocol = inputs.protocol ?? config.protocol;
+    const envKey = resolveEnvKey(config, inputs);
+    const models = inputs.prebuiltModels ?? buildModelConfigs(config, inputs);
+    if (models.length === 0) {
+        throw new Error(`No models configured for provider "${config.id}". Check model list or provider configuration.`);
+    }
+    const firstModelId = models[0]?.id;
+    return {
+        providerId: config.id,
+        authType: protocol,
+        env: { [envKey]: inputs.apiKey },
+        ...(firstModelId ? { modelSelection: { modelId: firstModelId } } : {}),
+        modelProviders: [
+            {
+                authType: protocol,
+                models,
+                mergeStrategy: 'prepend-and-remove-owned',
+                ownsModel: resolveOwnsModel(config),
+            },
+        ],
+        providerState: resolveProviderState(config, inputs.baseUrl, models),
+    };
+}
+// ---------------------------------------------------------------------------
+// Utility: version hash from model list
+// ---------------------------------------------------------------------------
+export function computeModelListVersion(models) {
+    return createHash('sha256').update(JSON.stringify(models)).digest('hex');
+}
+// ---------------------------------------------------------------------------
+// Resolve base URL from config + user selection
+// ---------------------------------------------------------------------------
+export function resolveBaseUrl(config, selectedBaseUrl) {
+    if (typeof config.baseUrl === 'string') {
+        return config.baseUrl;
+    }
+    if (Array.isArray(config.baseUrl)) {
+        const match = config.baseUrl.find((opt) => opt.url === selectedBaseUrl);
+        return match?.url ?? config.baseUrl[0].url;
+    }
+    return selectedBaseUrl ?? '';
+}
+// ---------------------------------------------------------------------------
+// Resolve model IDs from config
+// ---------------------------------------------------------------------------
+export function getDefaultModelIds(config) {
+    return config.models?.map((s) => s.id) ?? [];
+}
+// ---------------------------------------------------------------------------
+// Check if a step should be shown in the UI
+// ---------------------------------------------------------------------------
+export function shouldShowStep(config, step) {
+    switch (step) {
+        case 'protocol':
+            return (Array.isArray(config.protocolOptions) &&
+                config.protocolOptions.length > 1);
+        case 'baseUrl':
+            return config.baseUrl === undefined || Array.isArray(config.baseUrl);
+        case 'apiKey':
+            return config.authMethod !== 'oauth';
+        case 'models':
+            return !config.models || config.modelsEditable === true;
+        case 'advancedConfig':
+            return config.showAdvancedConfig === true;
+        default:
+            return false;
+    }
+}
+// ---------------------------------------------------------------------------
+// Match a provider by model credentials (baseUrl + envKey)
+// ---------------------------------------------------------------------------
+export function providerMatchesCredentials(config, baseUrl, envKey) {
+    if (typeof config.envKey !== 'string' || config.envKey !== envKey) {
+        return false;
+    }
+    if (typeof config.baseUrl === 'string') {
+        return config.baseUrl === baseUrl;
+    }
+    if (Array.isArray(config.baseUrl)) {
+        return config.baseUrl.some((opt) => opt.url === baseUrl);
+    }
+    return false;
+}
+// ---------------------------------------------------------------------------
+// Build template models for a provider (for version tracking / auto-update)
+// ---------------------------------------------------------------------------
+export function buildProviderTemplate(config, baseUrl) {
+    const resolved = resolveBaseUrl(config, baseUrl);
+    return buildModelConfigs(config, {
+        baseUrl: resolved,
+        apiKey: '',
+        modelIds: getDefaultModelIds(config),
+    });
+}
+//# sourceMappingURL=providerConfig.js.map

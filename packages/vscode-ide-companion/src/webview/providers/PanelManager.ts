@@ -70,9 +70,9 @@ export class PanelManager {
     const existingGroup = this.findExistingHopCodeGroup();
 
     if (existingGroup) {
-      // If Qwen Code webview already exists in a locked group, create the new panel in that same group
+      // If HopCode webview already exists in a locked group, create the new panel in that same group
       logger.log(
-        '[PanelManager] Found existing Qwen Code group, creating panel in same group',
+        '[PanelManager] Found existing HopCode group, creating panel in same group',
       );
       this.panel = vscode.window.createWebviewPanel(
         'HopCode.chat',
@@ -175,8 +175,8 @@ export class PanelManager {
           isWebviewInput(input) &&
           input.viewType === 'mainThreadWebview-HopCode.chat'
         ) {
-          // Found an existing Qwen Code tab
-          logger.log('[PanelManager] Found existing Qwen Code group:', {
+          // Found an existing HopCode tab
+          logger.log('[PanelManager] Found existing HopCode group:', {
             viewColumn: group.viewColumn,
             tabCount: group.tabs.length,
             isActive: group.isActive,

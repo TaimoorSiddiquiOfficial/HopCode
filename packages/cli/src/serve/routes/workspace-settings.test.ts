@@ -151,7 +151,7 @@ describe('POST /workspace/settings', () => {
     const res = await request(app).post('/workspace/settings').send({
       scope: 'user',
       key: 'tools.approvalMode',
-      value: 'yolo',
+      value: 'izn',
     });
 
     expect(res.status).toBe(400);

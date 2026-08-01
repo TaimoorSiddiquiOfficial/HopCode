@@ -2846,13 +2846,13 @@ describe('createAcpSessionBridge', () => {
       const h = makeChannel({
         loadSessionImpl: (p) => {
           expect(p._meta).toMatchObject({
-            'qwen.session.loadReplayMode': 'bulk',
-            'qwen.session.loadReplayPageSize': 100,
+            'hopcode.session.loadReplayMode': 'bulk',
+            'hopcode.session.loadReplayPageSize': 100,
           });
           return {
             _meta: {
               keep: 'state',
-              'qwen.session.loadReplay': {
+              'hopcode.session.loadReplay': {
                 v: 1,
                 hasMore: true,
                 partial: true,
@@ -2890,8 +2890,8 @@ describe('createAcpSessionBridge', () => {
       cwd: WS_A,
       mcpServers: [],
       _meta: {
-        'qwen.session.loadReplayMode': 'bulk',
-        'qwen.session.loadReplayPageSize': 100,
+        'hopcode.session.loadReplayMode': 'bulk',
+        'hopcode.session.loadReplayPageSize': 100,
       },
     });
     expect(loaded.state).toEqual({ _meta: { keep: 'state' } });
@@ -2923,11 +2923,11 @@ describe('createAcpSessionBridge', () => {
       const h = makeChannel({
         loadSessionImpl: (p) => {
           expect(p._meta).toMatchObject({
-            'qwen.session.loadReplayMode': 'bulk',
+            'hopcode.session.loadReplayMode': 'bulk',
           });
           return {
             _meta: {
-              'qwen.session.loadReplay': {
+              'hopcode.session.loadReplay': {
                 v: 1,
                 updates: [
                   {
@@ -2967,7 +2967,7 @@ describe('createAcpSessionBridge', () => {
       sessionId: 'persisted-replayed-artifact',
       cwd: WS_A,
       mcpServers: [],
-      _meta: { 'qwen.session.loadReplayMode': 'bulk' },
+      _meta: { 'hopcode.session.loadReplayMode': 'bulk' },
     });
     await expect(
       bridge.getSessionArtifacts(loaded.sessionId),
@@ -2989,18 +2989,18 @@ describe('createAcpSessionBridge', () => {
       makeChannel({
         loadSessionImpl: () => ({
           _meta: {
-            'qwen.session.loadReplay': {
+            'hopcode.session.loadReplay': {
               v: 1,
               updates: [
                 {
                   sessionUpdate: 'user_message_chunk',
                   content: { type: 'text', text: `old-${'x'.repeat(600)}` },
-                  _meta: { 'qwen.session.recordId': 'record-1' },
+                  _meta: { 'hopcode.session.recordId': 'record-1' },
                 },
                 {
                   sessionUpdate: 'agent_message_chunk',
                   content: { type: 'text', text: `new-${'y'.repeat(600)}` },
-                  _meta: { 'qwen.session.recordId': 'record-2' },
+                  _meta: { 'hopcode.session.recordId': 'record-2' },
                 },
               ],
             },
@@ -3043,7 +3043,7 @@ describe('createAcpSessionBridge', () => {
       makeChannel({
         loadSessionImpl: () => ({
           _meta: {
-            'qwen.session.loadReplay': {
+            'hopcode.session.loadReplay': {
               v: 1,
               updates: Array.from({ length: 10_001 }, () => ({
                 sessionUpdate: 'agent_message_chunk',
@@ -3061,7 +3061,7 @@ describe('createAcpSessionBridge', () => {
         historyReplay: 'response',
       }),
     ).rejects.toThrow(
-      'qwen.session.loadReplay updates exceed limit (10001 > 10000)',
+      'hopcode.session.loadReplay updates exceed limit (10001 > 10000)',
     );
 
     await bridge.shutdown();
@@ -3078,7 +3078,7 @@ describe('createAcpSessionBridge', () => {
       const h = makeChannel({
         loadSessionImpl: () => ({
           _meta: {
-            'qwen.session.loadReplay': {
+            'hopcode.session.loadReplay': {
               v: 1,
               updates: [{ sessionUpdate: 'agent_message_chunk' }],
             },
@@ -3128,7 +3128,7 @@ describe('createAcpSessionBridge', () => {
       makeChannel({
         loadSessionImpl: () => ({
           _meta: {
-            'qwen.session.loadReplay': {
+            'hopcode.session.loadReplay': {
               v: 1,
               updates: [
                 { sessionUpdate: 'agent_message_chunk' },
@@ -3175,7 +3175,7 @@ describe('createAcpSessionBridge', () => {
           await new Promise((r) => setTimeout(r, 20));
           return {
             _meta: {
-              'qwen.session.loadReplay': {
+              'hopcode.session.loadReplay': {
                 v: 1,
                 updates: [
                   {
@@ -3287,7 +3287,7 @@ describe('createAcpSessionBridge', () => {
       const fakeAgent = new FakeAgent({
         loadSessionImpl: async (p) => {
           expect(p._meta).toMatchObject({
-            'qwen.session.loadReplayMode': 'bulk',
+            'hopcode.session.loadReplayMode': 'bulk',
           });
           await capturedConn!.sessionUpdate({
             sessionId: p.sessionId,
@@ -9648,7 +9648,7 @@ describe('createAcpSessionBridge', () => {
         bridge.spawnOrAttach({
           workspaceCwd: WS_A,
           sessionScope: 'thread',
-          approvalMode: ApprovalMode.YOLO,
+          approvalMode: ApprovalMode.IZN,
         }),
       ).rejects.toThrow();
 
@@ -9672,7 +9672,7 @@ describe('createAcpSessionBridge', () => {
       const first = bridge.spawnOrAttach({
         workspaceCwd: WS_A,
         sessionScope: 'single',
-        approvalMode: ApprovalMode.YOLO,
+        approvalMode: ApprovalMode.IZN,
       });
       await waitForApprovalMode();
 
@@ -9718,7 +9718,7 @@ describe('createAcpSessionBridge', () => {
         bridge.spawnOrAttach({
           workspaceCwd: WS_A,
           sessionScope: 'single',
-          approvalMode: ApprovalMode.YOLO,
+          approvalMode: ApprovalMode.IZN,
         }),
       ).rejects.toThrow();
 
@@ -9742,7 +9742,7 @@ describe('createAcpSessionBridge', () => {
         bridge.loadSession({
           sessionId: 'restore-with-mode',
           workspaceCwd: WS_A,
-          approvalMode: ApprovalMode.YOLO,
+          approvalMode: ApprovalMode.IZN,
         }),
       ).rejects.toThrow();
 
@@ -9771,7 +9771,7 @@ describe('createAcpSessionBridge', () => {
       const attach = bridge.spawnOrAttach({
         workspaceCwd: WS_A,
         sessionScope: 'single',
-        approvalMode: ApprovalMode.YOLO,
+        approvalMode: ApprovalMode.IZN,
       });
       await waitForApprovalMode();
       await bridge.killSession(first.sessionId, { requireZeroAttaches: true });
@@ -13837,14 +13837,14 @@ describe('createHttpAcpBridge — side-channel state layer (#4511)', () => {
 
       await bridge.setSessionApprovalMode(
         session.sessionId,
-        ApprovalMode.YOLO,
+        ApprovalMode.IZN,
         { persist: false },
       );
 
       await expect(approvalEvent).resolves.toMatchObject({
         type: 'approval_mode_changed',
         promptId: 'prompt-approval',
-        data: { next: ApprovalMode.YOLO },
+        data: { next: ApprovalMode.IZN },
       });
 
       releasePrompt?.();

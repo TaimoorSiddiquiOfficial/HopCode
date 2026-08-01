@@ -1,0 +1,21 @@
+/**
+ * @license
+ * Copyright 2025 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/**
+ * Sentinel passed as `AbortController.abort(reason)` when a prompt
+ * exceeds its server-configured wallclock. Exported so tests can
+ * match on the class identity.
+ */
+export declare class PromptDeadlineExceededError extends Error {
+    readonly deadlineMs: number;
+    constructor(deadlineMs: number);
+}
+/**
+ * Resolve the effective per-prompt wallclock from the server flag +
+ * an optional request body override. Returns `undefined` when no
+ * deadline applies. The request override may SHORTEN the deadline but
+ * never EXTEND it — operators stay the upper bound.
+ */
+export declare function resolvePromptDeadlineMs(serverMs: number | undefined, requestMs: number | undefined): number | undefined;

@@ -55,11 +55,11 @@ describe('unresolvedWorkspaceDeps', () => {
 
 describe('buildRunEnv', () => {
   it("skips this repo's full-build `prepare` hook on npm ci", () => {
-    // Without QWEN_SKIP_PREPARE=1, `npm ci` runs `npm run build` + `npm run
+    // Without HOPCODE_SKIP_PREPARE=1, `npm ci` runs `npm run build` + `npm run
     // bundle` over every workspace (~190s) — wasted, because build-test does its
     // own scoped build next. Pinned here so a future env edit cannot silently
     // drop it and reintroduce the install-time full build.
-    expect(buildRunEnv({})['QWEN_SKIP_PREPARE']).toBe('1');
+    expect(buildRunEnv({})['HOPCODE_SKIP_PREPARE']).toBe('1');
     expect(buildRunEnv({})['CI']).toBe('1');
   });
 

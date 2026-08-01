@@ -16,7 +16,7 @@ const scriptPath = path.join(
 );
 
 /**
- * Runs sandbox_command.js as a subprocess with the given QWEN_SANDBOX value.
+ * Runs sandbox_command.js as a subprocess with the given HOPCODE_SANDBOX value.
  * Returns { status, stdout, stderr }. Never throws on a non-zero exit so the
  * caller can assert on the exit code.
  */
@@ -24,7 +24,7 @@ function runSandboxCommand(sandboxValue) {
   try {
     const stdout = execFileSync(process.execPath, [scriptPath, '-q'], {
       encoding: 'utf8',
-      env: { ...process.env, QWEN_SANDBOX: sandboxValue },
+      env: { ...process.env, HOPCODE_SANDBOX: sandboxValue },
     });
     return { status: 0, stdout, stderr: '' };
   } catch (err) {
@@ -36,7 +36,7 @@ function runSandboxCommand(sandboxValue) {
   }
 }
 
-describe('sandbox_command.js QWEN_SANDBOX handling', () => {
+describe('sandbox_command.js HOPCODE_SANDBOX handling', () => {
   // Each payload appends a command that would exit 0 if the shell ever split
   // the value on the metacharacter. A vulnerable build runs e.g.
   // `command -v doesnotexist; true`, which exits 0, so commandExists() returns

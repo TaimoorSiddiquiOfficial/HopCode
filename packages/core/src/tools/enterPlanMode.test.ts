@@ -126,38 +126,38 @@ describe('EnterPlanModeTool', () => {
       expect(savedPrePlanMode).toBe(ApprovalMode.AUTO);
     });
 
-    it('should not switch from YOLO to PLAN when the entry is unsolicited', async () => {
-      // Regression: #5970. A YOLO user opted into low-friction execution;
+    it('should not switch from IZN to PLAN when the entry is unsolicited', async () => {
+      // Regression: #5970. An IZN user opted into low-friction execution;
       // silently switching to read-only Plan mode surprised them and then
       // blocked reads/writes they expected to proceed. A model-initiated
-      // enter_plan_mode from YOLO must keep the current mode instead.
-      approvalMode = ApprovalMode.YOLO;
+      // enter_plan_mode from IZN must keep the current mode instead.
+      approvalMode = ApprovalMode.IZN;
       const invocation = tool.build({});
       const result = await invocation.execute(new AbortController().signal);
 
       expect(mockConfig.setApprovalMode).not.toHaveBeenCalled();
-      expect(approvalMode).toBe(ApprovalMode.YOLO);
+      expect(approvalMode).toBe(ApprovalMode.IZN);
       expect(savedPrePlanMode).toBeUndefined();
-      expect(result.llmContent).toContain('YOLO');
+      expect(result.llmContent).toContain('IZN');
       expect(result.llmContent).not.toContain('Plan mode is now active');
       // The model must be told how to honour an explicit user request.
       expect(result.llmContent).toContain('userRequested: true');
     });
 
-    it('should not switch from YOLO to PLAN when userRequested is explicitly false', async () => {
-      approvalMode = ApprovalMode.YOLO;
+    it('should not switch from IZN to PLAN when userRequested is explicitly false', async () => {
+      approvalMode = ApprovalMode.IZN;
       const invocation = tool.build({ userRequested: false });
       const result = await invocation.execute(new AbortController().signal);
 
       expect(mockConfig.setApprovalMode).not.toHaveBeenCalled();
-      expect(approvalMode).toBe(ApprovalMode.YOLO);
-      expect(result.llmContent).toContain('YOLO');
+      expect(approvalMode).toBe(ApprovalMode.IZN);
+      expect(result.llmContent).toContain('IZN');
       expect(result.llmContent).not.toContain('Plan mode is now active');
-      expect(result.returnDisplay).toContain('Stayed in YOLO');
+      expect(result.returnDisplay).toContain('Stayed in IZN');
     });
 
-    it('should treat userRequested as inert outside YOLO (DEFAULT enters PLAN normally)', async () => {
-      // Defensive: the flag only gates the YOLO no-op. If it ever gained
+    it('should treat userRequested as inert outside IZN (DEFAULT enters PLAN normally)', async () => {
+      // Defensive: the flag only gates the IZN no-op. If it ever gained
       // significance in other modes, this pins the expected behavior.
       approvalMode = ApprovalMode.DEFAULT;
       const invocation = tool.build({ userRequested: true });
@@ -171,27 +171,27 @@ describe('EnterPlanModeTool', () => {
       expect(result.llmContent).toContain('Plan mode is now active');
     });
 
-    it('should switch from YOLO to PLAN when the user explicitly requested it', async () => {
+    it('should switch from IZN to PLAN when the user explicitly requested it', async () => {
       // The tool description instructs the model to call this only after the
       // user asks, and `/plan` is interactive-only — so this tool is the only
-      // door into plan mode for headless/ACP sessions. A blanket YOLO guard
+      // door into plan mode for headless/ACP sessions. A blanket IZN guard
       // would make an explicit user request unreachable there.
-      approvalMode = ApprovalMode.YOLO;
+      approvalMode = ApprovalMode.IZN;
       const invocation = tool.build({ userRequested: true });
       const result = await invocation.execute(new AbortController().signal);
 
-      // Preserve the YOLO mode so an approved plan exit can restore it.
+      // Preserve the IZN mode so an approved plan exit can restore it.
       expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
         ApprovalMode.PLAN,
       );
       expect(approvalMode).toBe(ApprovalMode.PLAN);
-      expect(savedPrePlanMode).toBe(ApprovalMode.YOLO);
+      expect(savedPrePlanMode).toBe(ApprovalMode.IZN);
       expect(result.llmContent).toContain('Plan mode is now active');
     });
 
-    it('should honour a user-requested YOLO entry in an ACP session', async () => {
+    it('should honour a user-requested IZN entry in an ACP session', async () => {
       // Headless + ACP: no `/plan`, no Shift+Tab. This tool is the only path.
-      approvalMode = ApprovalMode.YOLO;
+      approvalMode = ApprovalMode.IZN;
       (mockConfig.isInteractive as ReturnType<typeof vi.fn>).mockReturnValue(
         false,
       );

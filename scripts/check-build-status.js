@@ -51,7 +51,7 @@ function findSourceFiles(dir, allFiles = []) {
 }
 
 // stderr, not stdout: scripts/start.js runs this with `stdio: 'inherit'` in
-// front of EVERY spawn, and start.js is a QWEN_CODE_CLI entry — its stdout is
+// front of EVERY spawn, and start.js is a HOPCODE_CODE_CLI entry — its stdout is
 // consumed by callers (`… review parse-args --stdin | tee plan.json` writes a
 // file whose first line must be JSON, not a status message). Status and
 // warnings are operator chatter; they belong on stderr with the rest.

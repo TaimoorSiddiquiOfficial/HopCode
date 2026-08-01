@@ -251,16 +251,16 @@ describe('gemini.tsx main function', () => {
     // Store and clear sandbox-related env variables to ensure a consistent test environment
     originalEnvGeminiSandbox = process.env['HOPCODE_SANDBOX'];
     originalEnvSandbox = process.env['SANDBOX'];
-    // QWEN_SANDBOX_IMAGE selects the custom-image relaunch branch in main(),
+    // HOPCODE_SANDBOX_IMAGE selects the custom-image relaunch branch in main(),
     // which skips the host-update capability computation; CI environments that
     // export a resolved sandbox image (e.g. the autofix runner) would otherwise
     // flip these tests' code path.
-    originalEnvQwenSandboxImage = process.env['QWEN_SANDBOX_IMAGE'];
-    originalEnvQwenCodeSimple = process.env['QWEN_CODE_SIMPLE'];
-    delete process.env['QWEN_SANDBOX'];
+    originalEnvQwenSandboxImage = process.env['HOPCODE_SANDBOX_IMAGE'];
+    originalEnvQwenCodeSimple = process.env['HOPCODE_CODE_SIMPLE'];
+    delete process.env['HOPCODE_SANDBOX'];
     delete process.env['SANDBOX'];
-    delete process.env['QWEN_SANDBOX_IMAGE'];
-    delete process.env['QWEN_CODE_SIMPLE'];
+    delete process.env['HOPCODE_SANDBOX_IMAGE'];
+    delete process.env['HOPCODE_CODE_SIMPLE'];
 
     initialUnhandledRejectionListeners =
       process.listeners('unhandledRejection');
@@ -279,12 +279,12 @@ describe('gemini.tsx main function', () => {
       delete process.env['SANDBOX'];
     }
     if (originalEnvQwenSandboxImage !== undefined) {
-      process.env['QWEN_SANDBOX_IMAGE'] = originalEnvQwenSandboxImage;
+      process.env['HOPCODE_SANDBOX_IMAGE'] = originalEnvQwenSandboxImage;
     } else {
-      delete process.env['QWEN_SANDBOX_IMAGE'];
+      delete process.env['HOPCODE_SANDBOX_IMAGE'];
     }
     if (originalEnvQwenCodeSimple !== undefined) {
-      process.env['QWEN_CODE_SIMPLE'] = originalEnvQwenCodeSimple;
+      process.env['HOPCODE_CODE_SIMPLE'] = originalEnvQwenCodeSimple;
     } else {
       delete process.env['HOPCODE_SIMPLE'];
     }
@@ -428,7 +428,7 @@ describe('gemini.tsx main function', () => {
     [
       'in the relaunched ACP process',
       { acp: true },
-      { QWEN_CODE_NO_RELAUNCH: 'true' },
+      { HOPCODE_CODE_NO_RELAUNCH: 'true' },
       undefined,
       undefined,
     ],
@@ -442,14 +442,14 @@ describe('gemini.tsx main function', () => {
     [
       'outside managed ACP startup',
       {},
-      { QWEN_CODE_NO_RELAUNCH: 'true' },
+      { HOPCODE_CODE_NO_RELAUNCH: 'true' },
       '1',
       '1',
     ],
     [
       'ACP without bootstrap marker',
       { acp: true },
-      { QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE: undefined },
+      { HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE: undefined },
       '1',
       undefined,
     ],
@@ -457,8 +457,8 @@ describe('gemini.tsx main function', () => {
     'manages Electron bootstrap env %s',
     async (_name, argv, extraEnv, expectedElectron, expectedMarker) => {
       vi.stubEnv('ELECTRON_RUN_AS_NODE', '1');
-      vi.stubEnv('QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE', '1');
-      vi.stubEnv('QWEN_CODE_NO_RELAUNCH', '');
+      vi.stubEnv('HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE', '1');
+      vi.stubEnv('HOPCODE_CODE_NO_RELAUNCH', '');
       for (const [key, value] of Object.entries(extraEnv)) {
         vi.stubEnv(key, value);
       }
@@ -468,7 +468,7 @@ describe('gemini.tsx main function', () => {
       vi.mocked(parseArguments).mockResolvedValue(argv as CliArgs);
       vi.mocked(loadSettings).mockImplementation(() => {
         expect(process.env['ELECTRON_RUN_AS_NODE']).toBe(expectedElectron);
-        expect(process.env['QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE']).toBe(
+        expect(process.env['HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE']).toBe(
           expectedMarker,
         );
         throw new Error('stop after env check');
@@ -975,7 +975,7 @@ describe('gemini.tsx main function', () => {
   });
 
   it('passes host update capability into a container sandbox', async () => {
-    const originalCapability = process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'];
+    const originalCapability = process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'];
 
     try {
       await runSandboxRelaunch(
@@ -988,12 +988,12 @@ describe('gemini.tsx main function', () => {
         expect.any(String),
         true,
       );
-      expect(process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH']).toBe('true');
+      expect(process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH']).toBe('true');
     } finally {
       if (originalCapability === undefined) {
-        delete process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'];
+        delete process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'];
       } else {
-        process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'] = originalCapability;
+        process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'] = originalCapability;
       }
     }
   });

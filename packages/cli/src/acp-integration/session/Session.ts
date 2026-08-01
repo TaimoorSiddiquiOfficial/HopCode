@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 Qwen
  * SPDX-License-Identifier: Apache-2.0
@@ -765,13 +765,13 @@ export function isExistingFile(
 export function resolveHomeLoopResolverRoots({
   homeQwenDir = Storage.getGlobalQwenDir(),
   homeDir = os.homedir(),
-  qwenHome = process.env['QWEN_HOME'],
+  qwenHome = process.env['HOPCODE_HOME'],
 }: {
   homeQwenDir?: string;
   homeDir?: string;
   qwenHome?: string;
 } = {}): { homeConfineRoot: string; homeQwenDir: string } {
-  // qwenHome truthy → QWEN_HOME is itself the global dir, so confine within
+  // qwenHome truthy → HOPCODE_HOME is itself the global dir, so confine within
   // homeQwenDir; the homeDir param is only consulted when qwenHome is unset.
   return {
     homeConfineRoot:
@@ -4171,8 +4171,8 @@ export class Session implements SessionContext {
     // Rebuild if the working dir changed (e.g. /cd) so loop.md resolves against
     // the current project; a fresh resolver also correctly re-delivers full.
     if (!this.loopTickResolver || this.loopTickResolverRoot !== root) {
-      // Resolve the home/global loop.md from the QWEN_HOME-aware global dir (the
-      // rest of Qwen honors QWEN_HOME for `.qwen`); reading raw os.homedir() here
+      // Resolve the home/global loop.md from the HOPCODE_HOME-aware global dir (the
+      // rest of Qwen honors HOPCODE_HOME for `.qwen`); reading raw os.homedir() here
       // would always hit the real `~/.qwen` and ignore a relocated config home.
       const { homeConfineRoot, homeQwenDir } = resolveHomeLoopResolverRoots();
       this.loopTickResolver = new LoopTickResolver({
@@ -4294,7 +4294,7 @@ export class Session implements SessionContext {
                     // client via emitAgentMessage,
                     // so re-throwing the raw fs error would leak that absolute
                     // path. Surface only the candidate labels + errno code via the
-                    // shared absentLocations() — reusing the QWEN_HOME-aware home
+                    // shared absentLocations() — reusing the HOPCODE_HOME-aware home
                     // label (never a hardcoded `~/.qwen`) and naming the project
                     // candidate only when it was actually read (the captured trust
                     // matches the resolve() probe, so an untrusted folder can't

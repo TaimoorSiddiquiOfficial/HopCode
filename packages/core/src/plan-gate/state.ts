@@ -39,7 +39,7 @@ export interface PlanGateState {
    * user entered plan mode explicitly (Shift+Tab, `/plan`, the approval-mode
    * dialog) — those entries always route through the user confirmation dialog,
    * regardless of `prePlanMode`. See issue #5574: cycling Shift+Tab to PLAN
-   * always lands with `prePlanMode === 'yolo'` (it is the mode immediately
+   * always lands with `prePlanMode === 'izn'` (it is the mode immediately
    * before PLAN in the cycle), which must NOT auto-approve via the gate.
    */
   enteredByModel: boolean;

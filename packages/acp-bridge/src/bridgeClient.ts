@@ -381,7 +381,7 @@ export const KNOWN_APPROVAL_MODES: ReadonlySet<string> = new Set([
   'default',
   'auto-edit',
   'auto',
-  'yolo',
+  'izn',
 ]);
 
 /**

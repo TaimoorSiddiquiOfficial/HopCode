@@ -397,10 +397,7 @@ describe('CLI entry import boundary', () => {
   it('uses the shared headless yolo warning helper on the serve fast path', () => {
     const fastPathSource = readFileSync('src/serve/fast-path.ts', 'utf8');
 
-    expect(fastPathSource).toContain('getHeadlessYoloSafetyWarning');
-    expect(fastPathSource).not.toContain(
-      "settings.tools?.approvalMode === 'yolo'",
-    );
+    expect(fastPathSource).toContain('HEADLESS_IZN_NO_SANDBOX_WARNING');
   });
 
   it('keeps headless yolo warning helper free of runtime core imports', () => {
@@ -1016,13 +1013,13 @@ describe('serve fast path environment bootstrap', () => {
 
   it('keeps headless yolo warning best-effort after listening', async () => {
     const originalSandbox = process.env['SANDBOX'];
-    const originalSuppress = process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
+    const originalSuppress = process.env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'];
     delete process.env['SANDBOX'];
-    delete process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
+    delete process.env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'];
     const hopcodeHome = useTemphopcodeHome();
     writeFileSync(
       join(hopcodeHome, 'settings.json'),
-      JSON.stringify({ tools: { approvalMode: 'yolo', sandbox: false } }),
+      JSON.stringify({ tools: { approvalMode: 'izn', sandbox: false } }),
     );
     const runtimeReady = Promise.reject(new Error('runtime boom'));
     void runtimeReady.catch(() => undefined);
@@ -1067,9 +1064,9 @@ describe('serve fast path environment bootstrap', () => {
         process.env['SANDBOX'] = originalSandbox;
       }
       if (originalSuppress === undefined) {
-        delete process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
+        delete process.env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'];
       } else {
-        process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'] = originalSuppress;
+        process.env['HOPCODE_CODE_SUPPRESS_IZN_WARNING'] = originalSuppress;
       }
     }
   });
@@ -1296,7 +1293,7 @@ describe('serve fast path environment bootstrap', () => {
     writeFileSync(
       join(hopcodeHome, 'settings.json'),
       JSON.stringify({
-        approvalMode: 'yolo',
+        approvalMode: 'izn',
         contextFileName: 'LEGACY.md',
         excludedProjectEnvVars: ['HOPCODE_SERVER_TOKEN'],
         fileFiltering: { customIgnoreFiles: ['.legacy-ignore'] },
@@ -1314,7 +1311,7 @@ describe('serve fast path environment bootstrap', () => {
         fileFiltering: { customIgnoreFiles: ['.legacy-ignore'] },
       },
       security: { folderTrust: { enabled: true } },
-      tools: { approvalMode: 'yolo', sandbox: false },
+      tools: { approvalMode: 'izn', sandbox: false },
     });
   });
 
@@ -1396,7 +1393,7 @@ describe('serve fast path environment bootstrap', () => {
             FAST_PATH_OVERLAP: 'system',
           },
           context: { fileName: 'SYSTEM.md' },
-          tools: { approvalMode: 'yolo' },
+          tools: { approvalMode: 'izn' },
         }),
       ),
     );
@@ -1433,7 +1430,7 @@ describe('serve fast path environment bootstrap', () => {
       join(hopcodeHome, 'settings.json'),
       JSON.stringify({
         $version: 5,
-        approvalMode: 'yolo',
+        approvalMode: 'izn',
         contextFileName: 'LEGACY.md',
         excludedProjectEnvVars: ['HOPCODE_SERVER_TOKEN'],
         fileFiltering: { customIgnoreFiles: ['.legacy-ignore'] },

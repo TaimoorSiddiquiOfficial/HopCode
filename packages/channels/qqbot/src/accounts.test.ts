@@ -1,4 +1,4 @@
-﻿import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 const { mockReadFileSync, mockWriteFileSync, mockExistsSync, mockMkdirSync } =
   vi.hoisted(() => ({
@@ -16,7 +16,7 @@ vi.mock('node:fs', () => ({
 }));
 
 vi.mock('@hoptrendy/channel-base', () => ({
-  getGlobalHopCodeDir: () => '/tmp/test-qwen',
+  getGlobalHopCodeDir: () => '/tmp/test-hopcode',
 }));
 
 const { getCredsFilePath, loadCredentials, saveCredentials } = await import(
@@ -26,7 +26,7 @@ const { getCredsFilePath, loadCredentials, saveCredentials } = await import(
 describe('getCredsFilePath', () => {
   it('returns path under channels dir with credentials suffix', () => {
     expect(getCredsFilePath('mybot')).toBe(
-      '/tmp/test-qwen/channels/mybot-credentials.json',
+      '/tmp/test-hopcode/channels/mybot-credentials.json',
     );
   });
 
@@ -78,7 +78,7 @@ describe('saveCredentials', () => {
   it('creates dir and writes file with 0o600 permissions', () => {
     saveCredentials('/path/to/creds.json', 'app-id', 'app-secret');
 
-    expect(mockMkdirSync).toHaveBeenCalledWith('/tmp/test-qwen/channels', {
+    expect(mockMkdirSync).toHaveBeenCalledWith('/tmp/test-hopcode/channels', {
       recursive: true,
     });
     expect(mockWriteFileSync).toHaveBeenCalledWith(

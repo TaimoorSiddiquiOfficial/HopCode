@@ -199,21 +199,21 @@ describe('DaemonChannelBridge', () => {
     });
 
     await bridge.start();
-    await bridge.newSession('/repo', { approvalMode: 'yolo' });
-    await bridge.loadSession('session-1', '/repo', { approvalMode: 'yolo' });
+    await bridge.newSession('/repo', { approvalMode: 'izn' });
+    await bridge.loadSession('session-1', '/repo', { approvalMode: 'izn' });
 
     expect(factory).toHaveBeenNthCalledWith(1, {
       workspaceCwd: '/repo',
       modelServiceId: undefined,
       sessionScope: 'thread',
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
     });
     expect(factory).toHaveBeenNthCalledWith(2, {
       workspaceCwd: '/repo',
       modelServiceId: undefined,
       sessionId: 'session-1',
       sessionScope: 'thread',
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
     });
 
     events.close();

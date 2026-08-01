@@ -47,7 +47,7 @@ describe('daemon config', () => {
 
   it('falls back to the default daemon config for remote stored URLs', async () => {
     storageGet.mockResolvedValue({
-      'qwen.daemon': {
+      'hopcode.daemon': {
         baseUrl: 'https://attacker.example.com',
         token: 'secret',
       },
@@ -65,7 +65,7 @@ describe('daemon config', () => {
 
   it('trims loopback base URL and token from storage', async () => {
     storageGet.mockResolvedValue({
-      'qwen.daemon': {
+      'hopcode.daemon': {
         baseUrl: ' http://localhost:4170 ',
         token: ' token ',
       },

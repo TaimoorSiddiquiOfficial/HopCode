@@ -3309,7 +3309,7 @@ describe('Session', () => {
     });
 
     it('rejects oversized ACP audio before decoding for the voice bridge', async () => {
-      const ENV_KEY = 'QWEN_CODE_MAX_INLINE_MEDIA_BYTES';
+      const ENV_KEY = 'HOPCODE_CODE_MAX_INLINE_MEDIA_BYTES';
       const original = process.env[ENV_KEY];
       process.env[ENV_KEY] = String(20 * 1024 * 1024);
       mockConfig.getEffectiveInputModalities = vi.fn().mockReturnValue({});
@@ -3458,7 +3458,7 @@ describe('Session', () => {
           execute: executeSpy,
         }),
       });
-      mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+      mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
       mockConfig.getEffectiveInputModalities = vi.fn().mockReturnValue({});
       mockConfig.getDefaultVisionBridgeModel = vi.fn().mockReturnValue({
         id: 'vision-agent',
@@ -3543,7 +3543,7 @@ describe('Session', () => {
     });
 
     it('clamps full-turn images before selecting the ACP route', async () => {
-      const ENV_KEY = 'QWEN_CODE_MAX_INLINE_MEDIA_BYTES';
+      const ENV_KEY = 'HOPCODE_CODE_MAX_INLINE_MEDIA_BYTES';
       const original = process.env[ENV_KEY];
       process.env[ENV_KEY] = '8';
       try {
@@ -3649,7 +3649,7 @@ describe('Session', () => {
     });
 
     it('preserves oversized inline images for the vision bridge', async () => {
-      const ENV_KEY = 'QWEN_CODE_MAX_INLINE_MEDIA_BYTES';
+      const ENV_KEY = 'HOPCODE_CODE_MAX_INLINE_MEDIA_BYTES';
       const original = process.env[ENV_KEY];
       process.env[ENV_KEY] = '8';
       try {
@@ -4152,7 +4152,7 @@ describe('Session', () => {
       });
 
       it('stops an ACP prompt after repeated invalid tool parameters with fresh ids', async () => {
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         const messageBus = {
           request: vi.fn().mockResolvedValue({
             success: true,
@@ -4288,7 +4288,7 @@ describe('Session', () => {
       });
 
       it('does not stop disabled tools as repeated invalid parameter calls', async () => {
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockConfig.getPermissionManager = vi.fn().mockReturnValue({
           isToolEnabled: vi.fn().mockResolvedValue(false),
         });
@@ -4334,7 +4334,7 @@ describe('Session', () => {
       });
 
       it('stops early tool lookup errors after repeated invalid tool calls', async () => {
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockToolRegistry.getTool.mockReturnValue(undefined);
         const functionCalls: FunctionCall[] = [
           {
@@ -4408,7 +4408,7 @@ describe('Session', () => {
       });
 
       it('stops an ACP prompt after exceeding the daemon tool-call cap', async () => {
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         // Pin the cap via the config mock — the daemon halts at whatever the
         // resolved getter returns.
         mockConfig.getMaxToolCallsPerTurn = vi.fn().mockReturnValue(100);
@@ -4473,7 +4473,7 @@ describe('Session', () => {
       });
 
       it('does not start unstarted concurrent Agent calls after invalid parameter loop detection', async () => {
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         const build = vi.fn().mockImplementation(() => {
           throw new Error('Invalid subagent_type: bad');
         });
@@ -4554,7 +4554,7 @@ describe('Session', () => {
       });
 
       it('stops concurrent Agent batches after Promise.race observes loop detection', async () => {
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         const build = vi.fn().mockImplementation(() => {
           throw new Error('Invalid subagent_type: bad');
         });
@@ -4693,7 +4693,7 @@ describe('Session', () => {
           }),
         };
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
 
         await (
           session as unknown as {
@@ -5593,7 +5593,7 @@ describe('Session', () => {
         };
 
         mockToolRegistry.getTool.mockReturnValue(tool);
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
         mockConfig.getEffectiveInputModalities = vi.fn().mockReturnValue({});
         mockConfig.getDefaultVisionBridgeModel = vi.fn().mockReturnValue({
           id: 'vision-agent',
@@ -7651,8 +7651,8 @@ describe('Session', () => {
         });
       });
 
-      it('keeps the home confinement root non-empty when os.homedir() is empty (no QWEN_HOME)', () => {
-        // Minimal containers with no HOME make os.homedir() === ''. With QWEN_HOME
+      it('keeps the home confinement root non-empty when os.homedir() is empty (no HOPCODE_HOME)', () => {
+        // Minimal containers with no HOME make os.homedir() === ''. With HOPCODE_HOME
         // unset the home confinement root must NOT collapse to '': isWithin('',
         // anyPath) is trivially true, so an empty root lets a home
         // `~/.qwen/loop.md` symlink resolve anywhere and bypass the confinement.
@@ -7675,7 +7675,7 @@ describe('Session', () => {
         expect(roots.homeQwenDir).toBe(homeQwenDir);
       });
 
-      it('confines the home loop resolver within QWEN_HOME when set', () => {
+      it('confines the home loop resolver within HOPCODE_HOME when set', () => {
         const homeQwenDir = path.join(os.tmpdir(), '.qwen-home');
 
         const roots = resolveHomeLoopResolverRoots({
@@ -7688,9 +7688,9 @@ describe('Session', () => {
         expect(roots.homeQwenDir).toBe(homeQwenDir);
       });
 
-      it('reads the home loop.md from QWEN_HOME, not the real ~/.qwen', async () => {
-        // The home/global candidate must honor QWEN_HOME (the relocated global
-        // dir) instead of always reading the real OS home. Point QWEN_HOME at a
+      it('reads the home loop.md from HOPCODE_HOME, not the real ~/.qwen', async () => {
+        // The home/global candidate must honor HOPCODE_HOME (the relocated global
+        // dir) instead of always reading the real OS home. Point HOPCODE_HOME at a
         // dir holding loop.md, leave the project dir and fake $HOME empty, and
         // confirm the relocated file's block reaches the model.
         const tmpDir = await fs.mkdtemp(
@@ -7708,8 +7708,8 @@ describe('Session', () => {
         );
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
         const restoreHome = setFakeHome(fakeHome);
-        const prevQwenHome = process.env['QWEN_HOME'];
-        process.env['QWEN_HOME'] = qwenHome;
+        const prevQwenHome = process.env['HOPCODE_HOME'];
+        process.env['HOPCODE_HOME'] = qwenHome;
 
         const scheduler = {
           size: 1,
@@ -7737,7 +7737,7 @@ describe('Session', () => {
           });
 
           // Echo names the home source (sourceLabel='home loop.md'), proving the
-          // home candidate resolved from QWEN_HOME rather than the empty $HOME.
+          // home candidate resolved from HOPCODE_HOME rather than the empty $HOME.
           await vi.waitFor(() => {
             expect(mockClient.sessionUpdate).toHaveBeenCalledWith({
               sessionId: 'test-session-id',
@@ -7766,8 +7766,8 @@ describe('Session', () => {
           });
         } finally {
           restoreHome();
-          if (prevQwenHome === undefined) delete process.env['QWEN_HOME'];
-          else process.env['QWEN_HOME'] = prevQwenHome;
+          if (prevQwenHome === undefined) delete process.env['HOPCODE_HOME'];
+          else process.env['HOPCODE_HOME'] = prevQwenHome;
           await fs.rm(tmpDir, { recursive: true, force: true });
           await fs.rm(fakeHome, { recursive: true, force: true });
           await fs.rm(qwenHome, { recursive: true, force: true });
@@ -7887,11 +7887,11 @@ describe('Session', () => {
         }
       });
 
-      it('names the QWEN_HOME-aware home path in the sanitized resolve error, not a hardcoded ~/.qwen', async () => {
+      it('names the HOPCODE_HOME-aware home path in the sanitized resolve error, not a hardcoded ~/.qwen', async () => {
         // Regression: the sanitized resolve-error hardcoded `~/.qwen/loop.md
-        // (home)`, but the resolver's home candidate is QWEN_HOME-aware. With
-        // QWEN_HOME relocated OUTSIDE $HOME, the error reuses homeLoopLabel(),
-        // which names it via the literal `$QWEN_HOME/loop.md` — leak-safe (never
+        // (home)`, but the resolver's home candidate is HOPCODE_HOME-aware. With
+        // HOPCODE_HOME relocated OUTSIDE $HOME, the error reuses homeLoopLabel(),
+        // which names it via the literal `$HOPCODE_HOME/loop.md` — leak-safe (never
         // the resolved absolute global dir, nor the absolute project path).
         debugLoggerWarnSpy.mockClear();
         const tmpDir = await fs.mkdtemp(
@@ -7905,12 +7905,12 @@ describe('Session', () => {
         );
         mockConfig.getWorkingDir = vi.fn().mockReturnValue(tmpDir);
         const restoreHome = setFakeHome(fakeHome);
-        const prevQwenHome = process.env['QWEN_HOME'];
-        process.env['QWEN_HOME'] = qwenHome;
+        const prevQwenHome = process.env['HOPCODE_HOME'];
+        process.env['HOPCODE_HOME'] = qwenHome;
         // qwenHome is under os.tmpdir() (not the OS home), so tildeifyPath is a
         // no-op there. The label is MODEL/client-facing, so it must read as the
-        // literal `$QWEN_HOME/loop.md`, never the resolved absolute path.
-        const expectedHomeLabel = `$QWEN_HOME/loop.md (home)`;
+        // literal `$HOPCODE_HOME/loop.md`, never the resolved absolute path.
+        const expectedHomeLabel = `$HOPCODE_HOME/loop.md (home)`;
 
         const eacces = Object.assign(
           new Error(
@@ -7970,21 +7970,21 @@ describe('Session', () => {
             expect(cronErrorTexts().length).toBeGreaterThan(0),
           );
           for (const text of cronErrorTexts()) {
-            // The QWEN_HOME-aware home path is named...
+            // The HOPCODE_HOME-aware home path is named...
             expect(text).toContain(expectedHomeLabel);
             expect(text).toContain('.qwen/loop.md (project)');
             // ...and the old hardcoded label is gone.
             expect(text).not.toContain('~/.qwen/loop.md');
             // Still leak-safe: neither the absolute project path nor the
-            // resolved $QWEN_HOME global dir reaches the client/API.
+            // resolved $HOPCODE_HOME global dir reaches the client/API.
             expect(text).not.toContain(path.join(tmpDir, '.qwen', 'loop.md'));
             expect(text).not.toContain(path.join(qwenHome, 'loop.md'));
           }
         } finally {
           resolveSpy.mockRestore();
           restoreHome();
-          if (prevQwenHome === undefined) delete process.env['QWEN_HOME'];
-          else process.env['QWEN_HOME'] = prevQwenHome;
+          if (prevQwenHome === undefined) delete process.env['HOPCODE_HOME'];
+          else process.env['HOPCODE_HOME'] = prevQwenHome;
           await fs.rm(tmpDir, { recursive: true, force: true });
           await fs.rm(fakeHome, { recursive: true, force: true });
           await fs.rm(qwenHome, { recursive: true, force: true });
@@ -7995,7 +7995,7 @@ describe('Session', () => {
         // An untrusted folder never reads `.qwen/loop.md` (the resolver gets
         // allowProjectFile=false), so the sanitized error must NOT claim the
         // project candidate was checked — it would be a lie. It still names the
-        // QWEN_HOME-aware home candidate (the only one actually probed) and the
+        // HOPCODE_HOME-aware home candidate (the only one actually probed) and the
         // errno code, and stays leak-safe. Mutation guard: hardcoding
         // `.qwen/loop.md (project)` back into the throw re-introduces the false
         // claim and fails this test.
@@ -9247,7 +9247,7 @@ describe('Session', () => {
               }
             : undefined,
         );
-        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+        mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
       }
 
       it('emits preparing before execution and keeps resolved preparations out of finally discard', async () => {
@@ -9430,7 +9430,7 @@ describe('Session', () => {
           });
           mockConfig.getApprovalMode = vi
             .fn()
-            .mockReturnValue(ApprovalMode.YOLO);
+            .mockReturnValue(ApprovalMode.IZN);
           mockChat.sendMessageStream = vi
             .fn()
             .mockResolvedValueOnce(
@@ -12667,7 +12667,7 @@ describe('Session', () => {
         llmContent: 'wrote memory',
         returnDisplay: 'wrote memory',
       });
-      mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+      mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
       mockToolRegistry.getTool.mockReturnValue(
         mockAllowedTool(core.ToolNames.WRITE_FILE, execute),
       );
@@ -12713,7 +12713,7 @@ describe('Session', () => {
         .mockImplementation(
           (eventName: string) => eventName === 'PostToolBatch',
         );
-      mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.YOLO);
+      mockConfig.getApprovalMode = vi.fn().mockReturnValue(ApprovalMode.IZN);
       const execute = vi.fn().mockResolvedValue({
         llmContent: 'tool output',
         returnDisplay: 'tool output',

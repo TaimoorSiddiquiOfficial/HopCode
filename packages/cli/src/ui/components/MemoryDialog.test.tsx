@@ -115,9 +115,9 @@ describe('MemoryDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubEnv('DISPLAY', ':99');
-    vi.stubEnv('QWEN_HOME', path.join(os.homedir(), '.qwen'));
+    vi.stubEnv('HOPCODE_HOME', path.join(os.homedir(), '.qwen'));
     vi.stubEnv(
-      'QWEN_CODE_MEMORY_BASE_DIR',
+      'HOPCODE_CODE_MEMORY_BASE_DIR',
       path.join(os.homedir(), '.qwen-memory-test'),
     );
     clearAutoMemoryRootCache();

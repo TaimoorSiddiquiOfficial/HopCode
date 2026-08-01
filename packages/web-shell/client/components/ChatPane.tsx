@@ -365,14 +365,14 @@ export function ChatPane({
       actions
         .setApprovalMode(modeId)
         .then(() => {
-          // Mirror App's handleSetMode: switching THIS pane to yolo (or
+          // Mirror App's handleSetMode: switching THIS pane to izn (or
           // auto-edit for an edit tool) auto-approves a tool call already
           // awaiting approval in this pane, so the shortcut behaves the same as
           // in the single-session chat.
           const approval = pendingToolApprovalRef.current;
           if (!approval) return;
           const autoApprove =
-            modeId === 'yolo' ||
+            modeId === 'izn' ||
             (modeId === 'auto-edit' && approval.toolKind === 'edit');
           if (!autoApprove) return;
           const allowOnce = approval.options.find(

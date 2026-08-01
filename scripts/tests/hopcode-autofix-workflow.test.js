@@ -1197,7 +1197,7 @@ describe('qwen-autofix workflow', () => {
         `"$(node -p "require('./package.json').config.sandboxImageUri")"`,
       );
     }
-    expect(sandboxImageResolverScript).toContain('QWEN_SANDBOX_IMAGE');
+    expect(sandboxImageResolverScript).toContain('HOPCODE_SANDBOX_IMAGE');
     expect(sandboxImageResolverScript).toContain(
       "const GHCR_REPOSITORY = 'qwenlm/hopcode';",
     );

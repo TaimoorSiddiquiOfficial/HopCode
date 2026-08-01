@@ -220,7 +220,7 @@ beforeEach(() => {
   delete process.env['https_proxy'];
   delete process.env['HTTP_PROXY'];
   delete process.env['http_proxy'];
-  delete process.env['QWEN_CODE_DISABLE_CRON'];
+  delete process.env['HOPCODE_CODE_DISABLE_CRON'];
 });
 
 describe('resolveProxy', () => {
@@ -397,7 +397,7 @@ describe('startCommand.handler', () => {
 
   it('does not expose channel loops when cron is disabled', async () => {
     const channels = { telegram: { type: 'telegram' } };
-    process.env['QWEN_CODE_DISABLE_CRON'] = '1';
+    process.env['HOPCODE_CODE_DISABLE_CRON'] = '1';
     mockLoadSettings.mockReturnValue({ merged: { channels } });
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
       throw new Error(`process.exit: ${String(code)}`);
@@ -409,7 +409,7 @@ describe('startCommand.handler', () => {
       );
     } finally {
       exitSpy.mockRestore();
-      delete process.env['QWEN_CODE_DISABLE_CRON'];
+      delete process.env['HOPCODE_CODE_DISABLE_CRON'];
     }
 
     const options = mockCreateChannel.mock.calls[0]?.[3] as
@@ -425,7 +425,7 @@ describe('startCommand.handler', () => {
       telegram: { type: 'telegram' },
       feishu: { type: 'feishu' },
     };
-    process.env['QWEN_CODE_DISABLE_CRON'] = '1';
+    process.env['HOPCODE_CODE_DISABLE_CRON'] = '1';
     mockLoadSettings.mockReturnValue({ merged: { channels } });
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
       throw new Error(`process.exit: ${String(code)}`);
@@ -435,7 +435,7 @@ describe('startCommand.handler', () => {
       await expect(invokeStartHandler({})).rejects.toThrow('process.exit: 1');
     } finally {
       exitSpy.mockRestore();
-      delete process.env['QWEN_CODE_DISABLE_CRON'];
+      delete process.env['HOPCODE_CODE_DISABLE_CRON'];
     }
 
     expect(mockCreateChannel).toHaveBeenCalledTimes(2);

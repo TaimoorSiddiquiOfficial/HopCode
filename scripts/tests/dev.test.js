@@ -98,7 +98,7 @@ describe('scripts/dev.js launcher', () => {
 
   it('re-raises a child signal instead of exiting 0 — close(null, SIGKILL) is not success', async () => {
     // `code ?? 0` read a signal-killed child as green. This launcher is a
-    // QWEN_CODE_CLI entry now: an OOM-killed review gate command must not come
+    // HOPCODE_CODE_CLI entry now: an OOM-killed review gate command must not come
     // back as a passing exit.
     const exitSpy = vi
       .spyOn(process, 'exit')
@@ -117,24 +117,24 @@ describe('scripts/dev.js launcher', () => {
     }
   });
 
-  it('stamps QWEN_CODE_CLI with its own path, overriding an inherited one', async () => {
+  it('stamps HOPCODE_CODE_CLI with its own path, overriding an inherited one', async () => {
     // A dev CLI started from inside another qwen session's shell inherits that
-    // session's QWEN_CODE_CLI. Honouring it points every `qwen …` subprocess of
+    // session's HOPCODE_CODE_CLI. Honouring it points every `qwen …` subprocess of
     // THIS session at the OUTER session's build — the exact version skew the
     // variable exists to prevent, one level up and silent. Each entry stamps
     // itself; nested sessions each call their own build.
-    const inherited = process.env.QWEN_CODE_CLI;
-    process.env.QWEN_CODE_CLI = '/somewhere/else/entirely/qwen';
+    const inherited = process.env.HOPCODE_CODE_CLI;
+    process.env.HOPCODE_CODE_CLI = '/somewhere/else/entirely/qwen';
     try {
       await import('../dev.js?stamps-own-cli');
 
       const [, , options] = spawnMock.mock.calls[0];
-      expect(normalizePath(options.env.QWEN_CODE_CLI)).toMatch(
+      expect(normalizePath(options.env.HOPCODE_CODE_CLI)).toMatch(
         /scripts\/dev\.js$/,
       );
     } finally {
-      if (inherited === undefined) delete process.env.QWEN_CODE_CLI;
-      else process.env.QWEN_CODE_CLI = inherited;
+      if (inherited === undefined) delete process.env.HOPCODE_CODE_CLI;
+      else process.env.HOPCODE_CODE_CLI = inherited;
     }
   });
 });

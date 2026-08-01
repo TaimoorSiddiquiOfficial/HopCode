@@ -685,7 +685,7 @@ type GapText = Record<Exclude<Delivery, 'ok'>, GapEntry>;
  * that every delivery check still passes.
  */
 const rebuildFix = (role: 'verify' | 'reverse-audit', noun: string): string =>
-  `build the prompt with \`"\${QWEN_CODE_CLI:-qwen}" review agent-prompt ` +
+  `build the prompt with \`"\${HOPCODE_CODE_CLI:-qwen}" review agent-prompt ` +
   `--plan <plan> --role ${role} --findings <file> [--rules <rules file>] ` +
   `[--round <k>]\` ` +
   (role === 'reverse-audit'

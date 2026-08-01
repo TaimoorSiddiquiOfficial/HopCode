@@ -1588,7 +1588,7 @@ export function useComposerCore(
   ]);
 
   const promptHistory = useInputHistory();
-  const shellHistory = useInputHistory('qwen-web-shell-command-history');
+  const shellHistory = useInputHistory('hopcode-web-shell-command-history');
 
   const {
     push,

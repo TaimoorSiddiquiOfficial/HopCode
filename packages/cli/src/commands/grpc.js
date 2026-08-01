@@ -1,0 +1,80 @@
+/**
+ * @license
+ * Copyright 2026 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * `hopcode grpc` — starts HopCode as a headless gRPC server.
+ *
+ * Provides bidirectional streaming agent sessions over gRPC,
+ * enabling remote IDE integrations, microservices, and
+ * language-agnostic clients.
+ */
+import { loadCliConfig, parseArguments } from '../config/config.js';
+import { loadSettings } from '../config/settings.js';
+async function buildConfig() {
+    try {
+        const argv = await parseArguments();
+        const settings = loadSettings();
+        return await loadCliConfig(settings.merged, argv, process.cwd());
+    }
+    catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(`[grpc] Could not build in-process config (${msg}); falling back to subprocess mode.`);
+        return undefined;
+    }
+}
+async function startGrpcServer(port, host, useSubprocess) {
+    try {
+        // Build runtime config for in-process mode unless --subprocess is set
+        const runtimeConfig = useSubprocess ? undefined : await buildConfig();
+        // Dynamic import so the server package is only loaded when this command runs.
+        const { HopCodeServer } = await import('@hoptrendy/hopcode-server');
+        const server = new HopCodeServer({
+            port,
+            host,
+            runtimeConfig,
+        });
+        const boundPort = await server.start();
+        const mode = runtimeConfig ? 'in-process' : 'subprocess';
+        console.log(`🐇  HopCode gRPC server running on ${host}:${boundPort} [${mode} mode]`);
+        console.log(`    Proto: packages/server/proto/hopcode.proto`);
+        const shutdown = async () => {
+            console.log('\n[grpc] Shutting down server...');
+            await server.stop();
+            process.exit(0);
+        };
+        process.on('SIGINT', shutdown);
+        process.on('SIGTERM', shutdown);
+    }
+    catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(`❌  Failed to start gRPC server: ${message}`);
+        process.exit(1);
+    }
+}
+export const grpcCommand = {
+    command: 'grpc',
+    describe: 'Start the HopCode gRPC headless server',
+    builder(yargs) {
+        return yargs
+            .option('port', {
+            type: 'number',
+            default: 50051,
+            description: 'Port to listen on',
+        })
+            .option('host', {
+            type: 'string',
+            default: '0.0.0.0',
+            description: 'Host to bind to',
+        })
+            .option('subprocess', {
+            type: 'boolean',
+            default: false,
+            description: 'Use subprocess-per-session mode instead of in-process AgentInteractive (for isolation)',
+        });
+    },
+    async handler(args) {
+        await startGrpcServer(args.port, args.host, args.subprocess);
+    },
+};
+//# sourceMappingURL=grpc.js.map

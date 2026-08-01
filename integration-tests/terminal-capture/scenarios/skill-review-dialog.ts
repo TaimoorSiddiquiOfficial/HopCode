@@ -5,7 +5,7 @@ const base = {
     cols: 112,
     rows: 40,
     theme: 'github-dark',
-    title: 'qwen-code skill review',
+    title: 'hopcode skill review',
     cwd: '../../..',
   },
   gif: false,
@@ -20,13 +20,13 @@ const harness = [
 export default [
   {
     ...base,
-    name: 'skill-review-before-global-qwen',
+    name: 'skill-review-before-global-hopcode',
     spawn: [...harness, 'before'],
     flow: [
       {
         sleep: 7000,
-        capture: 'before-global-qwen.png',
-        captureFull: 'before-global-qwen-full.png',
+        capture: 'before-global-hopcode.png',
+        captureFull: 'before-global-hopcode-full.png',
       },
     ],
   },

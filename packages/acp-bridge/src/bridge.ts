@@ -232,41 +232,41 @@ function extractLoadReplayResponse(state: BridgeSessionState): {
   if (!isRecord(replay) || replay['v'] !== LOAD_REPLAY_VERSION) {
     const version = isRecord(replay) ? replay['v'] : undefined;
     throw new Error(
-      `Invalid qwen.session.loadReplay payload ` +
+      `Invalid hopcode.session.loadReplay payload ` +
         `(type=${describeLoadReplayValue(replay)}, version=${JSON.stringify(version)})`,
     );
   }
   const rawUpdates = replay['updates'];
   if (!Array.isArray(rawUpdates)) {
     throw new Error(
-      `Invalid qwen.session.loadReplay updates ` +
+      `Invalid hopcode.session.loadReplay updates ` +
         `(version=${LOAD_REPLAY_VERSION}, count=not-array)`,
     );
   }
   if (rawUpdates.length > MAX_BULK_REPLAY_UPDATES) {
     throw new Error(
-      `qwen.session.loadReplay updates exceed limit ` +
+      `hopcode.session.loadReplay updates exceed limit ` +
         `(${rawUpdates.length} > ${MAX_BULK_REPLAY_UPDATES})`,
     );
   }
   const partial = replay['partial'];
   if (partial !== undefined && partial !== true) {
     throw new Error(
-      `Invalid qwen.session.loadReplay partial ` +
+      `Invalid hopcode.session.loadReplay partial ` +
         `(version=${LOAD_REPLAY_VERSION}, partial=${JSON.stringify(partial)})`,
     );
   }
   const replayError = replay['replayError'];
   if (replayError !== undefined && typeof replayError !== 'string') {
     throw new Error(
-      `Invalid qwen.session.loadReplay replayError ` +
+      `Invalid hopcode.session.loadReplay replayError ` +
         `(version=${LOAD_REPLAY_VERSION}, replayError=${describeLoadReplayValue(replayError)})`,
     );
   }
   const hasMore = replay['hasMore'];
   if (hasMore !== undefined && typeof hasMore !== 'boolean') {
     throw new Error(
-      `Invalid qwen.session.loadReplay hasMore ` +
+      `Invalid hopcode.session.loadReplay hasMore ` +
         `(version=${LOAD_REPLAY_VERSION}, hasMore=${describeLoadReplayValue(hasMore)})`,
     );
   }
@@ -279,7 +279,7 @@ function extractLoadReplayResponse(state: BridgeSessionState): {
       ? invalidUpdate['sessionUpdate']
       : undefined;
     throw new Error(
-      `Invalid qwen.session.loadReplay update at index ${invalidUpdateIndex} ` +
+      `Invalid hopcode.session.loadReplay update at index ${invalidUpdateIndex} ` +
         `(version=${LOAD_REPLAY_VERSION}, count=${rawUpdates.length}, ` +
         `sessionUpdate=${JSON.stringify(discriminator)})`,
     );

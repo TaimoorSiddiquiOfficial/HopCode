@@ -1727,13 +1727,13 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     const p = buildRoleBrief(PR_PLAN, '7', { planPath: '/tmp/plan.json' });
     expect(p).toContain('.qwen/tmp/review-pr-6766');
     expect(p).toContain(
-      '"${QWEN_CODE_CLI:-qwen}" review test-efficacy /tmp/plan.json',
+      '"${HOPCODE_CODE_CLI:-qwen}" review test-efficacy /tmp/plan.json',
     );
     expect(p).toContain('--base abc123');
     // No bare executable `qwen` anywhere in this brief. Agent 7 is the one
     // SUBAGENT that shells out to the review CLI — the one call site neither the
     // SKILL.md sweep nor check-coverage's stderr hints can reach — and its shell
-    // gets QWEN_CODE_CLI exactly as the orchestrator's does. On the machine that
+    // gets HOPCODE_CODE_CLI exactly as the orchestrator's does. On the machine that
     // motivated the variable, an unprefixed `build-test` resolves to a global old
     // enough to lack the subcommand entirely, wedging the agent between its
     // mandate (no hand-run builds) and a command that does not exist.
@@ -1749,7 +1749,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     // handed a path to that could not resolve from where it was standing.
     const p = buildRoleBrief(PR_PLAN, '7', { planPath: '/abs/tmp/plan.json' });
     expect(p).toContain(
-      '"${QWEN_CODE_CLI:-qwen}" review test-efficacy /abs/tmp/plan.json',
+      '"${HOPCODE_CODE_CLI:-qwen}" review test-efficacy /abs/tmp/plan.json',
     );
     expect(p).toMatch(/--worktree \/[^\s]*review-pr-6766/);
     expect(p).not.toMatch(/--worktree \.qwen/);
@@ -1758,7 +1758,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
 
   it('hands Agent 7 the build-test command with absolute --plan/--worktree/--out', () => {
     const p = buildRoleBrief(PR_PLAN, '7', { planPath: '/abs/tmp/plan.json' });
-    expect(p).toContain('"${QWEN_CODE_CLI:-qwen}" review build-test');
+    expect(p).toContain('"${HOPCODE_CODE_CLI:-qwen}" review build-test');
     expect(p).toContain('--plan /abs/tmp/plan.json');
     expect(p).toMatch(/--worktree \/[^\s]*review-pr-6766/);
     expect(p).not.toMatch(/--plan \.qwen/);
@@ -1786,7 +1786,7 @@ describe('buildRoleBrief — every agent, not just the territory ones', () => {
     const p = buildRoleBrief(local, '7', {
       planPath: '/abs/tmp/local-plan.json',
     });
-    expect(p).toContain('"${QWEN_CODE_CLI:-qwen}" review build-test');
+    expect(p).toContain('"${HOPCODE_CODE_CLI:-qwen}" review build-test');
     expect(p).toContain('--plan /abs/tmp/local-plan.json');
     expect(p).toContain('--worktree /'); // absolute (the resolved cwd), not `.`
     expect(p).not.toContain('undefined');

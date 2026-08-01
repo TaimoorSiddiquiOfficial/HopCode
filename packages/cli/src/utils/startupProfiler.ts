@@ -7,7 +7,7 @@
 /**
  * Lightweight startup performance profiler.
  *
- * Activated by setting QWEN_CODE_PROFILE_STARTUP=1. When enabled, collects
+ * Activated by setting HOPCODE_CODE_PROFILE_STARTUP=1. When enabled, collects
  * high-resolution timestamps at key phases of CLI startup and writes a JSON
  * report to ~/.qwen/startup-perf/ on finalization.
  *
@@ -19,7 +19,7 @@
  *
  * By default profiles inside the sandbox child process to avoid duplicate
  * reports. `qwen serve` has no sandbox child, so it is profiled directly.
- * Set QWEN_CODE_PROFILE_STARTUP_OUTER=1 to also profile the outer
+ * Set HOPCODE_CODE_PROFILE_STARTUP_OUTER=1 to also profile the outer
  * (pre-sandbox) process for non-serve runs; outer reports are written with an
  * `outer-` filename prefix to keep them separate from sandbox-child reports.
  *
@@ -137,12 +137,12 @@ export function initStartupProfiler(): void {
   // Reset any prior state so the function is idempotent.
   resetStartupProfiler();
 
-  if (process.env['QWEN_CODE_PROFILE_STARTUP'] !== '1') {
+  if (process.env['HOPCODE_CODE_PROFILE_STARTUP'] !== '1') {
     return;
   }
 
   const inSandboxChild = !!process.env['SANDBOX'];
-  const outerOptIn = process.env['QWEN_CODE_PROFILE_STARTUP_OUTER'] === '1';
+  const outerOptIn = process.env['HOPCODE_CODE_PROFILE_STARTUP_OUTER'] === '1';
   const serveCommand = isServeFastPathArgv(process.argv.slice(2));
 
   // Non-serve outer (pre-sandbox) collection requires an explicit opt-in to
@@ -155,9 +155,9 @@ export function initStartupProfiler(): void {
   enabled = true;
   outerProcess = !inSandboxChild && !serveCommand;
   // Default to capturing heap snapshots at every checkpoint.
-  // Disable with QWEN_CODE_PROFILE_STARTUP_NO_HEAP=1 when measuring the
+  // Disable with HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP=1 when measuring the
   // Heisenberg overhead of the heap call itself.
-  captureHeap = process.env['QWEN_CODE_PROFILE_STARTUP_NO_HEAP'] !== '1';
+  captureHeap = process.env['HOPCODE_CODE_PROFILE_STARTUP_NO_HEAP'] !== '1';
   finalized = false;
   processUptimeAtT0Ms = Math.round(process.uptime() * 1000 * 100) / 100;
   t0 = performance.now();

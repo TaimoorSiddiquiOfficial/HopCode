@@ -1,0 +1,42 @@
+src/agents/runtime/agent-core.ts(93,10): error TS2305: Module '"../../config/models.js"' has no exported member 'DEFAULT_HOPCODE_MODEL'.
+src/agents/runtime/agent-headless.ts(42,10): error TS2305: Module '"../../config/models.js"' has no exported member 'DEFAULT_HOPCODE_MODEL'.
+src/config/config.ts(183,1): error TS6133: 'DEFAULT_QWEN_EMBEDDING_MODEL' is declared but its value is never read.
+src/config/config.ts(1907,32): error TS2552: Cannot find name 'DEFAULT_HOPCODE_EMBEDDING_MODEL'. Did you mean 'DEFAULT_QWEN_EMBEDDING_MODEL'?
+src/core/prompts.ts(932,16): error TS2552: Cannot find name 'qwenVlToolCallExamples'. Did you mean 'getToolCallExamples'?
+src/core/prompts.ts(1259,10): error TS2304: Cannot find name 'QURAN_GUIDED_AGENT_PROMPT'.
+src/core/prompts.ts(1272,32): error TS2304: Cannot find name 'getQuranGuidedBehavior'.
+src/extension/extension-converter.ts(38,7): error TS2322: Type '"HopCode"' is not assignable to type 'ExtensionOriginSource'.
+src/extension/extension-store.ts(239,25): error TS2551: Property 'getGlobalQwenDir' does not exist on type 'typeof Storage'. Did you mean 'getGlobalIdeDir'?
+src/extension/extensionManager.ts(2422,11): error TS2322: Type '"HopCode" | ExtensionOriginSource' is not assignable to type 'ExtensionOriginSource | undefined'.
+  Type '"HopCode"' is not assignable to type 'ExtensionOriginSource | undefined'.
+src/ide/ide-client.ts(921,5): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/ide/ide-client.ts(948,5): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/ide/ide-client.ts(962,5): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/ide/ide-client.ts(978,5): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/index.ts(20,3): error TS2305: Module '"./config/models.js"' has no exported member 'DEFAULT_HOPCODE_MODEL'.
+src/index.ts(21,3): error TS2724: '"./config/models.js"' has no exported member named 'DEFAULT_HOPCODE_FLASH_MODEL'. Did you mean 'DEFAULT_QWEN_FLASH_MODEL'?
+src/index.ts(22,3): error TS2724: '"./config/models.js"' has no exported member named 'DEFAULT_HOPCODE_EMBEDDING_MODEL'. Did you mean 'DEFAULT_QWEN_EMBEDDING_MODEL'?
+src/models/constants.ts(8,3): error TS2305: Module '"../config/models.js"' has no exported member 'DEFAULT_HOPCODE_MODEL'.
+src/models/modelConfigResolver.ts(23,10): error TS2305: Module '"../config/models.js"' has no exported member 'DEFAULT_HOPCODE_MODEL'.
+src/models/modelRegistry.ts(18,10): error TS2305: Module '"../config/models.js"' has no exported member 'DEFAULT_HOPCODE_MODEL'.
+src/models/modelsConfig.ts(12,10): error TS2305: Module '"../config/models.js"' has no exported member 'DEFAULT_HOPCODE_MODEL'.
+src/plan-gate/planApprovalGate.ts(47,28): error TS2339: Property 'getPlanGateState' does not exist on type 'Config'.
+src/services/fileHistoryService.ts(19,43): error TS2305: Module '"diff"' has no exported member 'Hunk'.
+src/services/sessionService.ts(514,25): error TS2551: Property 'getGlobalQwenDir' does not exist on type 'typeof Storage'. Did you mean 'getGlobalIdeDir'?
+src/services/sessionTitle.ts(128,40): error TS2304: Cannot find name 'isSystemReminderContent'.
+src/services/usageHistoryService.ts(257,41): error TS2551: Property 'getGlobalQwenDir' does not exist on type 'typeof Storage'. Did you mean 'getGlobalIdeDir'?
+src/telemetry/loggers.ts(771,3): error TS2304: Cannot find name 'QwenLogger'.
+src/telemetry/loggers.ts(826,3): error TS2304: Cannot find name 'QwenLogger'.
+src/tools/diffOptions.ts(10,41): error TS2694: Namespace '"D:/HopCode/node_modules/diff/libesm/index"' has no exported member 'PatchOptions'.
+src/tools/diffOptions.ts(46,16): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/tools/diffOptions.ts(47,5): error TS2322: Type 'undefined' is not assignable to type 'string'.
+src/tools/diffOptions.ts(50,3): error TS2322: Type 'undefined' is not assignable to type 'string'.
+src/tools/diffOptions.ts(62,9): error TS2694: Namespace '"D:/HopCode/node_modules/diff/libesm/index"' has no exported member 'ParsedDiff'.
+src/tools/diffOptions.ts(73,7): error TS18048: 'result' is possibly 'undefined'.
+src/tools/diffOptions.ts(97,33): error TS2694: Namespace '"D:/HopCode/node_modules/diff/libesm/index"' has no exported member 'ParsedDiff'.
+src/tools/diffOptions.ts(103,37): error TS2694: Namespace '"D:/HopCode/node_modules/diff/libesm/index"' has no exported member 'Hunk'.
+src/tools/enterPlanMode.ts(106,54): error TS2339: Property 'YOLO' does not exist on type 'typeof ApprovalMode'.
+src/utils/fileUtils.ts(1713,75): error TS2304: Cannot find name 'pdfFailure'.
+src/utils/fileUtils.ts(1715,18): error TS2304: Cannot find name 'pdfFailure'.
+src/utils/gitDiff.ts(19,15): error TS2305: Module '"diff"' has no exported member 'Hunk'.
+src/utils/sideQuery.ts(15,10): error TS2305: Module '"../config/models.js"' has no exported member 'DEFAULT_HOPCODE_MODEL'.

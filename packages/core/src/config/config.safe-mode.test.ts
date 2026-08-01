@@ -197,7 +197,7 @@ describe('Config safe mode', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env = { ...originalEnv };
-    delete process.env['QWEN_CODE_SAFE_MODE'];
+    delete process.env['HOPCODE_CODE_SAFE_MODE'];
     (fs.existsSync as Mock).mockReturnValue(true);
     (fs.readdirSync as Mock).mockReturnValue([]);
     vi.mocked(fs.realpathSync).mockImplementation((p) => p.toString());
@@ -218,32 +218,32 @@ describe('Config safe mode', () => {
       expect(config.isSafeMode()).toBe(true);
     });
 
-    it('returns true when QWEN_CODE_SAFE_MODE=true', () => {
-      process.env['QWEN_CODE_SAFE_MODE'] = 'true';
+    it('returns true when HOPCODE_CODE_SAFE_MODE=true', () => {
+      process.env['HOPCODE_CODE_SAFE_MODE'] = 'true';
       const config = new Config(baseParams);
       expect(config.isSafeMode()).toBe(true);
     });
 
-    it('returns true when QWEN_CODE_SAFE_MODE=1', () => {
-      process.env['QWEN_CODE_SAFE_MODE'] = '1';
+    it('returns true when HOPCODE_CODE_SAFE_MODE=1', () => {
+      process.env['HOPCODE_CODE_SAFE_MODE'] = '1';
       const config = new Config(baseParams);
       expect(config.isSafeMode()).toBe(true);
     });
 
-    it('returns false when QWEN_CODE_SAFE_MODE is set to other values', () => {
-      process.env['QWEN_CODE_SAFE_MODE'] = 'false';
+    it('returns false when HOPCODE_CODE_SAFE_MODE is set to other values', () => {
+      process.env['HOPCODE_CODE_SAFE_MODE'] = 'false';
       const config = new Config(baseParams);
       expect(config.isSafeMode()).toBe(false);
     });
 
     it('explicit false param overrides env var (--no-safe-mode)', () => {
-      process.env['QWEN_CODE_SAFE_MODE'] = 'true';
+      process.env['HOPCODE_CODE_SAFE_MODE'] = 'true';
       const config = new Config({ ...baseParams, safeMode: false });
       expect(config.isSafeMode()).toBe(false);
     });
 
     it('undefined param falls through to env var', () => {
-      process.env['QWEN_CODE_SAFE_MODE'] = 'true';
+      process.env['HOPCODE_CODE_SAFE_MODE'] = 'true';
       const config = new Config({ ...baseParams, safeMode: undefined });
       expect(config.isSafeMode()).toBe(true);
     });

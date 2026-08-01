@@ -70,7 +70,7 @@ import {
  */
 // Derived from the session id at call time, not a constant: the args file is
 // named for the session that wrote it, and `submit` (a subprocess of that
-// session) reads the same name from the same inherited `QWEN_CODE_SESSION_ID`.
+// session) reads the same name from the same inherited `HOPCODE_CODE_SESSION_ID`.
 function defaultSkillArgsPath(): string {
   return skillArgsPath('review');
 }

@@ -263,7 +263,7 @@ export function ImpressiveWorkflows({
         {primarySuccess && Object.keys(primarySuccess).length > 0 && (
           <HorizontalBarChart
             data={primarySuccess}
-            title="What Helped Most (Qwen's Capabilities)"
+            title="What Helped Most (HopCode's Capabilities)"
             color="#3b82f6"
             allowedKeys={[
               'fast_accurate_search',
@@ -567,13 +567,13 @@ function HopCodeMdAdditionsSection({
   const checkedCount = checkedState.filter(Boolean).length;
 
   return (
-    <div className="qwen-md-section">
+    <div className="hopcode-md-section">
       <h3>Suggested HOPCODE.md Additions</h3>
       <p className="text-xs text-slate-500 mb-3">
         Just copy this into HopCode to add it to your HOPCODE.md.
       </p>
 
-      <div className="qwen-md-actions" style={{ marginBottom: '12px' }}>
+      <div className="hopcode-md-actions" style={{ marginBottom: '12px' }}>
         <button
           className={`copy-all-btn ${copiedAll ? 'copied' : ''}`}
           onClick={handleCopyAll}
@@ -584,7 +584,7 @@ function HopCodeMdAdditionsSection({
       </div>
 
       {additions.map((item, idx) => (
-        <div key={idx} className="qwen-md-item">
+        <div key={idx} className="hopcode-md-item">
           <input
             type="checkbox"
             checked={checkedState[idx]}

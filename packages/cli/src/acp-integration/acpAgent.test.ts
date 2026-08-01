@@ -195,7 +195,7 @@ vi.mock('@hoptrendy/hopcode-core', () => ({
   })),
   APPROVAL_MODE_INFO: {},
   APPROVAL_MODES: [],
-  ApprovalMode: { YOLO: 'yolo' },
+  ApprovalMode: { IZN: 'izn' },
   isGatedMcpScope: (scope: unknown) =>
     scope === 'project' || scope === 'workspace',
   matchesAnyServerPattern: (name: string, patterns: string[] | undefined) =>
@@ -3722,7 +3722,7 @@ describe('QwenAgent MCP SSE/HTTP support', () => {
       getModelsConfig: vi.fn().mockReturnValue({
         getGenerationConfig: vi
           .fn()
-          .mockReturnValue({ apiKey: 'QWEN_OAUTH_DYNAMIC_TOKEN' }),
+          .mockReturnValue({ apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN' }),
         getCurrentAuthType: vi.fn().mockReturnValue('qwen-oauth'),
         syncAfterAuthRefresh: vi.fn(),
       }),

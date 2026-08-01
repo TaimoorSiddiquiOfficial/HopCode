@@ -220,17 +220,17 @@ describe('createApprovalModeOverride bound-tool isolation', () => {
   it('isolates child approval-mode revisions from a parent in plan mode', async () => {
     const parent = await createParentWithRegistry();
     vi.spyOn(parent, 'isTrustedFolder').mockReturnValue(true);
-    parent.setApprovalMode(ApprovalMode.YOLO);
+    parent.setApprovalMode(ApprovalMode.IZN);
     parent.setApprovalMode(ApprovalMode.PLAN);
     const parentRevision = parent.getApprovalModeRevision();
-    expect(parent.getPrePlanMode()).toBe(ApprovalMode.YOLO);
+    expect(parent.getPrePlanMode()).toBe(ApprovalMode.IZN);
 
     const { config: child } = await createApprovalModeOverride(
       parent,
       ApprovalMode.PLAN,
     );
 
-    expect(child.getPrePlanMode()).toBe(ApprovalMode.YOLO);
+    expect(child.getPrePlanMode()).toBe(ApprovalMode.IZN);
     expect(child.getApprovalModeRevision()).toBe(0);
 
     child.setApprovalMode(ApprovalMode.DEFAULT);

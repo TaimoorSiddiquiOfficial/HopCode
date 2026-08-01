@@ -11,7 +11,7 @@
  * provides deterministic regex-based blocking that cannot be bypassed by
  * classifier failures.
  *
- * Only applies in AUTO mode — YOLO mode is an explicit opt-out of all guards.
+ * Only applies in AUTO mode — IZN mode is an explicit opt-out of all guards.
  */
 
 import type { Content, Part } from '@google/genai';

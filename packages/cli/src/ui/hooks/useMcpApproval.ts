@@ -79,7 +79,7 @@ export const useMcpApproval = (config: Config) => {
   // live server map + persisted approvals). Reused for both the initial mount
   // and mid-session recomputes triggered by a settings hot-reload.
   const computePending = useCallback((): PendingMcpServer[] => {
-    if (config.getApprovalMode() === ApprovalMode.YOLO) return [];
+    if (config.getApprovalMode() === ApprovalMode.IZN) return [];
     const servers = config.getMcpServers() ?? {};
     const approvals = loadMcpApprovals();
     const root = config.getWorkingDir();

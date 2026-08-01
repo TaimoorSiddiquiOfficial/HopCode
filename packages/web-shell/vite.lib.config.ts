@@ -22,12 +22,12 @@ function scopeComponentCss(css: string): string {
     const name = atRule.name.toLowerCase();
     if (name.endsWith('keyframes')) {
       const original = atRule.params.trim();
-      const scoped = `qwen-web-shell-${original}`;
+      const scoped = `hopcode-web-shell-${original}`;
       keyframeNames.set(original, scoped);
       atRule.params = scoped;
     } else if (name === 'property' && atRule.params.startsWith('--')) {
       const original = atRule.params.trim();
-      const scoped = `--qwen-web-shell-${original.slice(2)}`;
+      const scoped = `--hopcode-web-shell-${original.slice(2)}`;
       propertyNames.set(original, scoped);
       atRule.params = scoped;
     }

@@ -431,7 +431,7 @@ async function maybeOpenWebShellBrowser(
   await openBrowser(handle, true);
 }
 
-async function emitHeadlessYoloWarning(
+async function emitHeadlessIznWarning(
   settings: ServeFastPathSettings | undefined,
 ): Promise<void> {
   if (!settings) return;
@@ -530,7 +530,7 @@ export async function tryRunServeFastPath(
       deferRuntimeUntilFirstHealth: !parsed.open,
     });
     try {
-      await emitHeadlessYoloWarning(settings);
+      await emitHeadlessIznWarning(settings);
     } catch {
       // Keep the warning best-effort, matching the yargs serve handler.
     }

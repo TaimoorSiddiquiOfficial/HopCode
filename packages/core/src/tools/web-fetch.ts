@@ -240,7 +240,7 @@ class WebFetchToolInvocation extends BaseToolInvocation<
 
   private getUserAgent(): string {
     const version = this.config.getCliVersion?.() || 'unknown';
-    return `QwenCode/${version} ${USER_AGENT_SUFFIX}`;
+    return `HopCode/${version} ${USER_AGENT_SUFFIX}`;
   }
 
   private fetchPlan?: { url: string; upgradedFrom?: string };

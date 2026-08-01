@@ -686,7 +686,7 @@ export class DaemonChannelBridge
           // carrying only the id, status, and _meta.shellProgress stats.
           // Channels have no use for it — drop it without flagging the
           // session as malformed. Gate on shellProgress (matching the
-          // qwen-agent and web-shell normalizer guards) so a genuinely
+          // hopcode-agent and web-shell normalizer guards) so a genuinely
           // malformed kind-less tool_call still reaches emitProtocolError
           // below instead of being silently swallowed.
           break;

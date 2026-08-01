@@ -1044,8 +1044,8 @@ describe('extensionSettings', () => {
 
     it('synchronizes legacy sensitive settings through the current backend', async () => {
       const previousStorageOverride =
-        process.env['QWEN_CODE_FORCE_FILE_STORAGE'];
-      process.env['QWEN_CODE_FORCE_FILE_STORAGE'] = 'true';
+        process.env['HOPCODE_CODE_FORCE_FILE_STORAGE'];
+      process.env['HOPCODE_CODE_FORCE_FILE_STORAGE'] = 'true';
       try {
         await maybePromptForSettings(
           config,
@@ -1057,9 +1057,9 @@ describe('extensionSettings', () => {
         );
       } finally {
         if (previousStorageOverride === undefined) {
-          delete process.env['QWEN_CODE_FORCE_FILE_STORAGE'];
+          delete process.env['HOPCODE_CODE_FORCE_FILE_STORAGE'];
         } else {
-          process.env['QWEN_CODE_FORCE_FILE_STORAGE'] = previousStorageOverride;
+          process.env['HOPCODE_CODE_FORCE_FILE_STORAGE'] = previousStorageOverride;
         }
       }
 

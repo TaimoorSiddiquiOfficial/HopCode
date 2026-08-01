@@ -386,7 +386,7 @@ class EditToolInvocation implements ToolInvocation<EditToolParams, ToolResult> {
    * Edit operations always need user confirmation, except for the private
    * managed auto-memory files (user/project) which are written autonomously.
    * Team memory is shared and committed to the repo, so it is NOT auto-allowed
-   * like the private tiers — edits default to 'ask'. (In AUTO_EDIT/YOLO the user
+   * like the private tiers — edits default to 'ask'. (In AUTO_EDIT/IZN the user
    * has globally opted into auto-approval; team writes still surface in the git
    * diff for review before commit.)
    */

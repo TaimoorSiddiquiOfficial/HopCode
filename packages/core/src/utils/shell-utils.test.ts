@@ -404,10 +404,10 @@ describe('checkCommandPermissions', () => {
 
 describe('getCommandRoot — parameter expansion in command position', () => {
   // The bundled /review skill invokes every command as
-  // `"${QWEN_CODE_CLI:-qwen}" review …`. Before this resolver, such a command
+  // `"${HOPCODE_CODE_CLI:-qwen}" review …`. Before this resolver, such a command
   // had NO identifiable root — the shell tool hard-refused it ("Could not
   // identify command root to obtain permission from user") before any approval
-  // mode was consulted, YOLO included. Dogfooded live on every /review run.
+  // mode was consulted, IZN included. Dogfooded live on every /review run.
   const NAME = 'SHELL_UTILS_TEST_ENTRY';
   afterEach(() => {
     delete process.env[NAME];

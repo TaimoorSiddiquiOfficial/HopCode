@@ -68,8 +68,8 @@ describe('modelConfigUtils', () => {
       ).toBe(AuthType.USE_GEMINI);
     });
 
-    it('should return USE_OPENAI when the model is given via QWEN_MODEL', () => {
-      // QWEN_MODEL is a valid USE_OPENAI model var (see AUTH_ENV_MODEL_VARS),
+    it('should return USE_OPENAI when the model is given via HOPCODE_MODEL', () => {
+      // HOPCODE_MODEL is a valid USE_OPENAI model var (see AUTH_ENV_MODEL_VARS),
       // so a config that sets it instead of OPENAI_MODEL must still resolve.
       process.env['OPENAI_API_KEY'] = 'test-key';
       // OPENAI_MODEL and OPENAI_BASE_URL are required

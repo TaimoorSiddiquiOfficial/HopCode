@@ -91,17 +91,17 @@ export class TranscriptsUnavailableError extends Error {}
  *
  * Both halves come from the environment the CLI exported, never from an argument:
  * a path the model can choose is a path the model can point somewhere flattering.
- * `QWEN_CODE_PROJECT_DIR` exists because the project dir is keyed on the session's
+ * `HOPCODE_CODE_PROJECT_DIR` exists because the project dir is keyed on the session's
  * *launch* cwd, and this subcommand may well be running inside a PR worktree the
  * skill `cd`-ed into — recomputing it from `process.cwd()` yields a directory that
  * never existed.
  */
 export function transcriptDir(env: NodeJS.ProcessEnv = process.env): string {
-  const projectDir = env['QWEN_CODE_PROJECT_DIR']?.trim();
-  const sessionId = env['QWEN_CODE_SESSION_ID']?.trim();
+  const projectDir = env['HOPCODE_CODE_PROJECT_DIR']?.trim();
+  const sessionId = env['HOPCODE_CODE_SESSION_ID']?.trim();
   if (!projectDir || !sessionId) {
     throw new TranscriptsUnavailableError(
-      'the CLI did not export QWEN_CODE_PROJECT_DIR / QWEN_CODE_SESSION_ID, so ' +
+      'the CLI did not export HOPCODE_CODE_PROJECT_DIR / HOPCODE_CODE_SESSION_ID, so ' +
         "this run cannot find the harness's record of what its agents did",
     );
   }

@@ -154,9 +154,9 @@ export interface BridgeRestoreSessionRequest {
   sourceId?: string;
 }
 
-export const LOAD_REPLAY_MODE_META_KEY = 'qwen.session.loadReplayMode';
-export const LOAD_REPLAY_META_KEY = 'qwen.session.loadReplay';
-export const LOAD_REPLAY_PAGE_SIZE_META_KEY = 'qwen.session.loadReplayPageSize';
+export const LOAD_REPLAY_MODE_META_KEY = 'hopcode.session.loadReplayMode';
+export const LOAD_REPLAY_META_KEY = 'hopcode.session.loadReplay';
+export const LOAD_REPLAY_PAGE_SIZE_META_KEY = 'hopcode.session.loadReplayPageSize';
 export const LOAD_REPLAY_BULK_MODE = 'bulk';
 export const LOAD_REPLAY_VERSION = 1 as const;
 

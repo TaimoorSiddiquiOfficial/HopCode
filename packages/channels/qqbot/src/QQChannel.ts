@@ -1,4 +1,4 @@
-﻿/**
+/**
  * QQ Bot channel adapter for HopCode.
  *
  * Connects QQ Bot via official QQ Bot WebSocket API.
@@ -529,10 +529,10 @@ export class QQChannel extends ChannelBase {
         '先去掉 @标签和你的名字，剩下的内容是对你的提问或指令吗？',
         '',
         '以下场景即使 @了你也必须沉默：',
-        '1. 纯提及/陈述 — "QwenCode 好像变聪明了"',
-        '2. 转述/引用 — "刚才 QwenCode 给的方案可以"',
-        '3. 间接呼叫 — "@李四 你让 QwenCode 查下"',
-        '4. 调侃/试探 — "这事 QwenCode 肯定不知道"',
+        '1. 纯提及/陈述 — "HopCode 好像变聪明了"',
+        '2. 转述/引用 — "刚才 HopCode 给的方案可以"',
+        '3. 间接呼叫 — "@李四 你让 HopCode 查下"',
+        '4. 调侃/试探 — "这事 HopCode 肯定不知道"',
         '',
         '### 回复准则',
         '- 被唤醒后直接做事，禁止"我在"等占位回复',

@@ -379,7 +379,7 @@ function channelFileDirs(): string[] {
 
 // Capture before tests stub TMPDIR; one assertion checks the host temp root.
 const realTmpDir = tmpdir();
-const suiteTmpDir = mkdtempSync(join(realTmpDir, 'qwen-wecom-test-'));
+const suiteTmpDir = mkdtempSync(join(realTmpDir, 'hopcode-wecom-test-'));
 
 describe('WeComChannel', () => {
   beforeAll(() => {
@@ -1656,8 +1656,8 @@ describe('WeComChannel', () => {
   });
 
   it('logs sanitized payloads only when debug payload logging is enabled', async () => {
-    const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-    process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = 'bot';
+    const oldDebugPayload = process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
+    process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = 'bot';
     const channel = new TestWeComChannel('bot', makeConfig(), makeBridge());
     const writeSpy = vi
       .spyOn(process.stderr, 'write')
@@ -1684,9 +1684,9 @@ describe('WeComChannel', () => {
       logged = writeSpy.mock.calls.map((call) => String(call[0])).join('');
     } finally {
       if (oldDebugPayload === undefined) {
-        delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+        delete process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
       } else {
-        process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+        process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
       }
       writeSpy.mockRestore();
     }

@@ -40,7 +40,7 @@ let ENV: NodeJS.ProcessEnv;
 
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), 'compose-cov-'));
-  ENV = { QWEN_CODE_PROJECT_DIR: dir, QWEN_CODE_SESSION_ID: 'S1' };
+  ENV = { HOPCODE_CODE_PROJECT_DIR: dir, HOPCODE_CODE_SESSION_ID: 'S1' };
   mkdirSync(join(dir, 'subagents', 'S1'), { recursive: true });
 });
 
@@ -1038,15 +1038,15 @@ describe('composeReviewCommand handler (the CLI glue)', () => {
         inputPath,
         JSON.stringify({
           planPath,
-          env: { QWEN_CODE_PROJECT_DIR: forged, QWEN_CODE_SESSION_ID: 'S1' },
+          env: { HOPCODE_CODE_PROJECT_DIR: forged, HOPCODE_CODE_SESSION_ID: 'S1' },
           modelId: MODEL,
         }),
       );
       const commentsPath = join(dir, 'comments.json');
       writeFileSync(commentsPath, '[]', 'utf8');
       const outPath = join(dir, 'out.json');
-      const prevProj = process.env['QWEN_CODE_PROJECT_DIR'];
-      delete process.env['QWEN_CODE_PROJECT_DIR']; // real env cannot find transcripts
+      const prevProj = process.env['HOPCODE_CODE_PROJECT_DIR'];
+      delete process.env['HOPCODE_CODE_PROJECT_DIR']; // real env cannot find transcripts
       try {
         (composeReviewCommand.handler as (argv: unknown) => void)({
           input: inputPath,
@@ -1054,8 +1054,8 @@ describe('composeReviewCommand handler (the CLI glue)', () => {
           out: outPath,
         });
       } finally {
-        if (prevProj === undefined) delete process.env['QWEN_CODE_PROJECT_DIR'];
-        else process.env['QWEN_CODE_PROJECT_DIR'] = prevProj;
+        if (prevProj === undefined) delete process.env['HOPCODE_CODE_PROJECT_DIR'];
+        else process.env['HOPCODE_CODE_PROJECT_DIR'] = prevProj;
       }
       const written = JSON.parse(
         readFileSync(outPath, 'utf8'),
@@ -1118,7 +1118,7 @@ describe('coverage is recomputed, never accepted', () => {
     expect(r.body).toContain('never named the diff file');
     expect(r.body).not.toContain('agent-prompt');
     expect(r.remediation.join(' ')).toContain(
-      '"${QWEN_CODE_CLI:-qwen}" review agent-prompt',
+      '"${HOPCODE_CODE_CLI:-qwen}" review agent-prompt',
     );
     expect(r.remediation.join(' ')).toMatch(/do not relaunch the old prompt/);
     // Blind agents read nothing, so the chunks they owned are also chunks
@@ -1160,7 +1160,7 @@ describe('coverage is recomputed, never accepted', () => {
     // The FIX names the run's REAL plan path — a `<plan>` placeholder pasted
     // literally parses as a shell redirection.
     expect(r.remediation.join(' ')).toContain(
-      `"\${QWEN_CODE_CLI:-qwen}" review agent-prompt --plan '${p}' --roster`,
+      `"\${HOPCODE_CODE_CLI:-qwen}" review agent-prompt --plan '${p}' --roster`,
     );
   });
 
@@ -1226,10 +1226,10 @@ describe('coverage is recomputed, never accepted', () => {
     const commentsPath = join(dir, 'comments.json');
     writeFileSync(commentsPath, '[]', 'utf8');
 
-    const prevDir = process.env['QWEN_CODE_PROJECT_DIR'];
-    const prevSession = process.env['QWEN_CODE_SESSION_ID'];
-    process.env['QWEN_CODE_PROJECT_DIR'] = ENV['QWEN_CODE_PROJECT_DIR'];
-    process.env['QWEN_CODE_SESSION_ID'] = ENV['QWEN_CODE_SESSION_ID'];
+    const prevDir = process.env['HOPCODE_CODE_PROJECT_DIR'];
+    const prevSession = process.env['HOPCODE_CODE_SESSION_ID'];
+    process.env['HOPCODE_CODE_PROJECT_DIR'] = ENV['HOPCODE_CODE_PROJECT_DIR'];
+    process.env['HOPCODE_CODE_SESSION_ID'] = ENV['HOPCODE_CODE_SESSION_ID'];
     try {
       vi.mocked(writeStderrLine).mockClear();
       vi.mocked(writeStdoutLine).mockClear();
@@ -1263,10 +1263,10 @@ describe('coverage is recomputed, never accepted', () => {
         .find((l) => l.startsWith('Verdict:'));
       expect(parsedOut.verdictLine).toBe(printedVerdict);
     } finally {
-      if (prevDir === undefined) delete process.env['QWEN_CODE_PROJECT_DIR'];
-      else process.env['QWEN_CODE_PROJECT_DIR'] = prevDir;
-      if (prevSession === undefined) delete process.env['QWEN_CODE_SESSION_ID'];
-      else process.env['QWEN_CODE_SESSION_ID'] = prevSession;
+      if (prevDir === undefined) delete process.env['HOPCODE_CODE_PROJECT_DIR'];
+      else process.env['HOPCODE_CODE_PROJECT_DIR'] = prevDir;
+      if (prevSession === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
+      else process.env['HOPCODE_CODE_SESSION_ID'] = prevSession;
     }
   });
 
@@ -1280,8 +1280,8 @@ describe('coverage is recomputed, never accepted', () => {
       suggestionsInline: 0,
       planPath: coveredPlan(),
       env: {
-        QWEN_CODE_PROJECT_DIR: join(dir, 'no-such-project'),
-        QWEN_CODE_SESSION_ID: 'S1',
+        HOPCODE_CODE_PROJECT_DIR: join(dir, 'no-such-project'),
+        HOPCODE_CODE_SESSION_ID: 'S1',
       },
       modelId: MODEL,
     });

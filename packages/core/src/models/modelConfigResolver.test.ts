@@ -267,7 +267,7 @@ describe('modelConfigResolver', () => {
         expect(result.config.timeout).toBe(0);
         expect(result.sources['timeout'].kind).toBe('env');
         expect(result.sources['timeout'].envKey).toBe(
-          'QWEN_CODE_API_TIMEOUT_MS',
+          'HOPCODE_CODE_API_TIMEOUT_MS',
         );
       });
 
@@ -483,7 +483,7 @@ describe('modelConfigResolver', () => {
         expect(result.config.timeout).toBe(0);
         expect(result.sources['timeout'].kind).toBe('env');
         expect(result.sources['timeout'].envKey).toBe(
-          'QWEN_CODE_API_TIMEOUT_MS',
+          'HOPCODE_CODE_API_TIMEOUT_MS',
         );
       });
 

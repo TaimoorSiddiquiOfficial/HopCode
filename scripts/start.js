@@ -69,7 +69,7 @@ const env = {
   // nothing else publishes it, and a /review run from `npm start` would fall
   // back to whatever `qwen` PATH resolves to. Assignment, not `||=`, for the
   // same reason as scripts/dev.js: an inherited value is another session's CLI.
-  QWEN_CODE_CLI: fileURLToPath(import.meta.url),
+  HOPCODE_CODE_CLI: fileURLToPath(import.meta.url),
 };
 
 if (process.env.DEBUG) {
@@ -87,7 +87,7 @@ const child = spawn('node', nodeArgs, {
 });
 
 child.on('close', (code, signal) => {
-  // Same contract as scripts/dev.js: this launcher is a QWEN_CODE_CLI entry, and
+  // Same contract as scripts/dev.js: this launcher is a HOPCODE_CODE_CLI entry, and
   // a signal-killed child (`code === null`) must not exit 0 — `process.exit(null)`
   // coerces to success. Re-raise the signal; fall back to a non-zero exit.
   if (signal) {

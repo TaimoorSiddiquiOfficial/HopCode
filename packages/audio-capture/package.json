@@ -1,7 +1,7 @@
 {
   "name": "@hoptrendy/audio-capture",
   "version": "0.30.7",
-  "description": "Native microphone capture backend for Qwen Code voice input",
+  "description": "Native microphone capture backend for HopCode voice input",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

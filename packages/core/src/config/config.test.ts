@@ -892,17 +892,17 @@ describe('Server Config (config.ts)', () => {
   });
 
   describe('getCronRecurringMaxAgeDays', () => {
-    const prevEnv = process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'];
+    const prevEnv = process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'];
     afterEach(() => {
       if (prevEnv === undefined) {
-        delete process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'];
+        delete process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'];
       } else {
-        process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'] = prevEnv;
+        process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'] = prevEnv;
       }
     });
 
     it('defaults to 7 days and follows the setting', () => {
-      delete process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'];
+      delete process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'];
       expect(new Config(baseParams).getCronRecurringMaxAgeDays()).toBe(7);
       expect(
         new Config({
@@ -913,7 +913,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     it('maps 0 to Infinity (no expiry)', () => {
-      delete process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'];
+      delete process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'];
       expect(
         new Config({
           ...baseParams,
@@ -922,24 +922,24 @@ describe('Server Config (config.ts)', () => {
       ).toBe(Infinity);
     });
 
-    it('QWEN_CODE_CRON_MAX_AGE_DAYS overrides the setting', () => {
-      process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'] = '90';
+    it('HOPCODE_CODE_CRON_MAX_AGE_DAYS overrides the setting', () => {
+      process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'] = '90';
       expect(
         new Config({
           ...baseParams,
           cronRecurringMaxAgeDays: 30,
         }).getCronRecurringMaxAgeDays(),
       ).toBe(90);
-      process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'] = '0';
+      process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'] = '0';
       expect(new Config(baseParams).getCronRecurringMaxAgeDays()).toBe(
         Infinity,
       );
     });
 
     it('falls back to the default on invalid values', () => {
-      process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'] = 'not-a-number';
+      process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'] = 'not-a-number';
       expect(new Config(baseParams).getCronRecurringMaxAgeDays()).toBe(7);
-      delete process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'];
+      delete process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'];
       expect(
         new Config({
           ...baseParams,
@@ -949,7 +949,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     it('warns on the console once at construction for an invalid value', () => {
-      process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'] = 'not-a-number';
+      process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'] = 'not-a-number';
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       try {
         const config = new Config(baseParams);
@@ -958,7 +958,7 @@ describe('Server Config (config.ts)', () => {
         expect(config.getCronRecurringMaxAgeDays()).toBe(7);
         expect(config.getCronRecurringMaxAgeDays()).toBe(7);
         const cronWarnings = warnSpy.mock.calls.filter((call) =>
-          String(call[0]).includes('QWEN_CODE_CRON_MAX_AGE_DAYS'),
+          String(call[0]).includes('HOPCODE_CODE_CRON_MAX_AGE_DAYS'),
         );
         expect(cronWarnings).toHaveLength(1);
       } finally {
@@ -967,11 +967,11 @@ describe('Server Config (config.ts)', () => {
     });
 
     it('resolves once at construction, ignoring later env changes (requiresRestart)', () => {
-      process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'] = '90';
+      process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'] = '90';
       const config = new Config(baseParams);
-      process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'] = '3';
+      process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'] = '3';
       expect(config.getCronRecurringMaxAgeDays()).toBe(90);
-      delete process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'];
+      delete process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'];
       expect(config.getCronRecurringMaxAgeDays()).toBe(90);
     });
   });
@@ -2747,9 +2747,9 @@ describe('Server Config (config.ts)', () => {
         expect(config.isRecordArtifactEnabled()).toBe(false);
       });
 
-      it('lets QWEN_CODE_DISABLE_ARTIFACT override settings and env enablement', () => {
-        process.env['QWEN_CODE_DISABLE_ARTIFACT'] = '1';
-        process.env['QWEN_CODE_ENABLE_ARTIFACT'] = '1';
+      it('lets HOPCODE_CODE_DISABLE_ARTIFACT override settings and env enablement', () => {
+        process.env['HOPCODE_CODE_DISABLE_ARTIFACT'] = '1';
+        process.env['HOPCODE_CODE_ENABLE_ARTIFACT'] = '1';
 
         const config = new Config({
           ...baseParams,
@@ -5854,18 +5854,18 @@ describe('setApprovalMode with folder trust', () => {
       expect(config.getApprovalModeRevision()).toBe(initialRevision + 2);
     });
 
-    it('records prePlanMode=yolo for a Shift+Tab cycle into plan mode', () => {
+    it('records prePlanMode=izn for a Shift+Tab cycle into plan mode', () => {
       const config = new Config(baseParams);
       vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
 
       // Simulate the Shift+Tab cycle order:
-      // default → auto-edit → auto → yolo → plan
+      // default → auto-edit → auto → izn → plan
       config.setApprovalMode(ApprovalMode.AUTO_EDIT);
       config.setApprovalMode(ApprovalMode.AUTO);
-      config.setApprovalMode(ApprovalMode.YOLO);
+      config.setApprovalMode(ApprovalMode.IZN);
       config.setApprovalMode(ApprovalMode.PLAN);
 
-      expect(config.getPrePlanMode()).toBe(ApprovalMode.YOLO);
+      expect(config.getPrePlanMode()).toBe(ApprovalMode.IZN);
     });
 
     it('does not partially apply plan exit bookkeeping when transition work fails', () => {

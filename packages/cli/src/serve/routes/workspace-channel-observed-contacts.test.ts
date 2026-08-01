@@ -41,17 +41,17 @@ describe('workspace observed channel contact routes', () => {
   let previousQwenHome: string | undefined;
 
   beforeEach(async () => {
-    previousQwenHome = process.env['QWEN_HOME'];
+    previousQwenHome = process.env['HOPCODE_HOME'];
     qwenHome = await fsp.mkdtemp(
       path.join(os.tmpdir(), 'qwen-observed-contact-routes-'),
     );
-    process.env['QWEN_HOME'] = qwenHome;
+    process.env['HOPCODE_HOME'] = qwenHome;
   });
 
   afterEach(async () => {
     vi.restoreAllMocks();
-    if (previousQwenHome === undefined) delete process.env['QWEN_HOME'];
-    else process.env['QWEN_HOME'] = previousQwenHome;
+    if (previousQwenHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = previousQwenHome;
     await fsp.rm(qwenHome, { recursive: true, force: true });
   });
 

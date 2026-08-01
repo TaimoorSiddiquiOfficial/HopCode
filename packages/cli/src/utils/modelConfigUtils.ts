@@ -208,7 +208,7 @@ export function getAuthTypeFromEnv(
 
   if (
     env['OPENAI_API_KEY'] &&
-    (env['OPENAI_MODEL'] || env['QWEN_MODEL']) &&
+    (env['OPENAI_MODEL'] || env['HOPCODE_MODEL']) &&
     env['OPENAI_BASE_URL']
   ) {
     return AuthType.USE_OPENAI;

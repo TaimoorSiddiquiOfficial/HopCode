@@ -72,7 +72,7 @@ vi.mock('@hoptrendy/channel-base', () => ({
       return Promise.resolve();
     }
   },
-  getGlobalQwenDir: () => '/tmp/test-qwen',
+  getGlobalHopCodeDir: () => '/tmp/test-hopcode',
   sanitizeLogText: (text: string, _maxLen: number): string =>
     String(text).slice(0, 200),
   sanitizeSenderName: (name: string): string => name || 'QQ User',

@@ -1,0 +1,24 @@
+declare const _default: {
+    '00-index': string;
+    '01-architecture': string;
+    '02-serve-runtime': string;
+    '03-acp-bridge': string;
+    '04-permission-mediation': string;
+    '05-mcp-transport-pool': string;
+    '06-mcp-budget-guardrails': string;
+    '07-workspace-filesystem': string;
+    '08-session-lifecycle': string;
+    '09-event-schema': string;
+    '10-event-bus': string;
+    '11-capabilities-versioning': string;
+    '12-auth-security': string;
+    '13-sdk-daemon-client': string;
+    '14-cli-tui-adapter': string;
+    '15-channel-adapters': string;
+    '16-vscode-ide-adapter': string;
+    '17-configuration': string;
+    '18-error-taxonomy': string;
+    '19-observability': string;
+    '20-quickstart-operations': string;
+};
+export default _default;

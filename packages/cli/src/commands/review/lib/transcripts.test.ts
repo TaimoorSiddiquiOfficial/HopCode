@@ -27,7 +27,7 @@ let ENV: NodeJS.ProcessEnv;
 
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), 'transcripts-'));
-  ENV = { QWEN_CODE_PROJECT_DIR: dir, QWEN_CODE_SESSION_ID: 'S1' };
+  ENV = { HOPCODE_CODE_PROJECT_DIR: dir, HOPCODE_CODE_SESSION_ID: 'S1' };
   mkdirSync(join(dir, 'subagents', 'S1'), { recursive: true });
 });
 afterEach(() => rmSync(dir, { recursive: true, force: true }));
@@ -42,10 +42,10 @@ describe('transcriptDir — resolved from the environment only', () => {
   });
 
   it('throws when only one key is present', () => {
-    expect(() => transcriptDir({ QWEN_CODE_SESSION_ID: 'S1' })).toThrow(
+    expect(() => transcriptDir({ HOPCODE_CODE_SESSION_ID: 'S1' })).toThrow(
       TranscriptsUnavailableError,
     );
-    expect(() => transcriptDir({ QWEN_CODE_PROJECT_DIR: '/p' })).toThrow(
+    expect(() => transcriptDir({ HOPCODE_CODE_PROJECT_DIR: '/p' })).toThrow(
       TranscriptsUnavailableError,
     );
   });
@@ -56,8 +56,8 @@ describe('readTranscripts — defensive parsing', () => {
     // Not a verdict about the agents — an infrastructure fact.
     expect(() =>
       readTranscripts(undefined, {
-        QWEN_CODE_PROJECT_DIR: join(dir, 'gone'),
-        QWEN_CODE_SESSION_ID: 'S1',
+        HOPCODE_CODE_PROJECT_DIR: join(dir, 'gone'),
+        HOPCODE_CODE_SESSION_ID: 'S1',
       }),
     ).toThrow(TranscriptsUnavailableError);
   });

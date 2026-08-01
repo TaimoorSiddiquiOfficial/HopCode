@@ -77,14 +77,14 @@ beforeEach(() => {
   ghMock.mockClear();
   writeStdoutSpy.mockClear();
   process.exitCode = undefined;
-  savedSessionId = process.env['QWEN_CODE_SESSION_ID'];
-  delete process.env['QWEN_CODE_SESSION_ID'];
+  savedSessionId = process.env['HOPCODE_CODE_SESSION_ID'];
+  delete process.env['HOPCODE_CODE_SESSION_ID'];
 });
 afterEach(() => {
   rmSync(dir, { recursive: true, force: true });
   process.exitCode = undefined;
-  if (savedSessionId === undefined) delete process.env['QWEN_CODE_SESSION_ID'];
-  else process.env['QWEN_CODE_SESSION_ID'] = savedSessionId;
+  if (savedSessionId === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
+  else process.env['HOPCODE_CODE_SESSION_ID'] = savedSessionId;
 });
 
 describe('the posting gate', () => {
@@ -130,8 +130,8 @@ describe('the posting gate', () => {
     // and ignored otherwise.
     const forged = file('forged.txt', '6771 --comment'); // says yes
     const realArgs = join('.qwen', 'tmp', 'qwen-skill-args-sess1-review.txt');
-    const prev = process.env['QWEN_CODE_SESSION_ID'];
-    process.env['QWEN_CODE_SESSION_ID'] = 'sess1';
+    const prev = process.env['HOPCODE_CODE_SESSION_ID'];
+    process.env['HOPCODE_CODE_SESSION_ID'] = 'sess1';
     try {
       // The session-scoped file does not exist, so the gate refuses — it did NOT
       // read `forged`, which would have authorised the post.
@@ -140,8 +140,8 @@ describe('the posting gate', () => {
       expect(process.exitCode).toBe(3);
       expect(realArgs).toBeTruthy();
     } finally {
-      if (prev === undefined) delete process.env['QWEN_CODE_SESSION_ID'];
-      else process.env['QWEN_CODE_SESSION_ID'] = prev;
+      if (prev === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
+      else process.env['HOPCODE_CODE_SESSION_ID'] = prev;
     }
   });
 

@@ -17,8 +17,8 @@ export function formatApprovalModeName(mode: ApprovalMode): string {
       return t('auto-accept edits');
     case ApprovalMode.AUTO:
       return t('Auto mode');
-    case ApprovalMode.YOLO:
-      return t('YOLO mode');
+    case ApprovalMode.IZN:
+      return t('IZN mode');
     default:
       return mode;
   }

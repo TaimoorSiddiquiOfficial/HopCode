@@ -279,7 +279,6 @@ export enum ApprovalMode {
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
   IZN = 'izn',
-  YOLO = 'yolo',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -338,11 +337,6 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
   [ApprovalMode.IZN]: {
     id: ApprovalMode.IZN,
     name: 'IZN',
-    description: 'Autonomous mode with scope reporting',
-  },
-  [ApprovalMode.YOLO]: {
-    id: ApprovalMode.YOLO,
-    name: 'YOLO',
     description: 'Maximum autonomy, no confirmation prompts',
   },
 };
@@ -1069,7 +1063,7 @@ export interface ConfigParameters {
    * Idle timeout in milliseconds for MCP tool calls. If the MCP server does
    * not produce any response or progress update within this time, the call
    * is aborted. Default: 300000 (5 minutes). Can be overridden via
-   * QWEN_CODE_MCP_TOOL_IDLE_TIMEOUT_MS environment variable.
+   * HOPCODE_CODE_MCP_TOOL_IDLE_TIMEOUT_MS environment variable.
    */
   mcpToolIdleTimeoutMs?: number;
   /**
@@ -1201,7 +1195,7 @@ export interface ConfigParameters {
   /**
    * Safe mode: disables all user customizations (context files, hooks,
    * extensions, skills, MCP servers, rules) for troubleshooting.
-   * Activated via `--safe-mode` CLI flag or `QWEN_CODE_SAFE_MODE=true` env var.
+   * Activated via `--safe-mode` CLI flag or `HOPCODE_CODE_SAFE_MODE=true` env var.
    */
   safeMode?: boolean;
   /**
@@ -1521,7 +1515,7 @@ function resolveSensitiveSpanAttributeMaxLength(
  * construction — the setting declares `requiresRestart`, so re-reading
  * the environment per call could let the tool description, tool output,
  * and scheduler each report a different expiry if the env var changed
- * mid-session. The QWEN_CODE_CRON_MAX_AGE_DAYS environment variable
+ * mid-session. The HOPCODE_CODE_CRON_MAX_AGE_DAYS environment variable
  * overrides the settings value (convenient for cloud/container
  * deployments). `normalizeRecurringMaxAge` owns the `0 → Infinity`
  * (no expiry) contract shared with the CronScheduler constructor.
@@ -1531,7 +1525,7 @@ function resolveSensitiveSpanAttributeMaxLength(
  * otherwise surface only as "jobs stopped firing after 7 days".
  */
 function resolveCronRecurringMaxAgeDays(setting: number | undefined): number {
-  const env = process.env['QWEN_CODE_CRON_MAX_AGE_DAYS'];
+  const env = process.env['HOPCODE_CODE_CRON_MAX_AGE_DAYS'];
   const fromEnv = env !== undefined && env.trim() !== '';
   const raw = fromEnv ? Number(env) : setting;
   if (raw === undefined || !Number.isFinite(raw) || raw < 0) {
@@ -1539,7 +1533,7 @@ function resolveCronRecurringMaxAgeDays(setting: number | undefined): number {
       // eslint-disable-next-line no-console -- operator-facing misconfiguration breadcrumb; debug file logging is usually off in daemon deployments
       console.warn(
         (fromEnv
-          ? `QWEN_CODE_CRON_MAX_AGE_DAYS="${env}" is invalid`
+          ? `HOPCODE_CODE_CRON_MAX_AGE_DAYS="${env}" is invalid`
           : `cronRecurringMaxAgeDays=${setting} is invalid`) +
           `; recurring cron jobs will expire after the ` +
           `${DEFAULT_RECURRING_MAX_AGE_DAYS}-day default.`,
@@ -1957,7 +1951,7 @@ export class Config {
     this.cliAllowedMcpServerNames = params.cliAllowedMcpServerNames;
     this.excludedMcpServers = params.excludedMcpServers;
     this.pendingMcpServers = params.pendingMcpServers;
-    const envTimeout = process.env['QWEN_CODE_MCP_TOOL_IDLE_TIMEOUT_MS'];
+    const envTimeout = process.env['HOPCODE_CODE_MCP_TOOL_IDLE_TIMEOUT_MS'];
     const parsedEnv = envTimeout !== undefined ? Number(envTimeout) : NaN;
     this.mcpToolIdleTimeoutMs =
       params.mcpToolIdleTimeoutMs ??
@@ -2162,7 +2156,7 @@ export class Config {
     // where it is the only consumer and there is nothing to collide with.
     registerSessionProjectDir(this.sessionId, this.storage.getProjectDir());
     if (!projectDirEnvClaimed && process.env) {
-      process.env['QWEN_CODE_PROJECT_DIR'] = this.storage.getProjectDir();
+      process.env['HOPCODE_CODE_PROJECT_DIR'] = this.storage.getProjectDir();
       projectDirEnvClaimed = true;
     }
     this.inputFormat = params.inputFormat ?? InputFormat.TEXT;
@@ -5450,20 +5444,20 @@ export class Config {
 
   isArtifactEnabled(): boolean {
     // Publishing writes outside the project and opens a browser, so it is
-    // limited to interactive, non-SDK sessions. QWEN_CODE_DISABLE_ARTIFACT
-    // hard-disables both artifact tools; QWEN_CODE_ENABLE_ARTIFACT remains as
+    // limited to interactive, non-SDK sessions. HOPCODE_CODE_DISABLE_ARTIFACT
+    // hard-disables both artifact tools; HOPCODE_CODE_ENABLE_ARTIFACT remains as
     // a compatibility override for old configs that explicitly disabled them.
-    if (process.env['QWEN_CODE_DISABLE_ARTIFACT'] === '1') return false;
+    if (process.env['HOPCODE_CODE_DISABLE_ARTIFACT'] === '1') return false;
     if (this.sdkMode) return false;
     if (!this.interactive) return false;
-    if (process.env['QWEN_CODE_ENABLE_ARTIFACT'] === '1') return true;
+    if (process.env['HOPCODE_CODE_ENABLE_ARTIFACT'] === '1') return true;
     return this.artifactEnabled;
   }
 
   isRecordArtifactEnabled(): boolean {
-    if (process.env['QWEN_CODE_DISABLE_ARTIFACT'] === '1') return false;
+    if (process.env['HOPCODE_CODE_DISABLE_ARTIFACT'] === '1') return false;
     if (this.sdkMode) return false;
-    if (process.env['QWEN_CODE_ENABLE_ARTIFACT'] === '1') return true;
+    if (process.env['HOPCODE_CODE_ENABLE_ARTIFACT'] === '1') return true;
     return this.artifactEnabled;
   }
 

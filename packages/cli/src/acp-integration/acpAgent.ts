@@ -766,7 +766,7 @@ const HOPCODE_CORE_SETTING_DEFINITIONS = {
   'general.language': { type: 'string' },
   'tools.approvalMode': {
     type: 'enum',
-    values: ['plan', 'default', 'auto-edit', 'auto', 'yolo'],
+    values: ['plan', 'default', 'auto-edit', 'auto', 'izn'],
   },
   'general.vimMode': { type: 'boolean' },
   'general.enableAutoUpdate': { type: 'boolean' },
@@ -3119,7 +3119,7 @@ class QwenAgent implements Agent {
             mcpServers,
             cwd,
             config.getCliAllowedMcpServerNames(),
-            config.getApprovalMode() === ApprovalMode.YOLO,
+            config.getApprovalMode() === ApprovalMode.IZN,
           );
           config.setExcludedMcpServers(gating.excluded ?? []);
           config.setAllowedMcpServers(gating.allowed);

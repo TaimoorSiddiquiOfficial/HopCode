@@ -170,13 +170,13 @@ async function withIsolatedWorkspace<T>(
   const scratch = await fs.mkdtemp(path.join(os.tmpdir(), 'facade-ws-'));
   const home = path.join(scratch, 'home');
   const workspace = path.join(scratch, 'workspace');
-  const originalQwenHome = process.env['QWEN_HOME'];
+  const originalQwenHome = process.env['HOPCODE_HOME'];
   const originalTrustedFoldersPath =
-    process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'];
+    process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
   await fs.mkdir(home, { recursive: true });
   await fs.mkdir(workspace, { recursive: true });
-  process.env['QWEN_HOME'] = home;
-  process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'] = path.join(
+  process.env['HOPCODE_HOME'] = home;
+  process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = path.join(
     home,
     TRUSTED_FOLDERS_FILENAME,
   );
@@ -187,14 +187,14 @@ async function withIsolatedWorkspace<T>(
   } finally {
     await fs.rm(scratch, { recursive: true, force: true });
     if (originalQwenHome === undefined) {
-      delete process.env['QWEN_HOME'];
+      delete process.env['HOPCODE_HOME'];
     } else {
-      process.env['QWEN_HOME'] = originalQwenHome;
+      process.env['HOPCODE_HOME'] = originalQwenHome;
     }
     if (originalTrustedFoldersPath === undefined) {
-      delete process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'];
+      delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
     } else {
-      process.env['QWEN_CODE_TRUSTED_FOLDERS_PATH'] =
+      process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] =
         originalTrustedFoldersPath;
     }
     resetHomeEnvBootstrapForTesting();

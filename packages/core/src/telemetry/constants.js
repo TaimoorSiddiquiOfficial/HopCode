@@ -1,0 +1,86 @@
+/**
+ * @license
+ * Copyright 2025 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+export const SERVICE_NAME = 'hopcode';
+export const EVENT_USER_PROMPT = 'hopcode.user_prompt';
+export const EVENT_USER_RETRY = 'hopcode.user_retry';
+export const EVENT_TOOL_CALL = 'hopcode.tool_call';
+export const EVENT_API_REQUEST = 'hopcode.api_request';
+export const EVENT_API_ERROR = 'hopcode.api_error';
+export const EVENT_API_CANCEL = 'hopcode.api_cancel';
+export const EVENT_API_RESPONSE = 'hopcode.api_response';
+export const EVENT_CLI_CONFIG = 'hopcode.config';
+export const EVENT_EXTENSION_DISABLE = 'hopcode.extension_disable';
+export const EVENT_EXTENSION_ENABLE = 'hopcode.extension_enable';
+export const EVENT_EXTENSION_INSTALL = 'hopcode.extension_install';
+export const EVENT_EXTENSION_UNINSTALL = 'hopcode.extension_uninstall';
+export const EVENT_EXTENSION_UPDATE = 'hopcode.extension_update';
+export const EVENT_FLASH_FALLBACK = 'hopcode.flash_fallback';
+export const EVENT_RIPGREP_FALLBACK = 'hopcode.ripgrep_fallback';
+export const EVENT_NEXT_SPEAKER_CHECK = 'hopcode.next_speaker_check';
+export const EVENT_SLASH_COMMAND = 'hopcode.slash_command';
+export const EVENT_IDE_CONNECTION = 'hopcode.ide_connection';
+export const EVENT_CHAT_COMPRESSION = 'hopcode.chat_compression';
+export const EVENT_INVALID_CHUNK = 'hopcode.chat.invalid_chunk';
+export const EVENT_CONTENT_RETRY = 'hopcode.chat.content_retry';
+export const EVENT_CONTENT_RETRY_FAILURE = 'qwen-code.chat.content_retry_failure';
+export const EVENT_PROTOCOL_TAG_SANITIZED = 'qwen-code.chat.protocol_tag_sanitized';
+// Phase 4b — HTTP-status retry telemetry emitted by `retryWithBackoff` for
+// 429 / 5xx errors at LLM call sites. Distinct from EVENT_CONTENT_RETRY,
+// which is fired by geminiChat for InvalidStreamError retries on a separate
+// retry budget. See docs/design/telemetry-llm-request-timing-design.md.
+export const EVENT_API_RETRY = 'hopcode.api_retry';
+export const EVENT_CONVERSATION_FINISHED = 'hopcode.conversation_finished';
+export const EVENT_MALFORMED_JSON_RESPONSE = 'hopcode.malformed_json_response';
+export const EVENT_FILE_OPERATION = 'hopcode.file_operation';
+export const EVENT_MODEL_SLASH_COMMAND = 'hopcode.slash_command.model';
+export const EVENT_SUBAGENT_EXECUTION = 'hopcode.subagent_execution';
+export const EVENT_SKILL_LAUNCH = 'hopcode.skill_launch';
+export const EVENT_AUTH = 'hopcode.auth';
+export const EVENT_USER_FEEDBACK = 'hopcode.user_feedback';
+export const EVENT_TOOL_OUTPUT_TRUNCATED = 'hopcode.tool_output_truncated';
+export const DEFAULT_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH = 1024 * 1024;
+export const SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT = 100 * 1024 * 1024;
+export function isValidSensitiveSpanAttributeMaxLength(value) {
+    return (Number.isSafeInteger(value) &&
+        value >= 1 &&
+        value <= SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT);
+}
+// Prompt Suggestion Events
+export const EVENT_PROMPT_SUGGESTION = 'hopcode.prompt_suggestion';
+export const EVENT_SPECULATION = 'hopcode.speculation';
+// Workflow Events (#4721)
+export const EVENT_WORKFLOW_KEYWORD = 'hopcode.workflow_keyword';
+export const EVENT_WORKFLOW_RUN = 'hopcode.workflow_run';
+// Arena Events
+export const EVENT_ARENA_SESSION_STARTED = 'hopcode.arena_session_started';
+export const EVENT_ARENA_AGENT_COMPLETED = 'hopcode.arena_agent_completed';
+export const EVENT_ARENA_SESSION_ENDED = 'hopcode.arena_session_ended';
+// Performance Events
+export const EVENT_STARTUP_PERFORMANCE = 'hopcode.startup.performance';
+export const EVENT_MEMORY_USAGE = 'hopcode.memory.usage';
+export const EVENT_PERFORMANCE_BASELINE = 'hopcode.performance.baseline';
+export const EVENT_PERFORMANCE_REGRESSION = 'hopcode.performance.regression';
+// Managed Auto-Memory Events
+export const EVENT_MEMORY_EXTRACT = 'hopcode.memory.extract';
+export const EVENT_MEMORY_DREAM = 'hopcode.memory.dream';
+export const EVENT_MEMORY_RECALL = 'hopcode.memory.recall';
+// Session Tracing Span Names
+export const SPAN_INTERACTION = 'hopcode.interaction';
+export const SPAN_LLM_REQUEST = 'hopcode.llm_request';
+export const SPAN_TOOL = 'hopcode.tool';
+export const SPAN_TOOL_EXECUTION = 'hopcode.tool.execution';
+/** Brackets the time a tool spends in `awaiting_approval` waiting on the user. */
+export const SPAN_TOOL_BLOCKED_ON_USER = 'hopcode.tool.blocked_on_user';
+/** Wraps each pre/post-tool-use hook fire site for per-hook latency / decision tracking. */
+export const SPAN_HOOK = 'hopcode.hook';
+/**
+ * Wraps a single subagent invocation. Parents the LLM/tool/hook spans the
+ * subagent emits, so concurrent subagents (parallel AGENT tool calls) get
+ * isolated subtrees instead of interleaving under the parent interaction
+ * (#3731 Phase 3).
+ */
+export const SPAN_SUBAGENT = 'hopcode.subagent';
+//# sourceMappingURL=constants.js.map

@@ -18,7 +18,7 @@ function formatDays(days: number): string {
 
 /**
  * Expiry paragraph for the tool description. The max age comes from config
- * (settings / QWEN_CODE_CRON_MAX_AGE_DAYS) at construction time —
+ * (settings / HOPCODE_CODE_CRON_MAX_AGE_DAYS) at construction time —
  * changing it requires a restart, so baking it into the static
  * description is safe. Infinity (setting 0) disables expiry.
  */

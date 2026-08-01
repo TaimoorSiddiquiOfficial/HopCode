@@ -22,7 +22,7 @@ import {
 } from './paths.js';
 
 describe('createMemoryScopedAgentConfig', () => {
-  const originalMemoryBase = process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+  const originalMemoryBase = process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
   let tempDir: string;
   let projectRoot: string;
 
@@ -30,7 +30,7 @@ describe('createMemoryScopedAgentConfig', () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'memory-scoped-'));
     projectRoot = path.join(tempDir, 'project');
     await fs.mkdir(projectRoot, { recursive: true });
-    process.env['QWEN_CODE_MEMORY_BASE_DIR'] = path.join(tempDir, 'memory');
+    process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = path.join(tempDir, 'memory');
     clearAutoMemoryRootCache();
     await fs.mkdir(path.join(getAutoMemoryRoot(projectRoot), 'project'), {
       recursive: true,
@@ -42,9 +42,9 @@ describe('createMemoryScopedAgentConfig', () => {
 
   afterEach(async () => {
     if (originalMemoryBase === undefined) {
-      delete process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+      delete process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
     } else {
-      process.env['QWEN_CODE_MEMORY_BASE_DIR'] = originalMemoryBase;
+      process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = originalMemoryBase;
     }
     clearAutoMemoryRootCache();
     await fs.rm(tempDir, { recursive: true, force: true });
@@ -349,7 +349,7 @@ describe('createMemoryScopedAgentConfig', () => {
 });
 
 describe('isAllowedMemoryPath with a symlinked project root', () => {
-  const originalMemoryLocal = process.env['QWEN_CODE_MEMORY_LOCAL'];
+  const originalMemoryLocal = process.env['HOPCODE_CODE_MEMORY_LOCAL'];
   let baseDir: string;
   let projectRoot: string;
 
@@ -361,7 +361,7 @@ describe('isAllowedMemoryPath with a symlinked project root', () => {
     // (e.g. macOS `/var` -> `/private/var`). The memory root is deliberately
     // NOT created, so the allow-check must resolve the nearest existing
     // ancestor (the symlink) rather than assume the root already exists.
-    process.env['QWEN_CODE_MEMORY_LOCAL'] = '1';
+    process.env['HOPCODE_CODE_MEMORY_LOCAL'] = '1';
     baseDir = await fs.mkdtemp(path.join(os.tmpdir(), 'memory-symlink-'));
     const realProject = path.join(baseDir, 'realproj');
     projectRoot = path.join(baseDir, 'linkproj');
@@ -372,9 +372,9 @@ describe('isAllowedMemoryPath with a symlinked project root', () => {
 
   afterEach(async () => {
     if (originalMemoryLocal === undefined) {
-      delete process.env['QWEN_CODE_MEMORY_LOCAL'];
+      delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     } else {
-      process.env['QWEN_CODE_MEMORY_LOCAL'] = originalMemoryLocal;
+      process.env['HOPCODE_CODE_MEMORY_LOCAL'] = originalMemoryLocal;
     }
     clearAutoMemoryRootCache();
     await fs.rm(baseDir, { recursive: true, force: true });
@@ -406,13 +406,13 @@ describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
   // project. Canonicalizing such a symlink would relocate the "allowed" root
   // out of the project, so the anchor is canonicalized but the `.qwen/memory`
   // suffix is appended literally and the write is denied.
-  const originalMemoryLocal = process.env['QWEN_CODE_MEMORY_LOCAL'];
+  const originalMemoryLocal = process.env['HOPCODE_CODE_MEMORY_LOCAL'];
   let baseDir: string;
   let projectRoot: string;
   let outsideDir: string;
 
   beforeEach(async () => {
-    process.env['QWEN_CODE_MEMORY_LOCAL'] = '1';
+    process.env['HOPCODE_CODE_MEMORY_LOCAL'] = '1';
     baseDir = await fs.mkdtemp(path.join(os.tmpdir(), 'memory-qwenlink-'));
     projectRoot = path.join(baseDir, 'repo');
     outsideDir = path.join(baseDir, 'outside');
@@ -426,9 +426,9 @@ describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
 
   afterEach(async () => {
     if (originalMemoryLocal === undefined) {
-      delete process.env['QWEN_CODE_MEMORY_LOCAL'];
+      delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     } else {
-      process.env['QWEN_CODE_MEMORY_LOCAL'] = originalMemoryLocal;
+      process.env['HOPCODE_CODE_MEMORY_LOCAL'] = originalMemoryLocal;
     }
     clearAutoMemoryRootCache();
     await fs.rm(baseDir, { recursive: true, force: true });
@@ -454,20 +454,20 @@ describe('isAllowedMemoryPath with a symlinked managed-memory suffix', () => {
 });
 
 describe('isAllowedMemoryPath in default (shared) memory mode', () => {
-  // The two symlink blocks above both force QWEN_CODE_MEMORY_LOCAL=1, so they
+  // The two symlink blocks above both force HOPCODE_CODE_MEMORY_LOCAL=1, so they
   // only exercise the local-mode anchor (the project root). In the default
   // (shared) mode the managed root lives under getMemoryBaseDir() and THAT is
   // the trusted anchor — a distinct branch of getAutoMemoryTrustedAnchor /
   // resolveTrustedMemoryRoot. Pin both sides of its trust boundary too, so a
   // regression in the shared-base-dir path can't stay green behind the local
   // tests.
-  const originalMemoryLocal = process.env['QWEN_CODE_MEMORY_LOCAL'];
-  const originalMemoryBase = process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+  const originalMemoryLocal = process.env['HOPCODE_CODE_MEMORY_LOCAL'];
+  const originalMemoryBase = process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
   let tempDir: string;
   let projectRoot: string;
 
   beforeEach(async () => {
-    delete process.env['QWEN_CODE_MEMORY_LOCAL'];
+    delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'memory-shared-'));
     projectRoot = path.join(tempDir, 'project');
     await fs.mkdir(projectRoot, { recursive: true });
@@ -476,14 +476,14 @@ describe('isAllowedMemoryPath in default (shared) memory mode', () => {
 
   afterEach(async () => {
     if (originalMemoryLocal === undefined) {
-      delete process.env['QWEN_CODE_MEMORY_LOCAL'];
+      delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     } else {
-      process.env['QWEN_CODE_MEMORY_LOCAL'] = originalMemoryLocal;
+      process.env['HOPCODE_CODE_MEMORY_LOCAL'] = originalMemoryLocal;
     }
     if (originalMemoryBase === undefined) {
-      delete process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+      delete process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
     } else {
-      process.env['QWEN_CODE_MEMORY_BASE_DIR'] = originalMemoryBase;
+      process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = originalMemoryBase;
     }
     clearAutoMemoryRootCache();
     await fs.rm(tempDir, { recursive: true, force: true });
@@ -498,7 +498,7 @@ describe('isAllowedMemoryPath in default (shared) memory mode', () => {
     const linkBase = path.join(tempDir, 'link-base');
     await fs.mkdir(realBase, { recursive: true });
     await fs.symlink(realBase, linkBase);
-    process.env['QWEN_CODE_MEMORY_BASE_DIR'] = linkBase;
+    process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = linkBase;
     clearAutoMemoryRootCache();
 
     // Sanity: this is the default (shared) mode — the root lives under the
@@ -520,7 +520,7 @@ describe('isAllowedMemoryPath in default (shared) memory mode', () => {
     const outside = path.join(tempDir, 'outside');
     await fs.mkdir(realBase, { recursive: true });
     await fs.mkdir(outside, { recursive: true });
-    process.env['QWEN_CODE_MEMORY_BASE_DIR'] = realBase;
+    process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = realBase;
     clearAutoMemoryRootCache();
 
     const managedRoot = getAutoMemoryRoot(projectRoot);

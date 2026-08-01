@@ -41,7 +41,7 @@ function createConfig(projectRoot: string, managed = true): Config {
 }
 
 describe('managed memory refresh helper', () => {
-  const originalMemoryBase = process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+  const originalMemoryBase = process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
   let tempDir: string;
   let projectRoot: string;
 
@@ -49,7 +49,7 @@ describe('managed memory refresh helper', () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'memory-refresh-'));
     projectRoot = path.join(tempDir, 'project');
     await fs.mkdir(projectRoot, { recursive: true });
-    process.env['QWEN_CODE_MEMORY_BASE_DIR'] = path.join(tempDir, 'memory');
+    process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = path.join(tempDir, 'memory');
     clearAutoMemoryRootCache();
     vi.mocked(rebuildManagedAutoMemoryIndex).mockReset();
     vi.mocked(rebuildUserAutoMemoryIndex).mockReset();
@@ -59,9 +59,9 @@ describe('managed memory refresh helper', () => {
 
   afterEach(async () => {
     if (originalMemoryBase === undefined) {
-      delete process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+      delete process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
     } else {
-      process.env['QWEN_CODE_MEMORY_BASE_DIR'] = originalMemoryBase;
+      process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = originalMemoryBase;
     }
     clearAutoMemoryRootCache();
     await fs.rm(tempDir, { recursive: true, force: true });

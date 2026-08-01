@@ -25,7 +25,7 @@ export interface EnterPlanModeParams {
    * Set to `true` only when the user explicitly asked for plan mode in this
    * turn (or explicitly confirmed they want it). Distinguishes a genuine
    * user-requested entry from the model deciding to plan on its own, which
-   * matters when the session is in YOLO mode — see the guard in `execute()`.
+   * matters when the session is in IZN mode — see the guard in `execute()`.
    */
   userRequested?: boolean;
 }
@@ -50,7 +50,7 @@ const enterPlanModeToolSchemaData: FunctionDeclaration = {
       userRequested: {
         type: 'boolean',
         description:
-          'Set to true ONLY when the user explicitly asked for plan mode in this turn, or explicitly confirmed they want it. Leave unset (or false) when you are deciding to plan on your own without the user asking. In YOLO mode, an explicit user request will not take effect unless this is true.',
+          'Set to true ONLY when the user explicitly asked for plan mode in this turn, or explicitly confirmed they want it. Leave unset (or false) when you are deciding to plan on your own without the user asking. In IZN mode, an explicit user request will not take effect unless this is true.',
       },
     },
     additionalProperties: false,
@@ -90,30 +90,30 @@ class EnterPlanModeToolInvocation extends BaseToolInvocation<
       );
     }
 
-    // A model-initiated entry from YOLO (not requested by the user this
-    // turn) is a no-op. The user explicitly chose YOLO for low-friction
+    // A model-initiated entry from IZN (not requested by the user this
+    // turn) is a no-op. The user explicitly chose IZN for low-friction
     // execution; silently switching to the read-only Plan mode surprises
     // them and then blocks the reads/writes they expected to proceed
     // (#5970). This tool is ALSO the only door into plan mode in
     // headless/ACP sessions — `/plan` is `interactive`-only and there is no
-    // Shift+Tab there — so a blanket YOLO guard would make a genuine,
+    // Shift+Tab there — so a blanket IZN guard would make a genuine,
     // explicit user request unreachable in those sessions. `userRequested`
     // lets the model tell the two apart: only gate the no-op when the
     // entry is NOT user-requested. Keep the current mode and tell the
     // model to continue planning without switching, or to retry with
     // `userRequested: true` if the user did explicitly ask.
     if (
-      this.config.getApprovalMode() === ApprovalMode.YOLO &&
+      this.config.getApprovalMode() === ApprovalMode.IZN &&
       !this.params.userRequested
     ) {
       debugLogger.info(
-        'Blocked model-initiated plan entry from YOLO (userRequested=%s)',
+        'Blocked model-initiated plan entry from IZN (userRequested=%s)',
         this.params.userRequested,
       );
       return {
         llmContent:
-          'Plan mode was not entered: the session is in YOLO mode, which the user explicitly chose for low-friction execution. Continue investigating and presenting your plan in the current mode without switching. If the user explicitly asked for plan mode in this turn, retry this tool call with userRequested: true.',
-        returnDisplay: 'Stayed in YOLO mode (plan mode not entered).',
+          'Plan mode was not entered: the session is in IZN mode, which the user explicitly chose for low-friction execution. Continue investigating and presenting your plan in the current mode without switching. If the user explicitly asked for plan mode in this turn, retry this tool call with userRequested: true.',
+        returnDisplay: 'Stayed in IZN mode (plan mode not entered).',
       };
     }
 

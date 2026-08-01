@@ -345,10 +345,10 @@ describe('parseChannelConfig', () => {
     await expect(
       parseChannelConfig('bot', {
         type: 'bare',
-        approvalMode: 'YOLO',
+        approvalMode: 'IZN',
       }),
     ).rejects.toThrow(
-      'Channel "bot" field "approvalMode" must be one of: plan, default, auto-edit, auto, yolo.',
+      'Channel "bot" field "approvalMode" must be one of: plan, default, auto-edit, auto, izn.',
     );
   });
 

@@ -1,0 +1,27 @@
+src/config/config.ts(183,1): error TS6133: 'DEFAULT_QWEN_EMBEDDING_MODEL' is declared but its value is never read.
+src/config/config.ts(183,10): error TS2724: '"./models.js"' has no exported member named 'DEFAULT_QWEN_EMBEDDING_MODEL'. Did you mean 'DEFAULT_HOPCODE_EMBEDDING_MODEL'?
+src/config/config.ts(1907,32): error TS2552: Cannot find name 'DEFAULT_HOPCODE_EMBEDDING_MODEL'. Did you mean 'DEFAULT_QWEN_EMBEDDING_MODEL'?
+src/ide/ide-client.ts(641,32): error TS2551: Property 'getGlobalIdeDir' does not exist on type 'typeof Storage'. Did you mean 'getGlobalDebugDir'?
+src/ide/ide-client.ts(675,28): error TS2551: Property 'getGlobalIdeDir' does not exist on type 'typeof Storage'. Did you mean 'getGlobalDebugDir'?
+src/ide/ide-client.ts(849,15): error TS2551: Property 'getGlobalIdeDir' does not exist on type 'typeof Storage'. Did you mean 'getGlobalDebugDir'?
+src/ide/ide-client.ts(921,5): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/ide/ide-client.ts(948,5): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/ide/ide-client.ts(962,5): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/ide/ide-client.ts(978,5): error TS2589: Type instantiation is excessively deep and possibly infinite.
+src/plan-gate/planApprovalGate.ts(47,28): error TS2339: Property 'getPlanGateState' does not exist on type 'Config'.
+src/services/fileHistoryService.ts(19,43): error TS2305: Module '"diff"' has no exported member 'Hunk'.
+src/services/sessionTitle.ts(128,40): error TS2304: Cannot find name 'isSystemReminderContent'.
+src/telemetry/loggers.ts(771,3): error TS2304: Cannot find name 'QwenLogger'.
+src/telemetry/loggers.ts(826,3): error TS2304: Cannot find name 'QwenLogger'.
+src/tools/diffOptions.ts(10,41): error TS2694: Namespace '"D:/HopCode/node_modules/diff/libesm/index"' has no exported member 'PatchOptions'.
+src/tools/diffOptions.ts(46,16): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/tools/diffOptions.ts(47,5): error TS2322: Type 'undefined' is not assignable to type 'string'.
+src/tools/diffOptions.ts(50,3): error TS2322: Type 'undefined' is not assignable to type 'string'.
+src/tools/diffOptions.ts(62,9): error TS2694: Namespace '"D:/HopCode/node_modules/diff/libesm/index"' has no exported member 'ParsedDiff'.
+src/tools/diffOptions.ts(73,7): error TS18048: 'result' is possibly 'undefined'.
+src/tools/diffOptions.ts(97,33): error TS2694: Namespace '"D:/HopCode/node_modules/diff/libesm/index"' has no exported member 'ParsedDiff'.
+src/tools/diffOptions.ts(103,37): error TS2694: Namespace '"D:/HopCode/node_modules/diff/libesm/index"' has no exported member 'Hunk'.
+src/tools/enterPlanMode.ts(106,54): error TS2339: Property 'YOLO' does not exist on type 'typeof ApprovalMode'.
+src/utils/fileUtils.ts(1713,75): error TS2304: Cannot find name 'pdfFailure'.
+src/utils/fileUtils.ts(1715,18): error TS2304: Cannot find name 'pdfFailure'.
+src/utils/gitDiff.ts(19,15): error TS2305: Module '"diff"' has no exported member 'Hunk'.

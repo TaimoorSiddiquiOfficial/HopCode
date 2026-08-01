@@ -1328,7 +1328,7 @@ export async function runNonInteractive(
         };
 
         const maxToolConcurrency = parsePositiveIntegerEnv(
-          process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'],
+          process.env['HOPCODE_CODE_MAX_TOOL_CONCURRENCY'],
           10,
         );
 
@@ -1341,7 +1341,7 @@ export async function runNonInteractive(
             // in order (so --max-tool-calls caps at exactly N and the
             // abort fires on the same call it would serially), launch only
             // the calls that fit the budget — capped at
-            // QWEN_CODE_MAX_TOOL_CONCURRENCY in flight — then finalise in
+            // HOPCODE_CODE_MAX_TOOL_CONCURRENCY in flight — then finalise in
             // request order once all launched calls have settled.
             const launched: Array<{
               requestInfo: ToolCallRequestInfo;

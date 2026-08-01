@@ -1,0 +1,4 @@
+/**
+ * Tests for WorkspaceEventBus
+ */
+export {};

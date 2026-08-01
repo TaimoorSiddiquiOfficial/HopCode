@@ -12,7 +12,7 @@ import {
 } from '../fake-openai-server.js';
 import { TestRig, type } from '../test-helper.js';
 
-const SANDBOX_MODE = process.env['QWEN_SANDBOX']?.toLowerCase().trim();
+const SANDBOX_MODE = process.env['HOPCODE_SANDBOX']?.toLowerCase().trim();
 const IS_CONTAINER_SANDBOX =
   SANDBOX_MODE === 'docker' || SANDBOX_MODE === 'podman';
 
@@ -121,7 +121,7 @@ describe('Interactive protocol tag retry guard', () => {
 
       try {
         const isReady = await rig.poll(
-          () => /YOLO (模式|mode)/i.test(stripAnsi(rig._interactiveOutput)),
+          () => /IZN (模式|mode)/i.test(stripAnsi(rig._interactiveOutput)),
           30000,
           200,
         );

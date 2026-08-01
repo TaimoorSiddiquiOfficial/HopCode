@@ -52,7 +52,7 @@ const DIFF = '/abs/qwen-review-pr-1-diff.txt';
 
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), 'cov-'));
-  ENV = { QWEN_CODE_PROJECT_DIR: dir, QWEN_CODE_SESSION_ID: 'S1' };
+  ENV = { HOPCODE_CODE_PROJECT_DIR: dir, HOPCODE_CODE_SESSION_ID: 'S1' };
   mkdirSync(join(dir, 'subagents', 'S1'), { recursive: true });
 });
 afterEach(() => rmSync(dir, { recursive: true, force: true }));
@@ -424,8 +424,8 @@ describe('coverage — from the harness, not from the caller', () => {
     // failure and has to say so, or the reader chases agents that ran fine.
     expect(() =>
       coverageFromTranscripts(plan(), {
-        QWEN_CODE_PROJECT_DIR: join(dir, 'gone'),
-        QWEN_CODE_SESSION_ID: 'S1',
+        HOPCODE_CODE_PROJECT_DIR: join(dir, 'gone'),
+        HOPCODE_CODE_SESSION_ID: 'S1',
       }),
     ).toThrow(TranscriptsUnavailableError);
   });
@@ -832,10 +832,10 @@ describe('the roster — who should have been here', () => {
     }
     transcript('sec', wholeDiff(), { calls: 8 });
 
-    const prevDir = process.env['QWEN_CODE_PROJECT_DIR'];
-    const prevSession = process.env['QWEN_CODE_SESSION_ID'];
-    process.env['QWEN_CODE_PROJECT_DIR'] = ENV['QWEN_CODE_PROJECT_DIR'];
-    process.env['QWEN_CODE_SESSION_ID'] = ENV['QWEN_CODE_SESSION_ID'];
+    const prevDir = process.env['HOPCODE_CODE_PROJECT_DIR'];
+    const prevSession = process.env['HOPCODE_CODE_SESSION_ID'];
+    process.env['HOPCODE_CODE_PROJECT_DIR'] = ENV['HOPCODE_CODE_PROJECT_DIR'];
+    process.env['HOPCODE_CODE_SESSION_ID'] = ENV['HOPCODE_CODE_SESSION_ID'];
     const prevExit = process.exitCode;
     try {
       vi.mocked(writeStderrLine).mockClear();
@@ -852,10 +852,10 @@ describe('the roster — who should have been here', () => {
       expect(roleError).toContain(`Looked for them in: ${promptRecordDir(p)}`);
     } finally {
       process.exitCode = prevExit;
-      if (prevDir === undefined) delete process.env['QWEN_CODE_PROJECT_DIR'];
-      else process.env['QWEN_CODE_PROJECT_DIR'] = prevDir;
-      if (prevSession === undefined) delete process.env['QWEN_CODE_SESSION_ID'];
-      else process.env['QWEN_CODE_SESSION_ID'] = prevSession;
+      if (prevDir === undefined) delete process.env['HOPCODE_CODE_PROJECT_DIR'];
+      else process.env['HOPCODE_CODE_PROJECT_DIR'] = prevDir;
+      if (prevSession === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
+      else process.env['HOPCODE_CODE_SESSION_ID'] = prevSession;
     }
   });
 
@@ -869,10 +869,10 @@ describe('the roster — who should have been here', () => {
     rmSync(join(dir, 'subagents', 'S1', 'agent-r-1c.jsonl'), { force: true });
     transcript('sec', wholeDiff(), { calls: 8 });
 
-    const prevDir = process.env['QWEN_CODE_PROJECT_DIR'];
-    const prevSession = process.env['QWEN_CODE_SESSION_ID'];
-    process.env['QWEN_CODE_PROJECT_DIR'] = ENV['QWEN_CODE_PROJECT_DIR'];
-    process.env['QWEN_CODE_SESSION_ID'] = ENV['QWEN_CODE_SESSION_ID'];
+    const prevDir = process.env['HOPCODE_CODE_PROJECT_DIR'];
+    const prevSession = process.env['HOPCODE_CODE_SESSION_ID'];
+    process.env['HOPCODE_CODE_PROJECT_DIR'] = ENV['HOPCODE_CODE_PROJECT_DIR'];
+    process.env['HOPCODE_CODE_SESSION_ID'] = ENV['HOPCODE_CODE_SESSION_ID'];
     const prevExit = process.exitCode;
     try {
       vi.mocked(writeStderrLine).mockClear();
@@ -896,15 +896,15 @@ describe('the roster — who should have been here', () => {
       // run's REAL plan path substituted, not a `<plan>` placeholder a literal
       // paste would parse as a shell redirection.
       expect(roleError).toContain(
-        `"\${QWEN_CODE_CLI:-qwen}" review agent-prompt --plan '${p}' --roster`,
+        `"\${HOPCODE_CODE_CLI:-qwen}" review agent-prompt --plan '${p}' --roster`,
       );
       expect(roleError).toContain(`Looked for them in: ${promptRecordDir(p)}`);
     } finally {
       process.exitCode = prevExit;
-      if (prevDir === undefined) delete process.env['QWEN_CODE_PROJECT_DIR'];
-      else process.env['QWEN_CODE_PROJECT_DIR'] = prevDir;
-      if (prevSession === undefined) delete process.env['QWEN_CODE_SESSION_ID'];
-      else process.env['QWEN_CODE_SESSION_ID'] = prevSession;
+      if (prevDir === undefined) delete process.env['HOPCODE_CODE_PROJECT_DIR'];
+      else process.env['HOPCODE_CODE_PROJECT_DIR'] = prevDir;
+      if (prevSession === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
+      else process.env['HOPCODE_CODE_SESSION_ID'] = prevSession;
     }
   });
 
@@ -1404,7 +1404,7 @@ describe('verificationGaps — Step 4 and Step 5 ran, and read their briefs', ()
     );
     const old = new Date(2020, 0, 1);
     utimesSync(p, old, old);
-    const env = { QWEN_CODE_PROJECT_DIR: sub, QWEN_CODE_SESSION_ID: 'S1' };
+    const env = { HOPCODE_CODE_PROJECT_DIR: sub, HOPCODE_CODE_SESSION_ID: 'S1' };
 
     const r = verificationGaps(p, { postsFindings: false }, env);
     expect(r.ok).toBe(false);
@@ -1461,7 +1461,7 @@ describe('verificationGaps — Step 4 and Step 5 ran, and read their briefs', ()
     // POSIX shell that parses as input redirection, and the repair round the
     // skill prescribes could never run.
     expect(fix).toContain(
-      `"\${QWEN_CODE_CLI:-qwen}" review agent-prompt ` +
+      `"\${HOPCODE_CODE_CLI:-qwen}" review agent-prompt ` +
         `--plan '${p}' --role reverse-audit --findings <file>`,
     );
     expect(fix).not.toContain('<plan>');

@@ -79,7 +79,7 @@ async function createApp(
       fsp.mkdir(cwd, { recursive: true }),
     ),
   );
-  process.env['QWEN_HOME'] = home;
+  process.env['HOPCODE_HOME'] = home;
   resetHomeEnvBootstrapForTesting();
 
   const primary = runtime('primary-id', primaryCwd, { primary: true });
@@ -144,7 +144,7 @@ async function enableSecondaryVoice(runtime: WorkspaceRuntime): Promise<void> {
 }
 
 describe('workspace-qualified Voice routes', () => {
-  const originalQwenHome = process.env['QWEN_HOME'];
+  const originalQwenHome = process.env['HOPCODE_HOME'];
 
   afterEach(async () => {
     await Promise.all(
@@ -152,8 +152,8 @@ describe('workspace-qualified Voice routes', () => {
         .splice(0)
         .map((home) => fsp.rm(home, { recursive: true, force: true })),
     );
-    if (originalQwenHome === undefined) delete process.env['QWEN_HOME'];
-    else process.env['QWEN_HOME'] = originalQwenHome;
+    if (originalQwenHome === undefined) delete process.env['HOPCODE_HOME'];
+    else process.env['HOPCODE_HOME'] = originalQwenHome;
     resetHomeEnvBootstrapForTesting();
   });
 

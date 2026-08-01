@@ -896,7 +896,7 @@ export const AppContainer = (props: AppContainerProps) => {
    *    (all servers ready or failed) or `STARTUP_PROFILE_FINALIZE_CAP_MS`
    *    elapses (so a hung server doesn't keep the profile open forever).
    *
-   * In legacy blocking mode (`QWEN_CODE_LEGACY_MCP_BLOCKING=1`) MCP
+   * In legacy blocking mode (`HOPCODE_CODE_LEGACY_MCP_BLOCKING=1`) MCP
    * discovery already completed inside `config.initialize()`, so this
    * effect observes `MCPDiscoveryState.COMPLETED` immediately and finalizes
    * without waiting.
@@ -948,7 +948,7 @@ export const AppContainer = (props: AppContainerProps) => {
     // `acpAgent.ts`) which warn to stderr when MCP discovery completes with
     // failed servers. The interactive path can't use stderr (it would
     // collide with Ink's rendered output), so we route through
-    // `debugLogger.warn` so it shows up under `QWEN_CODE_DEBUG=1` and in
+    // `debugLogger.warn` so it shows up under `HOPCODE_CODE_DEBUG=1` and in
     // the debug log file — matching the channel `setTools()` errors above
     // use. The MCP status footer pill already surfaces failures
     // continuously in the UI; this log is the actionable-on-debug record

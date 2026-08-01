@@ -169,7 +169,7 @@ export const createMcpServer = (): McpServer => {
     event: string,
     properties: Record<string, string | number>,
   ) => {
-    // Telemetry disabled in @qwen-code/mobile-mcp fork.
+    // Telemetry disabled in @hoptrendy/hopcode mobile-mcp fork.
     // Set MOBILEMCP_ENABLE_TELEMETRY=1 to re-enable upstream PostHog reporting.
     if (!process.env.MOBILEMCP_ENABLE_TELEMETRY) {
       return;

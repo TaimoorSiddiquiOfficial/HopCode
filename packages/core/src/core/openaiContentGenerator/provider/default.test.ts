@@ -250,7 +250,7 @@ describe('DefaultOpenAICompatibleProvider', () => {
       expect(result.max_tokens).toBe(128_000);
     });
 
-    it('should ignore malformed QWEN_CODE_MAX_OUTPUT_TOKENS values', () => {
+    it('should ignore malformed HOPCODE_CODE_MAX_OUTPUT_TOKENS values', () => {
       const request: OpenAI.Chat.ChatCompletionCreateParams = {
         model: 'gpt-4',
         messages: [{ role: 'user', content: 'Hello' }],

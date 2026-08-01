@@ -31,11 +31,11 @@ vi.mock('../telemetry/trace-context.js', () => ({
 describe('getShellContextEnvVars', () => {
   let originalSessionId: string | undefined;
   // Isolated for the same reason as the session id, and it matters more now: the
-  // CLI exports QWEN_CODE_CLI to every shell it spawns, so a `npm test` run started
+  // CLI exports HOPCODE_CODE_CLI to every shell it spawns, so a `npm test` run started
   // from inside a qwen session inherits it — and the exact-equality assertion below
   // would fail on a variable the test never set.
   let originalCli: string | undefined;
-  // And QWEN_CODE_PROJECT_DIR, for the same reason again — the CLI exports it
+  // And HOPCODE_CODE_PROJECT_DIR, for the same reason again — the CLI exports it
   // too, and the `.toEqual()` exact matches below fail on the inherited key.
   // Reproduced: with it set, exactly the two exact-match tests fail. Restoring it
   // here also cleans up after the per-session tests below, which assign it and
@@ -43,12 +43,12 @@ describe('getShellContextEnvVars', () => {
   let originalProjectDir: string | undefined;
 
   beforeEach(() => {
-    originalSessionId = process.env['QWEN_CODE_SESSION_ID'];
-    delete process.env['QWEN_CODE_SESSION_ID'];
-    originalCli = process.env['QWEN_CODE_CLI'];
-    delete process.env['QWEN_CODE_CLI'];
-    originalProjectDir = process.env['QWEN_CODE_PROJECT_DIR'];
-    delete process.env['QWEN_CODE_PROJECT_DIR'];
+    originalSessionId = process.env['HOPCODE_CODE_SESSION_ID'];
+    delete process.env['HOPCODE_CODE_SESSION_ID'];
+    originalCli = process.env['HOPCODE_CODE_CLI'];
+    delete process.env['HOPCODE_CODE_CLI'];
+    originalProjectDir = process.env['HOPCODE_CODE_PROJECT_DIR'];
+    delete process.env['HOPCODE_CODE_PROJECT_DIR'];
   });
 
   afterEach(() => {
@@ -58,14 +58,14 @@ describe('getShellContextEnvVars', () => {
       delete process.env['HOPCODE_CODE_SESSION_ID'];
     }
     if (originalCli !== undefined) {
-      process.env['QWEN_CODE_CLI'] = originalCli;
+      process.env['HOPCODE_CODE_CLI'] = originalCli;
     } else {
-      delete process.env['QWEN_CODE_CLI'];
+      delete process.env['HOPCODE_CODE_CLI'];
     }
     if (originalProjectDir !== undefined) {
-      process.env['QWEN_CODE_PROJECT_DIR'] = originalProjectDir;
+      process.env['HOPCODE_CODE_PROJECT_DIR'] = originalProjectDir;
     } else {
-      delete process.env['QWEN_CODE_PROJECT_DIR'];
+      delete process.env['HOPCODE_CODE_PROJECT_DIR'];
     }
   });
 
@@ -80,8 +80,8 @@ describe('getShellContextEnvVars', () => {
       writeFileSync(entry, '#!/usr/bin/env node\nconsole.log("hi");\n', {
         mode: 0o755,
       });
-      process.env['QWEN_CODE_CLI'] = entry;
-      expect(getShellContextEnvVars()['QWEN_CODE_CLI']).toBe(entry);
+      process.env['HOPCODE_CODE_CLI'] = entry;
+      expect(getShellContextEnvVars()['HOPCODE_CODE_CLI']).toBe(entry);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -90,7 +90,7 @@ describe('getShellContextEnvVars', () => {
   it('overwrites a shebang-less .js with an EMPTY string — omission would leak it through the spread', () => {
     // The variable predates this mechanism with a second meaning: the desktop
     // app's scripts set it to a vendored `dist/cli.js` — a module path meant for
-    // `node <path>`, with no shebang. `"${QWEN_CODE_CLI:-qwen}"` executing that
+    // `node <path>`, with no shebang. `"${HOPCODE_CODE_CLI:-qwen}"` executing that
     // runs a JS bundle as a shell script (exit 126). Filtering must WRITE `''`:
     // every spawn site composes the child env as `{...process.env, ...vars}`,
     // so a key merely omitted from the returned record arrives anyway, inherited
@@ -100,13 +100,13 @@ describe('getShellContextEnvVars', () => {
     try {
       const bundle = join(dir, 'cli.js');
       writeFileSync(bundle, '"use strict";\nconsole.log("bundle");\n');
-      process.env['QWEN_CODE_CLI'] = bundle;
+      process.env['HOPCODE_CODE_CLI'] = bundle;
 
       const vars = getShellContextEnvVars();
-      expect(vars['QWEN_CODE_CLI']).toBe('');
+      expect(vars['HOPCODE_CODE_CLI']).toBe('');
       // The contract, one spread up — the channel the omission bug lived in:
       const childEnv = { ...process.env, ...vars };
-      expect(childEnv['QWEN_CODE_CLI']).toBe('');
+      expect(childEnv['HOPCODE_CODE_CLI']).toBe('');
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -116,9 +116,9 @@ describe('getShellContextEnvVars', () => {
     // The catch branch (`shebangless = true` on read failure) must not leak the
     // inherited value either — a deleted or permission-blocked path is exactly
     // as unusable as a shebang-less one.
-    process.env['QWEN_CODE_CLI'] = '/no/such/dir/cli.js';
+    process.env['HOPCODE_CODE_CLI'] = '/no/such/dir/cli.js';
     const childEnv = { ...process.env, ...getShellContextEnvVars() };
-    expect(childEnv['QWEN_CODE_CLI']).toBe('');
+    expect(childEnv['HOPCODE_CODE_CLI']).toBe('');
   });
 
   it('an EXECUTABLE shebang-less .js is filtered by the header check itself', () => {
@@ -134,9 +134,9 @@ describe('getShellContextEnvVars', () => {
       writeFileSync(bundle, '"use strict";\nconsole.log("bundle");\n', {
         mode: 0o755,
       });
-      process.env['QWEN_CODE_CLI'] = bundle;
+      process.env['HOPCODE_CODE_CLI'] = bundle;
       const childEnv = { ...process.env, ...getShellContextEnvVars() };
-      expect(childEnv['QWEN_CODE_CLI']).toBe('');
+      expect(childEnv['HOPCODE_CODE_CLI']).toBe('');
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -152,9 +152,9 @@ describe('getShellContextEnvVars', () => {
       writeFileSync(entry, '#!/usr/bin/env node\nconsole.log("hi");\n', {
         mode: 0o644,
       });
-      process.env['QWEN_CODE_CLI'] = entry;
+      process.env['HOPCODE_CODE_CLI'] = entry;
       const childEnv = { ...process.env, ...getShellContextEnvVars() };
-      expect(childEnv['QWEN_CODE_CLI']).toBe('');
+      expect(childEnv['HOPCODE_CODE_CLI']).toBe('');
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -167,21 +167,21 @@ describe('getShellContextEnvVars', () => {
       writeFileSync(entry, '#!/usr/bin/env node\nconsole.log("hi");\n', {
         mode: 0o755,
       });
-      process.env['QWEN_CODE_CLI'] = entry;
+      process.env['HOPCODE_CODE_CLI'] = entry;
       const childEnv = { ...process.env, ...getShellContextEnvVars() };
-      expect(childEnv['QWEN_CODE_CLI']).toBe(entry);
+      expect(childEnv['HOPCODE_CODE_CLI']).toBe(entry);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
-  it('omits QWEN_CODE_CLI when the host does not export one', () => {
+  it('omits HOPCODE_CODE_CLI when the host does not export one', () => {
     // Nothing to override: when the process env has no value, the spread at the
     // spawn sites has nothing to leak either, so absence is correct here. (NOT
     // because an empty string would shadow the fallback — the consumer is the
-    // colon form `${QWEN_CODE_CLI:-qwen}`, which falls back on unset AND empty.
+    // colon form `${HOPCODE_CODE_CLI:-qwen}`, which falls back on unset AND empty.
     // That mistaken comment is what produced the filter-by-omission bug below.)
-    expect('QWEN_CODE_CLI' in getShellContextEnvVars()).toBe(false);
+    expect('HOPCODE_CODE_CLI' in getShellContextEnvVars()).toBe(false);
   });
 
   it('returns empty strings for agent/prompt when no context is available', () => {
@@ -232,34 +232,34 @@ describe('getShellContextEnvVars', () => {
       // for that session's transcripts and find none (or worse, find theirs).
       registerSessionProjectDir('sess-A', '/proj/A');
       registerSessionProjectDir('sess-B', '/proj/B');
-      process.env['QWEN_CODE_PROJECT_DIR'] = '/proj/A'; // the first to boot
+      process.env['HOPCODE_CODE_PROJECT_DIR'] = '/proj/A'; // the first to boot
 
       const a = sessionIdContext.run('sess-A', () => getShellContextEnvVars());
       const b = sessionIdContext.run('sess-B', () => getShellContextEnvVars());
 
-      expect(a['QWEN_CODE_PROJECT_DIR']).toBe('/proj/A');
-      expect(b['QWEN_CODE_PROJECT_DIR']).toBe('/proj/B'); // NOT A's
+      expect(a['HOPCODE_CODE_PROJECT_DIR']).toBe('/proj/A');
+      expect(b['HOPCODE_CODE_PROJECT_DIR']).toBe('/proj/B'); // NOT A's
     });
 
     it('drops a session entry on unregister — no daemon leak', () => {
       registerSessionProjectDir('sess-X', '/proj/X');
       expect(
         sessionIdContext.run('sess-X', () => getShellContextEnvVars())[
-          'QWEN_CODE_PROJECT_DIR'
+          'HOPCODE_CODE_PROJECT_DIR'
         ],
       ).toBe('/proj/X');
       unregisterSessionProjectDir('sess-X');
-      delete process.env['QWEN_CODE_PROJECT_DIR'];
+      delete process.env['HOPCODE_CODE_PROJECT_DIR'];
       expect(
         sessionIdContext.run('sess-X', () => getShellContextEnvVars())[
-          'QWEN_CODE_PROJECT_DIR'
+          'HOPCODE_CODE_PROJECT_DIR'
         ],
       ).toBeUndefined();
     });
 
     it('falls back to the env var for the single-session CLI', () => {
-      process.env['QWEN_CODE_PROJECT_DIR'] = '/proj/only';
-      expect(getShellContextEnvVars()['QWEN_CODE_PROJECT_DIR']).toBe(
+      process.env['HOPCODE_CODE_PROJECT_DIR'] = '/proj/only';
+      expect(getShellContextEnvVars()['HOPCODE_CODE_PROJECT_DIR']).toBe(
         '/proj/only',
       );
     });

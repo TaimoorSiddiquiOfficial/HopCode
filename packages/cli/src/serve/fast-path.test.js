@@ -1,0 +1,1226 @@
+/**
+ * @license
+ * Copyright 2025 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import yargs, {} from 'yargs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync, } from 'node:fs';
+import * as os from 'node:os';
+import { dirname, join, relative, resolve } from 'node:path';
+import * as ts from 'typescript';
+import { HOPCODE_DIR, Storage } from '@hoptrendy/hopcode-core';
+import { bootstrapServeFastPathEnvironment, parseServeFastPathArgs, tryRunServeFastPath, waitForServeRuntimeOrExit, } from './fast-path.js';
+import { loadServeFastPathEnvironment, loadServeFastPathSettings, preResolveServeFastPathHomeEnvOverrides, resetServeFastPathHomeEnvBootstrapForTesting, } from './fast-path-settings.js';
+import { getGlobalhopcodeDirLite, SETTINGS_DIRECTORY_NAME, } from '../config/storage-paths-lite.js';
+import { RUNTIME_STARTUP_CANCELLED_MESSAGE } from './runtime-startup-errors.js';
+import { resetTrustedFoldersForTesting, TrustLevel, } from '../config/trustedFolders.js';
+import * as runHopCodeServeModule from './run-hopcode-serve.js';
+import { serveCommand } from '../commands/serve.js';
+import { HEADLESS_IZN_NO_SANDBOX_WARNING } from '../utils/headlessSafetyWarnings.js';
+let tempWorkspace;
+let tempLaunchCwd;
+let temphopcodeHome;
+let tempSymlink;
+const originalToken = process.env['HOPCODE_SERVER_TOKEN'];
+const originalhopcodeHome = process.env['HOPCODE_HOME'];
+const originalHome = process.env['HOME'];
+const originalUserProfile = process.env['USERPROFILE'];
+const originalQwenRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
+const originalMcpApprovalsPath = process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
+const originalSystemSettingsPath = process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'];
+const originalSystemDefaultsPath = process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'];
+const originalTrustedFoldersPath = process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
+const originalReferencedToken = process.env['FAST_PATH_REFERENCED_TOKEN'];
+const originalRateLimit = process.env['HOPCODE_SERVE_RATE_LIMIT'];
+const originalRateLimitPrompt = process.env['HOPCODE_SERVE_RATE_LIMIT_PROMPT'];
+const originalCloudShell = process.env['CLOUD_SHELL'];
+const originalGoogleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'];
+const originalCwd = process.cwd();
+const cliPackageRoot = process.cwd();
+function normalizePathForTest(filePath) {
+    return filePath.replace(/\\/g, '/');
+}
+function moduleSpecifierText(specifier) {
+    if (!specifier || !ts.isStringLiteral(specifier))
+        return undefined;
+    return specifier.text;
+}
+function importDeclarationHasRuntimeValue(node) {
+    const clause = node.importClause;
+    if (!clause)
+        return true;
+    if (clause.isTypeOnly)
+        return false;
+    if (clause.name)
+        return true;
+    const bindings = clause.namedBindings;
+    if (!bindings)
+        return false;
+    if (ts.isNamespaceImport(bindings))
+        return true;
+    if (bindings.elements.length === 0)
+        return true;
+    return bindings.elements.some((element) => !element.isTypeOnly);
+}
+function exportDeclarationHasRuntimeValue(node) {
+    if (node.isTypeOnly)
+        return false;
+    const clause = node.exportClause;
+    if (!clause)
+        return true;
+    if (ts.isNamespaceExport(clause))
+        return true;
+    if (clause.elements.length === 0)
+        return true;
+    return clause.elements.some((element) => !element.isTypeOnly);
+}
+function resolveLocalSourceImport(importer, specifier) {
+    const basePath = resolve(dirname(importer), specifier);
+    const candidates = specifier.endsWith('.js')
+        ? [`${basePath.slice(0, -3)}.ts`, `${basePath.slice(0, -3)}.tsx`]
+        : [
+            `${basePath}.ts`,
+            `${basePath}.tsx`,
+            join(basePath, 'index.ts'),
+            join(basePath, 'index.tsx'),
+        ];
+    return candidates.find((candidate) => existsSync(candidate));
+}
+function collectStaticSourceGraph(entryFile) {
+    const visited = new Set();
+    const localFiles = new Set();
+    const externalValueImports = new Set();
+    const unresolvedLocalImports = [];
+    function visit(filePath) {
+        const normalizedFilePath = resolve(filePath);
+        if (visited.has(normalizedFilePath))
+            return;
+        visited.add(normalizedFilePath);
+        localFiles.add(normalizePathForTest(relative(cliPackageRoot, normalizedFilePath)));
+        const sourceText = readFileSync(normalizedFilePath, 'utf8');
+        const sourceFile = ts.createSourceFile(normalizedFilePath, sourceText, ts.ScriptTarget.Latest, true, normalizedFilePath.endsWith('.tsx')
+            ? ts.ScriptKind.TSX
+            : ts.ScriptKind.TS);
+        for (const statement of sourceFile.statements) {
+            let specifier;
+            let hasRuntimeValue = false;
+            if (ts.isImportDeclaration(statement)) {
+                specifier = moduleSpecifierText(statement.moduleSpecifier);
+                hasRuntimeValue = importDeclarationHasRuntimeValue(statement);
+            }
+            else if (ts.isExportDeclaration(statement)) {
+                specifier = moduleSpecifierText(statement.moduleSpecifier);
+                hasRuntimeValue = exportDeclarationHasRuntimeValue(statement);
+            }
+            if (!specifier || !hasRuntimeValue)
+                continue;
+            if (!specifier.startsWith('.')) {
+                externalValueImports.add(specifier);
+                continue;
+            }
+            const resolvedImport = resolveLocalSourceImport(normalizedFilePath, specifier);
+            if (!resolvedImport) {
+                unresolvedLocalImports.push(`${normalizePathForTest(relative(cliPackageRoot, normalizedFilePath))} -> ${specifier}`);
+                continue;
+            }
+            visit(resolvedImport);
+        }
+    }
+    visit(entryFile);
+    return { localFiles, externalValueImports, unresolvedLocalImports };
+}
+function useTemphopcodeHome() {
+    temphopcodeHome = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-home-')));
+    process.env['HOPCODE_HOME'] = temphopcodeHome;
+    process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'] = join(temphopcodeHome, 'system-settings.json');
+    process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'] = join(temphopcodeHome, 'system-defaults.json');
+    return temphopcodeHome;
+}
+function buildServeCommandParser() {
+    return serveCommand.builder(yargs([]).exitProcess(false).fail(false).locale('en'));
+}
+function pickServeFastPathComparable(settings) {
+    const out = {};
+    if (settings.env) {
+        out.env = settings.env;
+    }
+    if (settings.general?.chatRecording !== undefined) {
+        out.general = { chatRecording: settings.general.chatRecording };
+    }
+    if (settings.advanced?.excludedEnvVars !== undefined) {
+        out.advanced = {
+            ...(out.advanced ?? {}),
+            excludedEnvVars: settings.advanced.excludedEnvVars,
+        };
+    }
+    if (settings.advanced?.runtimeOutputDir !== undefined) {
+        out.advanced = {
+            ...(out.advanced ?? {}),
+            runtimeOutputDir: settings.advanced.runtimeOutputDir,
+        };
+    }
+    if (settings.security?.folderTrust?.enabled !== undefined) {
+        out.security = {
+            folderTrust: { enabled: settings.security.folderTrust.enabled },
+        };
+    }
+    if (settings.tools?.approvalMode !== undefined) {
+        out.tools = {
+            ...(out.tools ?? {}),
+            approvalMode: settings.tools.approvalMode,
+        };
+    }
+    if (settings.tools?.sandbox !== undefined) {
+        out.tools = { ...(out.tools ?? {}), sandbox: settings.tools.sandbox };
+    }
+    if (settings.context?.fileName !== undefined) {
+        out.context = {
+            ...(out.context ?? {}),
+            fileName: settings.context.fileName,
+        };
+    }
+    if (settings.context?.fileFiltering?.customIgnoreFiles !== undefined) {
+        out.context = {
+            ...(out.context ?? {}),
+            fileFiltering: {
+                customIgnoreFiles: settings.context.fileFiltering.customIgnoreFiles,
+            },
+        };
+    }
+    if (settings.policy?.permissionStrategy !== undefined) {
+        out.policy = {
+            ...(out.policy ?? {}),
+            permissionStrategy: settings.policy.permissionStrategy,
+        };
+    }
+    if (settings.policy?.consensusQuorum !== undefined) {
+        out.policy = {
+            ...(out.policy ?? {}),
+            consensusQuorum: settings.policy.consensusQuorum,
+        };
+    }
+    return out;
+}
+afterEach(() => {
+    vi.restoreAllMocks();
+    process.chdir(originalCwd);
+    if (originalToken === undefined) {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+    }
+    else {
+        process.env['HOPCODE_SERVER_TOKEN'] = originalToken;
+    }
+    if (originalhopcodeHome === undefined) {
+        delete process.env['HOPCODE_HOME'];
+    }
+    else {
+        process.env['HOPCODE_HOME'] = originalhopcodeHome;
+    }
+    if (originalHome === undefined) {
+        delete process.env['HOME'];
+    }
+    else {
+        process.env['HOME'] = originalHome;
+    }
+    if (originalUserProfile === undefined) {
+        delete process.env['USERPROFILE'];
+    }
+    else {
+        process.env['USERPROFILE'] = originalUserProfile;
+    }
+    if (originalSystemSettingsPath === undefined) {
+        delete process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'];
+    }
+    else {
+        process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'] =
+            originalSystemSettingsPath;
+    }
+    if (originalSystemDefaultsPath === undefined) {
+        delete process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'];
+    }
+    else {
+        process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'] =
+            originalSystemDefaultsPath;
+    }
+    if (originalTrustedFoldersPath === undefined) {
+        delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
+    }
+    else {
+        process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] =
+            originalTrustedFoldersPath;
+    }
+    if (originalReferencedToken === undefined) {
+        delete process.env['FAST_PATH_REFERENCED_TOKEN'];
+    }
+    else {
+        process.env['FAST_PATH_REFERENCED_TOKEN'] = originalReferencedToken;
+    }
+    if (originalRateLimit === undefined) {
+        delete process.env['HOPCODE_SERVE_RATE_LIMIT'];
+    }
+    else {
+        process.env['HOPCODE_SERVE_RATE_LIMIT'] = originalRateLimit;
+    }
+    if (originalRateLimitPrompt === undefined) {
+        delete process.env['HOPCODE_SERVE_RATE_LIMIT_PROMPT'];
+    }
+    else {
+        process.env['HOPCODE_SERVE_RATE_LIMIT_PROMPT'] = originalRateLimitPrompt;
+    }
+    if (originalCloudShell === undefined) {
+        delete process.env['CLOUD_SHELL'];
+    }
+    else {
+        process.env['CLOUD_SHELL'] = originalCloudShell;
+    }
+    if (originalGoogleCloudProject === undefined) {
+        delete process.env['GOOGLE_CLOUD_PROJECT'];
+    }
+    else {
+        process.env['GOOGLE_CLOUD_PROJECT'] = originalGoogleCloudProject;
+    }
+    if (originalQwenRuntimeDir === undefined) {
+        delete process.env['HOPCODE_RUNTIME_DIR'];
+    }
+    else {
+        process.env['HOPCODE_RUNTIME_DIR'] = originalQwenRuntimeDir;
+    }
+    if (originalMcpApprovalsPath === undefined) {
+        delete process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
+    }
+    else {
+        process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'] = originalMcpApprovalsPath;
+    }
+    resetServeFastPathHomeEnvBootstrapForTesting();
+    resetTrustedFoldersForTesting();
+    if (tempWorkspace) {
+        rmSync(tempWorkspace, { recursive: true, force: true });
+        tempWorkspace = undefined;
+    }
+    if (tempLaunchCwd) {
+        rmSync(tempLaunchCwd, { recursive: true, force: true });
+        tempLaunchCwd = undefined;
+    }
+    if (temphopcodeHome) {
+        rmSync(temphopcodeHome, { recursive: true, force: true });
+        temphopcodeHome = undefined;
+    }
+    if (tempSymlink) {
+        rmSync(tempSymlink, { force: true });
+        tempSymlink = undefined;
+    }
+});
+describe('CLI entry import boundary', () => {
+    it('does not statically import the full gemini entry before the serve fast path can run', () => {
+        const cliSource = readFileSync('src/cli.ts', 'utf8');
+        expect(cliSource).not.toContain("import './gemini.js'");
+        expect(cliSource).not.toContain("import { main } from './gemini.js'");
+        expect(cliSource).not.toContain("process.argv[2] === 'serve'");
+        expect(cliSource).toContain("await import('./serve/fast-path.js')");
+    });
+    it('does not import the full settings loader on the serve fast path', () => {
+        const fastPathSource = readFileSync('src/serve/fast-path.ts', 'utf8');
+        expect(fastPathSource).not.toContain('../config/settings.js');
+        expect(fastPathSource).not.toContain('../config/environment.js');
+        expect(fastPathSource).not.toContain('@hoptrendy/hopcode-core');
+        expect(fastPathSource).toContain('bootSettings: settings');
+        expect(fastPathSource).toContain('resolveOnListen: true');
+        expect(fastPathSource).toContain('deferRuntimeUntilFirstHealth: !parsed.open');
+    });
+    it('uses the shared headless yolo warning helper on the serve fast path', () => {
+        const fastPathSource = readFileSync('src/serve/fast-path.ts', 'utf8');
+        expect(fastPathSource).toContain('getHeadlessYoloSafetyWarning');
+        expect(fastPathSource).not.toContain("settings.tools?.approvalMode === 'yolo'");
+    });
+    it('keeps headless yolo warning helper free of runtime core imports', () => {
+        const helperSource = readFileSync('src/utils/headlessSafetyWarnings.ts', 'utf8');
+        expect(helperSource).not.toMatch(/import\s+(?!type\b)[^;]*from ['"]@hoptrendy\/hopcode-core['"]/);
+    });
+    it('keeps settings free of UI imports used before serve can listen', () => {
+        const settingsSource = readFileSync('src/config/settings.ts', 'utf8');
+        expect(settingsSource).not.toContain('../ui/');
+    });
+    it('keeps extension command parsing free of UI state imports', () => {
+        const updateCommandSource = readFileSync('src/commands/extensions/update.ts', 'utf8');
+        expect(updateCommandSource).not.toContain('../../ui/');
+    });
+    it('keeps runHopCodeServe from statically loading the full server and ACP runtime', () => {
+        const runServeSource = readFileSync('src/serve/run-hopcode-serve.ts', 'utf8');
+        expect(runServeSource).not.toMatch(/from ['"]\.\/server\.js['"]/);
+        expect(runServeSource).not.toMatch(/from ['"]\.\/web-shell-static\.js['"]/);
+        expect(runServeSource).not.toMatch(/from ['"]\.\/acp-session-bridge\.js['"]/);
+        expect(runServeSource).not.toMatch(/from ['"]@hopcode\/acp-bridge\/bridge['"]/);
+        expect(runServeSource).not.toMatch(/from ['"]@hopcode\/acp-bridge\/spawnChannel['"]/);
+        expect(runServeSource).toContain("import('./server.js')");
+        expect(runServeSource).toContain("import('@hoptrendy/acp-bridge/bridge')");
+    });
+    it('keeps request helpers from value-importing the ACP compatibility shim', () => {
+        const requestHelpersSource = readFileSync('src/serve/server/request-helpers.ts', 'utf8');
+        expect(requestHelpersSource).not.toMatch(/from ['"]\.\.\/acp-session-bridge\.js['"]/);
+        expect(requestHelpersSource).toContain("import type { AcpSessionBridge } from '@hoptrendy/acp-bridge/bridgeTypes';");
+        expect(requestHelpersSource).toContain("import { MAX_WORKSPACE_PATH_LENGTH } from '@hoptrendy/acp-bridge/workspacePaths';");
+    });
+    it('keeps the runHopCodeServe static source graph free of ACP runtime modules', () => {
+        const graph = collectStaticSourceGraph(resolve(cliPackageRoot, 'src/serve/run-hopcode-serve.ts'));
+        expect(graph.unresolvedLocalImports).toEqual([]);
+        const forbiddenLocalFiles = [...graph.localFiles].filter((filePath) => filePath === 'src/serve/acp-session-bridge.ts');
+        expect(forbiddenLocalFiles, `Unexpected static source graph files:\n${forbiddenLocalFiles.join('\n')}`).toEqual([]);
+        const forbiddenExternalImports = [
+            '@hoptrendy/acp-bridge',
+            '@hoptrendy/acp-bridge/bridge',
+            '@hoptrendy/acp-bridge/spawnChannel',
+            '@hoptrendy/acp-bridge/bridgeClient',
+            '@hoptrendy/acp-bridge/bridgeErrors',
+        ];
+        const forbiddenImports = [...graph.externalValueImports].filter((specifier) => forbiddenExternalImports.includes(specifier));
+        expect(forbiddenImports, `Unexpected ACP runtime imports:\n${forbiddenImports.join('\n')}`).toEqual([]);
+    });
+});
+describe('serve fast path argument parsing', () => {
+    it('parses the common daemon startup flags without loading the full CLI parser', () => {
+        const parsed = parseServeFastPathArgs([
+            'serve',
+            '--port',
+            '0',
+            '--hostname',
+            '127.0.0.1',
+            '--workspace',
+            '/tmp/workspace',
+            '--no-web',
+            '--no-open',
+        ]);
+        expect(parsed).toEqual({
+            kind: 'serve',
+            httpBridge: true,
+            open: false,
+            options: {
+                hostname: '127.0.0.1',
+                mcpBudgetMode: 'off',
+                mode: 'http-bridge',
+                port: 0,
+                serveWebShell: false,
+                workspace: '/tmp/workspace',
+            },
+        });
+    });
+    it('parses --tls-cert and --tls-key on the fast path', () => {
+        const parsed = parseServeFastPathArgs([
+            'serve',
+            '--tls-cert',
+            '/tmp/cert.pem',
+            '--tls-key',
+            '/tmp/key.pem',
+        ]);
+        expect(parsed).toMatchObject({
+            kind: 'serve',
+            options: {
+                tlsCert: '/tmp/cert.pem',
+                tlsKey: '/tmp/key.pem',
+            },
+        });
+    });
+    it('parses bundled entrypoint argv before serve', () => {
+        const parsed = parseServeFastPathArgs([
+            '/repo/dist/cli.js',
+            'serve',
+            '--port',
+            '0',
+        ]);
+        expect(parsed).toMatchObject({
+            kind: 'serve',
+            options: { port: 0 },
+        });
+    });
+    it('falls back to the full parser for repeatable --workspace values', () => {
+        expect(parseServeFastPathArgs([
+            'serve',
+            '--workspace',
+            '/tmp/primary',
+            '--workspace',
+            '/tmp/secondary',
+        ])).toEqual({ kind: 'fallback' });
+    });
+    it('falls back to the full parser for empty --workspace values', () => {
+        expect(parseServeFastPathArgs(['serve', '--workspace='])).toEqual({
+            kind: 'fallback',
+        });
+        expect(parseServeFastPathArgs(['serve', '--workspace', ''])).toEqual({
+            kind: 'fallback',
+        });
+    });
+    it('parses Windows bundled entrypoint argv before serve', () => {
+        const parsed = parseServeFastPathArgs([
+            'C:\\repo\\dist\\cli.js',
+            'serve',
+            '--port',
+            '0',
+        ]);
+        expect(parsed).toMatchObject({
+            kind: 'serve',
+            options: { port: 0 },
+        });
+    });
+    it('falls back to the full parser for help and unknown options', () => {
+        expect(parseServeFastPathArgs(['serve', '--help'])).toEqual({
+            kind: 'fallback',
+        });
+        expect(parseServeFastPathArgs(['serve', '--unknown-option'])).toEqual({
+            kind: 'fallback',
+        });
+    });
+    it('falls back to the full parser for daemon-managed channels', () => {
+        expect(parseServeFastPathArgs(['serve', '--channel', 'telegram'])).toEqual({
+            kind: 'fallback',
+        });
+    });
+    it('handles every yargs serve long option or explicitly falls back', () => {
+        const options = buildServeCommandParser().getOptions();
+        const longOptionNames = Object.keys(options.key).filter((name) => name.length > 1 && !options.alias[name]?.length);
+        const sampleArgvByOption = new Map([
+            ['port', ['--port', '0']],
+            ['hostname', ['--hostname', '127.0.0.1']],
+            ['token', ['--token', 'token']],
+            ['max-sessions', ['--max-sessions', '10']],
+            ['max-total-sessions', ['--max-total-sessions', '20']],
+            [
+                'max-pending-prompts-per-session',
+                ['--max-pending-prompts-per-session', '5'],
+            ],
+            ['max-connections', ['--max-connections', '256']],
+            ['event-ring-size', ['--event-ring-size', '8000']],
+            [
+                'compacted-replay-max-bytes',
+                ['--compacted-replay-max-bytes', '4194304'],
+            ],
+            ['workspace', ['--workspace', process.cwd()]],
+            ['require-auth', ['--require-auth']],
+            ['enable-session-shell', ['--enable-session-shell']],
+            ['tls-cert', ['--tls-cert', '/tmp/cert.pem']],
+            ['tls-key', ['--tls-key', '/tmp/key.pem']],
+            ['web', ['--no-web']],
+            ['open', ['--open']],
+            ['http-bridge', ['--no-http-bridge']],
+            ['mcp-client-budget', ['--mcp-client-budget', '10']],
+            ['mcp-budget-mode', ['--mcp-budget-mode', 'warn']],
+            ['allow-origin', ['--allow-origin', 'http://localhost:3000']],
+            ['allow-private-auth-base-url', ['--allow-private-auth-base-url']],
+            ['prompt-deadline-ms', ['--prompt-deadline-ms', '1000']],
+            ['writer-idle-timeout-ms', ['--writer-idle-timeout-ms', '1000']],
+            ['channel-idle-timeout-ms', ['--channel-idle-timeout-ms', '1000']],
+            ['session-reap-interval-ms', ['--session-reap-interval-ms', '1000']],
+            ['session-idle-timeout-ms', ['--session-idle-timeout-ms', '1000']],
+            [
+                'permission-response-timeout-ms',
+                ['--permission-response-timeout-ms', '1000'],
+            ],
+            ['rate-limit', ['--rate-limit']],
+            ['rate-limit-prompt', ['--rate-limit-prompt', '10']],
+            ['rate-limit-mutation', ['--rate-limit-mutation', '30']],
+            ['rate-limit-read', ['--rate-limit-read', '120']],
+            ['rate-limit-window-ms', ['--rate-limit-window-ms', '60000']],
+            ['experimental-lsp', ['--experimental-lsp']],
+            ['channel', ['--channel', 'telegram']],
+            ['help', ['--help']],
+            ['version', ['--version']],
+        ]);
+        const expectedFallbackOptions = new Set(['channel', 'help', 'version']);
+        expect(longOptionNames.sort()).toEqual([...sampleArgvByOption.keys()].sort());
+        for (const [optionName, sampleArgv] of sampleArgvByOption) {
+            const parsed = parseServeFastPathArgs(['serve', ...sampleArgv]);
+            if (parsed.kind === 'fallback') {
+                expect(expectedFallbackOptions.has(optionName)).toBe(true);
+            }
+            else {
+                expect(expectedFallbackOptions.has(optionName)).toBe(false);
+            }
+        }
+    });
+    it('matches yargs defaults for options materialized before runHopCodeServe', () => {
+        const yargsParsed = buildServeCommandParser().parseSync('');
+        const fastPathParsed = parseServeFastPathArgs(['serve']);
+        expect(fastPathParsed).toMatchObject({
+            kind: 'serve',
+            options: {
+                hostname: yargsParsed['hostname'],
+                mode: 'http-bridge',
+                port: yargsParsed['port'],
+            },
+        });
+        expect(fastPathParsed).not.toHaveProperty('options.maxSessions');
+        expect(fastPathParsed).not.toHaveProperty('options.maxTotalSessions');
+        expect(fastPathParsed).not.toHaveProperty('options.maxConnections');
+        expect(fastPathParsed).not.toHaveProperty('options.eventRingSize');
+        expect(fastPathParsed).not.toHaveProperty('options.compactedReplayMaxBytes');
+        expect(fastPathParsed).not.toHaveProperty('options.maxPendingPromptsPerSession');
+    });
+    it('parses --compacted-replay-max-bytes on the fast path', () => {
+        const parsed = parseServeFastPathArgs([
+            'serve',
+            '--compacted-replay-max-bytes',
+            '1048576',
+        ]);
+        expect(parsed).toMatchObject({
+            kind: 'serve',
+            options: { compactedReplayMaxBytes: 1024 * 1024 },
+        });
+    });
+    it('keeps --experimental-lsp on the fast path', () => {
+        const parsed = parseServeFastPathArgs(['serve', '--experimental-lsp']);
+        expect(parsed).toMatchObject({
+            kind: 'serve',
+            options: { experimentalLsp: true },
+        });
+    });
+    it('returns false to let the full CLI handle fallback cases', async () => {
+        await expect(tryRunServeFastPath(['serve', '--help'])).resolves.toBe(false);
+    });
+    it('prints a breadcrumb when settings bootstrap falls back to the full CLI', async () => {
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-fallback-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), '{');
+        const stderrWrites = [];
+        vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+            stderrWrites.push(String(chunk));
+            return true;
+        });
+        await expect(tryRunServeFastPath(['serve', '--workspace', tempWorkspace])).resolves.toBe(false);
+        expect(stderrWrites.join('')).toContain('hopcode serve: fast-path bootstrap failed, falling back to full startup:');
+    });
+    it.each([
+        [
+            ['serve', '--mcp-client-budget', '0'],
+            'hopcode serve: --mcp-client-budget must be a positive integer.',
+        ],
+        [
+            ['serve', '--mcp-budget-mode', 'enforce'],
+            'hopcode serve: --mcp-budget-mode=enforce requires --mcp-client-budget=N.',
+        ],
+        [
+            ['serve', '--max-pending-prompts-per-session=-1'],
+            'hopcode serve: --max-pending-prompts-per-session must be a non-negative integer (0 / Infinity = unlimited).',
+        ],
+        [
+            ['serve', '--compacted-replay-max-bytes=0'],
+            'qwen serve: --compacted-replay-max-bytes must be a positive safe integer in [1, 268435456].',
+        ],
+        [
+            ['serve', '--rate-limit', '--rate-limit-prompt=0'],
+            'hopcode serve: --rate-limit-prompt must be a positive integer.',
+        ],
+    ])('validates %s before bootstrapping settings and environment', async (argv, message) => {
+        const hopcodeHome = useTemphopcodeHome();
+        writeFileSync(join(hopcodeHome, 'settings.json'), '{');
+        const stderrWrites = [];
+        vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+            stderrWrites.push(String(chunk));
+            return true;
+        });
+        vi.spyOn(process, 'exit').mockImplementation(((code) => {
+            throw new Error(`process.exit(${code})`);
+        }));
+        await expect(tryRunServeFastPath(argv)).rejects.toThrow('process.exit(1)');
+        expect(stderrWrites.join('')).toContain(message);
+    });
+    it('does not enable rate limiting just because tuning flags are present', () => {
+        const parsed = parseServeFastPathArgs([
+            'serve',
+            '--rate-limit-prompt',
+            '0',
+            '--rate-limit-window-ms',
+            '1',
+        ]);
+        expect(parsed.kind).toBe('serve');
+        if (parsed.kind !== 'serve')
+            return;
+        expect(parsed.options).not.toHaveProperty('rateLimit');
+        expect(parsed.options.rateLimitPrompt).toBe(0);
+        expect(parsed.options.rateLimitWindowMs).toBe(1);
+    });
+    it('enables rate limiting from env and applies env tuning values', () => {
+        const parsed = parseServeFastPathArgs(['serve'], {
+            HOPCODE_SERVE_RATE_LIMIT: '1',
+            HOPCODE_SERVE_RATE_LIMIT_PROMPT: '10',
+        });
+        expect(parsed.kind).toBe('serve');
+        if (parsed.kind !== 'serve')
+            return;
+        expect(parsed.options.rateLimit).toBe(true);
+        expect(parsed.options.rateLimitPrompt).toBe(10);
+    });
+    it('discards rate limit env tuning when rate limiting is disabled', () => {
+        const parsed = parseServeFastPathArgs(['serve'], {
+            HOPCODE_SERVE_RATE_LIMIT_PROMPT: '10',
+        });
+        expect(parsed.kind).toBe('serve');
+        if (parsed.kind !== 'serve')
+            return;
+        expect(parsed.options).not.toHaveProperty('rateLimit');
+        expect(parsed.options.rateLimitPrompt).toBeUndefined();
+    });
+    it('rejects unsafe rate limit env integers instead of rounding them', () => {
+        const parsed = parseServeFastPathArgs(['serve', '--rate-limit'], {
+            HOPCODE_SERVE_RATE_LIMIT_PROMPT: String(Number.MAX_SAFE_INTEGER + 1),
+        });
+        expect(parsed.kind).toBe('serve');
+        if (parsed.kind !== 'serve')
+            return;
+        expect(parsed.options.rateLimitPrompt).toBeNaN();
+    });
+});
+describe('serve fast path environment bootstrap', () => {
+    it('keeps the lite settings directory name in sync with core HOPCODE_DIR', () => {
+        expect(SETTINGS_DIRECTORY_NAME).toBe(HOPCODE_DIR);
+    });
+    it('matches Storage.getGlobalhopcodeDir path resolution', () => {
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-storage-cwd-')));
+        temphopcodeHome = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-storage-home-')));
+        process.chdir(tempWorkspace);
+        for (const hopcodeHome of [
+            undefined,
+            temphopcodeHome,
+            '~',
+            '~/qwen-fast-path',
+            '~\\qwen-fast-path',
+            'relative-hopcode-home',
+        ]) {
+            if (hopcodeHome === undefined) {
+                delete process.env['HOPCODE_HOME'];
+            }
+            else {
+                process.env['HOPCODE_HOME'] = hopcodeHome;
+            }
+            expect(getGlobalhopcodeDirLite()).toBe(Storage.getGlobalHopCodeDir());
+        }
+    });
+    it('closes the listener and exits when runtime startup fails after listen', async () => {
+        const stderrWrites = [];
+        const close = vi.fn().mockResolvedValue(undefined);
+        vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+            stderrWrites.push(String(chunk));
+            return true;
+        });
+        vi.spyOn(process, 'exit').mockImplementation(((code) => {
+            throw new Error(`process.exit(${code})`);
+        }));
+        await expect(waitForServeRuntimeOrExit({
+            runtimeReady: Promise.reject(new Error('runtime boom')),
+            close,
+        })).rejects.toThrow('process.exit(1)');
+        expect(close).toHaveBeenCalledTimes(1);
+        expect(stderrWrites.join('')).toContain('hopcode serve: runtime startup failed after listener was ready: runtime boom');
+        expect(process.exit).toHaveBeenCalledWith(1);
+    });
+    it('does not report startup failure when runtime startup is cancelled by close', async () => {
+        const stderrWrites = [];
+        const close = vi.fn().mockResolvedValue(undefined);
+        vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+            stderrWrites.push(String(chunk));
+            return true;
+        });
+        const exit = vi.spyOn(process, 'exit').mockImplementation(((code) => {
+            throw new Error(`process.exit(${code})`);
+        }));
+        await expect(waitForServeRuntimeOrExit({
+            runtimeReady: Promise.reject(new Error(RUNTIME_STARTUP_CANCELLED_MESSAGE)),
+            close,
+        })).resolves.toBeUndefined();
+        expect(close).not.toHaveBeenCalled();
+        expect(stderrWrites.join('')).not.toContain('runtime startup failed after listener was ready');
+        expect(exit).not.toHaveBeenCalled();
+    });
+    it('validates rate limit env after settings bootstrap enables rate limiting', async () => {
+        useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-rate-limit-env-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), JSON.stringify({
+            env: {
+                HOPCODE_SERVE_RATE_LIMIT: '1',
+                HOPCODE_SERVE_RATE_LIMIT_PROMPT: '0',
+            },
+        }));
+        const stderrWrites = [];
+        vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+            stderrWrites.push(String(chunk));
+            return true;
+        });
+        vi.spyOn(process, 'exit').mockImplementation(((code) => {
+            throw new Error(`process.exit(${code})`);
+        }));
+        await expect(tryRunServeFastPath([
+            'serve',
+            '--workspace',
+            tempWorkspace,
+            '--port',
+            '0',
+            '--hostname',
+            '127.0.0.1',
+            '--no-open',
+            '--no-web',
+        ])).rejects.toThrow('process.exit(1)');
+        expect(stderrWrites.join('')).toContain('hopcode serve: --rate-limit-prompt must be a positive integer.');
+        expect(process.exit).toHaveBeenCalledWith(1);
+    });
+    it('exits when runHopCodeServe fails after settings bootstrap succeeds', async () => {
+        useTemphopcodeHome();
+        vi.spyOn(runHopCodeServeModule, 'runHopCodeServe').mockRejectedValue(new Error('listen boom'));
+        const stderrWrites = [];
+        vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+            stderrWrites.push(String(chunk));
+            return true;
+        });
+        vi.spyOn(process, 'exit').mockImplementation(((code) => {
+            throw new Error(`process.exit(${code})`);
+        }));
+        await expect(tryRunServeFastPath([
+            'serve',
+            '--port',
+            '0',
+            '--hostname',
+            '127.0.0.1',
+            '--no-open',
+            '--no-web',
+        ])).rejects.toThrow('process.exit(1)');
+        expect(stderrWrites.join('')).toContain('hopcode serve: listen boom');
+        expect(process.exit).toHaveBeenCalledWith(1);
+    });
+    it('keeps headless yolo warning best-effort after listening', async () => {
+        const originalSandbox = process.env['SANDBOX'];
+        const originalSuppress = process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
+        delete process.env['SANDBOX'];
+        delete process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
+        const hopcodeHome = useTemphopcodeHome();
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ tools: { approvalMode: 'yolo', sandbox: false } }));
+        const runtimeReady = Promise.reject(new Error('runtime boom'));
+        void runtimeReady.catch(() => undefined);
+        const close = vi.fn().mockResolvedValue(undefined);
+        vi.spyOn(runHopCodeServeModule, 'runHopCodeServe').mockResolvedValue({
+            runtimeReady,
+            close,
+        });
+        const stderrWrites = [];
+        vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+            const text = String(chunk);
+            stderrWrites.push(text);
+            if (text.includes(HEADLESS_IZN_NO_SANDBOX_WARNING)) {
+                throw new Error('stderr closed');
+            }
+            return true;
+        });
+        vi.spyOn(process, 'exit').mockImplementation(((code) => {
+            throw new Error(`process.exit(${code})`);
+        }));
+        try {
+            await expect(tryRunServeFastPath(['serve', '--port', '0', '--no-open', '--no-web'])).rejects.toThrow('process.exit(1)');
+            expect(stderrWrites.join('')).toContain(HEADLESS_IZN_NO_SANDBOX_WARNING);
+            expect(stderrWrites.join('')).toContain('qwen serve: runtime startup failed after listener was ready: runtime boom');
+            expect(stderrWrites.join('')).not.toContain('qwen serve: stderr closed');
+            expect(close).toHaveBeenCalledTimes(1);
+            expect(process.exit).toHaveBeenCalledWith(1);
+        }
+        finally {
+            if (originalSandbox === undefined) {
+                delete process.env['SANDBOX'];
+            }
+            else {
+                process.env['SANDBOX'] = originalSandbox;
+            }
+            if (originalSuppress === undefined) {
+                delete process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'];
+            }
+            else {
+                process.env['QWEN_CODE_SUPPRESS_YOLO_WARNING'] = originalSuppress;
+            }
+        }
+    });
+    it('rejects malformed user settings so the full settings loader can handle it', async () => {
+        const hopcodeHome = useTemphopcodeHome();
+        writeFileSync(join(hopcodeHome, 'settings.json'), '{');
+        await expect(bootstrapServeFastPathEnvironment(undefined)).rejects.toThrow(/settings/i);
+    }, 10_000);
+    it('falls back to the full CLI when fast-path settings bootstrap fails', async () => {
+        const hopcodeHome = useTemphopcodeHome();
+        writeFileSync(join(hopcodeHome, 'settings.json'), '{');
+        await expect(tryRunServeFastPath(['serve', '--port', '0', '--no-open', '--no-web'])).resolves.toBe(false);
+    }, 10_000);
+    it.each([
+        [
+            'advanced.excludedEnvVars',
+            { advanced: { excludedEnvVars: 'HOPCODE_SERVER_TOKEN' } },
+        ],
+        [
+            'advanced.runtimeOutputDir',
+            { advanced: { runtimeOutputDir: ['.hopcode-runtime'] } },
+        ],
+        [
+            'security.folderTrust.enabled',
+            { security: { folderTrust: { enabled: 'true' } } },
+        ],
+    ])('falls back to the full CLI when %s has an incompatible shape', async (_field, settingsJson) => {
+        const hopcodeHome = useTemphopcodeHome();
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify(settingsJson));
+        await expect(tryRunServeFastPath(['serve', '--port', '0', '--no-open', '--no-web'])).resolves.toBe(false);
+    });
+    it('loads HOPCODE_SERVER_TOKEN from the workspace .env before the daemon starts', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-env-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(tempWorkspace, '.hopcode', '.env'), 'HOPCODE_SERVER_TOKEN=from-workspace-env\n');
+        process.chdir(tempWorkspace);
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('from-workspace-env');
+    });
+    it('loads .env from --workspace even when launched from another directory', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-workspace-env-')));
+        tempLaunchCwd = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-launch-cwd-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(tempWorkspace, '.hopcode', '.env'), 'HOPCODE_SERVER_TOKEN=from-explicit-workspace-env\n');
+        process.chdir(tempLaunchCwd);
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('from-explicit-workspace-env');
+    });
+    it('loads home .env after workspace .env for daemon boot-time keys', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        delete process.env['HOPCODE_SERVE_RATE_LIMIT'];
+        delete process.env['HOPCODE_SERVE_RATE_LIMIT_PROMPT'];
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-layered-env-')));
+        writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVE_RATE_LIMIT_PROMPT=123\n');
+        writeFileSync(join(hopcodeHome, '.env'), ['HOPCODE_SERVER_TOKEN=from-home-env', 'HOPCODE_SERVE_RATE_LIMIT=1'].join('\n'));
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVE_RATE_LIMIT_PROMPT']).toBe('123');
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('from-home-env');
+        expect(process.env['HOPCODE_SERVE_RATE_LIMIT']).toBe('1');
+    });
+    it('applies legacy excludedProjectEnvVars before loading workspace .env', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        const hopcodeHome = useTemphopcodeHome();
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ excludedProjectEnvVars: ['HOPCODE_SERVER_TOKEN'] }));
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-legacy-env-')));
+        writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=from-workspace-env\n');
+        process.chdir(tempWorkspace);
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBeUndefined();
+    });
+    it('loads HOPCODE_SERVER_TOKEN from workspace settings.env without the full settings loader', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-settings-env-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), JSON.stringify({
+            env: { HOPCODE_SERVER_TOKEN: 'from-workspace-settings-env' },
+        }));
+        process.chdir(tempWorkspace);
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('from-workspace-settings-env');
+    });
+    it('pre-resolves home env overrides in the same order as the full loader', () => {
+        delete process.env['HOPCODE_HOME'];
+        delete process.env['HOPCODE_RUNTIME_DIR'];
+        delete process.env['HOPCODE_CODE_MCP_APPROVALS_PATH'];
+        delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
+        tempLaunchCwd = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-fake-home-')));
+        process.env['HOME'] = tempLaunchCwd;
+        process.env['USERPROFILE'] = tempLaunchCwd;
+        temphopcodeHome = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-discovered-home-')));
+        mkdirSync(join(tempLaunchCwd, '.hopcode'), { recursive: true });
+        writeFileSync(join(tempLaunchCwd, '.hopcode', '.env'), `HOPCODE_HOME=${temphopcodeHome}\n`);
+        writeFileSync(join(tempLaunchCwd, '.env'), 'HOPCODE_RUNTIME_DIR=from-home-env\n');
+        writeFileSync(join(temphopcodeHome, '.env'), [
+            'HOPCODE_CODE_MCP_APPROVALS_PATH=from-discovered-home',
+            'HOPCODE_CODE_TRUSTED_FOLDERS_PATH=from-discovered-trust',
+        ].join('\n'));
+        preResolveServeFastPathHomeEnvOverrides();
+        expect(process.env['HOPCODE_HOME']).toBe(temphopcodeHome);
+        expect(process.env['HOPCODE_RUNTIME_DIR']).toBe('from-home-env');
+        expect(process.env['HOPCODE_CODE_MCP_APPROVALS_PATH']).toBe('from-discovered-home');
+        expect(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH']).toBe('from-discovered-trust');
+    });
+    it('still pre-resolves missing home-scoped keys when HOPCODE_HOME and runtime are already set', () => {
+        delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
+        const hopcodeHome = useTemphopcodeHome();
+        process.env['HOPCODE_RUNTIME_DIR'] = join(hopcodeHome, 'runtime');
+        writeFileSync(join(hopcodeHome, '.env'), 'HOPCODE_CODE_TRUSTED_FOLDERS_PATH=from-existing-home\n');
+        preResolveServeFastPathHomeEnvOverrides();
+        expect(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH']).toBe('from-existing-home');
+    });
+    it('applies legacy settings keys consumed by the serve fast path', () => {
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-legacy-settings-')));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({
+            approvalMode: 'yolo',
+            contextFileName: 'LEGACY.md',
+            excludedProjectEnvVars: ['HOPCODE_SERVER_TOKEN'],
+            fileFiltering: { customIgnoreFiles: ['.legacy-ignore'] },
+            folderTrust: true,
+            sandbox: false,
+        }));
+        const settings = loadServeFastPathSettings(tempWorkspace);
+        expect(settings).toMatchObject({
+            advanced: { excludedEnvVars: ['HOPCODE_SERVER_TOKEN'] },
+            context: {
+                fileName: 'LEGACY.md',
+                fileFiltering: { customIgnoreFiles: ['.legacy-ignore'] },
+            },
+            security: { folderTrust: { enabled: true } },
+            tools: { approvalMode: 'yolo', sandbox: false },
+        });
+    });
+    it('matches the full settings loader for fields consumed before listen', async () => {
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-settings-parity-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        const { SETTINGS_VERSION, loadSettings } = await import('../config/settings.js');
+        const versioned = (settings) => ({
+            $version: SETTINGS_VERSION,
+            ...settings,
+        });
+        writeFileSync(process.env['HOPCODE_CODE_SYSTEM_DEFAULTS_PATH'], JSON.stringify(versioned({
+            env: {
+                FAST_PATH_DEFAULT_ONLY: 'default',
+                FAST_PATH_OVERLAP: 'default',
+            },
+            advanced: {
+                excludedEnvVars: ['FAST_PATH_DEFAULT_EXCLUDED'],
+                runtimeOutputDir: '.default-runtime',
+            },
+            context: {
+                fileName: 'DEFAULT.md',
+                fileFiltering: { customIgnoreFiles: ['.default-ignore'] },
+            },
+            security: { folderTrust: { enabled: false } },
+            tools: { approvalMode: 'default' },
+        })));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify(versioned({
+            env: {
+                FAST_PATH_USER_ONLY: 'user',
+                FAST_PATH_OVERLAP: 'user',
+            },
+            advanced: {
+                excludedEnvVars: ['FAST_PATH_USER_EXCLUDED'],
+            },
+            security: { folderTrust: { enabled: true } },
+            tools: { approvalMode: 'auto' },
+        })));
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), JSON.stringify(versioned({
+            env: {
+                FAST_PATH_WORKSPACE_ONLY: 'workspace',
+                FAST_PATH_OVERLAP: 'workspace',
+            },
+            advanced: { runtimeOutputDir: '.workspace-runtime' },
+            general: { chatRecording: false },
+            context: {
+                fileName: 'WORKSPACE.md',
+                fileFiltering: { customIgnoreFiles: ['.workspace-ignore'] },
+            },
+            policy: { permissionStrategy: 'consensus', consensusQuorum: 3 },
+            tools: { sandbox: true },
+        })));
+        writeFileSync(process.env['HOPCODE_CODE_SYSTEM_SETTINGS_PATH'], JSON.stringify(versioned({
+            env: {
+                FAST_PATH_SYSTEM_ONLY: 'system',
+                FAST_PATH_OVERLAP: 'system',
+            },
+            context: { fileName: 'SYSTEM.md' },
+            tools: { approvalMode: 'yolo' },
+        })));
+        expect(loadServeFastPathSettings(tempWorkspace)).toEqual(pickServeFastPathComparable(loadSettings(tempWorkspace, { skipLoadEnvironment: true }).merged));
+    });
+    it('loads runtimeOutputDir for daemon startup artifacts', () => {
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-runtime-dir-')));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({
+            advanced: { runtimeOutputDir: '.hopcode-runtime' },
+        }));
+        const settings = loadServeFastPathSettings(tempWorkspace);
+        expect(settings.advanced?.runtimeOutputDir).toBe('.hopcode-runtime');
+    });
+    it('ignores stale legacy keys in current-version settings files', () => {
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-stale-legacy-settings-')));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({
+            $version: 5,
+            approvalMode: 'yolo',
+            contextFileName: 'LEGACY.md',
+            excludedProjectEnvVars: ['HOPCODE_SERVER_TOKEN'],
+            fileFiltering: { customIgnoreFiles: ['.legacy-ignore'] },
+            folderTrust: true,
+            sandbox: false,
+        }));
+        const settings = loadServeFastPathSettings(tempWorkspace);
+        expect(settings.advanced).toBeUndefined();
+        expect(settings.context).toBeUndefined();
+        expect(settings.security).toBeUndefined();
+        expect(settings.tools).toBeUndefined();
+    });
+    it('uses trusted-folders path from home .env before loading workspace env', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        delete process.env['HOPCODE_RUNTIME_DIR'];
+        delete process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'];
+        const hopcodeHome = useTemphopcodeHome();
+        const customTrustedFoldersPath = join(hopcodeHome, 'custom-trusted.json');
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-home-trust-env-')));
+        writeFileSync(join(hopcodeHome, '.env'), `HOPCODE_CODE_TRUSTED_FOLDERS_PATH=${customTrustedFoldersPath}\n`);
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ security: { folderTrust: { enabled: true } } }));
+        writeFileSync(customTrustedFoldersPath, JSON.stringify({ [tempWorkspace]: TrustLevel.DO_NOT_TRUST }));
+        writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=from-untrusted-workspace-env\n');
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH']).toBe(customTrustedFoldersPath);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBeUndefined();
+    });
+    it('uses legacy folderTrust before loading workspace env', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-legacy-trust-')));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ folderTrust: true }));
+        process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = join(hopcodeHome, 'trustedFolders.json');
+        writeFileSync(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'], JSON.stringify({ [tempWorkspace]: TrustLevel.DO_NOT_TRUST }));
+        writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=from-untrusted-workspace-env\n');
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBeUndefined();
+    });
+    it('caches trusted folders during a single fast-path bootstrap', () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-trust-cache-')));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ security: { folderTrust: { enabled: true } } }));
+        process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = join(hopcodeHome, 'trustedFolders.json');
+        writeFileSync(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'], JSON.stringify({ [tempWorkspace]: TrustLevel.TRUST_FOLDER }));
+        writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=trusted\n');
+        const settings = loadServeFastPathSettings(tempWorkspace);
+        writeFileSync(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'], JSON.stringify({ [tempWorkspace]: TrustLevel.DO_NOT_TRUST }));
+        loadServeFastPathEnvironment(settings, tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('trusted');
+    });
+    it('prioritizes trusted parent folders over nested distrust rules', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-trust-precedence-')));
+        const childWorkspace = join(tempWorkspace, 'child');
+        mkdirSync(childWorkspace);
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ security: { folderTrust: { enabled: true } } }));
+        process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = join(hopcodeHome, 'trustedFolders.json');
+        writeFileSync(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'], JSON.stringify({
+            [tempWorkspace]: TrustLevel.TRUST_FOLDER,
+            [childWorkspace]: TrustLevel.DO_NOT_TRUST,
+        }));
+        writeFileSync(join(childWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=trusted\n');
+        await bootstrapServeFastPathEnvironment(childWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('trusted');
+    });
+    it('treats TRUST_PARENT as trusting the containing folder', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-trust-parent-')));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ security: { folderTrust: { enabled: true } } }));
+        process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = join(hopcodeHome, 'trustedFolders.json');
+        writeFileSync(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'], JSON.stringify({
+            [join(tempWorkspace, 'marker')]: TrustLevel.TRUST_PARENT,
+        }));
+        writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=trusted\n');
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('trusted');
+    });
+    it('matches Cloud Shell default project behavior for empty env values', async () => {
+        delete process.env['GOOGLE_CLOUD_PROJECT'];
+        process.env['CLOUD_SHELL'] = 'true';
+        useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-cloud-shell-')));
+        writeFileSync(join(tempWorkspace, '.env'), 'GOOGLE_CLOUD_PROJECT=\n');
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['GOOGLE_CLOUD_PROJECT']).toBe('cloudshell-gca');
+    });
+    it('expands process environment placeholders in workspace settings.env', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        useTemphopcodeHome();
+        process.env['FAST_PATH_REFERENCED_TOKEN'] = 'from-referenced-env';
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-settings-env-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), JSON.stringify({
+            env: { HOPCODE_SERVER_TOKEN: '${FAST_PATH_REFERENCED_TOKEN}' },
+        }));
+        process.chdir(tempWorkspace);
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('from-referenced-env');
+    });
+    it('expands home .env fallback placeholders in workspace settings.env', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        delete process.env['FAST_PATH_REFERENCED_TOKEN'];
+        const hopcodeHome = useTemphopcodeHome();
+        writeFileSync(join(hopcodeHome, '.env'), 'FAST_PATH_REFERENCED_TOKEN=from-home-env\n');
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-settings-env-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), JSON.stringify({
+            env: { HOPCODE_SERVER_TOKEN: '${FAST_PATH_REFERENCED_TOKEN}' },
+        }));
+        process.chdir(tempWorkspace);
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBe('from-home-env');
+    });
+    it.each([
+        ['malformed JSON', '{ "env": { "HOPCODE_SERVER_TOKEN": "broken" }'],
+        ['non-object JSON', '[]'],
+    ])('rejects %s workspace settings so the full settings loader can handle it', async (_name, settingsJson) => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-bad-settings-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), settingsJson);
+        process.chdir(tempWorkspace);
+        await expect(bootstrapServeFastPathEnvironment(tempWorkspace)).rejects.toThrow(/settings/i);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBeUndefined();
+    });
+    it('still reads invalid workspace settings before dropping an untrusted workspace from the merge', () => {
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-untrusted-settings-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ security: { folderTrust: { enabled: true } } }));
+        process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = join(hopcodeHome, 'trustedFolders.json');
+        writeFileSync(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'], JSON.stringify({ [tempWorkspace]: TrustLevel.DO_NOT_TRUST }));
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), '[]');
+        process.chdir(tempWorkspace);
+        expect(() => loadServeFastPathSettings(tempWorkspace)).toThrow(/settings/i);
+    });
+    it('does not load env from an explicit untrusted workspace when launched elsewhere', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-untrusted-env-')));
+        tempLaunchCwd = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-trusted-launch-')));
+        mkdirSync(join(tempWorkspace, '.hopcode'));
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ security: { folderTrust: { enabled: true } } }));
+        process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = join(hopcodeHome, 'trustedFolders.json');
+        writeFileSync(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'], JSON.stringify({
+            [tempLaunchCwd]: TrustLevel.TRUST_FOLDER,
+            [tempWorkspace]: TrustLevel.DO_NOT_TRUST,
+        }));
+        writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=from-untrusted-workspace-env\n');
+        writeFileSync(join(tempWorkspace, '.hopcode', 'settings.json'), JSON.stringify({
+            env: { HOPCODE_SERVER_TOKEN: 'from-untrusted-workspace-settings' },
+        }));
+        process.chdir(tempLaunchCwd);
+        await bootstrapServeFastPathEnvironment(tempWorkspace);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBeUndefined();
+    });
+    it('checks trust against the canonical explicit workspace path', async () => {
+        delete process.env['HOPCODE_SERVER_TOKEN'];
+        const hopcodeHome = useTemphopcodeHome();
+        tempWorkspace = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-real-untrusted-env-')));
+        tempLaunchCwd = realpathSync(mkdtempSync(join(os.tmpdir(), 'qws-fast-path-symlink-launch-')));
+        tempSymlink = join(tempLaunchCwd, 'workspace-link');
+        symlinkSync(tempWorkspace, tempSymlink, 'dir');
+        writeFileSync(join(hopcodeHome, 'settings.json'), JSON.stringify({ security: { folderTrust: { enabled: true } } }));
+        process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'] = join(hopcodeHome, 'trustedFolders.json');
+        writeFileSync(process.env['HOPCODE_CODE_TRUSTED_FOLDERS_PATH'], JSON.stringify({
+            [tempLaunchCwd]: TrustLevel.TRUST_FOLDER,
+            [tempWorkspace]: TrustLevel.DO_NOT_TRUST,
+        }));
+        writeFileSync(join(tempWorkspace, '.env'), 'HOPCODE_SERVER_TOKEN=from-symlinked-untrusted-workspace-env\n');
+        process.chdir(tempLaunchCwd);
+        await bootstrapServeFastPathEnvironment(tempSymlink);
+        expect(process.env['HOPCODE_SERVER_TOKEN']).toBeUndefined();
+    });
+});
+//# sourceMappingURL=fast-path.test.js.map

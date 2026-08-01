@@ -58,7 +58,7 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 // platform-agnostic, but daemon SIGTERM teardown is cleaner on POSIX. Keep it
 // running everywhere `ws` works.
 const SKIP = process.platform === 'win32';
-const SANDBOX_MODE = process.env['QWEN_SANDBOX']?.toLowerCase().trim();
+const SANDBOX_MODE = process.env['HOPCODE_SANDBOX']?.toLowerCase().trim();
 const SKIP_PROMPTED_MODEL_TEST = Boolean(
   SANDBOX_MODE && SANDBOX_MODE !== 'false' && SANDBOX_MODE !== '0',
 );
@@ -133,9 +133,9 @@ beforeAll(async () => {
         OPENAI_API_KEY: 'fake-key',
         OPENAI_BASE_URL: fakeServer.baseUrl,
         OPENAI_MODEL: 'fake-model',
-        QWEN_MODEL: 'fake-model',
+        HOPCODE_MODEL: 'fake-model',
         // Reverse tool channel opt-in (the contract is still gated).
-        QWEN_SERVE_CLIENT_MCP_OVER_WS: '1',
+        HOPCODE_SERVE_CLIENT_MCP_OVER_WS: '1',
       },
     },
   );
@@ -519,7 +519,7 @@ describeMaybe('qwen serve — reverse tool channel (client-hosted MCP over WS)',
     ).toMatchObject({ type: 'mcp_registered', server: 'chrome-tools' });
     expect(registeredAck?.['toolCount']).toBe(1);
 
-    // 4. Pin the session to `yolo` so the model-emitted tool call auto-approves
+    // 4. Pin the session to `izn` so the model-emitted tool call auto-approves
     // (no human in the loop on the WS) — otherwise a `permission_request` would
     // stall the turn forever. Matches the daemon's intended "extension drives
     // tools unattended" posture.
@@ -529,7 +529,7 @@ describeMaybe('qwen serve — reverse tool channel (client-hosted MCP over WS)',
         Authorization: `Bearer ${TOKEN}`,
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ mode: 'yolo' }),
+      body: JSON.stringify({ mode: 'izn' }),
     });
     expect(modeRes.status).toBe(200);
 

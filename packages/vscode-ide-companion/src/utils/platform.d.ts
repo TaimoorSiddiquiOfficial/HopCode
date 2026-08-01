@@ -1,0 +1,7 @@
+/**
+ * @license
+ * Copyright 2026 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+/** Whether the current platform is Windows */
+export declare const isWindows: boolean;

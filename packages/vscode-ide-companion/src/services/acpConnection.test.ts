@@ -51,7 +51,7 @@ function createMockChild(overrides?: Record<string, unknown>) {
 describe('AcpConnection process spawning', () => {
   it('runs the managed ACP child in Electron Node mode', async () => {
     vi.stubEnv('ELECTRON_RUN_AS_NODE', '');
-    vi.stubEnv('QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE', '');
+    vi.stubEnv('HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE', '');
     spawnMock.mockReturnValue(createMockChild());
     const conn = new AcpConnection() as unknown as {
       connect: (cliEntryPath: string) => Promise<void>;
@@ -66,7 +66,7 @@ describe('AcpConnection process spawning', () => {
       };
 
       expect(options.env?.['ELECTRON_RUN_AS_NODE']).toBe('1');
-      expect(options.env?.['QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE']).toBe('1');
+      expect(options.env?.['HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE']).toBe('1');
     } finally {
       vi.unstubAllEnvs();
     }

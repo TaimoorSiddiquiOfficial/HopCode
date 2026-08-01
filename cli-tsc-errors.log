@@ -1,0 +1,152 @@
+src/interactive.test.tsx(588,49): error TS2345: Argument of type '{ model: undefined; sandbox: undefined; sandboxImage: undefined; debug: undefined; prompt: undefined; promptInteractive: undefined; systemPrompt: undefined; appendSystemPrompt: undefined; ... 44 more ...; sessionId: undefined; }' is not assignable to parameter of type 'CliArgs'.
+  Type '{ model: undefined; sandbox: undefined; sandboxImage: undefined; debug: undefined; prompt: undefined; promptInteractive: undefined; systemPrompt: undefined; appendSystemPrompt: undefined; ... 44 more ...; sessionId: undefined; }' is missing the following properties from type 'CliArgs': fallbackModel, maxSubagentDepth
+src/nonInteractive/control/controllers/permissionController.test.ts(97,5): error TS2322: Type '"yolo"' is not assignable to type 'PermissionMode'.
+src/serve/acp-http/connection-registry.ts(30,7): error TS6133: 'HARD_BUFFERED_FRAMES_CAP' is declared but its value is never read.
+src/serve/acp-http/dispatch.ts(19,3): error TS6133: 'RUNTIME_MCP_IF_ABSENT_CONFIG_FLAG' is declared but its value is never read.
+src/serve/acp-http/dispatch.ts(622,22): error TS6138: Property 'workspaceRememberLane' is declared but its value is never read.
+src/serve/acp-http/dispatch.ts(1385,32): error TS2304: Cannot find name 'SessionArchivingError'.
+src/serve/acp-http/dispatch.ts(1386,17): error TS18046: 'err' is of type 'unknown'.
+src/serve/acp-http/dispatch.ts(2298,30): error TS1361: 'WorkspacePermissionRulesSessionRequiredError' cannot be used as a value because it was imported using 'import type'.
+src/serve/acp-http/dispatch.ts(3332,23): error TS2304: Cannot find name 'result'.
+src/serve/acp-http/dispatch.ts(3333,30): error TS2304: Cannot find name 'result'.
+src/serve/acp-http/dispatch.ts(3334,23): error TS2304: Cannot find name 'result'.
+src/serve/acp-http/dispatch.ts(3335,49): error TS2304: Cannot find name 'result'.
+src/serve/acp-http/index.ts(227,6): error TS2304: Cannot find name 'RUNTIME_MCP_IF_ABSENT_CONFIG_FLAG'.
+src/serve/acp-http/transport.test.ts(52,3): error TS6133: 'MAX_READ_BYTES' is declared but its value is never read.
+src/serve/acp-http/transport.test.ts(783,18): error TS2304: Cannot find name 'AcpHttpHandle'.
+src/serve/acp-http/transport.test.ts(804,5): error TS2304: Cannot find name 'mountWorkspaceMemoryRememberRoutes'.
+src/serve/acp-http/transport.test.ts(807,22): error TS7006: Parameter '_req' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(807,28): error TS7006: Parameter '_res' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(807,34): error TS7006: Parameter 'next' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(808,23): error TS7006: Parameter 'req' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(808,28): error TS7006: Parameter 'res' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(821,18): error TS7006: Parameter 'req' implicitly has an 'any' type.
+src/serve/acp-http/transport.test.ts(945,33): error TS2554: Expected 2-3 arguments, but got 1.
+src/serve/acp-http/transport.test.ts(948,5): error TS2322: Type 'void' is not assignable to type 'string | undefined'.
+src/serve/acp-http/transport.test.ts(950,23): error TS2345: Argument of type 'void' is not assignable to parameter of type 'string'.
+src/serve/acp-http/transport.test.ts(957,19): error TS2345: Argument of type 'void' is not assignable to parameter of type 'PathLike'.
+src/serve/acp-http/transport.test.ts(973,32): error TS2353: Object literal may only specify known properties, and 'recursive' does not exist in type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(1022,7): error TS2345: Argument of type 'string' is not assignable to parameter of type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(1059,43): error TS2339: Property 'qwen' does not exist on type '{ hopcode: { methods: string[]; }; }'.
+src/serve/acp-http/transport.test.ts(3444,35): error TS2554: Expected 2-3 arguments, but got 1.
+src/serve/acp-http/transport.test.ts(3447,7): error TS2322: Type 'void' is not assignable to type 'string | undefined'.
+src/serve/acp-http/transport.test.ts(3455,36): error TS2353: Object literal may only specify known properties, and 'recursive' does not exist in type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(3467,11): error TS2345: Argument of type 'string' is not assignable to parameter of type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(3494,21): error TS2345: Argument of type 'void' is not assignable to parameter of type 'PathLike'.
+src/serve/acp-http/transport.test.ts(4845,30): error TS2554: Expected 2-3 arguments, but got 1.
+src/serve/acp-http/transport.test.ts(4846,33): error TS2345: Argument of type 'void' is not assignable to parameter of type 'string'.
+src/serve/acp-http/transport.test.ts(4847,28): error TS2345: Argument of type 'void' is not assignable to parameter of type 'string'.
+src/serve/acp-http/transport.test.ts(4853,35): error TS2353: Object literal may only specify known properties, and 'recursive' does not exist in type 'NoParamCallback'.
+src/serve/acp-http/transport.test.ts(4854,13): error TS2304: Cannot find name 'writeJson'.
+src/serve/acp-http/transport.test.ts(4888,19): error TS2345: Argument of type 'void' is not assignable to parameter of type 'PathLike'.
+src/serve/acp-http/transport.test.ts(4896,13): error TS2304: Cannot find name 'WorkspacePermissionRulesSessionRequiredError'.
+src/serve/acp-http/transport.test.ts(5022,13): error TS2304: Cannot find name 'WorkspaceSettingsPartialPersistError'.
+src/serve/acp-http/transport.test.ts(5076,40): error TS2304: Cannot find name 'MAX_VOICE_MODEL_LENGTH'.
+src/serve/acp-http/transport.test.ts(5086,48): error TS2304: Cannot find name 'MAX_VOICE_MODEL_LENGTH'.
+src/serve/acp-http/transport.test.ts(7476,38): error TS2304: Cannot find name 'CdpTunnelRegistry'.
+src/serve/daemon-status.test.ts(1144,5): error TS2561: Object literal may only specify known properties, but 'HopCodeVersion' does not exist in type 'BuildDaemonStatusOptions'. Did you mean to write 'hopCodeVersion'?
+src/serve/fast-path.test.ts(85,14): error TS2503: Cannot find namespace 'ts'.
+src/serve/fast-path.test.ts(87,22): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(91,49): error TS2503: Cannot find namespace 'ts'.
+src/serve/fast-path.test.ts(98,7): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(100,34): error TS7006: Parameter 'element' implicitly has an 'any' type.
+src/serve/fast-path.test.ts(103,49): error TS2503: Cannot find namespace 'ts'.
+src/serve/fast-path.test.ts(107,7): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(109,32): error TS7006: Parameter 'element' implicitly has an 'any' type.
+src/serve/fast-path.test.ts(116,20): error TS2304: Cannot find name 'resolve'.
+src/serve/fast-path.test.ts(116,28): error TS2304: Cannot find name 'dirname'.
+src/serve/fast-path.test.ts(135,32): error TS2304: Cannot find name 'resolve'.
+src/serve/fast-path.test.ts(139,28): error TS2304: Cannot find name 'relative'.
+src/serve/fast-path.test.ts(143,24): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(146,7): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(149,11): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(150,11): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(156,11): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(159,18): error TS2304: Cannot find name 'ts'.
+src/serve/fast-path.test.ts(174,35): error TS2304: Cannot find name 'relative'.
+src/serve/fast-path.test.ts(467,7): error TS2304: Cannot find name 'resolve'.
+src/serve/fast-path.ts(13,1): error TS6133: 'getHeadlessIznSafetyWarning' is declared but its value is never read.
+src/serve/fast-path.ts(440,49): error TS1308: 'await' expressions are only allowed within async functions and at the top levels of modules.
+src/serve/fs/index.ts(9,3): error TS2724: '"./paths.js"' has no exported member named 'canonicalizeWorkspaces'. Did you mean 'canonicalizeWorkspace'?
+src/serve/fs/paths.ts(21,3): error TS6133: 'canonicalizeWorkspaces' is declared but its value is never read.
+src/serve/fs/workspace-file-system.ts(38,3): error TS2724: '"./paths.js"' has no exported member named 'canonicalizeWorkspaces'. Did you mean 'canonicalizeWorkspace'?
+src/serve/fs/workspace-file-system.ts(38,3): error TS6133: 'canonicalizeWorkspaces' is declared but its value is never read.
+src/serve/fs/workspace-file-system.ts(284,26): error TS2552: Cannot find name 'canonicalizeWorkspace'. Did you mean 'canonicalizeWorkspaces'?
+src/serve/fs/workspace-file-system.ts(284,53): error TS2551: Property 'boundWorkspace' does not exist on type 'CreateWorkspaceFileSystemFactoryDeps'. Did you mean 'boundWorkspaces'?
+src/serve/fs/workspace-file-system.ts(309,21): error TS2304: Cannot find name 'primaryWorkspace'.
+src/serve/fs/workspace-file-system.ts(321,9): error TS18004: No value exists in scope for the shorthand property 'primaryWorkspace'. Either declare one or provide an initializer.
+src/serve/fs/workspace-file-system.ts(322,9): error TS18004: No value exists in scope for the shorthand property 'workspaces'. Either declare one or provide an initializer.
+src/serve/fs/workspace-file-system.ts(348,10): error TS6133: 'assertNoNestedWorkspaces' is declared but its value is never read.
+src/serve/run-hopcode-serve.test.ts(11,1): error TS6133: 'https' is declared but its value is never read.
+src/serve/run-hopcode-serve.test.ts(2371,7): error TS2345: Argument of type '"resolveBoundWorkspacesFromIdeEnv"' is not assignable to parameter of type '"getActiveSseCount" | "InvalidCursorError" | "createServeApp" | "createDefaultFsAuditEmit" | "computeKeepaliveIntervalMs" | "detectFromLoopback" | "resolveBridgeFsFactory" | "PromptDeadlineExceededError" | "resolvePromptDeadlineMs" | "getWorkspaceSessionInfoForResponse" | "listWorkspaceSessionsForResponse"'.
+src/serve/run-hopcode-serve.test.ts(2372,27): error TS7006: Parameter '_primary' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2372,37): error TS7006: Parameter '_ide' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2372,43): error TS7006: Parameter 'includeWorkspace' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2373,7): error TS2322: Type 'string[]' is not assignable to type 'typeof InvalidCursorError | typeof PromptDeadlineExceededError'.
+src/serve/run-hopcode-serve.test.ts(2504,7): error TS2345: Argument of type '"resolveBoundWorkspacesFromIdeEnv"' is not assignable to parameter of type '"getActiveSseCount" | "InvalidCursorError" | "createServeApp" | "createDefaultFsAuditEmit" | "computeKeepaliveIntervalMs" | "detectFromLoopback" | "resolveBridgeFsFactory" | "PromptDeadlineExceededError" | "resolvePromptDeadlineMs" | "getWorkspaceSessionInfoForResponse" | "listWorkspaceSessionsForResponse"'.
+src/serve/run-hopcode-serve.test.ts(2505,27): error TS7006: Parameter '_primary' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2505,37): error TS7006: Parameter '_ide' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2505,43): error TS7006: Parameter 'includeWorkspace' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2506,7): error TS2322: Type 'string[]' is not assignable to type 'typeof InvalidCursorError | typeof PromptDeadlineExceededError'.
+src/serve/run-hopcode-serve.test.ts(2565,7): error TS2345: Argument of type '"resolveBoundWorkspacesFromIdeEnv"' is not assignable to parameter of type '"getActiveSseCount" | "InvalidCursorError" | "createServeApp" | "createDefaultFsAuditEmit" | "computeKeepaliveIntervalMs" | "detectFromLoopback" | "resolveBridgeFsFactory" | "PromptDeadlineExceededError" | "resolvePromptDeadlineMs" | "getWorkspaceSessionInfoForResponse" | "listWorkspaceSessionsForResponse"'.
+src/serve/run-hopcode-serve.test.ts(2566,27): error TS7006: Parameter '_primary' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2566,37): error TS7006: Parameter '_ide' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2566,43): error TS7006: Parameter 'includeWorkspace' implicitly has an 'any' type.
+src/serve/run-hopcode-serve.test.ts(2567,7): error TS2322: Type 'string[]' is not assignable to type 'typeof InvalidCursorError | typeof PromptDeadlineExceededError'.
+src/serve/run-hopcode-serve.ts(927,20): error TS2339: Property 'resolveBoundWorkspacesFromIdeEnv' does not exist on type 'typeof import("D:/HopCode/packages/cli/src/serve/server", { with: { "resolution-mode": "import" } })'.
+src/serve/server.ts(128,3): error TS2440: Import declaration conflicts with local declaration of 'getActiveSseCount'.
+src/serve/server.ts(1552,43): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/serve/server.ts(1587,48): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+  Type 'string[]' is not assignable to type 'string'.
+src/serve/server.ts(2051,7): error TS6133: 'MAX_TOOL_NAME_LENGTH' is declared but its value is never read.
+src/serve/server.ts(2171,10): error TS6133: 'requireSessionId' is declared but its value is never read.
+src/serve/server.ts(2231,10): error TS6133: 'validateMcpRuntimeServerName' is declared but its value is never read.
+src/serve/server.ts(2292,10): error TS6133: 'parsePermissionVoteBody' is declared but its value is never read.
+src/serve/server.ts(2344,10): error TS6133: 'parseMaxQueuedQuery' is declared but its value is never read.
+src/serve/server.ts(2402,10): error TS6133: 'parseLastEventId' is declared but its value is never read.
+src/serve/server.ts(2434,10): error TS6133: 'formatSseFrame' is declared but its value is never read.
+src/serve/server.ts(2477,10): error TS6133: 'errorMessage' is declared but its value is never read.
+src/ui/components/DiffDialog.test.tsx(11,15): error TS2305: Module '"diff"' has no exported member 'Hunk'.
+src/ui/hooks/useToolScheduler.test.ts(221,24): error TS2304: Cannot find name 'renderSchedulerInYoloMode'.
+src/ui/hooks/useToolScheduler.test.ts(247,8): error TS7006: Parameter 'tc' implicitly has an 'any' type.
+src/utils/headlessSafetyWarnings.test.ts(8,29): error TS6133: 'Config' is declared but its value is never read.
+src/utils/headlessSafetyWarnings.test.ts(24,40): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(31,40): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(39,40): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(46,35): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(50,35): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(53,40): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(54,40): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(59,40): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(62,40): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(70,35): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(75,35): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/headlessSafetyWarnings.test.ts(85,37): error TS2345: Argument of type '{ getApprovalMode: () => ApprovalMode; getSandbox: () => unknown; }' is not assignable to parameter of type 'Pick<Config, "getApprovalMode" | "getSandbox">'.
+  The types returned by 'getSandbox()' are incompatible between these types.
+    Type 'unknown' is not assignable to type 'SandboxConfig | undefined'.
+src/utils/sandbox.ts(87,5): error TS2304: Cannot find name 'resolveBundleDir'.
+src/utils/sandbox.ts(649,9): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.

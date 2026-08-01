@@ -107,7 +107,7 @@ vi.mock('@hoptrendy/channel-base', () => ({
       return Promise.resolve();
     }
   },
-  getGlobalHopCodeDir: () => '/tmp/test-qwen',
+  getGlobalHopCodeDir: () => '/tmp/test-hopcode',
 }));
 
 const { QQChannel } = await import('./QQChannel.js');
@@ -210,10 +210,10 @@ describe('session persistence paths', () => {
 
   it('uses per-channel sessions files when QQChannel owns the router', () => {
     expect(getGlobalSessionsPath(makeChannel('bot one'))).toBe(
-      '/tmp/test-qwen/channels/bot_one-sessions.json',
+      '/tmp/test-hopcode/channels/bot_one-sessions.json',
     );
     expect(getGlobalSessionsPath(makeChannel('bot/two'))).toBe(
-      '/tmp/test-qwen/channels/bot_two-sessions.json',
+      '/tmp/test-hopcode/channels/bot_two-sessions.json',
     );
   });
 
@@ -224,7 +224,7 @@ describe('session persistence paths', () => {
 
     expect(
       getGlobalSessionsPath(makeChannel('bot-one', { router: externalRouter })),
-    ).toBe('/tmp/test-qwen/channels/sessions.json');
+    ).toBe('/tmp/test-hopcode/channels/sessions.json');
   });
 
   it('asks ChannelBase to register bridge events when QQ owns the router', () => {

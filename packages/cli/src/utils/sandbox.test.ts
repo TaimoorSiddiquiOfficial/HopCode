@@ -104,7 +104,7 @@ describe('resolveSeatbeltProfileFile', () => {
   ])(
     'handles Electron Node mode for a %s seatbelt re-exec',
     async (_name, marker, expected) => {
-      vi.stubEnv('QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE', marker ?? '');
+      vi.stubEnv('HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE', marker ?? '');
       vi.spyOn(fs, 'existsSync').mockReturnValue(true);
       vi.spyOn(fs, 'mkdirSync').mockReturnValue(undefined);
       vi.spyOn(fs, 'realpathSync').mockImplementation(
@@ -134,17 +134,17 @@ describe('getSandboxPassthroughEnvArgs', () => {
   it('passes update relaunch state into container sandboxes', () => {
     expect(
       getSandboxPassthroughEnvArgs({
-        QWEN_CODE_SKIP_UPDATE_CHECK_ONCE: 'true',
-        QWEN_CODE_CUSTOM_SANDBOX_IMAGE: 'example.com/qwen:1.0.0',
-        QWEN_CODE_HOST_UPDATE_RELAUNCH: 'false',
+        HOPCODE_CODE_SKIP_UPDATE_CHECK_ONCE: 'true',
+        HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE: 'example.com/qwen:1.0.0',
+        HOPCODE_CODE_HOST_UPDATE_RELAUNCH: 'false',
       }),
     ).toEqual([
       '--env',
-      'QWEN_CODE_SKIP_UPDATE_CHECK_ONCE=true',
+      'HOPCODE_CODE_SKIP_UPDATE_CHECK_ONCE=true',
       '--env',
-      'QWEN_CODE_CUSTOM_SANDBOX_IMAGE=example.com/qwen:1.0.0',
+      'HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE=example.com/qwen:1.0.0',
       '--env',
-      'QWEN_CODE_HOST_UPDATE_RELAUNCH=false',
+      'HOPCODE_CODE_HOST_UPDATE_RELAUNCH=false',
     ]);
   });
 });

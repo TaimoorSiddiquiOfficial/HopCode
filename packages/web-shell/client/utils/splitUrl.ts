@@ -54,7 +54,7 @@ export function parseSplitSessionIds(search: string): string[] {
     .filter(Boolean);
 }
 
-const SPLIT_STORAGE_KEY = 'qwen-webshell-split-sessions';
+const SPLIT_STORAGE_KEY = 'hopcode-webshell-split-sessions';
 
 /**
  * Persist the in-window split's session set so a refresh restores it. Uses

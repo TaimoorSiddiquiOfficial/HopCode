@@ -1314,10 +1314,10 @@ describe('runNonInteractive', () => {
       expect(mockCoreExecuteToolCall).toHaveBeenCalledTimes(5);
     });
 
-    it('throttles a parallel batch to QWEN_CODE_MAX_TOOL_CONCURRENCY in flight', async () => {
+    it('throttles a parallel batch to HOPCODE_CODE_MAX_TOOL_CONCURRENCY in flight', async () => {
       setupMetricsMock();
-      const prev = process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'];
-      process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'] = '2';
+      const prev = process.env['HOPCODE_CODE_MAX_TOOL_CONCURRENCY'];
+      process.env['HOPCODE_CODE_MAX_TOOL_CONCURRENCY'] = '2';
       try {
         vi.mocked(mockToolRegistry.getTool).mockReturnValue({
           kind: Kind.Read,
@@ -1369,9 +1369,9 @@ describe('runNonInteractive', () => {
         expect(mockCoreExecuteToolCall).toHaveBeenCalledTimes(4);
       } finally {
         if (prev === undefined) {
-          delete process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'];
+          delete process.env['HOPCODE_CODE_MAX_TOOL_CONCURRENCY'];
         } else {
-          process.env['QWEN_CODE_MAX_TOOL_CONCURRENCY'] = prev;
+          process.env['HOPCODE_CODE_MAX_TOOL_CONCURRENCY'] = prev;
         }
       }
     });

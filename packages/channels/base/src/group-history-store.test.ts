@@ -7,7 +7,7 @@ import type { GroupHistoryEntry } from './group-history-store.js';
 
 function filePath(): string {
   return join(
-    mkdtempSync(join(tmpdir(), 'qwen-group-history-')),
+    mkdtempSync(join(tmpdir(), 'hopcode-group-history-')),
     'history.jsonl',
   );
 }
@@ -125,7 +125,7 @@ describe('GroupHistoryStore', () => {
   });
 
   it('does not treat unreadable existing stores as empty', () => {
-    const path = mkdtempSync(join(tmpdir(), 'qwen-group-history-dir-'));
+    const path = mkdtempSync(join(tmpdir(), 'hopcode-group-history-dir-'));
     const store = new GroupHistoryStore(path);
 
     expect(() => store.record('k', entry('a'), 10)).toThrow();

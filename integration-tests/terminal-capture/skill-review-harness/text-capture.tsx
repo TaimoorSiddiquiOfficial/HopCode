@@ -36,7 +36,7 @@ description: Run the Qwen CLI headlessly against a mock model and inspect API tr
 
 1. Build the bundle: npm run build && npm run bundle.
 2. Start the fake OpenAI server on a free port.
-3. Point OPENAI_BASE_URL at it and run node dist/cli.js -p "<prompt>" --yolo.
+3. Point OPENAI_BASE_URL at it and run node dist/cli.js -p "<prompt>" --izn.
 4. Assert on the captured request/response JSON.
 `;
 

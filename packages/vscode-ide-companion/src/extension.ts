@@ -112,7 +112,7 @@ async function checkForUpdates(
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-  outputChannel = vscode.window.createOutputChannel('Qwen Code Companion');
+  outputChannel = vscode.window.createOutputChannel('HopCode Companion');
   createLogger(outputChannel, redactLogCredentials);
   logger.info('Extension activated');
 
@@ -251,59 +251,49 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       'hopcode.diff.accept',
       (uri?: vscode.Uri) => {
+        try {
+          const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
+          if (docUri && docUri.scheme === DIFF_SCHEME) {
+            diffManager.acceptDiff(docUri);
+          }
+          logger.log('[Extension] Diff accepted');
+        } catch (err) {
+          logger.warn('[Extension] Auto-allow on diff.accept failed:', err);
+        }
+      },
+    ),
+    vscode.commands.registerCommand('hopcode.diff.cancel', (uri?: vscode.Uri) => {
+      try {
         const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
         if (docUri && docUri.scheme === DIFF_SCHEME) {
-          diffManager.acceptDiff(docUri);
+          diffManager.cancelDiff(docUri);
         }
-      } catch (err) {
-        logger.warn('[Extension] Auto-allow on diff.accept failed:', err);
-      }
-      logger.log('[Extension] Diff accepted');
-    }),
-    vscode.commands.registerCommand('qwen.diff.cancel', (uri?: vscode.Uri) => {
-      const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
-      if (docUri && docUri.scheme === DIFF_SCHEME) {
-        diffManager.cancelDiff(docUri);
-      }
-      // If any chat surface is requesting permission, actively select reject/cancel
-      try {
+        // If any chat surface is requesting permission, actively select reject/cancel
         for (const provider of chatProviderRegistry?.getPermissionAwareProviders() ??
           []) {
           if (provider?.hasPendingPermission()) {
             provider.respondToPendingPermission('cancel');
           }
-        } catch (err) {
-          console.warn('[Extension] Auto-allow on diff.accept failed:', err);
         }
       } catch (err) {
         logger.warn('[Extension] Auto-reject on diff.cancel failed:', err);
       }
       logger.log('[Extension] Diff cancelled');
-    })),
-    vscode.commands.registerCommand('qwen.diff.closeAll', async () => {
+    }),
+    vscode.commands.registerCommand('hopcode.diff.closeAll', async () => {
       try {
         await diffManager.closeAll();
       } catch (err) {
-        logger.warn('[Extension] qwen.diff.closeAll failed:', err);
+        logger.warn('[Extension] hopcode.diff.closeAll failed:', err);
       }
     }),
-    vscode.commands.registerCommand('qwen.diff.suppressBriefly', async () => {
+    vscode.commands.registerCommand('hopcode.diff.suppressBriefly', async () => {
       try {
         diffManager.suppressFor(1200);
       } catch (err) {
-        logger.warn('[Extension] qwen.diff.suppressBriefly failed:', err);
+        logger.warn('[Extension] hopcode.diff.suppressBriefly failed:', err);
       }
     }),
-    vscode.commands.registerCommand(
-      'hopcode.diff.suppressBriefly',
-      async () => {
-        try {
-          diffManager.suppressFor(1200);
-        } catch (err) {
-          console.warn('[Extension] hopcode.diff.suppressBriefly failed:', err);
-        }
-      },
-    ),
   );
 
   ideServer = new IDEServer(logger.info, diffManager);

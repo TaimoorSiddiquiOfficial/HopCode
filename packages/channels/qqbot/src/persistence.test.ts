@@ -69,7 +69,7 @@ vi.mock('@hoptrendy/channel-base', () => ({
       return Promise.resolve();
     }
   },
-  getGlobalQwenDir: () => '/tmp/test-qwen',
+  getGlobalHopCodeDir: () => '/tmp/test-hopcode',
   sanitizeLogText: (text: string, maxLen: number): string => {
     const sanitized = Array.from(text, (c) => {
       const cp = c.codePointAt(0)!;
@@ -111,11 +111,11 @@ function makeChannel(): QQChannelClass {
   return ch;
 }
 
-const statePath = '/tmp/test-qwen/channels/test-bot-state.json';
-const sessionsPath = '/tmp/test-qwen/channels/test-bot-sessions.json';
-const globalSessionsPath = '/tmp/test-qwen/channels/sessions.json';
+const statePath = '/tmp/test-hopcode/channels/test-bot-state.json';
+const sessionsPath = '/tmp/test-hopcode/channels/test-bot-sessions.json';
+const globalSessionsPath = '/tmp/test-hopcode/channels/sessions.json';
 const sessionsBackupPath =
-  '/tmp/test-qwen/channels/test-bot-sessions-backup.json';
+  '/tmp/test-hopcode/channels/test-bot-sessions-backup.json';
 
 beforeEach(() => {
   vi.useFakeTimers();

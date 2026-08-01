@@ -800,7 +800,7 @@ describe('CoreToolScheduler', () => {
     };
   }
 
-  it('keeps interaction-required tools awaiting approval despite YOLO and an allow hook', async () => {
+  it('keeps interaction-required tools awaiting approval despite IZN and an allow hook', async () => {
     const execute = vi.fn().mockResolvedValue({
       llmContent: 'executed',
       returnDisplay: 'executed',
@@ -844,7 +844,7 @@ describe('CoreToolScheduler', () => {
     const { scheduler, onAllToolCallsComplete } =
       createSchedulerForLegacyToolTests({
         toolsByName: new Map([[ToolNames.EXIT_PLAN_MODE, tool]]),
-        approvalMode: ApprovalMode.YOLO,
+        approvalMode: ApprovalMode.IZN,
         messageBus,
         disableHooks: false,
         onToolCallsUpdate,
@@ -1064,8 +1064,8 @@ describe('CoreToolScheduler', () => {
   });
 
   it('aborts and fails a tool call that exceeds the execution timeout', async () => {
-    const previousTimeout = process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
-    process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '30';
+    const previousTimeout = process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+    process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '30';
     try {
       const parentController = new AbortController();
       let toolSawAbort = false;
@@ -1120,9 +1120,9 @@ describe('CoreToolScheduler', () => {
       expect(toolSawAbort).toBe(true);
     } finally {
       if (previousTimeout === undefined) {
-        delete process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+        delete process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
       } else {
-        process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
+        process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
       }
     }
   });
@@ -1222,8 +1222,8 @@ describe('CoreToolScheduler', () => {
   });
 
   it('keeps parent cancellation when the scheduler timeout fires later', async () => {
-    const previousTimeout = process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
-    process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '30';
+    const previousTimeout = process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+    process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '30';
     try {
       const parentController = new AbortController();
       const execute = vi.fn(() => new Promise<ToolResult>(() => {}));
@@ -1253,16 +1253,16 @@ describe('CoreToolScheduler', () => {
       expect(completedCall.status).toBe('cancelled');
     } finally {
       if (previousTimeout === undefined) {
-        delete process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+        delete process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
       } else {
-        process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
+        process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
       }
     }
   });
 
   it('forwards a parent signal abort to the timeout controller', async () => {
-    const previousTimeout = process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
-    process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '10000';
+    const previousTimeout = process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+    process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '10000';
     try {
       const parentController = new AbortController();
       let toolSawAbort = false;
@@ -1313,16 +1313,16 @@ describe('CoreToolScheduler', () => {
       expect(completedCall.status).toBe('cancelled');
     } finally {
       if (previousTimeout === undefined) {
-        delete process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+        delete process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
       } else {
-        process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
+        process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
       }
     }
   }, 15000);
 
   it('aborts immediately when the parent signal is already aborted before scheduling', async () => {
-    const previousTimeout = process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
-    process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '10000';
+    const previousTimeout = process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+    process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '10000';
     try {
       const parentController = new AbortController();
       parentController.abort(); // Pre-abort
@@ -1357,16 +1357,16 @@ describe('CoreToolScheduler', () => {
       expect(completedCall.status).toBe('cancelled');
     } finally {
       if (previousTimeout === undefined) {
-        delete process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+        delete process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
       } else {
-        process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
+        process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
       }
     }
   });
 
   it('propagates a tool rejection even when timeout is active', async () => {
-    const previousTimeout = process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
-    process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '5000';
+    const previousTimeout = process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+    process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '5000';
     try {
       const execute = vi.fn().mockRejectedValue(new Error('disk full'));
       const toolsByName = new Map<string, MockTool>([
@@ -1404,9 +1404,9 @@ describe('CoreToolScheduler', () => {
       }
     } finally {
       if (previousTimeout === undefined) {
-        delete process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+        delete process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
       } else {
-        process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
+        process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
       }
     }
   });
@@ -8137,8 +8137,8 @@ describe('CoreToolScheduler telemetry spans', () => {
   });
 
   it('sets timeout failure_kind on span when tool exceeds execution timeout', async () => {
-    const previousTimeout = process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
-    process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '30';
+    const previousTimeout = process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+    process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = '30';
     try {
       toolSpanRecords.length = 0;
       const { scheduler, onAllToolCallsComplete } = buildScheduler({
@@ -8169,9 +8169,9 @@ describe('CoreToolScheduler telemetry spans', () => {
       expect(spanRecord.ended).toBe(true);
     } finally {
       if (previousTimeout === undefined) {
-        delete process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
+        delete process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'];
       } else {
-        process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
+        process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'] = previousTimeout;
       }
     }
   });

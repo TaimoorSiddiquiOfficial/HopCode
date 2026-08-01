@@ -288,8 +288,7 @@ function buildMainAgentToolCall(packageJsonPath: string) {
             },
           ],
         },
-        'call_dispatch_main',
-      ),
+      },
     ],
     usage: { prompt_tokens: 32, completion_tokens: 16, total_tokens: 48 },
   };

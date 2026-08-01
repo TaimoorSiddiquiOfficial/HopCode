@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -85,14 +85,14 @@ describe('loadSettingsCached', () => {
     mockHome.dir = homeDir;
 
     // Sandbox every settings path inside tmpRoot: user/workspace via
-    // QWEN_HOME + cwd, system/system-defaults via their test overrides.
-    vi.stubEnv('QWEN_HOME', qwenHome);
+    // HOPCODE_HOME + cwd, system/system-defaults via their test overrides.
+    vi.stubEnv('HOPCODE_HOME', qwenHome);
     vi.stubEnv(
-      'QWEN_CODE_SYSTEM_SETTINGS_PATH',
+      'HOPCODE_CODE_SYSTEM_SETTINGS_PATH',
       path.join(tmpRoot, 'system', 'settings.json'),
     );
     vi.stubEnv(
-      'QWEN_CODE_SYSTEM_DEFAULTS_PATH',
+      'HOPCODE_CODE_SYSTEM_DEFAULTS_PATH',
       path.join(tmpRoot, 'system', 'system-defaults.json'),
     );
     resetModuleState();
@@ -183,7 +183,7 @@ describe('loadSettingsCached', () => {
     expect(process.env[`${TEST_ENV_PREFIX}B`]).toBe('2');
   });
 
-  it('reloads when QWEN_HOME points at a different directory', () => {
+  it('reloads when HOPCODE_HOME points at a different directory', () => {
     writeJson(userSettingsPath(), versioned({ model: { name: 'home-one' } }));
     const first = loadSettingsCached(workspaceDir);
     expect(first.merged.model?.name).toBe('home-one');
@@ -193,7 +193,7 @@ describe('loadSettingsCached', () => {
       path.join(otherQwenHome, 'settings.json'),
       versioned({ model: { name: 'home-two' } }),
     );
-    vi.stubEnv('QWEN_HOME', otherQwenHome);
+    vi.stubEnv('HOPCODE_HOME', otherQwenHome);
 
     const second = loadSettingsCached(workspaceDir);
     expect(second).not.toBe(first);
@@ -201,7 +201,7 @@ describe('loadSettingsCached', () => {
   });
 
   it('reloads when os.homedir() changes even if no settings path moves', () => {
-    // The R2 corner: QWEN_HOME pins the user/system paths and no .env exists
+    // The R2 corner: HOPCODE_HOME pins the user/system paths and no .env exists
     // anywhere, so only the homeDir fingerprint component can catch this.
     const first = loadSettingsCached(workspaceDir);
 

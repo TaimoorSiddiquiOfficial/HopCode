@@ -5,9 +5,9 @@ import type {
 } from './ChannelAgentBridge.js';
 
 export const CHANNEL_LOOP_MCP_SERVER_NAME = 'channel_loop';
-export const CLIENT_MCP_MESSAGE_METHOD = 'qwen/control/client_mcp/message';
+export const CLIENT_MCP_MESSAGE_METHOD = 'hopcode/control/client_mcp/message';
 export const WORKSPACE_MCP_RUNTIME_ADD_METHOD =
-  'qwen/control/workspace/mcp/runtime-add';
+  'hopcode/control/workspace/mcp/runtime-add';
 export const CLIENT_MCP_OVER_WS_CONFIG_FLAG = '__clientMcpOverWs';
 
 export type JsonRpcMessage = Record<string, unknown>;

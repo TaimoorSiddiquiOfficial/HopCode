@@ -26,11 +26,11 @@ export class PairingStore {
    * @param channelName Channel name the state is keyed by.
    * @param workspaceCwd Workspace working directory to scope the state to.
    *   When provided, files live under
-   *   `<qwen-home>/channels/<workspace-scope>/` so two workspaces using the
+   *   `<hopcode-home>/channels/<workspace-scope>/` so two workspaces using the
    *   same channel name never share pairing requests or allowlist entries
    *   (see #7017 — sharing them is an authorization-boundary violation in
    *   multi-workspace daemon deployments). Omitting it preserves the legacy
-   *   global layout (`<qwen-home>/channels/`).
+   *   global layout (`<hopcode-home>/channels/`).
    */
   constructor(channelName: string, workspaceCwd?: string) {
     const channelsRoot = path.join(getGlobalHopCodeDir(), 'channels');
@@ -78,7 +78,7 @@ export class PairingStore {
    * store already has is never overwritten.
    *
    * Copy, not move: another workspace upgrading later must be able to
-   * grandfather the same baseline, and an older qwen version running
+   * grandfather the same baseline, and an older hopcode version running
    * concurrently still reads the global files.
    *
    * Revocation therefore means REMOVING ENTRIES from the scoped allowlist

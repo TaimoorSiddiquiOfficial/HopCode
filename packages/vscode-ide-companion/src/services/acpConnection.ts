@@ -114,7 +114,7 @@ export class AcpConnection {
 
     const env = { ...process.env };
     env['ELECTRON_RUN_AS_NODE'] = '1';
-    env['QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE'] = '1';
+    env['HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE'] = '1';
 
     const proxyArg = extraArgs.find(
       (arg, i) => arg === '--proxy' && i + 1 < extraArgs.length,

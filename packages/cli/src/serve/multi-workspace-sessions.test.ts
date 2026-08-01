@@ -231,18 +231,18 @@ async function archiveStoredSession(
 }
 
 async function withRuntimeDir<T>(fn: () => Promise<T>): Promise<T> {
-  const previousRuntimeDir = process.env['QWEN_RUNTIME_DIR'];
+  const previousRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
   const runtimeDir = await fsp.mkdtemp(
     path.join(os.tmpdir(), 'qwen-multi-workspace-sessions-'),
   );
-  process.env['QWEN_RUNTIME_DIR'] = runtimeDir;
+  process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
   try {
     return await fn();
   } finally {
     if (previousRuntimeDir === undefined) {
-      delete process.env['QWEN_RUNTIME_DIR'];
+      delete process.env['HOPCODE_RUNTIME_DIR'];
     } else {
-      process.env['QWEN_RUNTIME_DIR'] = previousRuntimeDir;
+      process.env['HOPCODE_RUNTIME_DIR'] = previousRuntimeDir;
     }
     await fsp.rm(runtimeDir, { recursive: true, force: true });
   }
@@ -900,7 +900,7 @@ describe('multi-workspace session dispatch', () => {
     const res = await request(app)
       .post('/session')
       .set('Host', host())
-      .send({ cwd: SECONDARY_CWD, approvalMode: 'yolo' });
+      .send({ cwd: SECONDARY_CWD, approvalMode: 'izn' });
 
     expect(res.status).toBe(200);
     expect(primaryBridge.spawnCalls).toEqual([]);
@@ -909,7 +909,7 @@ describe('multi-workspace session dispatch', () => {
     // so no follow-up primary-only approval-mode round-trip is required.
     expect(secondaryBridge.spawnCalls[0]).toMatchObject({
       workspaceCwd: SECONDARY_CWD,
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
     });
   });
 
@@ -1655,18 +1655,18 @@ describe('multi-workspace session dispatch', () => {
     const res = await request(app)
       .post('/session/secondary-session/approval-mode')
       .set('Host', host())
-      .send({ mode: 'yolo', persist: true });
+      .send({ mode: 'izn', persist: true });
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({
       sessionId: 'secondary-session',
-      mode: 'yolo',
+      mode: 'izn',
       persisted: true,
     });
     expect(secondaryBridge.setApprovalModeCalls).toHaveLength(1);
     expect(secondaryBridge.setApprovalModeCalls[0]).toMatchObject({
       sessionId: 'secondary-session',
-      mode: 'yolo',
+      mode: 'izn',
       opts: { persist: true },
     });
     expect(primaryBridge.setApprovalModeCalls).toEqual([]);
@@ -1688,7 +1688,7 @@ describe('multi-workspace session dispatch', () => {
     const approvalRes = await request(app)
       .post('/session/secondary-session/approval-mode')
       .set('Host', host())
-      .send({ mode: 'yolo' });
+      .send({ mode: 'izn' });
     expect(approvalRes.status).toBe(403);
     expect(approvalRes.body.code).toBe('untrusted_workspace');
     expect(secondaryBridge.setApprovalModeCalls).toEqual([]);
@@ -3097,10 +3097,10 @@ describe('multi-workspace session dispatch', () => {
         prompt: 'no debug writes',
         mtime: new Date('2026-07-08T00:00:00.000Z'),
       });
-      const previousDebugLogFile = process.env['QWEN_DEBUG_LOG_FILE'];
+      const previousDebugLogFile = process.env['HOPCODE_DEBUG_LOG_FILE'];
       const debugSessionId = '550e8400-e29b-41d4-a716-446655440275';
       const debugLogPath = Storage.getDebugLogPath(debugSessionId);
-      process.env['QWEN_DEBUG_LOG_FILE'] = '1';
+      process.env['HOPCODE_DEBUG_LOG_FILE'] = '1';
       resetDebugLoggingState();
       setDebugLogSession({ getSessionId: () => debugSessionId });
       try {
@@ -3116,9 +3116,9 @@ describe('multi-workspace session dispatch', () => {
         setDebugLogSession(null);
         resetDebugLoggingState();
         if (previousDebugLogFile === undefined) {
-          delete process.env['QWEN_DEBUG_LOG_FILE'];
+          delete process.env['HOPCODE_DEBUG_LOG_FILE'];
         } else {
-          process.env['QWEN_DEBUG_LOG_FILE'] = previousDebugLogFile;
+          process.env['HOPCODE_DEBUG_LOG_FILE'] = previousDebugLogFile;
         }
       }
     });
@@ -3242,7 +3242,7 @@ describe('multi-workspace session dispatch', () => {
 
   it('does not repair malformed untrusted catalog storage', async () => {
     await withRuntimeDir(async () => {
-      const previousDebugLogFile = process.env['QWEN_DEBUG_LOG_FILE'];
+      const previousDebugLogFile = process.env['HOPCODE_DEBUG_LOG_FILE'];
       const storage = new Storage(SECONDARY_CWD);
       const chatsDir = path.join(storage.getProjectDir(), 'chats');
       const malformedSessionPath = path.join(
@@ -3264,7 +3264,7 @@ describe('multi-workspace session dispatch', () => {
       });
       const debugSessionId = '550e8400-e29b-41d4-a716-446655440191';
       const debugLogPath = Storage.getDebugLogPath(debugSessionId);
-      process.env['QWEN_DEBUG_LOG_FILE'] = '1';
+      process.env['HOPCODE_DEBUG_LOG_FILE'] = '1';
       resetDebugLoggingState();
       setDebugLogSession({ getSessionId: () => debugSessionId });
 
@@ -3303,9 +3303,9 @@ describe('multi-workspace session dispatch', () => {
         setDebugLogSession(null);
         resetDebugLoggingState();
         if (previousDebugLogFile === undefined) {
-          delete process.env['QWEN_DEBUG_LOG_FILE'];
+          delete process.env['HOPCODE_DEBUG_LOG_FILE'];
         } else {
-          process.env['QWEN_DEBUG_LOG_FILE'] = previousDebugLogFile;
+          process.env['HOPCODE_DEBUG_LOG_FILE'] = previousDebugLogFile;
         }
       }
     });

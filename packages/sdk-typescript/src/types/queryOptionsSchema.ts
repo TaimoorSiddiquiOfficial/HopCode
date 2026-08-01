@@ -12,7 +12,7 @@ const RESERVED_CLI_FLAGS = new Set([
   '--auth-type',
   '--fallback-model',
   '--approval-mode',
-  '--yolo',
+  '--izn',
   '-y',
   '--insecure',
   '--no-insecure',

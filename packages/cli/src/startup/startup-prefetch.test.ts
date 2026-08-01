@@ -57,9 +57,9 @@ vi.mock('../ui/utils/updateCheck.js', () => ({
 }));
 
 vi.mock('../utils/processUtils.js', () => ({
-  CUSTOM_SANDBOX_IMAGE_ENV_VAR: 'QWEN_CODE_CUSTOM_SANDBOX_IMAGE',
-  HOST_UPDATE_RELAUNCH_ENV_VAR: 'QWEN_CODE_HOST_UPDATE_RELAUNCH',
-  SKIP_UPDATE_CHECK_ENV_VAR: 'QWEN_CODE_SKIP_UPDATE_CHECK_ONCE',
+  CUSTOM_SANDBOX_IMAGE_ENV_VAR: 'HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE',
+  HOST_UPDATE_RELAUNCH_ENV_VAR: 'HOPCODE_CODE_HOST_UPDATE_RELAUNCH',
+  SKIP_UPDATE_CHECK_ENV_VAR: 'HOPCODE_CODE_SKIP_UPDATE_CHECK_ONCE',
   requestUpdateOnExit: (...args: unknown[]) => mockRequestUpdateOnExit(...args),
 }));
 
@@ -118,9 +118,9 @@ function makeSettings(
 describe('startupPrefetch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    delete process.env['QWEN_CODE_CUSTOM_SANDBOX_IMAGE'];
-    delete process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'];
-    delete process.env['QWEN_CODE_SKIP_UPDATE_CHECK_ONCE'];
+    delete process.env['HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE'];
+    delete process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'];
+    delete process.env['HOPCODE_CODE_SKIP_UPDATE_CHECK_ONCE'];
     vi.useRealTimers();
     mockCheckForUpdatesDetailed.mockResolvedValue({
       status: 'up-to-date',
@@ -283,7 +283,7 @@ describe('startupPrefetch', () => {
   });
 
   it('keeps a container running until the user updates the host', async () => {
-    process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'] = 'true';
+    process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'] = 'true';
     mockCheckForUpdatesDetailed.mockResolvedValue({
       status: 'update',
       info: {
@@ -304,7 +304,7 @@ describe('startupPrefetch', () => {
   });
 
   it('keeps a container running when the host requires manual updates', async () => {
-    process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'] = 'false';
+    process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'] = 'false';
     mockCheckForUpdatesDetailed.mockResolvedValue({
       status: 'update',
       info: {
@@ -325,7 +325,7 @@ describe('startupPrefetch', () => {
   });
 
   it('skips one automatic update check after an update relaunch', async () => {
-    process.env['QWEN_CODE_SKIP_UPDATE_CHECK_ONCE'] = 'true';
+    process.env['HOPCODE_CODE_SKIP_UPDATE_CHECK_ONCE'] = 'true';
 
     try {
       startPostRenderPrefetches(makeConfig(), makeSettings());
@@ -333,12 +333,12 @@ describe('startupPrefetch', () => {
 
       expect(mockCheckForUpdatesDetailed).not.toHaveBeenCalled();
     } finally {
-      delete process.env['QWEN_CODE_SKIP_UPDATE_CHECK_ONCE'];
+      delete process.env['HOPCODE_CODE_SKIP_UPDATE_CHECK_ONCE'];
     }
   });
 
   it('leaves explicitly configured sandbox images user-managed', async () => {
-    process.env['QWEN_CODE_CUSTOM_SANDBOX_IMAGE'] =
+    process.env['HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE'] =
       'example.com/custom-qwen:1.0.0';
 
     try {
@@ -348,7 +348,7 @@ describe('startupPrefetch', () => {
       expect(mockCheckForUpdatesDetailed).not.toHaveBeenCalled();
       expect(mockRequestUpdateOnExit).not.toHaveBeenCalled();
     } finally {
-      delete process.env['QWEN_CODE_CUSTOM_SANDBOX_IMAGE'];
+      delete process.env['HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE'];
     }
   });
 

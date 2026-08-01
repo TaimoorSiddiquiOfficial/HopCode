@@ -342,8 +342,8 @@ export function splitCommands(command: string): string[] {
  * Without this, such a command had NO identifiable root: the tokenizer turns
  * the expansion into a non-string (or empty) token, `getCommandRoot` returns
  * undefined, and the shell tool hard-refuses the command before any approval
- * mode is consulted — including YOLO. Dogfooded live: the bundled /review
- * skill invokes every command as `"${QWEN_CODE_CLI:-qwen}" review …`, and each
+ * mode is consulted — including IZN. Dogfooded live: the bundled /review
+ * skill invokes every command as `"${HOPCODE_CODE_CLI:-qwen}" review …`, and each
  * run opened with "Could not identify command root to obtain permission from
  * user" until the model hand-resolved the variable itself.
  *

@@ -31,11 +31,11 @@ describe('channel pairing CLI (--cwd scoping)', () => {
   let qwenHome: string;
   let wsA: string;
   let wsB: string;
-  const originalQwenHome = process.env['QWEN_HOME'];
+  const originalQwenHome = process.env['HOPCODE_HOME'];
 
   beforeEach(() => {
     qwenHome = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-pairing-cli-'));
-    process.env['QWEN_HOME'] = qwenHome;
+    process.env['HOPCODE_HOME'] = qwenHome;
     wsA = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-a-'));
     wsB = fs.mkdtempSync(path.join(os.tmpdir(), 'ws-b-'));
     vi.mocked(writeStdoutLine).mockClear();
@@ -44,9 +44,9 @@ describe('channel pairing CLI (--cwd scoping)', () => {
 
   afterEach(() => {
     if (originalQwenHome !== undefined) {
-      process.env['QWEN_HOME'] = originalQwenHome;
+      process.env['HOPCODE_HOME'] = originalQwenHome;
     } else {
-      delete process.env['QWEN_HOME'];
+      delete process.env['HOPCODE_HOME'];
     }
     for (const dir of [qwenHome, wsA, wsB]) {
       fs.rmSync(dir, { recursive: true, force: true });

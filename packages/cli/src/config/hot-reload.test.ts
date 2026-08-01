@@ -466,11 +466,11 @@ describe('registerMcpHotReload', () => {
     }
   });
 
-  it('YOLO: does not compute pending or emit McpPendingApprovalChanged for gated servers', async () => {
+  it('IZN: does not compute pending or emit McpPendingApprovalChanged for gated servers', async () => {
     const fc = makeFakeConfig(cwd, {
       settingsMcp: {},
       gating: {},
-      approvalMode: ApprovalMode.YOLO,
+      approvalMode: ApprovalMode.IZN,
     });
     registerMcpHotReload(watcher, settings, fc.config, undefined);
 

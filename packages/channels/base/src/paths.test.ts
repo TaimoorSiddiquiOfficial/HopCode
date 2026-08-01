@@ -104,19 +104,19 @@ describe('canonicalizeWorkspacePath', () => {
   it('collapses trailing-separator and dot-dot spellings of a nonexistent path', () => {
     // The realpath step cannot help for paths that do not exist on disk, so
     // the resolved fallback itself must canonicalize equivalent spellings.
-    const missing = path.join(os.tmpdir(), 'qwen-scope-missing-norm');
+    const missing = path.join(os.tmpdir(), 'hopcode-scope-missing-norm');
     expect(getWorkspaceScopeDirName(`${missing}${path.sep}`)).toBe(
       getWorkspaceScopeDirName(missing),
     );
     expect(
       getWorkspaceScopeDirName(
-        path.join(missing, '..', 'qwen-scope-missing-norm'),
+        path.join(missing, '..', 'hopcode-scope-missing-norm'),
       ),
     ).toBe(getWorkspaceScopeDirName(missing));
   });
 
   it('keeps the resolved spelling for a path that does not exist (ENOENT fallback)', () => {
-    const missing = path.join(os.tmpdir(), 'qwen-scope-missing', 'nested');
+    const missing = path.join(os.tmpdir(), 'hopcode-scope-missing', 'nested');
     expect(canonicalizeWorkspacePath(missing)).toBe(resolvePath(missing));
     // The scope name of a nonexistent path is exactly the one computed from
     // its resolved spelling — the realpath step degrades to a no-op.

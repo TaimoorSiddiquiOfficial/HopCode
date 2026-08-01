@@ -56,24 +56,24 @@ describe('scripts/start.js launcher', () => {
     }
   });
 
-  it('stamps QWEN_CODE_CLI with its own path, overriding an inherited one', async () => {
+  it('stamps HOPCODE_CODE_CLI with its own path, overriding an inherited one', async () => {
     // Same property dev.test.js pins for scripts/dev.js, on the entry with no
     // other coverage of its env block: `npm start` runs `node packages/cli`
     // directly — no bin wrapper anywhere in that chain — so this launcher is the
     // only thing that can publish the entry, and an inherited value is another
     // session's CLI, which every subprocess would then call instead of this one.
-    const inherited = process.env.QWEN_CODE_CLI;
-    process.env.QWEN_CODE_CLI = '/somewhere/else/entirely/qwen';
+    const inherited = process.env.HOPCODE_CODE_CLI;
+    process.env.HOPCODE_CODE_CLI = '/somewhere/else/entirely/qwen';
     try {
       await import('../start.js?stamps-own-cli');
 
       const [, , options] = spawnMock.mock.calls[0];
-      expect(normalizePath(options.env.QWEN_CODE_CLI)).toMatch(
+      expect(normalizePath(options.env.HOPCODE_CODE_CLI)).toMatch(
         /scripts\/start\.js$/,
       );
     } finally {
-      if (inherited === undefined) delete process.env.QWEN_CODE_CLI;
-      else process.env.QWEN_CODE_CLI = inherited;
+      if (inherited === undefined) delete process.env.HOPCODE_CODE_CLI;
+      else process.env.HOPCODE_CODE_CLI = inherited;
     }
   });
 });

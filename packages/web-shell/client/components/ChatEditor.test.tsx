@@ -487,15 +487,15 @@ describe('ChatEditor toolbar popovers', () => {
     expect(popover).not.toBeNull();
     expect(popover?.getAttribute('data-side')).toBe('top');
 
-    const yolo = Array.from(popover?.querySelectorAll('button') ?? []).find(
-      (button) => button.textContent?.includes('(yolo)'),
+    const izn = Array.from(popover?.querySelectorAll('button') ?? []).find(
+      (button) => button.textContent?.includes('(izn)'),
     );
     await act(async () => {
-      yolo?.click();
+      izn?.click();
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
-    expect(onSelectMode).toHaveBeenCalledWith('yolo');
+    expect(onSelectMode).toHaveBeenCalledWith('izn');
     expect(document.activeElement).toBe(focusTarget);
     expect(
       document.querySelector('[data-web-shell-toolbar-popover]'),

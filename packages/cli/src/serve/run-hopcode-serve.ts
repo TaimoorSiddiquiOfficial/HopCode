@@ -3091,7 +3091,7 @@ async function runHopCodeServeImpl(
     daemonLog.info('daemon workspace roots initialized', {
       primary: boundWorkspaces[0],
       secondary: boundWorkspaces.slice(1),
-      ideEnvPresent: !!process.env['QWEN_CODE_IDE_WORKSPACE_PATH'],
+      ideEnvPresent: !!process.env['HOPCODE_CODE_IDE_WORKSPACE_PATH'],
     });
     const sharedPathLocks = new PathMutexRegistry();
     const fsFactory = runtime.resolveBridgeFsFactory({

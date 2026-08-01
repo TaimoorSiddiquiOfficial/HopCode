@@ -1,0 +1,162 @@
+/**
+ * @license
+ * Copyright 2026 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+/**
+ * Session management Hook
+ * Manages session list, current session, session switching, and search
+ */
+export const useSessionManagement = (vscode) => {
+    const [hopcodeSessions, setHopCodeSessions] = useState([]);
+    const [currentSessionId, setCurrentSessionId] = useState(null);
+    const [currentSessionTitle, setCurrentSessionTitle] = useState('Past Conversations');
+    const [showSessionSelector, setShowSessionSelector] = useState(false);
+    const [sessionSearchQuery, setSessionSearchQuery] = useState('');
+    const [nextCursor, setNextCursor] = useState(undefined);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSwitchingSession, setIsSwitchingSessionRaw] = useState(false);
+    const switchTimeoutRef = useRef(null);
+    const SWITCH_TIMEOUT_MS = 15000;
+    const PAGE_SIZE = 20;
+    const setIsSwitchingSession = useCallback((value) => {
+        setIsSwitchingSessionRaw(value);
+        if (switchTimeoutRef.current) {
+            clearTimeout(switchTimeoutRef.current);
+            switchTimeoutRef.current = null;
+        }
+        if (value) {
+            switchTimeoutRef.current = setTimeout(() => {
+                console.warn('[useSessionManagement] Switch session timed out, clearing loading state');
+                setIsSwitchingSessionRaw(false);
+                switchTimeoutRef.current = null;
+            }, SWITCH_TIMEOUT_MS);
+        }
+    }, []);
+    useEffect(() => () => {
+        if (switchTimeoutRef.current) {
+            clearTimeout(switchTimeoutRef.current);
+            switchTimeoutRef.current = null;
+        }
+    }, []);
+    /**
+     * Filter session list
+     */
+    const filteredSessions = useMemo(() => {
+        if (!sessionSearchQuery.trim()) {
+            return hopcodeSessions;
+        }
+        const query = sessionSearchQuery.toLowerCase();
+        return hopcodeSessions.filter((session) => {
+            const title = (session.title ||
+                session.name ||
+                '').toLowerCase();
+            return title.includes(query);
+        });
+    }, [hopcodeSessions, sessionSearchQuery]);
+    /**
+     * Load session list
+     */
+    const handleLoadHopCodeSessions = useCallback(() => {
+        // Reset pagination state and load first page
+        setHopCodeSessions([]);
+        setNextCursor(undefined);
+        setHasMore(true);
+        setIsLoading(true);
+        vscode.postMessage({
+            type: 'getHopCodeSessions',
+            data: { size: PAGE_SIZE },
+        });
+        setShowSessionSelector(true);
+    }, [vscode]);
+    const handleLoadMoreSessions = useCallback(() => {
+        if (!hasMore || isLoading || nextCursor === undefined) {
+            return;
+        }
+        setIsLoading(true);
+        vscode.postMessage({
+            type: 'getHopCodeSessions',
+            data: { cursor: nextCursor, size: PAGE_SIZE },
+        });
+    }, [hasMore, isLoading, nextCursor, vscode]);
+    /**
+     * Create new session
+     */
+    const handleNewHopCodeSession = useCallback((modelId) => {
+        const trimmedModelId = typeof modelId === 'string' && modelId.trim().length > 0
+            ? modelId.trim()
+            : undefined;
+        vscode.postMessage({
+            type: 'openNewChatTab',
+            data: trimmedModelId ? { modelId: trimmedModelId } : {},
+        });
+        setShowSessionSelector(false);
+    }, [vscode]);
+    /**
+     * Switch session
+     */
+    const handleSwitchSession = useCallback((sessionId) => {
+        if (sessionId === currentSessionId) {
+            console.log('[useSessionManagement] Already on this session, ignoring');
+            setShowSessionSelector(false);
+            return;
+        }
+        console.log('[useSessionManagement] Switching to session:', sessionId);
+        setIsSwitchingSession(true);
+        vscode.postMessage({
+            type: 'switchHopCodeSession',
+            data: { sessionId },
+        });
+    }, [currentSessionId, vscode, setIsSwitchingSession]);
+    /**
+     * Delete session
+     */
+    const handleDeleteSession = useCallback((sessionId) => {
+        vscode.postMessage({
+            type: 'deleteHopCodeSession',
+            data: { sessionId },
+        });
+    }, [vscode]);
+    /**
+     * Rename session
+     */
+    const handleRenameSession = useCallback((sessionId, title) => {
+        vscode.postMessage({
+            type: 'renameHopCodeSession',
+            data: { sessionId, title },
+        });
+    }, [vscode]);
+    return {
+        // State
+        hopcodeSessions,
+        currentSessionId,
+        currentSessionTitle,
+        showSessionSelector,
+        sessionSearchQuery,
+        filteredSessions,
+        nextCursor,
+        hasMore,
+        isLoading,
+        isSwitchingSession,
+        // State setters
+        setHopCodeSessions,
+        setCurrentSessionId,
+        setCurrentSessionTitle,
+        setShowSessionSelector,
+        setSessionSearchQuery,
+        setNextCursor,
+        setHasMore,
+        setIsLoading,
+        setIsSwitchingSession,
+        // Operations
+        handleLoadHopCodeSessions,
+        handleNewHopCodeSession,
+        handleSwitchSession,
+        handleLoadMoreSessions,
+        handleDeleteSession,
+        handleRenameSession,
+    };
+};
+//# sourceMappingURL=useSessionManagement.js.map

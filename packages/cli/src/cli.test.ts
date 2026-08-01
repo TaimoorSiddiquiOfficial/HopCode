@@ -398,7 +398,7 @@ describe('bootstrap import boundaries', () => {
       );
       writeFileSync(
         path.join(newDir, 'cli.js'),
-        "process.stdout.write(`${JSON.stringify({ args: process.argv.slice(2), skip: process.env.QWEN_CODE_SKIP_UPDATE_CHECK_ONCE, hasLauncherPid: /^\\d+$/.test(process.env.QWEN_CODE_LAUNCHER_PID ?? ''), launcherPath: process.env.QWEN_CODE_LAUNCHER_PATH })}\\n`);\n",
+        "process.stdout.write(`${JSON.stringify({ args: process.argv.slice(2), skip: process.env.HOPCODE_CODE_SKIP_UPDATE_CHECK_ONCE, hasLauncherPid: /^\\d+$/.test(process.env.HOPCODE_CODE_LAUNCHER_PID ?? ''), launcherPath: process.env.HOPCODE_CODE_LAUNCHER_PATH })}\\n`);\n",
       );
       writeFileSync(
         binPath,
@@ -438,7 +438,7 @@ describe('bootstrap import boundaries', () => {
       copyFileSync('../../scripts/cli-entry.js', entryPath);
       writeFileSync(
         path.join(tempDir, 'cli.js'),
-        'process.stdout.write(JSON.stringify({ launcherPath: process.env.QWEN_CODE_LAUNCHER_PATH }));\n',
+        'process.stdout.write(JSON.stringify({ launcherPath: process.env.HOPCODE_CODE_LAUNCHER_PATH }));\n',
       );
       writeFileSync(launcherPath, '#!/bin/sh\n');
       chmodSync(launcherPath, 0o755);
@@ -447,7 +447,7 @@ describe('bootstrap import boundaries', () => {
         encoding: 'utf8',
         env: {
           ...process.env,
-          QWEN_CODE_LAUNCHER_PATH: launcherPath,
+          HOPCODE_CODE_LAUNCHER_PATH: launcherPath,
         },
       });
 
@@ -463,7 +463,7 @@ describe('bootstrap import boundaries', () => {
       ['../../scripts/cli-entry.js', '--version'],
       {
         encoding: 'utf8',
-        env: { ...process.env, QWEN_CODE_RELAUNCH_ARGS: 'not-json' },
+        env: { ...process.env, HOPCODE_CODE_RELAUNCH_ARGS: 'not-json' },
       },
     );
 

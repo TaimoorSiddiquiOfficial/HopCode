@@ -112,7 +112,7 @@ function runCheckCoverage(args: CheckCoverageArgs): void {
         `that never named the diff file — ${report.blindAgents.join(', ')}. They ` +
         `could not have read the diff, whatever they returned. Do NOT relaunch ` +
         `them as they are: a second blind agent reads no more than the first. ` +
-        `Build each prompt with \`"\${QWEN_CODE_CLI:-qwen}" review agent-prompt ` +
+        `Build each prompt with \`"\${HOPCODE_CODE_CLI:-qwen}" review agent-prompt ` +
         `--plan ${shellQuotePath(args.plan)} --chunk <id>\` and pass it verbatim.`,
     );
   }
@@ -126,7 +126,7 @@ function runCheckCoverage(args: CheckCoverageArgs): void {
         `\`agent-prompt\` prints a prompt to be passed VERBATIM; a summary of it is ` +
         `not it. The last run to paraphrase one dropped the rule against reciting a ` +
         `stock sentence and replaced the project's review rules with three sentences ` +
-        `of its own. Re-run \`"\${QWEN_CODE_CLI:-qwen}" review agent-prompt\` and ` +
+        `of its own. Re-run \`"\${HOPCODE_CODE_CLI:-qwen}" review agent-prompt\` and ` +
         `pass its output ` +
         `unedited — copy it, do not retype it.`,
     );
@@ -146,7 +146,7 @@ function runCheckCoverage(args: CheckCoverageArgs): void {
         `severity bar, the finding format and this project's rules live in the ` +
         `brief it was never given, and a dimension reviewed without them cannot ` +
         `be certified clean. Build every required prompt in one call — ` +
-        `\`"\${QWEN_CODE_CLI:-qwen}" review agent-prompt --plan ${shellQuotePath(args.plan)} --roster\` ` +
+        `\`"\${HOPCODE_CODE_CLI:-qwen}" review agent-prompt --plan ${shellQuotePath(args.plan)} --roster\` ` +
         // No "the label above names the role" here: when no role was briefed at
         // all, the report collapses to one line that names none of them.
         `— and launch one agent per block it prints, verbatim. To rebuild a ` +
@@ -197,7 +197,7 @@ function runCheckCoverage(args: CheckCoverageArgs): void {
       'NOTE: a chunk counts as read when an agent was pointed at its lines AND ' +
         'the harness recorded that agent opening the diff. An agent handed the ' +
         'diff with no line ranges covers nothing. Build every whole-diff ' +
-        'agent\'s prompt with `"${QWEN_CODE_CLI:-qwen}" review agent-prompt ' +
+        'agent\'s prompt with `"${HOPCODE_CODE_CLI:-qwen}" review agent-prompt ' +
         `--plan ${shellQuotePath(args.plan)} --whole-diff\` and paste it verbatim ahead of its brief.`,
     );
   }

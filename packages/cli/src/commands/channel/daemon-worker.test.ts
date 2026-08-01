@@ -369,19 +369,19 @@ describe('createDaemonSessionFactory', () => {
 
     await factory({
       workspaceCwd: '/workspace',
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
     });
     await factory({
       workspaceCwd: '/workspace',
       sessionId: 'existing-session',
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
     });
 
     expect(sdk.DaemonSessionClient.createOrAttach).toHaveBeenCalledWith(
       sdk.client,
       {
         workspaceCwd: '/workspace',
-        approvalMode: 'yolo',
+        approvalMode: 'izn',
         sessionScope: 'thread',
         sourceType: 'channel',
       },
@@ -392,7 +392,7 @@ describe('createDaemonSessionFactory', () => {
       'existing-session',
       {
         workspaceCwd: '/workspace',
-        approvalMode: 'yolo',
+        approvalMode: 'izn',
         sessionScope: 'thread',
       },
       'qwen-channel-worker',
@@ -777,7 +777,7 @@ describe('runChannelDaemonWorker', () => {
     mockParseConfiguredChannels.mockResolvedValueOnce([
       {
         ...parsedTelegram,
-        config: { ...parsedTelegram.config, approvalMode: 'yolo' },
+        config: { ...parsedTelegram.config, approvalMode: 'izn' },
       },
       parsedFeishu,
     ]);
@@ -810,13 +810,13 @@ describe('runChannelDaemonWorker', () => {
         ...parsedTelegram,
         config: {
           ...parsedTelegram.config,
-          approvalMode: 'yolo',
+          approvalMode: 'izn',
           webhooks: { sources: {} },
         },
       },
       {
         ...parsedFeishu,
-        config: { ...parsedFeishu.config, approvalMode: 'yolo' },
+        config: { ...parsedFeishu.config, approvalMode: 'izn' },
       },
     ]);
 
@@ -830,7 +830,7 @@ describe('runChannelDaemonWorker', () => {
     expect(mockRouterSetChannelApprovalMode).toHaveBeenCalledTimes(1);
     expect(mockRouterSetChannelApprovalMode).toHaveBeenCalledWith(
       'telegram',
-      'yolo',
+      'izn',
     );
   });
 

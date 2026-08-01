@@ -112,7 +112,7 @@ export class AcpBridge extends EventEmitter implements ChannelAgentBridge {
     this.child = spawn(process.execPath, args, {
       cwd,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, QWEN_CODE_DISABLE_CRON: '1' },
+      env: { ...process.env, HOPCODE_CODE_DISABLE_CRON: '1' },
       shell: false,
     });
 

@@ -256,7 +256,7 @@ describe('DaemonSessionClient', () => {
 
     const session = await DaemonSessionClient.createOrAttach(client, {
       workspaceCwd: '/work/a',
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
     });
 
     for await (const _event of session.events()) {

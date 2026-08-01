@@ -10,7 +10,6 @@ export enum ApprovalMode {
   AUTO_EDIT = 'auto-edit',
   AUTO = 'auto',
   IZN = 'izn',
-  YOLO = 'yolo',
 }
 
 export const APPROVAL_MODES = Object.values(ApprovalMode);
@@ -52,11 +51,6 @@ export const APPROVAL_MODE_INFO: Record<ApprovalMode, ApprovalModeInfo> = {
   [ApprovalMode.IZN]: {
     id: ApprovalMode.IZN,
     name: 'IZN',
-    description: 'Automatically approve all tools',
-  },
-  [ApprovalMode.YOLO]: {
-    id: ApprovalMode.YOLO,
-    name: 'YOLO',
     description: 'Maximum autonomy, no confirmation prompts',
   },
 };

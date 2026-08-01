@@ -1,0 +1,59 @@
+/**
+ * @license
+ * Copyright 2025 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import process from 'node:process';
+import { CommandKind, } from './types.js';
+import { openBrowserSecurely } from '@hoptrendy/hopcode-core';
+import { MessageType } from '../types.js';
+import { t, getCurrentLanguage } from '../../i18n/index.js';
+export const docsCommand = {
+    name: 'docs',
+    get description() {
+        return t('open full HopCode documentation in your browser');
+    },
+    kind: CommandKind.BUILT_IN,
+    supportedModes: ['interactive', 'non_interactive', 'acp'],
+    action: async (context) => {
+        const langPath = getCurrentLanguage()?.startsWith('zh') ? 'zh' : 'en';
+        const docsUrl = `https://taimoor-siddiqui-official.github.io/HopCode/${langPath}`;
+        // Non-interactive/ACP: return URL directly, no browser, no addItem
+        if (context.executionMode !== 'interactive') {
+            return {
+                type: 'message',
+                messageType: 'info',
+                content: `HopCode documentation: ${docsUrl}`,
+            };
+        }
+        if (process.env['SANDBOX'] && process.env['SANDBOX'] !== 'sandbox-exec') {
+            context.ui.addItem({
+                type: MessageType.INFO,
+                text: t('Please open the following URL in your browser to view the documentation:\n{{url}}', {
+                    url: docsUrl,
+                }),
+            }, Date.now());
+        }
+        else {
+            context.ui.addItem({
+                type: MessageType.INFO,
+                text: t('Opening documentation in your browser: {{url}}', {
+                    url: docsUrl,
+                }),
+            }, Date.now());
+            try {
+                await openBrowserSecurely(docsUrl);
+            }
+            catch (_error) {
+                context.ui.addItem({
+                    type: MessageType.ERROR,
+                    text: t('Failed to open browser. View documentation at {{url}}', {
+                        url: docsUrl,
+                    }),
+                }, Date.now());
+            }
+        }
+        return;
+    },
+};
+//# sourceMappingURL=docsCommand.js.map

@@ -3569,7 +3569,7 @@ export class CoreToolScheduler {
     if (!this.config.getDisableAllHooks() && messageBus) {
       fireNotificationHook(
         messageBus,
-        `Qwen Code needs your permission to use ${toolName}`,
+        `HopCode needs your permission to use ${toolName}`,
         NotificationType.PermissionPrompt,
         'Permission needed',
       ).catch((error) => {
@@ -3801,13 +3801,13 @@ export class CoreToolScheduler {
       let promise: Promise<ToolResult>;
 
       // Per-tool-call execution timeout. Disabled by default (experimental):
-      // set QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS to a positive number of
+      // set HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS to a positive number of
       // milliseconds to cap how long a single tool call may run.
       // Cap at 2^31-1 to avoid setTimeout integer overflow (Node truncates
       // larger values to 1ms with TimeoutOverflowWarning).
       const toolExecutionTimeoutMs = Math.min(
         parsePositiveIntegerEnv(
-          process.env['QWEN_CODE_TOOL_EXECUTION_TIMEOUT_MS'],
+          process.env['HOPCODE_CODE_TOOL_EXECUTION_TIMEOUT_MS'],
           0,
         ),
         2_147_483_647,

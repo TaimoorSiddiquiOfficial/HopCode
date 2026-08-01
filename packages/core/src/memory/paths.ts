@@ -108,7 +108,7 @@ export function clearAutoMemoryRootCache(): void {
  * of getAutoMemoryRoot() that is derived from the user's environment rather than
  * repo-tracked contents, and is therefore safe to canonicalize through symlinks.
  *
- * In local-memory mode (`QWEN_CODE_MEMORY_LOCAL=1`) the root is
+ * In local-memory mode (`HOPCODE_CODE_MEMORY_LOCAL=1`) the root is
  * `<projectRoot>/.qwen/memory`, so the anchor is the project root; otherwise the
  * root lives under the shared memory base dir, which is the anchor. The write
  * boundary (isAllowedMemoryPath) canonicalizes this anchor but appends the
@@ -117,7 +117,7 @@ export function clearAutoMemoryRootCache(): void {
  * out of the trusted anchor.
  */
 export function getAutoMemoryTrustedAnchor(projectRoot: string): string {
-  return process.env['QWEN_CODE_MEMORY_LOCAL'] === '1'
+  return process.env['HOPCODE_CODE_MEMORY_LOCAL'] === '1'
     ? projectRoot
     : getMemoryBaseDir();
 }

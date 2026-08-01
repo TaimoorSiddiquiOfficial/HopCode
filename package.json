@@ -23,7 +23,7 @@
     "url": "git+https://github.com/TaimoorSiddiquiOfficial/HopCode.git"
   },
   "config": {
-    "sandboxImageUri": "ghcr.io/qwenlm/qwen-code:0.19.12"
+    "sandboxImageUri": "ghcr.io/hoptrendy/hopcode:latest"
   },
   "scripts": {
     "start": "node scripts/start.js",

@@ -55,10 +55,10 @@ describe('<AutoAcceptIndicator />', () => {
     }
   });
 
-  it('renders YOLO mode indicator', () => {
+  it('renders IZN mode indicator', () => {
     const { lastFrame } = render(
-      <AutoAcceptIndicator approvalMode={ApprovalMode.YOLO} />,
+      <AutoAcceptIndicator approvalMode={ApprovalMode.IZN} />,
     );
-    expect(lastFrame()).toContain('YOLO mode');
+    expect(lastFrame()).toContain('IZN mode');
   });
 });

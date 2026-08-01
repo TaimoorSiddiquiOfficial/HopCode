@@ -84,7 +84,7 @@ function createLoopController(store: ChannelLoopStore): ChannelLoopController {
 function isChannelCronEnabled(settings: {
   merged: { experimental?: { cron?: boolean } };
 }): boolean {
-  if (process.env['QWEN_CODE_DISABLE_CRON'] === '1') return false;
+  if (process.env['HOPCODE_CODE_DISABLE_CRON'] === '1') return false;
   return settings.merged.experimental?.cron !== false;
 }
 

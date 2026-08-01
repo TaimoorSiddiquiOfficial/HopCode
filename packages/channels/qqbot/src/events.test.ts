@@ -86,7 +86,7 @@ vi.mock('@hoptrendy/channel-base', () => ({
       return Promise.resolve();
     }
   },
-  getGlobalQwenDir: () => '/tmp/test-qwen',
+  getGlobalHopCodeDir: () => '/tmp/test-hopcode',
   sanitizeLogText: (text: string, maxLen: number): string => {
     const sanitized = Array.from(text, (c) => {
       const cp = c.codePointAt(0)!;

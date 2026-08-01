@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 
 const DEFAULT_STORAGE_KEY = 'hopcode-web-shell-history';
-const LEGACY_DEFAULT_STORAGE_KEY = 'qwen-web-shell-history';
+const LEGACY_DEFAULT_STORAGE_KEY = 'hopcode-web-shell-history';
 const MAX_HISTORY = 100;
 
 function parseHistory(raw: string): string[] {

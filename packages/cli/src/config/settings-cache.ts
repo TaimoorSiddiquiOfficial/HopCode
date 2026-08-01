@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @license
  * Copyright 2025 HopCode Team
  * SPDX-License-Identifier: Apache-2.0
@@ -93,7 +93,7 @@ function realpathOr(p: string): string {
 
 /**
  * Paths are recomputed on every call (not stored once): they depend on
- * QWEN_HOME / HOME and the test-only system-path overrides, so a changed
+ * HOPCODE_HOME / HOME and the test-only system-path overrides, so a changed
  * environment shows up as a path mismatch and invalidates the entry.
  *
  * IMPORTANT: this list MUST stay in sync with the settings files that
@@ -144,7 +144,7 @@ function isEntryFresh(key: string, entry: CacheEntry): boolean {
   return (
     ideContextStore.get()?.workspaceState?.isTrusted === fp.ideTrust &&
     realpathOr(key) === fp.realCwd &&
-    // homeDir guards the corner where nothing else moves: QWEN_HOME set (so
+    // homeDir guards the corner where nothing else moves: HOPCODE_HOME set (so
     // settings paths don't follow HOME), no .env files anywhere, and the new
     // home equals the workspace dir — which flips workspaceSettingsActive.
     realpathOr(os.homedir()) === fp.homeDir &&
@@ -160,7 +160,7 @@ function isEntryFresh(key: string, entry: CacheEntry): boolean {
  */
 export function loadSettingsCached(workspaceDir: string): LoadedSettings {
   // Idempotent process-level latch (loadSettings runs it internally too);
-  // running it up front makes the QWEN_HOME-derived paths below stable from
+  // running it up front makes the HOPCODE_HOME-derived paths below stable from
   // the very first call instead of only after the first miss.
   preResolveHomeEnvOverrides();
   const key = path.resolve(workspaceDir);

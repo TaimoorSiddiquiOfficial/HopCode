@@ -1041,34 +1041,34 @@ describe('loadCliConfig', () => {
     ]);
   });
 
-  it('enables debug file logging for --debug when QWEN_DEBUG_LOG_FILE is unset', async () => {
-    delete process.env['QWEN_DEBUG_LOG_FILE'];
+  it('enables debug file logging for --debug when HOPCODE_DEBUG_LOG_FILE is unset', async () => {
+    delete process.env['HOPCODE_DEBUG_LOG_FILE'];
     process.argv = ['node', 'script.js', '--debug'];
     const argv = await parseArguments();
 
     await loadCliConfig({}, argv);
 
-    expect(process.env['QWEN_DEBUG_LOG_FILE']).toBe('1');
+    expect(process.env['HOPCODE_DEBUG_LOG_FILE']).toBe('1');
   });
 
   it('preserves explicit opt-out when --debug is used', async () => {
-    process.env['QWEN_DEBUG_LOG_FILE'] = '0';
+    process.env['HOPCODE_DEBUG_LOG_FILE'] = '0';
     process.argv = ['node', 'script.js', '--debug'];
     const argv = await parseArguments();
 
     await loadCliConfig({}, argv);
 
-    expect(process.env['QWEN_DEBUG_LOG_FILE']).toBe('0');
+    expect(process.env['HOPCODE_DEBUG_LOG_FILE']).toBe('0');
   });
 
   it('leaves debug file logging unset outside --debug mode', async () => {
-    delete process.env['QWEN_DEBUG_LOG_FILE'];
+    delete process.env['HOPCODE_DEBUG_LOG_FILE'];
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
 
     await loadCliConfig({}, argv);
 
-    expect(process.env['QWEN_DEBUG_LOG_FILE']).toBeUndefined();
+    expect(process.env['HOPCODE_DEBUG_LOG_FILE']).toBeUndefined();
   });
 
   it('should use configured context file name when settings.context.fileName is set', async () => {
@@ -1195,7 +1195,7 @@ describe('loadCliConfig', () => {
     let errorSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
-      for (const key of ['QWEN_TLS_INSECURE', 'NODE_TLS_REJECT_UNAUTHORIZED']) {
+      for (const key of ['HOPCODE_TLS_INSECURE', 'NODE_TLS_REJECT_UNAUTHORIZED']) {
         savedEnv[key] = process.env[key];
         delete process.env[key];
       }
@@ -1211,11 +1211,11 @@ describe('loadCliConfig', () => {
       }
     });
 
-    it('sets QWEN_TLS_INSECURE=1 and NODE_TLS_REJECT_UNAUTHORIZED=0 when --insecure is passed', async () => {
+    it('sets HOPCODE_TLS_INSECURE=1 and NODE_TLS_REJECT_UNAUTHORIZED=0 when --insecure is passed', async () => {
       process.argv = ['node', 'script.js', '--insecure'];
       const argv = await parseArguments();
       await loadCliConfig({}, argv);
-      expect(process.env['QWEN_TLS_INSECURE']).toBe('1');
+      expect(process.env['HOPCODE_TLS_INSECURE']).toBe('1');
       expect(process.env['NODE_TLS_REJECT_UNAUTHORIZED']).toBe('0');
       expect(errorSpy).toHaveBeenCalled();
     });
@@ -1224,13 +1224,13 @@ describe('loadCliConfig', () => {
       process.argv = ['node', 'script.js'];
       const argv = await parseArguments();
       await loadCliConfig({}, argv);
-      expect(process.env['QWEN_TLS_INSECURE']).toBeUndefined();
+      expect(process.env['HOPCODE_TLS_INSECURE']).toBeUndefined();
       expect(process.env['NODE_TLS_REJECT_UNAUTHORIZED']).toBeUndefined();
       expect(errorSpy).not.toHaveBeenCalled();
     });
 
-    it('propagates a pre-set QWEN_TLS_INSECURE to NODE_TLS_REJECT_UNAUTHORIZED=0', async () => {
-      process.env['QWEN_TLS_INSECURE'] = '1';
+    it('propagates a pre-set HOPCODE_TLS_INSECURE to NODE_TLS_REJECT_UNAUTHORIZED=0', async () => {
+      process.env['HOPCODE_TLS_INSECURE'] = '1';
       process.argv = ['node', 'script.js'];
       const argv = await parseArguments();
       await loadCliConfig({}, argv);
@@ -3087,7 +3087,7 @@ describe('loadCliConfig safe mode', () => {
     const argv = await parseArguments();
     const settings = {
       tools: {
-        approvalMode: 'yolo',
+        approvalMode: 'izn',
       },
     } as unknown as Settings;
     const config = await loadCliConfig(settings, argv, undefined, []);
@@ -3100,7 +3100,7 @@ describe('loadCliConfig safe mode', () => {
     const argv = await parseArguments();
     const settings = {
       tools: {
-        approvalMode: 'yolo',
+        approvalMode: 'izn',
       },
     } as unknown as Settings;
     const config = await loadCliConfig(settings, argv, undefined, []);
@@ -3200,8 +3200,8 @@ describe('loadCliConfig safe mode', () => {
     expect(config.getVisibleTools()).toEqual(new Set(['web_fetch', 'monitor']));
   });
 
-  it('should respect safe mode via QWEN_CODE_SAFE_MODE env var', async () => {
-    vi.stubEnv('QWEN_CODE_SAFE_MODE', 'true');
+  it('should respect safe mode via HOPCODE_CODE_SAFE_MODE env var', async () => {
+    vi.stubEnv('HOPCODE_CODE_SAFE_MODE', 'true');
     process.argv = ['node', 'script.js'];
     const argv = await parseArguments();
     const settings: Settings = {
@@ -3675,8 +3675,8 @@ describe('loadCliConfig approval mode', () => {
       expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.DEFAULT);
     });
 
-    it('should override --approval-mode=yolo to DEFAULT', async () => {
-      process.argv = ['node', 'script.js', '--approval-mode', 'yolo'];
+    it('should override --approval-mode=izn to DEFAULT', async () => {
+      process.argv = ['node', 'script.js', '--approval-mode', 'izn'];
       const argv = await parseArguments();
       const config = await loadCliConfig({}, argv, undefined, []);
       expect(config.getApprovalMode()).toBe(ServerConfig.ApprovalMode.DEFAULT);

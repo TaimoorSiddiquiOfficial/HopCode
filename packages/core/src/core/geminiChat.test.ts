@@ -4619,8 +4619,8 @@ describe('GeminiChat', async () => {
       expect(requestConfig.maxOutputTokens).toBe(32_000);
     });
 
-    it('uses QWEN_CODE_MAX_OUTPUT_TOKENS as the ceiling when set', async () => {
-      process.env['QWEN_CODE_MAX_OUTPUT_TOKENS'] = '12000';
+    it('uses HOPCODE_CODE_MAX_OUTPUT_TOKENS as the ceiling when set', async () => {
+      process.env['HOPCODE_CODE_MAX_OUTPUT_TOKENS'] = '12000';
       try {
         vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
           authType: AuthType.USE_GEMINI,
@@ -4666,7 +4666,7 @@ describe('GeminiChat', async () => {
         ).mock.calls[0][0].config as { maxOutputTokens?: number };
         expect(requestConfig.maxOutputTokens).toBe(12_000);
       } finally {
-        delete process.env['QWEN_CODE_MAX_OUTPUT_TOKENS'];
+        delete process.env['HOPCODE_CODE_MAX_OUTPUT_TOKENS'];
       }
     });
 
@@ -5766,7 +5766,7 @@ describe('GeminiChat', async () => {
     });
 
     it('does not enter the fallback chain in unattended retry mode', async () => {
-      vi.stubEnv('QWEN_CODE_UNATTENDED_RETRY', '1');
+      vi.stubEnv('HOPCODE_CODE_UNATTENDED_RETRY', '1');
       try {
         vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
           authType: AuthType.USE_GEMINI,

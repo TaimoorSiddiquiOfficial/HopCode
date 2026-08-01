@@ -341,7 +341,7 @@ function createWorkerEnv(opts: {
   baseEnv?: Readonly<NodeJS.ProcessEnv>;
 }): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...(opts.baseEnv ?? process.env) };
-  env['QWEN_CODE_NO_RELAUNCH'] = 'true';
+  env['HOPCODE_CODE_NO_RELAUNCH'] = 'true';
   env[CHANNEL_DAEMON_WORKER_SENTINEL] = randomUUID();
   env[QWEN_DAEMON_URL_ENV] = opts.daemonUrl;
   env[QWEN_DAEMON_WORKSPACE_ENV] = opts.workspace;

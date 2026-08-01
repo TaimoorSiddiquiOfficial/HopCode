@@ -14,7 +14,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 describe('scripts/check-build-status.js', () => {
   it('writes nothing to stdout — start.js runs it in front of piped review JSON', async () => {
     // `scripts/start.js` executes this checker with `stdio: 'inherit'` before
-    // every spawn, and start.js is a QWEN_CODE_CLI entry whose stdout callers
+    // every spawn, and start.js is a HOPCODE_CODE_CLI entry whose stdout callers
     // consume: `… review parse-args --stdin | tee plan.json` must produce a file
     // whose first line is JSON. One `console.log` here — the shape this pins
     // against — puts "Checking build status..." at the top of that file. Status

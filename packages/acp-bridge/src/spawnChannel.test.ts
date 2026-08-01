@@ -74,12 +74,12 @@ describe('createSpawnChannelFactory env policy', () => {
 
   beforeEach(() => {
     mockSpawn.mockReset();
-    originalSimple = process.env['QWEN_CODE_SIMPLE'];
+    originalSimple = process.env['HOPCODE_SIMPLE'];
     originalServerToken = process.env['QWEN_SERVER_TOKEN'];
     originalCliEntry = process.env['QWEN_CLI_ENTRY'];
     originalRuntimeOnlyForTest = process.env['RUNTIME_ONLY_FOR_TEST'];
     process.argv[1] = '/tmp/qwen.js';
-    process.env['QWEN_CODE_SIMPLE'] = '1';
+    process.env['HOPCODE_SIMPLE'] = '1';
     process.env['QWEN_SERVER_TOKEN'] = 'secret';
   });
 

@@ -38,8 +38,8 @@ const formatUpdateInstructions = vi.fn(
 );
 vi.mock('../utils/updateCheck.js', () => ({ checkForUpdatesDetailed }));
 vi.mock('../../utils/processUtils.js', () => ({
-  CUSTOM_SANDBOX_IMAGE_ENV_VAR: 'QWEN_CODE_CUSTOM_SANDBOX_IMAGE',
-  HOST_UPDATE_RELAUNCH_ENV_VAR: 'QWEN_CODE_HOST_UPDATE_RELAUNCH',
+  CUSTOM_SANDBOX_IMAGE_ENV_VAR: 'HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE',
+  HOST_UPDATE_RELAUNCH_ENV_VAR: 'HOPCODE_CODE_HOST_UPDATE_RELAUNCH',
   relaunchForUpdate,
 }));
 vi.mock('../../utils/standalone-update.js', () => ({
@@ -73,8 +73,8 @@ describe('updateCommand', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     relaunchForUpdate.mockReset();
-    delete process.env['QWEN_CODE_CUSTOM_SANDBOX_IMAGE'];
-    delete process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'];
+    delete process.env['HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE'];
+    delete process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'];
     checkForUpdatesDetailed.mockResolvedValue({
       status: 'update',
       info: {
@@ -206,7 +206,7 @@ describe('updateCommand', () => {
   });
 
   it('keeps explicitly configured sandbox images user-managed', async () => {
-    process.env['QWEN_CODE_CUSTOM_SANDBOX_IMAGE'] =
+    process.env['HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE'] =
       'example.com/custom-qwen:1.0.0';
 
     try {
@@ -220,12 +220,12 @@ describe('updateCommand', () => {
       });
       expect(relaunchForUpdate).not.toHaveBeenCalled();
     } finally {
-      delete process.env['QWEN_CODE_CUSTOM_SANDBOX_IMAGE'];
+      delete process.env['HOPCODE_CODE_CUSTOM_SANDBOX_IMAGE'];
     }
   });
 
   it('uses the host update capability inside a container', async () => {
-    process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'] = 'true';
+    process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'] = 'true';
 
     const result = await updateCommand.action!(context('interactive'), '');
 
@@ -234,7 +234,7 @@ describe('updateCommand', () => {
   });
 
   it('respects disabled auto-update for a supported host installation', async () => {
-    process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'] = 'true';
+    process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'] = 'true';
 
     const result = await updateCommand.action!(
       context('interactive', false),
@@ -251,7 +251,7 @@ describe('updateCommand', () => {
   });
 
   it('shows manual guidance for an unsupported host installation', async () => {
-    process.env['QWEN_CODE_HOST_UPDATE_RELAUNCH'] = 'false';
+    process.env['HOPCODE_CODE_HOST_UPDATE_RELAUNCH'] = 'false';
 
     const result = await updateCommand.action!(context('interactive'), '');
 

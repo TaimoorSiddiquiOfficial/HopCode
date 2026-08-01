@@ -183,7 +183,7 @@ const {
 });
 
 vi.mock('@hoptrendy/webui/daemon-react-sdk', () => ({
-  DAEMON_APPROVAL_MODES: ['default', 'plan', 'auto-edit', 'auto', 'yolo'],
+  DAEMON_APPROVAL_MODES: ['default', 'plan', 'auto-edit', 'auto', 'izn'],
   useActions: () => mockSessionActions,
   useConnection: () => mockConnection,
   useDaemonFollowupSuggestion: () => ({
@@ -4172,7 +4172,7 @@ describe('App session callbacks', () => {
   it('dismisses an open sub-dialog (model picker) when an approval becomes pending', async () => {
     // A DialogShell sub-dialog left open would sit (backdrop) over the approval
     // overlay in the chat footer, hiding it — and, for the approval-mode picker,
-    // let the user yolo-approve an unseen tool call. /model (no arg) opens the
+    // let the user izn-approve an unseen tool call. /model (no arg) opens the
     // picker; an approval must dismiss it.
     const { container, rerender } = renderApp();
     await flush();

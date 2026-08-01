@@ -252,7 +252,7 @@ async function runStartupIteration(
           NO_COLOR: '1',
           HOPCODE_CODE_PROFILE_STARTUP: '0',
           HOPCODE_CODE_PROFILE_STARTUP_OUTER: '0',
-          HOPCODE_CODE_SUPPRESS_YOLO_WARNING: '1',
+          HOPCODE_CODE_SUPPRESS_IZN_WARNING: '1',
           HOPCODE_SERVER_TOKEN: TOKEN,
         },
       },

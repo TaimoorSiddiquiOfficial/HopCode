@@ -101,12 +101,12 @@ describe('split session persistence (sessionStorage)', () => {
   });
 
   it('falls back to [] on malformed stored JSON', () => {
-    sessionStorage.setItem('qwen-webshell-split-sessions', '{not json');
+    sessionStorage.setItem('hopcode-webshell-split-sessions', '{not json');
     expect(loadSplitSessions()).toEqual([]);
   });
 
   it('falls back to [] when the stored value is not an array', () => {
-    sessionStorage.setItem('qwen-webshell-split-sessions', '"s1"');
+    sessionStorage.setItem('hopcode-webshell-split-sessions', '"s1"');
     expect(loadSplitSessions()).toEqual([]);
   });
 });

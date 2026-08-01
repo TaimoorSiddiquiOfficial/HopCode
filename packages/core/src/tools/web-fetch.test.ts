@@ -186,7 +186,7 @@ describe('WebFetchTool', () => {
   });
 
   describe('request headers', () => {
-    it('should send a QwenCode User-Agent alongside Accept', async () => {
+    it('should send a HopCode User-Agent alongside Accept', async () => {
       const fetchSpy = vi
         .spyOn(fetchUtils, 'fetchWithPolicy')
         .mockResolvedValue(okResponse());
@@ -205,7 +205,7 @@ describe('WebFetchTool', () => {
           headers: {
             Accept:
               'text/markdown, text/html;q=0.9, text/plain;q=0.8, */*;q=0.1',
-            'User-Agent': `QwenCode/1.2.3 (${process.platform}; ${process.arch})`,
+            'User-Agent': `HopCode/1.2.3 (${process.platform}; ${process.arch})`,
           },
         }),
       );

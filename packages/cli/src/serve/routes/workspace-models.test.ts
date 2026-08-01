@@ -84,13 +84,13 @@ function makeApp(
 beforeEach(() => {
   home = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-models-home-'));
   workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'qwen-models-ws-'));
-  prevHome = process.env['QWEN_HOME'];
-  process.env['QWEN_HOME'] = home;
+  prevHome = process.env['HOPCODE_HOME'];
+  process.env['HOPCODE_HOME'] = home;
 });
 
 afterEach(() => {
-  if (prevHome === undefined) delete process.env['QWEN_HOME'];
-  else process.env['QWEN_HOME'] = prevHome;
+  if (prevHome === undefined) delete process.env['HOPCODE_HOME'];
+  else process.env['HOPCODE_HOME'] = prevHome;
   fs.rmSync(home, { recursive: true, force: true });
   fs.rmSync(workspace, { recursive: true, force: true });
 });

@@ -1,0 +1,48 @@
+/**
+ * @license
+ * Copyright 2026 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+type JsonObject = Record<string, unknown>;
+export type FakeOpenAIToolCall = {
+    id: string;
+    type: 'function';
+    function: {
+        name: string;
+        arguments: string;
+    };
+};
+export type FakeOpenAIResponse = {
+    content?: string;
+    contentChunks?: string[];
+    disconnectAfterContentChunks?: number;
+    toolCalls?: FakeOpenAIToolCall[];
+    finishReason?: 'stop' | 'tool_calls' | 'length';
+    usage?: {
+        prompt_tokens: number;
+        completion_tokens: number;
+        total_tokens: number;
+    };
+};
+export type FakeOpenAIRequest = {
+    body: JsonObject;
+};
+export type FakeOpenAIServer = {
+    baseUrl: string;
+    requests: FakeOpenAIRequest[];
+    close: () => Promise<void>;
+};
+export type FakeOpenAIServerOptions = {
+    listenHost?: undefined;
+    baseUrlHost?: undefined;
+} | {
+    listenHost: string;
+    baseUrlHost: string;
+};
+export type FakeOpenAIHandler = (ctx: {
+    body: JsonObject;
+    requestIndex: number;
+}) => FakeOpenAIResponse | Promise<FakeOpenAIResponse>;
+export declare function fakeToolCall(name: string, args: JsonObject, id?: string): FakeOpenAIToolCall;
+export declare function startFakeOpenAIServer(handler: FakeOpenAIHandler, options?: FakeOpenAIServerOptions): Promise<FakeOpenAIServer>;
+export {};

@@ -300,11 +300,11 @@ export async function main() {
 
   if (
     (argv.acp || argv.experimentalAcp) &&
-    process.env['QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE'] === '1'
+    process.env['HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE'] === '1'
   ) {
     delete process.env['ELECTRON_RUN_AS_NODE'];
-    if (process.env['QWEN_CODE_NO_RELAUNCH'] || process.env['SANDBOX']) {
-      delete process.env['QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE'];
+    if (process.env['HOPCODE_CODE_NO_RELAUNCH'] || process.env['SANDBOX']) {
+      delete process.env['HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE'];
     }
   }
 
@@ -416,7 +416,7 @@ export async function main() {
     const sandboxConfig = await loadSandboxConfig(settings.merged, argv);
     const customSandboxImage =
       argv.sandboxImage ??
-      process.env['QWEN_SANDBOX_IMAGE'] ??
+      process.env['HOPCODE_SANDBOX_IMAGE'] ??
       settings.merged.tools?.sandboxImage;
     if (
       sandboxConfig &&
@@ -1031,7 +1031,7 @@ export async function main() {
           `Logging to: ${Storage.getDebugLogPath(config.getSessionId())}`,
         );
       } else {
-        writeStderrLine('Debug log file disabled by QWEN_DEBUG_LOG_FILE');
+        writeStderrLine('Debug log file disabled by HOPCODE_DEBUG_LOG_FILE');
       }
       if (isDebugLoggingDegraded()) {
         writeStderrLine(
@@ -1047,8 +1047,8 @@ export async function main() {
     // because the user is at the keyboard and the TUI shows approval
     // state directly. See issue #4103.
     if (!config.isInteractive()) {
-      const yoloWarning = getHeadlessIznSafetyWarning(config);
-      if (yoloWarning) writeStderrLine(yoloWarning);
+      const iznWarning = getHeadlessIznSafetyWarning(config);
+      if (iznWarning) writeStderrLine(iznWarning);
     }
 
     // For non-stream-json mode, initialize config here. Stream-json defers

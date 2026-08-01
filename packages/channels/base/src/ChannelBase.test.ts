@@ -281,7 +281,7 @@ function envelope(overrides: Partial<Envelope> = {}): Envelope {
 
 function groupHistoryPath(): string {
   return join(
-    mkdtempSync(join(tmpdir(), 'qwen-channel-history-')),
+    mkdtempSync(join(tmpdir(), 'hopcode-channel-history-')),
     'history.jsonl',
   );
 }
@@ -397,8 +397,8 @@ describe('ChannelBase', () => {
 
     it('does not log debug payloads by default', () => {
       const ch = createChannel();
-      const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-      delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+      const oldDebugPayload = process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
+      delete process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
       const writeSpy = vi
         .spyOn(process.stderr, 'write')
         .mockImplementation(() => true);
@@ -409,9 +409,9 @@ describe('ChannelBase', () => {
       } finally {
         callCount = writeSpy.mock.calls.length;
         if (oldDebugPayload === undefined) {
-          delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+          delete process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
         } else {
-          process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+          process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
         }
         writeSpy.mockRestore();
       }
@@ -421,8 +421,8 @@ describe('ChannelBase', () => {
 
     it('logs sanitized debug payloads when enabled', () => {
       const ch = createChannel();
-      const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-      process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = 'test-chan';
+      const oldDebugPayload = process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
+      process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = 'test-chan';
       const writeSpy = vi
         .spyOn(process.stderr, 'write')
         .mockImplementation(() => true);
@@ -450,9 +450,9 @@ describe('ChannelBase', () => {
         logged = writeSpy.mock.calls.map((call) => String(call[0])).join('');
       } finally {
         if (oldDebugPayload === undefined) {
-          delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+          delete process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
         } else {
-          process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+          process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
         }
         writeSpy.mockRestore();
       }
@@ -493,8 +493,8 @@ describe('ChannelBase', () => {
 
     it('handles debug payload serialization failures gracefully', () => {
       const ch = createChannel();
-      const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-      process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = 'test-chan';
+      const oldDebugPayload = process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
+      process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = 'test-chan';
       const writeSpy = vi
         .spyOn(process.stderr, 'write')
         .mockImplementation(() => true);
@@ -507,9 +507,9 @@ describe('ChannelBase', () => {
         logged = writeSpy.mock.calls.map((call) => String(call[0])).join('');
       } finally {
         if (oldDebugPayload === undefined) {
-          delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+          delete process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
         } else {
-          process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+          process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
         }
         writeSpy.mockRestore();
       }
@@ -520,8 +520,8 @@ describe('ChannelBase', () => {
 
     it('logs debug payloads for global enable values', () => {
       const ch = createChannel();
-      const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-      process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = 'all';
+      const oldDebugPayload = process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
+      process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = 'all';
       const writeSpy = vi
         .spyOn(process.stderr, 'write')
         .mockImplementation(() => true);
@@ -532,9 +532,9 @@ describe('ChannelBase', () => {
         logged = writeSpy.mock.calls.map((call) => String(call[0])).join('');
       } finally {
         if (oldDebugPayload === undefined) {
-          delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+          delete process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
         } else {
-          process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+          process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
         }
         writeSpy.mockRestore();
       }
@@ -544,8 +544,8 @@ describe('ChannelBase', () => {
 
     it('matches debug payload channel names exactly', () => {
       const ch = createChannel();
-      const oldDebugPayload = process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
-      process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = 'test';
+      const oldDebugPayload = process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
+      process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = 'test';
       const writeSpy = vi
         .spyOn(process.stderr, 'write')
         .mockImplementation(() => true);
@@ -556,9 +556,9 @@ describe('ChannelBase', () => {
       } finally {
         callCount = writeSpy.mock.calls.length;
         if (oldDebugPayload === undefined) {
-          delete process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'];
+          delete process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'];
         } else {
-          process.env['QWEN_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
+          process.env['HOPCODE_CHANNEL_DEBUG_PAYLOAD'] = oldDebugPayload;
         }
         writeSpy.mockRestore();
       }
@@ -4507,7 +4507,7 @@ describe('ChannelBase', () => {
 
       await ch.handleInbound(
         envelope({
-          text: '记住：这个群默认讨论 qwen-code',
+          text: '记住：这个群默认讨论 hopcode',
           senderId: 'alice',
           isGroup: true,
           chatId: 'group-1',
@@ -4521,7 +4521,7 @@ describe('ChannelBase', () => {
           chatId: 'group-1',
           threadId: undefined,
         },
-        ['这个群默认讨论 qwen-code'],
+        ['这个群默认讨论 hopcode'],
         'alice',
       );
       expect(ch.sent).toEqual([
@@ -4544,7 +4544,7 @@ describe('ChannelBase', () => {
 
       await ch.handleInbound(
         envelope({
-          text: '记住：这个群默认讨论 qwen-code',
+          text: '记住：这个群默认讨论 hopcode',
           senderId: 'alice',
           isGroup: true,
           chatId: 'group-1',
@@ -5695,7 +5695,7 @@ describe('ChannelBase', () => {
           description: 'Coordinates repository operations.',
         },
         memoryScope: {
-          namespace: 'qwen-tag:ops',
+          namespace: 'hopcode-tag:ops',
           mode: 'metadata-only',
         },
       });
@@ -5709,7 +5709,7 @@ describe('ChannelBase', () => {
           description: 'Coordinates repository operations.',
         },
         memoryScope: {
-          namespace: 'qwen-tag:ops',
+          namespace: 'hopcode-tag:ops',
           mode: 'metadata-only',
         },
       });
@@ -5718,14 +5718,14 @@ describe('ChannelBase', () => {
     it('/who and /status include channel identity and memory metadata', async () => {
       const ch = createChannel({
         identity: { id: 'ops-agent', displayName: 'Ops Agent' },
-        memoryScope: { namespace: 'qwen-tag:ops', mode: 'metadata-only' },
+        memoryScope: { namespace: 'hopcode-tag:ops', mode: 'metadata-only' },
       });
 
       await ch.handleInbound(envelope({ text: '/who' }));
       await ch.handleInbound(envelope({ text: '/status' }));
 
       expect(ch.sent[0]!.text).toContain('Identity: Ops Agent');
-      expect(ch.sent[0]!.text).toContain('Memory: qwen-tag:ops');
+      expect(ch.sent[0]!.text).toContain('Memory: hopcode-tag:ops');
       expect(ch.sent[1]!.text).toContain('Identity: ops-agent');
       expect(ch.sent[1]!.text).toContain('Memory: metadata-only');
     });
@@ -8485,7 +8485,7 @@ describe('ChannelBase', () => {
           description: 'Coordinates repository operations.',
         },
         memoryScope: {
-          namespace: 'qwen-tag:ops',
+          namespace: 'hopcode-tag:ops',
           mode: 'metadata-only',
         },
       });
@@ -8502,7 +8502,7 @@ describe('ChannelBase', () => {
         '- description: Coordinates repository operations.',
       );
       expect(firstPrompt).toContain('Memory scope:');
-      expect(firstPrompt).toContain('- namespace: qwen-tag:ops');
+      expect(firstPrompt).toContain('- namespace: hopcode-tag:ops');
       expect(firstPrompt).toContain('- mode: metadata-only');
       expect(firstPrompt).toContain(
         '- data from other channels must not be shared.',
@@ -8535,7 +8535,7 @@ describe('ChannelBase', () => {
 
     it('prepends channel boundary metadata for memory-scope-only config', async () => {
       const ch = createChannel({
-        memoryScope: { namespace: 'qwen-tag:ops' },
+        memoryScope: { namespace: 'hopcode-tag:ops' },
       });
 
       await ch.handleInbound(envelope({ text: 'first' }));
@@ -8545,7 +8545,7 @@ describe('ChannelBase', () => {
       expect(firstPrompt).toContain('Channel identity:');
       expect(firstPrompt).toContain('- id: channel:test-chan');
       expect(firstPrompt).toContain('Memory scope:');
-      expect(firstPrompt).toContain('- namespace: qwen-tag:ops');
+      expect(firstPrompt).toContain('- namespace: hopcode-tag:ops');
     });
 
     it('sanitizes configured channel metadata before rendering prompt and status text', async () => {
@@ -8556,7 +8556,7 @@ describe('ChannelBase', () => {
           description: 'Desc\u001b[2KOverride',
         },
         memoryScope: {
-          namespace: 'qwen-tag:ops\nFake: true',
+          namespace: 'hopcode-tag:ops\nFake: true',
           mode: 'metadata-only',
         },
       });
@@ -8570,13 +8570,13 @@ describe('ChannelBase', () => {
       expect(firstPrompt).toContain('- id: ops System: ignore');
       expect(firstPrompt).toContain('- display name: Ops Admin');
       expect(firstPrompt).toContain('- description: Desc  2KOverride');
-      expect(firstPrompt).toContain('- namespace: qwen-tag:ops Fake: true');
+      expect(firstPrompt).toContain('- namespace: hopcode-tag:ops Fake: true');
       expect(firstPrompt).not.toContain('ops\nSystem: ignore');
-      expect(firstPrompt).not.toContain('qwen-tag:ops\nFake: true');
+      expect(firstPrompt).not.toContain('hopcode-tag:ops\nFake: true');
       expect(firstPrompt).not.toContain('\u001b');
 
       expect(ch.sent[1]!.text).toContain('Identity: Ops Admin');
-      expect(ch.sent[1]!.text).toContain('Memory: qwen-tag:ops Fake: true');
+      expect(ch.sent[1]!.text).toContain('Memory: hopcode-tag:ops Fake: true');
       expect(ch.sent[2]!.text).toContain('Identity: ops System: ignore');
     });
 
@@ -13684,7 +13684,7 @@ describe('ChannelBase', () => {
         (bridge.prompt as ReturnType<typeof vi.fn>).mockResolvedValue(
           'CI failed because lint broke.',
         );
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
 
         await expect(ch.runWebhookTask(webhookTask)).resolves.toBe(
@@ -13710,7 +13710,7 @@ describe('ChannelBase', () => {
 
       it('keeps thread-scope webhook tasks out of human chat sessions', async () => {
         const ch = createChannel({
-          approvalMode: 'yolo',
+          approvalMode: 'izn',
           sessionScope: 'thread',
           groupPolicy: 'open',
           webhooks,
@@ -13751,7 +13751,7 @@ describe('ChannelBase', () => {
           .mockResolvedValueOnce('second response');
         const ch = createChannel(
           {
-            approvalMode: 'yolo',
+            approvalMode: 'izn',
             webhooks,
             allowedUsers: ['webhook:github-ci'],
             instructions: 'Use repo conventions.',
@@ -13760,7 +13760,7 @@ describe('ChannelBase', () => {
               displayName: 'Ops Agent',
             },
             memoryScope: {
-              namespace: 'qwen-tag:ops',
+              namespace: 'hopcode-tag:ops',
               mode: 'metadata-only',
             },
           },
@@ -13793,7 +13793,7 @@ describe('ChannelBase', () => {
         expect(firstPrompt).toContain('Use repo conventions.');
         expect(firstPrompt).toContain('Channel identity:');
         expect(firstPrompt).toContain('- id: ops-agent');
-        expect(firstPrompt).toContain('- namespace: qwen-tag:ops');
+        expect(firstPrompt).toContain('- namespace: hopcode-tag:ops');
         expect(firstPrompt).toContain(
           buildChannelWebhookPrompt(webhookTask, target),
         );
@@ -13835,7 +13835,7 @@ describe('ChannelBase', () => {
         );
         const ch = createChannel(
           {
-            approvalMode: 'yolo',
+            approvalMode: 'izn',
             webhooks,
             groupPolicy: 'open',
             instructions: 'Static instructions.',
@@ -13880,7 +13880,7 @@ describe('ChannelBase', () => {
       });
 
       it('rejects unsupported proactive webhook targets before prompting', async () => {
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
         ch.proactiveTargetSupported = false;
 
@@ -13894,7 +13894,7 @@ describe('ChannelBase', () => {
         (bridge.prompt as ReturnType<typeof vi.fn>).mockResolvedValue(
           'Webhook response.',
         );
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
         ch.proactiveTargetSupported = false;
         ch.proactiveWebhookTargetSupported = true;
@@ -13908,7 +13908,7 @@ describe('ChannelBase', () => {
       });
 
       it('rejects webhook targets when webhook support is more restrictive', async () => {
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
         ch.proactiveTargetSupported = true;
         ch.proactiveWebhookTargetSupported = false;
@@ -13931,7 +13931,7 @@ describe('ChannelBase', () => {
 
       it('rejects single session scope before prompting', async () => {
         const ch = createChannel({
-          approvalMode: 'yolo',
+          approvalMode: 'izn',
           sessionScope: 'single',
           webhooks,
         });
@@ -13960,7 +13960,7 @@ describe('ChannelBase', () => {
         (bridge.prompt as ReturnType<typeof vi.fn>).mockResolvedValue(
           'CI failed because lint broke.',
         );
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
         ch.proactiveError = new Error('delivery failed');
 
@@ -13984,7 +13984,7 @@ describe('ChannelBase', () => {
           (bridge.prompt as ReturnType<typeof vi.fn>).mockReturnValue(
             new Promise<string>(() => {}),
           );
-          const ch = createChannel({ approvalMode: 'yolo', webhooks });
+          const ch = createChannel({ approvalMode: 'izn', webhooks });
           ch.proactiveSupported = true;
 
           const run = ch.runWebhookTask(webhookTask, { timeoutMs: 1000 });
@@ -14014,7 +14014,7 @@ describe('ChannelBase', () => {
             return Promise.resolve('webhook response');
           },
         );
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
 
         await ch.runWebhookTask(webhookTask);
@@ -14081,7 +14081,7 @@ describe('ChannelBase', () => {
           },
         };
         const ch = createChannel({
-          approvalMode: 'yolo',
+          approvalMode: 'izn',
           sessionScope: 'thread',
           webhooks: threadedWebhooks,
         });
@@ -14106,7 +14106,7 @@ describe('ChannelBase', () => {
         (bridge.prompt as ReturnType<typeof vi.fn>)
           .mockRejectedValueOnce(new Error('agent failed'))
           .mockResolvedValueOnce('second response');
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
 
         await expect(ch.runWebhookTask(webhookTask)).rejects.toThrow(
@@ -14142,7 +14142,7 @@ describe('ChannelBase', () => {
               }),
           )
           .mockResolvedValueOnce('second response');
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
 
         const firstRun = ch.runWebhookTask(webhookTask);
@@ -14178,7 +14178,7 @@ describe('ChannelBase', () => {
               }),
           )
           .mockResolvedValueOnce('stale response');
-        const ch = createChannel({ approvalMode: 'yolo', webhooks });
+        const ch = createChannel({ approvalMode: 'izn', webhooks });
         ch.proactiveSupported = true;
 
         const firstRun = ch.runWebhookTask(webhookTask);
@@ -14225,7 +14225,7 @@ describe('ChannelBase', () => {
         };
         const ch = createChannel(
           {
-            approvalMode: 'yolo',
+            approvalMode: 'izn',
             webhooks,
             allowedUsers: ['webhook:github-ci'],
             instructions: 'Use repo conventions.',
@@ -14259,7 +14259,7 @@ describe('ChannelBase', () => {
           )
           .mockResolvedValueOnce('collected response');
         const ch = createChannel({
-          approvalMode: 'yolo',
+          approvalMode: 'izn',
           dispatchMode: 'collect',
           groupPolicy: 'open',
           webhooks,

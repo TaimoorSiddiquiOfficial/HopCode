@@ -15,7 +15,7 @@ import {
 import type { PathMutexRegistry } from '../fs/path-mutex-registry.js';
 import { isWithinRoot } from '../../config/path-comparison.js';
 
-const IDE_WORKSPACE_PATH_ENV_VAR = 'QWEN_CODE_IDE_WORKSPACE_PATH';
+const IDE_WORKSPACE_PATH_ENV_VAR = 'HOPCODE_CODE_IDE_WORKSPACE_PATH';
 
 /**
  * Build a no-op fs-audit emitter that logs a warning every

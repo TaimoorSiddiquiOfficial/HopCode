@@ -287,7 +287,7 @@ export function composeReview(input: ComposeReviewInput): ComposeReviewResult {
       }
       if (cov.blindAgents.length > 0) {
         remediation.push(
-          'blind agents: rebuild each prompt with `"${QWEN_CODE_CLI:-qwen}" ' +
+          'blind agents: rebuild each prompt with `"${HOPCODE_CODE_CLI:-qwen}" ' +
             `review agent-prompt --plan ${planRef} --chunk <id>\` (or \`--role <r>\`) ` +
             '`[--rules <rules file>]` and launch an agent with it verbatim — ' +
             'do not relaunch the old prompt; a second blind agent reads no ' +
@@ -322,7 +322,7 @@ export function composeReview(input: ComposeReviewInput): ComposeReviewResult {
       }
       if (cov.rewrittenPrompts.length > 0) {
         remediation.push(
-          'rewritten launches: re-run `"${QWEN_CODE_CLI:-qwen}" review ' +
+          'rewritten launches: re-run `"${HOPCODE_CODE_CLI:-qwen}" review ' +
             `agent-prompt --plan ${planRef} --chunk <id>\` (or \`--role <r>\`, with ` +
             '`--file <path>` for an invariant agent) `[--rules <rules file>]` ' +
             'for each named agent and pass its output unedited — copy it, do ' +
@@ -339,7 +339,7 @@ export function composeReview(input: ComposeReviewInput): ComposeReviewResult {
       if (cov.missingRoles.length > 0) {
         remediation.push(
           'missing briefs: build every required prompt in one call — ' +
-            `\`"\${QWEN_CODE_CLI:-qwen}" review agent-prompt --plan ${planRef} ` +
+            `\`"\${HOPCODE_CODE_CLI:-qwen}" review agent-prompt --plan ${planRef} ` +
             '--roster [--rules <rules file>]` — and launch one agent per block ' +
             'it prints, verbatim; `--role <n>` or `--chunk <id>` rebuilds a ' +
             'single one. Pass --rules whenever the review loaded any',
@@ -484,7 +484,7 @@ export function composeReview(input: ComposeReviewInput): ComposeReviewResult {
     // miss its repair (or vice versa) — the drift the rest of this file exists
     // to prevent.
     remediation.push(
-      'chunks nobody read: build each with `"${QWEN_CODE_CLI:-qwen}" review ' +
+      'chunks nobody read: build each with `"${HOPCODE_CODE_CLI:-qwen}" review ' +
         `agent-prompt --plan ${planRef} --chunk <id> [--rules <rules file>]\` — or ` +
         'the whole fan-out with `--roster` — and launch one agent per block, ' +
         'verbatim',

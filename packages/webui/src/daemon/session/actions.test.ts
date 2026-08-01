@@ -188,10 +188,10 @@ describe('createDaemonSessionActions', () => {
       createDetachedSession,
     });
 
-    await actions.createSession({ approvalMode: 'yolo' });
+    await actions.createSession({ approvalMode: 'izn' });
 
     expect(createDetachedSession).toHaveBeenCalledWith(undefined, {
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
     });
   });
 
@@ -235,10 +235,10 @@ describe('createDaemonSessionActions', () => {
       session: existingSession,
     });
 
-    await actions.createSession({ approvalMode: 'yolo' });
+    await actions.createSession({ approvalMode: 'izn' });
 
     expect(existingSession.client.createOrAttachSession).toHaveBeenCalledWith(
-      expect.objectContaining({ approvalMode: 'yolo' }),
+      expect.objectContaining({ approvalMode: 'izn' }),
     );
   });
 

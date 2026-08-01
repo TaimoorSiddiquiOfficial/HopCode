@@ -561,8 +561,8 @@ export class WebViewProvider {
               (request.toolCall as { kind?: string } | undefined)?.kind ===
               'switch_mode';
 
-            // Always close open qwen-diff editors after any permission decision
-            void vscode.commands.executeCommand('qwen.diff.closeAll');
+            // Always close open hopcode-diff editors after any permission decision
+            void vscode.commands.executeCommand('hopcode.diff.closeAll');
 
             if (isCancel) {
               // Fire and forget — for normal tool calls, cancel generation and
@@ -638,7 +638,7 @@ export class WebViewProvider {
               })();
             } else {
               // Allowed/proceeded — suppress diff re-open briefly
-              void vscode.commands.executeCommand('qwen.diff.suppressBriefly');
+              void vscode.commands.executeCommand('hopcode.diff.suppressBriefly');
             }
           };
           // Store handler in message handler

@@ -1761,7 +1761,7 @@ describe('standalone release packaging', () => {
         path.join(extractDir, 'qwen-code', 'bin', 'qwen.cmd'),
       );
       expect(shim).toContain(
-        'set "QWEN_CODE_LAUNCHER_PATH=%ROOT%\\bin\\qwen.cmd"',
+        'set "HOPCODE_CODE_LAUNCHER_PATH=%ROOT%\\bin\\hopcode.cmd"',
       );
       expect(shim).toContain(
         '"%ROOT%\\node\\node.exe" "%ROOT%\\lib\\cli-entry.js" %*',
@@ -1934,7 +1934,7 @@ describe('standalone release packaging', () => {
           path.join(extractDir, 'qwen-code', 'bin', 'qwen'),
         );
         expect(shim).toContain(
-          'QWEN_CODE_LAUNCHER_PATH="$ROOT/bin/qwen" exec "$ROOT/node/bin/node" "$ROOT/lib/cli-entry.js" "$@"',
+          'HOPCODE_CODE_LAUNCHER_PATH="$ROOT/bin/hopcode" exec "$ROOT/node/bin/node" "$ROOT/lib/cli-entry.js" "$@"',
         );
       } finally {
         restoreMinimalDist(createdDist);

@@ -7,7 +7,7 @@
 /**
  * P4a real-LLM E2E — drives WorkflowOrchestrator with a dispatch that hits
  * qwen3-coder-plus via DashScope. Skipped by default; runs only when
- * `QWEN_CODE_RUN_LIVE_TESTS=1` and `DASHSCOPE_API_KEY` are set in the
+ * `HOPCODE_CODE_RUN_LIVE_TESTS=1` and `DASHSCOPE_API_KEY` are set in the
  * environment.
  *
  * Verifies end-to-end:
@@ -38,7 +38,7 @@ import {
 import type { WorkflowAgentOpts } from './workflow-sandbox.js';
 
 const apiKey = process.env['DASHSCOPE_API_KEY'];
-const runLiveTests = process.env['QWEN_CODE_RUN_LIVE_TESTS'] === '1';
+const runLiveTests = process.env['HOPCODE_CODE_RUN_LIVE_TESTS'] === '1';
 const baseUrl =
   process.env['DASHSCOPE_BASE_URL'] ||
   'https://dashscope.aliyuncs.com/compatible-mode/v1';

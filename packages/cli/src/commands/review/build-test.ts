@@ -125,7 +125,7 @@ function trimOutput(s: string): string {
 /**
  * The environment every build/test/install command runs under.
  *
- * `QWEN_SKIP_PREPARE` is the load-bearing entry, and it is exported and tested so
+ * `HOPCODE_SKIP_PREPARE` is the load-bearing entry, and it is exported and tested so
  * a future edit to this env cannot silently drop it. Without it, `npm ci` builds
  * the whole project through this repo's `prepare` hook — `npm run build` + `npm
  * run bundle` over every workspace, ~190s — which is entirely wasted, because this
@@ -142,7 +142,7 @@ export function buildRunEnv(
     ...base,
     CI: '1',
     npm_config_yes: 'true',
-    QWEN_SKIP_PREPARE: '1',
+    HOPCODE_SKIP_PREPARE: '1',
   };
 }
 

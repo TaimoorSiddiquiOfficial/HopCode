@@ -196,18 +196,18 @@ describe('useMcpApproval', () => {
     expect(result.current.mcpApprovalRemaining).toBe(0);
   });
 
-  it('YOLO: dialog stays closed even with pending project-scoped servers', () => {
+  it('IZN: dialog stays closed even with pending project-scoped servers', () => {
     const config = makeConfig(
       { a: { command: 'a', scope: 'project' } },
-      ApprovalMode.YOLO,
+      ApprovalMode.IZN,
     );
     const { result } = renderHook(() => useMcpApproval(config));
     expect(result.current.isMcpApprovalDialogOpen).toBe(false);
   });
 
-  it('YOLO: hot-reload does not open the approval dialog', () => {
+  it('IZN: hot-reload does not open the approval dialog', () => {
     const servers: Record<string, MCPServerConfig> = {};
-    const config = makeConfig(servers, ApprovalMode.YOLO);
+    const config = makeConfig(servers, ApprovalMode.IZN);
     const { result } = renderHook(() => useMcpApproval(config));
     expect(result.current.isMcpApprovalDialogOpen).toBe(false);
 

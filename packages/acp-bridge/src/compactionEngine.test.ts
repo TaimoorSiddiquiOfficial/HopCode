@@ -1072,7 +1072,7 @@ describe('EventBus + CompactionEngine integration', () => {
         update: {
           sessionUpdate: 'agent_message_chunk',
           content: { type: 'text', text: `${text}-${'x'.repeat(600)}` },
-          _meta: { 'qwen.session.recordId': recordId },
+          _meta: { 'hopcode.session.recordId': recordId },
         },
       },
     });

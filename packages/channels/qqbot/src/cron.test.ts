@@ -62,7 +62,7 @@ vi.mock('@hoptrendy/channel-base', () => ({
   },
   sanitizeLogText: (text: string, _maxLen: number): string =>
     String(text).slice(0, 200),
-  getGlobalQwenDir: () => '/tmp/test-qwen',
+  getGlobalHopCodeDir: () => '/tmp/test-hopcode',
 }));
 
 const { QQChannel } = await import('./QQChannel.js');

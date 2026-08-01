@@ -23,7 +23,7 @@ describe('approval mode display', () => {
         'auto-accept edits',
       );
       expect(formatApprovalModeName(ApprovalMode.AUTO)).toBe('Auto mode');
-      expect(formatApprovalModeName(ApprovalMode.YOLO)).toBe('YOLO mode');
+      expect(formatApprovalModeName(ApprovalMode.IZN)).toBe('IZN mode');
     });
 
     it('formats mode names with the active locale', async () => {
@@ -35,7 +35,7 @@ describe('approval mode display', () => {
           '自动接受编辑',
         );
         expect(formatApprovalModeName(ApprovalMode.AUTO)).toBe('自动模式');
-        expect(formatApprovalModeName(ApprovalMode.YOLO)).toBe('YOLO 模式');
+        expect(formatApprovalModeName(ApprovalMode.IZN)).toBe('IZN 模式');
       } finally {
         await setLanguageAsync('en');
       }
@@ -79,7 +79,7 @@ describe('approval mode display', () => {
         expect(formatApprovalModeDescription(ApprovalMode.AUTO)).toBe(
           '使用分类器自动批准安全的工具调用',
         );
-        expect(formatApprovalModeDescription(ApprovalMode.YOLO)).toBe(
+        expect(formatApprovalModeDescription(ApprovalMode.IZN)).toBe(
           '自动批准所有工具',
         );
       } finally {

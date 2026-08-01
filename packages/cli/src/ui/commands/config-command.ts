@@ -337,12 +337,12 @@ export const configCommand: SlashCommand = {
       };
     }
 
-    if (key === 'tools.approvalMode' && result.value === 'yolo') {
+    if (key === 'tools.approvalMode' && result.value === 'izn') {
       return {
         type: 'message',
         messageType: 'error',
         content: t(
-          'Setting tools.approvalMode to "yolo" is blocked via /config for security reasons. Edit settings.json directly if you understand the risks.',
+          'Setting tools.approvalMode to "izn" is blocked via /config for security reasons. Edit settings.json directly if you understand the risks.',
         ),
       };
     }

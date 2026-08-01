@@ -32,7 +32,7 @@ vi.mock('../utils/forkedAgent.js', () => ({
 }));
 
 describe('dreamAgentPlanner', () => {
-  const originalMemoryBase = process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+  const originalMemoryBase = process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
   let tempDir: string;
   let projectRoot: string;
   let config: Config;
@@ -43,7 +43,7 @@ describe('dreamAgentPlanner', () => {
     );
     projectRoot = path.join(tempDir, 'project');
     await fs.mkdir(projectRoot, { recursive: true });
-    process.env['QWEN_CODE_MEMORY_BASE_DIR'] = path.join(tempDir, 'memory');
+    process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = path.join(tempDir, 'memory');
     clearAutoMemoryRootCache();
     await ensureAutoMemoryScaffold(projectRoot);
     config = {
@@ -58,9 +58,9 @@ describe('dreamAgentPlanner', () => {
   afterEach(async () => {
     Storage.setRuntimeBaseDir(null);
     if (originalMemoryBase === undefined) {
-      delete process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+      delete process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
     } else {
-      process.env['QWEN_CODE_MEMORY_BASE_DIR'] = originalMemoryBase;
+      process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = originalMemoryBase;
     }
     clearAutoMemoryRootCache();
     await fs.rm(tempDir, {

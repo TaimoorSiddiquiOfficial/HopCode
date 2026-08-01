@@ -19,14 +19,14 @@
  * independently add --expose-gc via spawnChannel.ts.
  */
 
-const relaunchArgs = process.env['QWEN_CODE_RELAUNCH_ARGS'];
+const relaunchArgs = process.env['HOPCODE_CODE_RELAUNCH_ARGS'];
 let cliArgs = process.argv.slice(2);
 try {
   cliArgs = relaunchArgs ? JSON.parse(relaunchArgs) : cliArgs;
 } catch {
   // Ignore stale or user-provided junk; normal argv is still usable.
 }
-delete process.env['QWEN_CODE_RELAUNCH_ARGS'];
+delete process.env['HOPCODE_CODE_RELAUNCH_ARGS'];
 
 function hasFlag(flag, alias) {
   for (const arg of cliArgs) {
@@ -87,7 +87,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 //
 // One exception, and it points the SAME way: the standalone package launches this
 // file through a shim (`bin/qwen`) that selects the BUNDLED Node — the host may
-// have none — and announces itself via QWEN_CODE_LAUNCHER_PATH. There, "the entry
+// have none — and announces itself via HOPCODE_CODE_LAUNCHER_PATH. There, "the entry
 // that reaches this build" is the shim: stamping this file instead would hand
 // subprocesses a `#!/usr/bin/env node` script on a machine where that resolves to
 // nothing. Read before the spawn path deletes the variable below.
@@ -96,9 +96,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // child of a standalone daemon — and a child qwen from a DIFFERENT checkout
 // would read the outer shim and republish it as its own entry: the wrong build,
 // wearing this one's stamp.
-const standaloneShim = process.env['QWEN_CODE_LAUNCHER_PATH'];
-delete process.env['QWEN_CODE_LAUNCHER_PATH'];
-process.env['QWEN_CODE_CLI'] =
+const standaloneShim = process.env['HOPCODE_CODE_LAUNCHER_PATH'];
+delete process.env['HOPCODE_CODE_LAUNCHER_PATH'];
+process.env['HOPCODE_CODE_CLI'] =
   standaloneShim && existsSync(standaloneShim)
     ? standaloneShim
     : fileURLToPath(import.meta.url);
@@ -142,7 +142,7 @@ if (isInProcessFastPath()) {
   const entryPath = resolve(process.argv[1]);
   const entryRootLength = parse(entryPath).root.length;
   const launcherFromEnv = standaloneShim;
-  delete process.env['QWEN_CODE_LAUNCHER_PID'];
+  delete process.env['HOPCODE_CODE_LAUNCHER_PID'];
   const launcherCandidates = process.env['PATH']
     ?.split(delimiter)
     .flatMap((dir) => launcherNames.map((name) => join(dir, name)))
@@ -178,7 +178,7 @@ if (isInProcessFastPath()) {
           .sort((a, b) => b.score - a.score)[0]?.candidate;
   const env = {
     ...process.env,
-    QWEN_CODE_LAUNCHER_PID: String(process.pid),
+    HOPCODE_CODE_LAUNCHER_PID: String(process.pid),
   };
   const result = spawnSync(
     process.execPath,
@@ -199,8 +199,8 @@ if (isInProcessFastPath()) {
     }
     const relaunchEnv = {
       ...process.env,
-      QWEN_CODE_RELAUNCH_ARGS: JSON.stringify(cliArgs),
-      QWEN_CODE_SKIP_UPDATE_CHECK_ONCE: 'true',
+      HOPCODE_CODE_RELAUNCH_ARGS: JSON.stringify(cliArgs),
+      HOPCODE_CODE_SKIP_UPDATE_CHECK_ONCE: 'true',
     };
     const relaunchResult =
       process.platform === 'win32' && launcher.endsWith('.cmd')

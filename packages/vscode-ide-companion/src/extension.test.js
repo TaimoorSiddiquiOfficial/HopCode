@@ -1,0 +1,294 @@
+/**
+ * @license
+ * Copyright 2025 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import * as vscode from 'vscode';
+import { activate } from './extension.js';
+import { IDE_DEFINITIONS, detectIdeFromEnv } from '@hoptrendy/hopcode-core';
+vi.mock('@hoptrendy/hopcode-core', async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        detectIdeFromEnv: vi.fn(() => actual.IDE_DEFINITIONS.vscode),
+    };
+});
+vi.mock('vscode', () => ({
+    version: '1.94.0',
+    window: {
+        createOutputChannel: vi.fn(() => ({
+            appendLine: vi.fn(),
+        })),
+        showInformationMessage: vi.fn(),
+        createTerminal: vi.fn(() => ({
+            show: vi.fn(),
+            sendText: vi.fn(),
+        })),
+        onDidChangeActiveTextEditor: vi.fn(),
+        activeTextEditor: undefined,
+        tabGroups: {
+            all: [],
+            close: vi.fn(),
+        },
+        showTextDocument: vi.fn(),
+        showWorkspaceFolderPick: vi.fn(),
+        registerWebviewPanelSerializer: vi.fn(() => ({
+            dispose: vi.fn(),
+        })),
+        registerWebviewViewProvider: vi.fn(() => ({
+            dispose: vi.fn(),
+        })),
+    },
+    workspace: {
+        workspaceFolders: [],
+        onDidCloseTextDocument: vi.fn(),
+        registerTextDocumentContentProvider: vi.fn(),
+        onDidChangeWorkspaceFolders: vi.fn(),
+        onDidGrantWorkspaceTrust: vi.fn(),
+        registerFileSystemProvider: vi.fn(() => ({
+            dispose: vi.fn(),
+        })),
+    },
+    commands: {
+        registerCommand: vi.fn(),
+        executeCommand: vi.fn(),
+    },
+    Uri: {
+        joinPath: vi.fn(),
+    },
+    ExtensionMode: {
+        Development: 1,
+        Production: 2,
+    },
+    EventEmitter: vi.fn(() => ({
+        event: vi.fn(),
+        fire: vi.fn(),
+        dispose: vi.fn(),
+    })),
+    extensions: {
+        getExtension: vi.fn(),
+    },
+}));
+describe('activate', () => {
+    let context;
+    beforeEach(() => {
+        vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(undefined);
+        vscode.workspace.workspaceFolders = [];
+        context = {
+            subscriptions: [],
+            environmentVariableCollection: {
+                replace: vi.fn(),
+            },
+            globalState: {
+                get: vi.fn(),
+                update: vi.fn(),
+            },
+            extensionUri: {
+                fsPath: '/path/to/extension',
+            },
+            extension: {
+                packageJSON: {
+                    version: '1.1.0',
+                },
+            },
+            extensionMode: vscode.ExtensionMode.Production,
+        };
+    });
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+    it('should show the info message on first activation', async () => {
+        const showInformationMessageMock = vi
+            .mocked(vscode.window.showInformationMessage)
+            .mockResolvedValue(undefined);
+        vi.mocked(context.globalState.get).mockReturnValue(undefined);
+        vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+            packageJSON: { version: '1.1.0' },
+        });
+        await activate(context);
+        expect(showInformationMessageMock).toHaveBeenCalledWith('HopCode Companion extension successfully installed.');
+    });
+    it('writes production logs to the Qwen Code Companion output channel', async () => {
+        const appendLine = vi.fn();
+        vi.mocked(vscode.window.createOutputChannel).mockReturnValue({
+            appendLine,
+        });
+        await activate(context);
+        expect(vscode.window.createOutputChannel).toHaveBeenCalledWith('Qwen Code Companion');
+        expect(appendLine).toHaveBeenCalledWith('[INFO] Extension activated');
+    });
+    it('launches Qwen Code with the full multi-root workspace env', async () => {
+        vi.mocked(context.globalState.get).mockReturnValue(true);
+        const first = {
+            name: 'first',
+            index: 0,
+            uri: { fsPath: '/workspace/first' },
+        };
+        const second = {
+            name: 'second',
+            index: 1,
+            uri: { fsPath: '/workspace/second' },
+        };
+        vscode.workspace.workspaceFolders = [first, second];
+        vi.mocked(vscode.window.showWorkspaceFolderPick).mockResolvedValue(second);
+        vi.mocked(vscode.Uri.joinPath).mockReturnValue({
+            fsPath: '/extension/dist/qwen-cli/cli.js',
+        });
+        await activate(context);
+        const command = vi
+            .mocked(vscode.commands.registerCommand)
+            .mock.calls.find(([id]) => id === 'qwen-code.runQwenCode')?.[1];
+        expect(command).toBeDefined();
+        await command();
+        expect(vscode.window.createTerminal).toHaveBeenCalledWith(expect.objectContaining({
+            cwd: '/workspace/second',
+            env: {
+                QWEN_CODE_IDE_WORKSPACE_PATH: JSON.stringify([
+                    '/workspace/first',
+                    '/workspace/second',
+                ]),
+            },
+        }));
+    });
+    it('should not show the info message on subsequent activations', async () => {
+        vi.mocked(context.globalState.get).mockReturnValue(true);
+        vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+            packageJSON: { version: '1.1.0' },
+        });
+        await activate(context);
+        expect(vscode.window.showInformationMessage).not.toHaveBeenCalled();
+    });
+    it('should register a handler for onDidGrantWorkspaceTrust', async () => {
+        await activate(context);
+        expect(vscode.workspace.onDidGrantWorkspaceTrust).toHaveBeenCalled();
+    });
+    it('should register the webview view provider for the sidebar position', async () => {
+        await activate(context);
+        const registerCalls = vi.mocked(vscode.window.registerWebviewViewProvider)
+            .mock.calls;
+        expect(registerCalls).toHaveLength(1);
+        const viewIds = registerCalls.map((call) => call[0]);
+        // Only sidebar and secondary are registered; panel view was removed
+        expect(viewIds).toContain('hopcode.chatView.sidebar');
+        expect(viewIds).toContain('hopcode.chatView.secondary');
+    });
+    it('should launch HopCode when the user clicks the button', async () => {
+        const showInformationMessageMock = vi
+            .mocked(vscode.window.showInformationMessage)
+            .mockResolvedValue('Run HopCode');
+        vi.mocked(context.globalState.get).mockReturnValue(undefined);
+        vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+            packageJSON: { version: '1.1.0' },
+        });
+        await activate(context);
+        expect(showInformationMessageMock).toHaveBeenCalledWith('HopCode Companion extension successfully installed.');
+    });
+    describe('update notification', () => {
+        beforeEach(() => {
+            // Prevent the "installed" message from showing
+            vi.mocked(context.globalState.get).mockReturnValue(true);
+        });
+        it('should show an update notification if a newer version is available', async () => {
+            vi.spyOn(global, 'fetch').mockResolvedValue({
+                ok: true,
+                json: async () => ({
+                    results: [
+                        {
+                            extensions: [
+                                {
+                                    versions: [{ version: '1.2.0' }],
+                                },
+                            ],
+                        },
+                    ],
+                }),
+            });
+            const showInformationMessageMock = vi.mocked(vscode.window.showInformationMessage);
+            await activate(context);
+            expect(showInformationMessageMock).toHaveBeenCalledWith('A new version (1.2.0) of the HopCode Companion extension is available.', 'Update to latest version');
+        });
+        it('should not show an update notification if the version is the same', async () => {
+            vi.spyOn(global, 'fetch').mockResolvedValue({
+                ok: true,
+                json: async () => ({
+                    results: [
+                        {
+                            extensions: [
+                                {
+                                    versions: [{ version: '1.1.0' }],
+                                },
+                            ],
+                        },
+                    ],
+                }),
+            });
+            const showInformationMessageMock = vi.mocked(vscode.window.showInformationMessage);
+            await activate(context);
+            expect(showInformationMessageMock).not.toHaveBeenCalled();
+        });
+        it.each([
+            {
+                ide: IDE_DEFINITIONS.cloudshell,
+            },
+            { ide: IDE_DEFINITIONS.firebasestudio },
+        ])('does not show the notification for $ide.name', async ({ ide }) => {
+            vi.mocked(detectIdeFromEnv).mockReturnValue(ide);
+            vi.mocked(context.globalState.get).mockReturnValue(undefined);
+            const showInformationMessageMock = vi.mocked(vscode.window.showInformationMessage);
+            await activate(context);
+            expect(showInformationMessageMock).not.toHaveBeenCalled();
+        });
+        it('should not show an update notification if the version is older', async () => {
+            vi.spyOn(global, 'fetch').mockResolvedValue({
+                ok: true,
+                json: async () => ({
+                    results: [
+                        {
+                            extensions: [
+                                {
+                                    versions: [{ version: '1.0.0' }],
+                                },
+                            ],
+                        },
+                    ],
+                }),
+            });
+            const showInformationMessageMock = vi.mocked(vscode.window.showInformationMessage);
+            await activate(context);
+            expect(showInformationMessageMock).not.toHaveBeenCalled();
+        });
+        it('should execute the install command when the user clicks "Update"', async () => {
+            vi.spyOn(global, 'fetch').mockResolvedValue({
+                ok: true,
+                json: async () => ({
+                    results: [
+                        {
+                            extensions: [
+                                {
+                                    versions: [{ version: '1.2.0' }],
+                                },
+                            ],
+                        },
+                    ],
+                }),
+            });
+            vi.mocked(vscode.window.showInformationMessage).mockResolvedValue('Update to latest version');
+            const executeCommandMock = vi.mocked(vscode.commands.executeCommand);
+            await activate(context);
+            // Wait for the promise from showInformationMessage.then() to resolve
+            await new Promise(process.nextTick);
+            expect(executeCommandMock).toHaveBeenCalledWith('workbench.extensions.installExtension', 'hopcode.hopcode-vscode-ide-companion');
+        });
+        it('should handle fetch errors gracefully', async () => {
+            vi.spyOn(global, 'fetch').mockResolvedValue({
+                ok: false,
+                statusText: 'Internal Server Error',
+            });
+            const showInformationMessageMock = vi.mocked(vscode.window.showInformationMessage);
+            await activate(context);
+            expect(showInformationMessageMock).not.toHaveBeenCalled();
+        });
+    });
+});
+//# sourceMappingURL=extension.test.js.map

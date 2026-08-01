@@ -115,18 +115,18 @@ async function writeStoredSession(sessionId: string, cwd: string) {
 }
 
 async function withRuntimeDir<T>(fn: () => Promise<T>): Promise<T> {
-  const previousRuntimeDir = process.env['QWEN_RUNTIME_DIR'];
+  const previousRuntimeDir = process.env['HOPCODE_RUNTIME_DIR'];
   const runtimeDir = await fsp.mkdtemp(
     path.join(os.tmpdir(), 'qwen-workspace-qualified-acp-'),
   );
-  process.env['QWEN_RUNTIME_DIR'] = runtimeDir;
+  process.env['HOPCODE_RUNTIME_DIR'] = runtimeDir;
   try {
     return await fn();
   } finally {
     if (previousRuntimeDir === undefined) {
-      delete process.env['QWEN_RUNTIME_DIR'];
+      delete process.env['HOPCODE_RUNTIME_DIR'];
     } else {
-      process.env['QWEN_RUNTIME_DIR'] = previousRuntimeDir;
+      process.env['HOPCODE_RUNTIME_DIR'] = previousRuntimeDir;
     }
     await fsp.rm(runtimeDir, { recursive: true, force: true });
   }

@@ -97,9 +97,9 @@ describe('team auto-memory paths', () => {
   });
 
   it('classifies all managed roots for read retention and rejects symlink escapes', () => {
-    const previousBaseDir = process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+    const previousBaseDir = process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
     const memoryBaseDir = path.join(projectRoot, '.runtime');
-    process.env['QWEN_CODE_MEMORY_BASE_DIR'] = memoryBaseDir;
+    process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = memoryBaseDir;
     clearAutoMemoryRootCache();
     try {
       const projectMemory = path.join(
@@ -136,9 +136,9 @@ describe('team auto-memory paths', () => {
       expect(isManagedMemoryPath(escaped, projectRoot)).toBe(false);
     } finally {
       if (previousBaseDir === undefined) {
-        delete process.env['QWEN_CODE_MEMORY_BASE_DIR'];
+        delete process.env['HOPCODE_CODE_MEMORY_BASE_DIR'];
       } else {
-        process.env['QWEN_CODE_MEMORY_BASE_DIR'] = previousBaseDir;
+        process.env['HOPCODE_CODE_MEMORY_BASE_DIR'] = previousBaseDir;
       }
       clearAutoMemoryRootCache();
     }

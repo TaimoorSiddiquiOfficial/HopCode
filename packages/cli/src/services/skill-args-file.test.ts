@@ -82,18 +82,18 @@ describe('writeSkillArgs', () => {
     // per-skill name any file could sit at. The session id — which the model
     // cannot choose or see — is the key, and it is read from the environment on
     // both the write and read sides.
-    const prev = process.env['QWEN_CODE_SESSION_ID'];
-    process.env['QWEN_CODE_SESSION_ID'] = 'abc-123';
+    const prev = process.env['HOPCODE_CODE_SESSION_ID'];
+    process.env['HOPCODE_CODE_SESSION_ID'] = 'abc-123';
     try {
       const p1 = skillArgsPath('review');
       expect(p1).toContain('abc-123');
       expect(p1).toContain('review');
       // A different session is a different file.
-      process.env['QWEN_CODE_SESSION_ID'] = 'xyz-789';
+      process.env['HOPCODE_CODE_SESSION_ID'] = 'xyz-789';
       expect(skillArgsPath('review')).not.toBe(p1);
     } finally {
-      if (prev === undefined) delete process.env['QWEN_CODE_SESSION_ID'];
-      else process.env['QWEN_CODE_SESSION_ID'] = prev;
+      if (prev === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
+      else process.env['HOPCODE_CODE_SESSION_ID'] = prev;
     }
   });
 
@@ -129,8 +129,8 @@ describe('writeSkillArgs', () => {
   it('refuses to write through a symlinked session directory', () => {
     // O_NOFOLLOW guards the file, not the parent. `s-<session> -> victim/` would
     // otherwise truncate victim/qwen-skill-args-review.txt at mode 0644.
-    const prev = process.env['QWEN_CODE_SESSION_ID'];
-    process.env['QWEN_CODE_SESSION_ID'] = 'attacker';
+    const prev = process.env['HOPCODE_CODE_SESSION_ID'];
+    process.env['HOPCODE_CODE_SESSION_ID'] = 'attacker';
     try {
       const victim = join(dir, 'victim');
       mkdirSync(victim, { recursive: true });
@@ -143,8 +143,8 @@ describe('writeSkillArgs', () => {
         readFileSync(join(victim, 'qwen-skill-args-review.txt'), 'utf8'),
       ).toBe('precious');
     } finally {
-      if (prev === undefined) delete process.env['QWEN_CODE_SESSION_ID'];
-      else process.env['QWEN_CODE_SESSION_ID'] = prev;
+      if (prev === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
+      else process.env['HOPCODE_CODE_SESSION_ID'] = prev;
     }
   });
 
@@ -171,15 +171,15 @@ describe('writeSkillArgs', () => {
   it('puts the session scope in the directory, keeping the filename stable', () => {
     // The filename the skill prompt and cleanup reference must not move with the
     // session; the directory carries the scope.
-    const prev = process.env['QWEN_CODE_SESSION_ID'];
-    process.env['QWEN_CODE_SESSION_ID'] = 'sess-A';
+    const prev = process.env['HOPCODE_CODE_SESSION_ID'];
+    process.env['HOPCODE_CODE_SESSION_ID'] = 'sess-A';
     try {
       const p = skillArgsPath('review');
       expect(p).toContain('s-sess-A');
       expect(p.endsWith('qwen-skill-args-review.txt')).toBe(true);
     } finally {
-      if (prev === undefined) delete process.env['QWEN_CODE_SESSION_ID'];
-      else process.env['QWEN_CODE_SESSION_ID'] = prev;
+      if (prev === undefined) delete process.env['HOPCODE_CODE_SESSION_ID'];
+      else process.env['HOPCODE_CODE_SESSION_ID'] = prev;
     }
   });
 

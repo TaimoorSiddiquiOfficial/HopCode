@@ -5,7 +5,7 @@
  * Drives two deterministic scenarios against a fake OpenAI server and
  * captures PNG screenshots for the PR's Before/After section:
  *
- *   detail  (yolo): the subagent performs 11 read_file calls, then runs a
+ *   detail  (izn): the subagent performs 11 read_file calls, then runs a
  *           long shell command that sleeps. While it sleeps we open the
  *           background-tasks dialog detail view and capture:
  *             - Progress rows (5 truncated on main vs 10 + wrapped live
@@ -153,15 +153,15 @@ async function main(): Promise<void> {
     ...process.env,
     FORCE_COLOR: '1',
     NODE_NO_WARNINGS: '1',
-    QWEN_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
-    QWEN_CODE_NO_RELAUNCH: '1',
-    QWEN_SANDBOX: 'false',
+    HOPCODE_CODE_DISABLE_SYNCHRONIZED_OUTPUT: '1',
+    HOPCODE_CODE_NO_RELAUNCH: '1',
+    HOPCODE_SANDBOX: 'false',
     TERM: 'xterm-256color',
     HOME: homeDir,
     USERPROFILE: homeDir,
   };
   delete env['NO_COLOR'];
-  delete env['QWEN_CODE_SIMPLE'];
+  delete env['HOPCODE_CODE_SIMPLE'];
   for (const key of [
     'HTTP_PROXY',
     'http_proxy',
@@ -178,14 +178,14 @@ async function main(): Promise<void> {
     rows: ROWS,
     cwd: repoRoot,
     outputDir,
-    title: `qwen-code — subagent observability (${label})`,
+    title: `hopcode — subagent observability (${label})`,
     theme: 'github-dark',
     chrome: true,
     fontSize: 14,
     env,
   });
 
-  const approvalMode = scenario === 'detail' ? 'yolo' : 'default';
+  const approvalMode = scenario === 'detail' ? 'izn' : 'default';
   try {
     await terminal.spawn('node', [
       'dist/cli.js',

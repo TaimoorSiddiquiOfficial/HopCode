@@ -68,9 +68,9 @@ export async function relaunchAppInChildProcess(
     ];
     const newEnv: NodeJS.ProcessEnv = {
       ...process.env,
-      QWEN_CODE_NO_RELAUNCH: 'true',
+      HOPCODE_CODE_NO_RELAUNCH: 'true',
     };
-    if (newEnv['QWEN_CODE_SCRUB_ELECTRON_RUN_AS_NODE'] === '1') {
+    if (newEnv['HOPCODE_CODE_SCRUB_ELECTRON_RUN_AS_NODE'] === '1') {
       newEnv['ELECTRON_RUN_AS_NODE'] = '1';
     }
 

@@ -126,7 +126,7 @@ describe('activate', () => {
     );
   });
 
-  it('writes production logs to the Qwen Code Companion output channel', async () => {
+  it('writes production logs to the HopCode Companion output channel', async () => {
     const appendLine = vi.fn();
     vi.mocked(vscode.window.createOutputChannel).mockReturnValue({
       appendLine,
@@ -135,12 +135,12 @@ describe('activate', () => {
     await activate(context);
 
     expect(vscode.window.createOutputChannel).toHaveBeenCalledWith(
-      'Qwen Code Companion',
+      'HopCode Companion',
     );
     expect(appendLine).toHaveBeenCalledWith('[INFO] Extension activated');
   });
 
-  it('launches Qwen Code with the full multi-root workspace env', async () => {
+  it('launches HopCode with the full multi-root workspace env', async () => {
     vi.mocked(context.globalState.get).mockReturnValue(true);
     const first = {
       name: 'first',
@@ -176,7 +176,7 @@ describe('activate', () => {
       expect.objectContaining({
         cwd: '/workspace/second',
         env: {
-          QWEN_CODE_IDE_WORKSPACE_PATH: JSON.stringify([
+          HOPCODE_CODE_IDE_WORKSPACE_PATH: JSON.stringify([
             '/workspace/first',
             '/workspace/second',
           ]),

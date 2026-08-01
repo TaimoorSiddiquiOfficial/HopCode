@@ -124,7 +124,7 @@ describe('AcpBridge', () => {
       () => new Promise<void>((resolve) => pending.push(resolve)),
     );
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.connection = { extMethod };
@@ -146,7 +146,7 @@ describe('AcpBridge', () => {
     );
     const newSession = vi.fn().mockResolvedValue({ sessionId: 's-1' });
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -171,7 +171,7 @@ describe('AcpBridge', () => {
       .mockResolvedValueOnce({ skipped: true, reason: 'budget_warning_only' })
       .mockResolvedValueOnce({});
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.connection = { extMethod };
@@ -196,7 +196,7 @@ describe('AcpBridge', () => {
       reason: 'budget\n\u001b[31mforged',
     });
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.connection = { extMethod };
@@ -218,7 +218,7 @@ describe('AcpBridge', () => {
 
   it('returns a synthetic payload ack for MCP notifications', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.channelLoopMcpServer = {
@@ -238,7 +238,7 @@ describe('AcpBridge', () => {
 
   it('handles mid-turn queue drain requests from the ACP child', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
 
@@ -251,7 +251,7 @@ describe('AcpBridge', () => {
 
   it('returns only the final turn text after tool calls', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -291,7 +291,7 @@ describe('AcpBridge', () => {
 
   it('excludes nested subagent text from the final response', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -326,7 +326,7 @@ describe('AcpBridge', () => {
 
   it('returns only the final slash-command output', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -359,7 +359,7 @@ describe('AcpBridge', () => {
 
   it('prefers model text over slash-command output', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -383,7 +383,7 @@ describe('AcpBridge', () => {
 
   it('clears slash-command output at response boundaries', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -407,7 +407,7 @@ describe('AcpBridge', () => {
 
   it('returns only the final turn text after auto-approved tool calls', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -436,7 +436,7 @@ describe('AcpBridge', () => {
 
   it('preserves text when tool calls are not pending', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -465,7 +465,7 @@ describe('AcpBridge', () => {
 
   it('treats plan updates as turn boundaries for TodoWrite-only rounds', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -489,7 +489,7 @@ describe('AcpBridge', () => {
 
   it('treats permission requests as turn boundaries', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.child = { killed: false, exitCode: null };
@@ -522,7 +522,7 @@ describe('AcpBridge', () => {
 
   it('rejects channel loop tool calls when no handler matches the session', () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.channelLoopToolHandlers = [
@@ -546,7 +546,7 @@ describe('AcpBridge', () => {
       cancel: vi.fn(),
     };
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     }) as unknown as TestableAcpBridge;
     bridge.channelLoopToolHandlers = [handler];
@@ -556,7 +556,7 @@ describe('AcpBridge', () => {
 
   it('kills the ACP child when it reports a large event loop stall', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
     const disconnected = vi.fn();
@@ -582,7 +582,7 @@ describe('AcpBridge', () => {
 
   it('kills the ACP child when a stall line is coalesced with prior stderr', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
 
@@ -599,7 +599,7 @@ describe('AcpBridge', () => {
 
   it('does not kill the ACP child for a small event loop stall warning', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
 
@@ -615,7 +615,7 @@ describe('AcpBridge', () => {
 
   it('ignores non-perf stderr that mentions an event loop stall', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
 
@@ -631,7 +631,7 @@ describe('AcpBridge', () => {
 
   it('does not kill the ACP child again after it is already killed', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
 
@@ -648,7 +648,7 @@ describe('AcpBridge', () => {
 
   it('relays ACP permission requests instead of auto-approving them', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
     const permissionRequest = vi.fn();
@@ -711,7 +711,7 @@ describe('AcpBridge', () => {
 
   it('allows permission request listeners to respond synchronously', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
     const response: RequestPermissionResponse = {
@@ -737,7 +737,7 @@ describe('AcpBridge', () => {
 
   it('falls back to the tool call id for permission requests without a session id', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
     const permissionRequest = vi.fn();
@@ -766,7 +766,7 @@ describe('AcpBridge', () => {
 
   it('resolves matching pending permissions as cancelled when a session is cancelled', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
     const permissionRequest = vi.fn();
@@ -825,7 +825,7 @@ describe('AcpBridge', () => {
 
   it('resolves pending permissions as cancelled after the response timeout', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
     const permissionRequest = vi.fn();
@@ -872,7 +872,7 @@ describe('AcpBridge', () => {
 
   it('resolves pending permissions as cancelled when the ACP child exits', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
     const permissionRequest = vi.fn();
@@ -906,7 +906,7 @@ describe('AcpBridge', () => {
 
   it('resolves pending permissions as cancelled on stop', async () => {
     const bridge = new AcpBridge({
-      cliEntryPath: '/tmp/qwen',
+      cliEntryPath: '/tmp/hopcode',
       cwd: '/tmp',
     });
 

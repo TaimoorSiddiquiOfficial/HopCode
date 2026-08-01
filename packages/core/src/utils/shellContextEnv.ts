@@ -87,9 +87,9 @@ export function getShellContextEnvVars(): Record<string, string> {
   // would hand its subprocesses another session's directory.
   const projectDir =
     (sessionId ? getSessionProjectDir(sessionId) : undefined) ??
-    process.env['QWEN_CODE_PROJECT_DIR'];
+    process.env['HOPCODE_CODE_PROJECT_DIR'];
   if (projectDir) {
-    env['QWEN_CODE_PROJECT_DIR'] = projectDir;
+    env['HOPCODE_CODE_PROJECT_DIR'] = projectDir;
   }
 
   // The CLI a subprocess should call to reach *this* build.
@@ -119,12 +119,12 @@ export function getShellContextEnvVars(): Record<string, string> {
   // every spawn site composes the child env as `{...process.env, ...this}`, so
   // a key omitted here arrives anyway, inherited through the spread. The first
   // cut omitted, and on exactly the hosts the filter was written for the value
-  // leaked through and every `"${QWEN_CODE_CLI:-qwen}"` died on exit 126.
+  // leaked through and every `"${HOPCODE_CODE_CLI:-qwen}"` died on exit 126.
   // Empty is safe for the consumer: the `:-` expansion falls back to `qwen` on
   // unset AND on empty.
-  const cliEntry = process.env['QWEN_CODE_CLI'];
+  const cliEntry = process.env['HOPCODE_CODE_CLI'];
   if (cliEntry) {
-    env['QWEN_CODE_CLI'] = isUnusableScriptEntry(cliEntry) ? '' : cliEntry;
+    env['HOPCODE_CODE_CLI'] = isUnusableScriptEntry(cliEntry) ? '' : cliEntry;
   }
 
   // For agent/prompt IDs: explicitly set empty string when no ALS context

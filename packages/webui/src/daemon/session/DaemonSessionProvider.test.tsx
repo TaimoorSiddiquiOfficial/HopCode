@@ -448,7 +448,7 @@ describe('DaemonSessionProvider', () => {
       v: 1,
       workspaceCwd: '/mock-workspace',
       initialized: true,
-      approvalMode: 'yolo',
+      approvalMode: 'izn',
       providers: [],
     });
     let connection: DaemonConnectionState | undefined;
@@ -468,7 +468,7 @@ describe('DaemonSessionProvider', () => {
     expect(connection).toMatchObject({
       status: 'connected',
       workspaceCwd: '/mock-workspace',
-      currentMode: 'yolo',
+      currentMode: 'izn',
       gitBranch: 'main',
     });
     expect(connection).not.toHaveProperty('sessionId');
@@ -8650,7 +8650,7 @@ describe('DaemonSessionProvider', () => {
               update: {
                 sessionUpdate: 'user_message_chunk',
                 content: { type: 'text', text: 'complete history' },
-                _meta: { 'qwen.session.recordId': 'record-1' },
+                _meta: { 'hopcode.session.recordId': 'record-1' },
               },
             },
           },
@@ -8699,7 +8699,7 @@ describe('DaemonSessionProvider', () => {
         update: {
           sessionUpdate: 'user_message_chunk',
           content: { type: 'text', text },
-          ...(recordId ? { _meta: { 'qwen.session.recordId': recordId } } : {}),
+          ...(recordId ? { _meta: { 'hopcode.session.recordId': recordId } } : {}),
         },
       },
     });
@@ -8770,7 +8770,7 @@ describe('DaemonSessionProvider', () => {
         update: {
           sessionUpdate: 'user_message_chunk',
           content: { type: 'text', text },
-          _meta: { 'qwen.session.recordId': `record-${id}` },
+          _meta: { 'hopcode.session.recordId': `record-${id}` },
         },
       },
     });
@@ -8837,7 +8837,7 @@ describe('DaemonSessionProvider', () => {
         update: {
           sessionUpdate: 'user_message_chunk',
           content: { type: 'text', text },
-          _meta: { 'qwen.session.recordId': `record-${id}` },
+          _meta: { 'hopcode.session.recordId': `record-${id}` },
         },
       },
     });
@@ -8940,7 +8940,7 @@ describe('DaemonSessionProvider', () => {
         update: {
           sessionUpdate: 'user_message_chunk',
           content: { type: 'text', text },
-          ...(recordId ? { _meta: { 'qwen.session.recordId': recordId } } : {}),
+          ...(recordId ? { _meta: { 'hopcode.session.recordId': recordId } } : {}),
         },
       },
     });
@@ -9012,7 +9012,7 @@ describe('DaemonSessionProvider', () => {
         update: {
           sessionUpdate: kind,
           content: { type: 'text', text },
-          _meta: { 'qwen.session.recordId': recordId },
+          _meta: { 'hopcode.session.recordId': recordId },
         },
       },
     });
@@ -9072,7 +9072,7 @@ describe('DaemonSessionProvider', () => {
         update: {
           sessionUpdate: 'user_message_chunk',
           content: { type: 'text', text },
-          ...(recordId ? { _meta: { 'qwen.session.recordId': recordId } } : {}),
+          ...(recordId ? { _meta: { 'hopcode.session.recordId': recordId } } : {}),
         },
       },
     });

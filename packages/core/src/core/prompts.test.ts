@@ -93,7 +93,7 @@ describe('Core System Prompt (prompts.ts)', () => {
       vi.stubEnv('SANDBOX', undefined);
       const prompt = getCoreSystemPrompt(undefined, undefined, undefined, mode);
 
-      expect(prompt).toContain(`You are Qwen Code, ${role}`);
+      expect(prompt).toContain(`You are HopCode, ${role}`);
       expect(prompt).toContain(questionGuidance);
     },
   );
@@ -567,8 +567,8 @@ describe('Model-specific tool call formats', () => {
     expect(prompt).toMatchSnapshot();
   });
 
-  it('should override tool call format via QWEN_CODE_TOOL_CALL_STYLE env variable for gemma4', () => {
-    vi.stubEnv('QWEN_CODE_TOOL_CALL_STYLE', 'gemma4');
+  it('should override tool call format via HOPCODE_CODE_TOOL_CALL_STYLE env variable for gemma4', () => {
+    vi.stubEnv('HOPCODE_CODE_TOOL_CALL_STYLE', 'gemma4');
     vi.mocked(isGitRepository).mockReturnValue(false);
 
     // Pass a non-gemma model string to verify env var takes precedence

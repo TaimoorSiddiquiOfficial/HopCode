@@ -91,11 +91,11 @@ describe('ExitPlanModeTool', () => {
   it.each([
     [ToolConfirmationOutcome.ProceedOnce, ApprovalMode.DEFAULT],
     [ToolConfirmationOutcome.ProceedAlways, ApprovalMode.AUTO_EDIT],
-    [ToolConfirmationOutcome.RestorePrevious, ApprovalMode.YOLO],
+    [ToolConfirmationOutcome.RestorePrevious, ApprovalMode.IZN],
   ])(
     'records %s and changes mode only during execute',
     async (outcome, targetMode) => {
-      prePlanMode = ApprovalMode.YOLO;
+      prePlanMode = ApprovalMode.IZN;
       const invocation = tool.build({ plan: 'Approved plan' });
       const confirmation = await invocation.getConfirmationDetails(
         new AbortController().signal,
@@ -104,7 +104,7 @@ describe('ExitPlanModeTool', () => {
       expect(confirmation).toMatchObject({
         type: 'plan',
         plan: 'Approved plan',
-        prePlanMode: ApprovalMode.YOLO,
+        prePlanMode: ApprovalMode.IZN,
         hideAlwaysAllow: true,
       });
       await confirmation.onConfirm(outcome);
@@ -122,7 +122,7 @@ describe('ExitPlanModeTool', () => {
 
   it('freezes the plan and pre-plan mode when confirmation is created', async () => {
     const params = { plan: 'Original plan' };
-    prePlanMode = ApprovalMode.YOLO;
+    prePlanMode = ApprovalMode.IZN;
     const invocation = tool.build(params);
     const confirmation = await invocation.getConfirmationDetails(
       new AbortController().signal,
@@ -135,7 +135,7 @@ describe('ExitPlanModeTool', () => {
 
     expect(result.returnDisplay).toMatchObject({ plan: 'Original plan' });
     expect(config.savePlan).toHaveBeenCalledWith('Original plan');
-    expect(approvalMode).toBe(ApprovalMode.YOLO);
+    expect(approvalMode).toBe(ApprovalMode.IZN);
   });
 
   it('executes the snapshot belonging to the confirmation that was approved', async () => {

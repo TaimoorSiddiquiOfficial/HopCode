@@ -21,7 +21,7 @@ const originalDocumentHidden = Object.getOwnPropertyDescriptor(
   'hidden',
 );
 const originalElementFromPoint = document.elementFromPoint;
-const COLUMN_DRAG_MIME = 'application/x-qwen-web-shell-table-column';
+const COLUMN_DRAG_MIME = 'application/x-hopcode-web-shell-table-column';
 
 afterEach(() => {
   for (const { root, container, portalRoot } of mounted.splice(0)) {

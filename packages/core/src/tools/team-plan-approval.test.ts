@@ -49,7 +49,7 @@ describe('TeamPlanApprovalTool', () => {
   });
 
   it('downgrades approval target mode to default in untrusted workspaces', async () => {
-    approvalMode = ApprovalMode.YOLO;
+    approvalMode = ApprovalMode.IZN;
     vi.mocked(config.isTrustedFolder).mockReturnValue(false);
 
     await tool

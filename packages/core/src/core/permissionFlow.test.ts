@@ -231,14 +231,14 @@ describe('needsConfirmation', () => {
     ).toBe(true);
   });
 
-  it('requires confirmation in YOLO when the invocation requires interaction', () => {
-    expect(needsConfirmation('ask', ApprovalMode.YOLO, 'shell', true)).toBe(
+  it('requires confirmation in IZN when the invocation requires interaction', () => {
+    expect(needsConfirmation('ask', ApprovalMode.IZN, 'shell', true)).toBe(
       true,
     );
   });
 
   it('never requests confirmation for a hard deny', () => {
-    expect(needsConfirmation('deny', ApprovalMode.YOLO, 'shell', true)).toBe(
+    expect(needsConfirmation('deny', ApprovalMode.IZN, 'shell', true)).toBe(
       false,
     );
   });

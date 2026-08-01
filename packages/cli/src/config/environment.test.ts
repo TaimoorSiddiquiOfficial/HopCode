@@ -22,8 +22,8 @@ const TRACKED_ENV = [
   'RUNTIME_SETTINGS_ONLY',
   'BASH_ENV',
   'NODE_OPTIONS',
-  'QWEN_HOME',
-  'QWEN_RUNTIME_DIR',
+  'HOPCODE_HOME',
+  'HOPCODE_RUNTIME_DIR',
   'QWEN_SERVER_TOKEN',
 ] as const;
 
@@ -78,7 +78,7 @@ describe('buildRuntimeEnvironment', () => {
         'RUNTIME_EXCLUDED=excluded',
         'NODE_OPTIONS=--require ./bad.js',
         'QWEN_SERVER_TOKEN=dotenv-token',
-        'QWEN_HOME=/tmp/ignored-qwen-home',
+        'HOPCODE_HOME=/tmp/ignored-qwen-home',
         '',
       ].join('\n'),
     );
@@ -97,7 +97,7 @@ describe('buildRuntimeEnvironment', () => {
           RUNTIME_SETTINGS_ONLY: 'from-settings',
           RUNTIME_SETTINGS_EXCLUDED: 'settings-excluded',
           BASH_ENV: '/tmp/bad-profile',
-          QWEN_RUNTIME_DIR: '/tmp/ignored-runtime-dir',
+          HOPCODE_RUNTIME_DIR: '/tmp/ignored-runtime-dir',
         },
       }),
       workspace,
@@ -116,8 +116,8 @@ describe('buildRuntimeEnvironment', () => {
     expect(snapshot.effectiveEnv['NODE_OPTIONS']).toBeUndefined();
     expect(snapshot.effectiveEnv['BASH_ENV']).toBeUndefined();
     expect(snapshot.effectiveEnv['QWEN_SERVER_TOKEN']).toBeUndefined();
-    expect(snapshot.effectiveEnv['QWEN_HOME']).toBeUndefined();
-    expect(snapshot.effectiveEnv['QWEN_RUNTIME_DIR']).toBeUndefined();
+    expect(snapshot.effectiveEnv['HOPCODE_HOME']).toBeUndefined();
+    expect(snapshot.effectiveEnv['HOPCODE_RUNTIME_DIR']).toBeUndefined();
     expect(snapshot.overlayKeys).toEqual([
       'RUNTIME_DOTENV',
       'RUNTIME_EMPTY',

@@ -642,7 +642,7 @@ export async function parseArguments(): Promise<CliArgs> {
     .option('insecure', {
       type: 'boolean',
       description:
-        'Skip TLS certificate verification for API connections (for self-signed certs in trusted/lab environments). Equivalent to setting QWEN_TLS_INSECURE=1. WARNING: removes protection against man-in-the-middle attacks.',
+        'Skip TLS certificate verification for API connections (for self-signed certs in trusted/lab environments). Equivalent to setting HOPCODE_TLS_INSECURE=1. WARNING: removes protection against man-in-the-middle attacks.',
       default: false,
     })
     .option('chat-recording', {
@@ -1507,8 +1507,8 @@ export async function loadCliConfig(
   settingsWatcher?: { stopWatching(): void },
 ): Promise<Config> {
   const debugMode = isDebugMode(argv);
-  if (debugMode && process.env['QWEN_DEBUG_LOG_FILE'] === undefined) {
-    process.env['QWEN_DEBUG_LOG_FILE'] = '1';
+  if (debugMode && process.env['HOPCODE_DEBUG_LOG_FILE'] === undefined) {
+    process.env['HOPCODE_DEBUG_LOG_FILE'] = '1';
   }
   const bareMode = isBareMode(argv.bare);
   const safeMode =
@@ -1517,9 +1517,9 @@ export async function loadCliConfig(
   // Surface `--insecure` as an env var so it reaches the undici dispatcher
   // layer (which controls TLS verification) without threading a flag through
   // every content generator and the preconnect path. Resolution there ORs this
-  // with QWEN_TLS_INSECURE / NODE_TLS_REJECT_UNAUTHORIZED=0.
+  // with HOPCODE_TLS_INSECURE / NODE_TLS_REJECT_UNAUTHORIZED=0.
   if (argv.insecure) {
-    process.env['QWEN_TLS_INSECURE'] = '1';
+    process.env['HOPCODE_TLS_INSECURE'] = '1';
   }
   // When opting out of TLS verification, also set NODE_TLS_REJECT_UNAUTHORIZED
   // process-wide. The custom undici dispatcher handles the Node path, but this
@@ -1537,7 +1537,7 @@ export async function loadCliConfig(
     // inherit the env), not just model calls. Log to the debug file too, so the
     // state is discoverable after the terminal scrollback is gone.
     const tlsWarning =
-      'TLS certificate verification is disabled (--insecure / QWEN_TLS_INSECURE). All HTTPS connections in this process (API calls, OAuth, MCP servers, child processes) are vulnerable to man-in-the-middle attacks.';
+      'TLS certificate verification is disabled (--insecure / HOPCODE_TLS_INSECURE). All HTTPS connections in this process (API calls, OAuth, MCP servers, child processes) are vulnerable to man-in-the-middle attacks.';
     debugLogger.warn(tlsWarning);
     // eslint-disable-next-line no-console
     console.error(`WARNING: ${tlsWarning}`);
@@ -1997,7 +1997,7 @@ export async function loadCliConfig(
       ? {}
       : assembleMcpServers(settings.mcpServers, cwd, topTierMcpServers);
   const pendingMcpServers =
-    bareMode || safeMode || approvalMode === ApprovalMode.YOLO
+    bareMode || safeMode || approvalMode === ApprovalMode.IZN
       ? undefined
       : getPendingGatedMcpServers(mcpServers, cwd);
 

@@ -307,7 +307,7 @@ export class CronScheduler {
   private fileWatcher: fsSync.FSWatcher | null = null;
   private lockProbeTimer: ReturnType<typeof setInterval> | null = null;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
-  // Test-only auto-fire timers (QWEN_CODE_TEST_CRON_FAST). Each timer
+  // Test-only auto-fire timers (HOPCODE_CODE_TEST_CRON_FAST). Each timer
   // fires its job via forceFireJob after a short delay so integration
   // tests don't wait for the wall-clock minute boundary. Cleared on
   // stop()/destroy() so a session teardown never leaks a pending fire.
@@ -371,15 +371,15 @@ export class CronScheduler {
 
     this.jobs.set(id, job);
 
-    // Test seam: when QWEN_CODE_TEST_CRON_FAST is set, schedule an
+    // Test seam: when HOPCODE_CODE_TEST_CRON_FAST is set, schedule an
     // auto-fire for newly created session-only jobs so integration tests
     // don't wait up to 60s for the wall-clock minute boundary. The timer
     // fires once after the configured delay (default 5s), then the normal
     // tick takes over for subsequent fires of recurring jobs. Timers are
     // tracked in testFireTimers and cleared on stop()/destroy().
-    if (process.env['QWEN_CODE_TEST_CRON_FAST'] === '1' && !job.durable) {
+    if (process.env['HOPCODE_CODE_TEST_CRON_FAST'] === '1' && !job.durable) {
       const delayMs =
-        Number(process.env['QWEN_CODE_TEST_CRON_DELAY_MS']) || 5000;
+        Number(process.env['HOPCODE_CODE_TEST_CRON_DELAY_MS']) || 5000;
       const timer = setTimeout(() => {
         this.testFireTimers.delete(id);
         this.forceFireJob(id);
@@ -1178,7 +1178,7 @@ export class CronScheduler {
    * Immediately fires a job by ID, bypassing the cron schedule check.
    * Sets lastFiredAt to prevent the normal tick from re-firing the same
    * minute slot. Returns true if the job existed and was fired, false
-   * otherwise. Primarily a test seam (see QWEN_CODE_TEST_CRON_FAST in
+   * otherwise. Primarily a test seam (see HOPCODE_CODE_TEST_CRON_FAST in
    * create()); also useful for manual debug triggers.
    */
   forceFireJob(id: string): boolean {

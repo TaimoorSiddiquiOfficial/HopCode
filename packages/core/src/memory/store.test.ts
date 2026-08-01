@@ -133,7 +133,7 @@ describe('auto-memory storage scaffold', () => {
   });
 
   it('gives a linked git worktree its own memory root, separate from the main checkout', async () => {
-    delete process.env['QWEN_CODE_MEMORY_LOCAL'];
+    delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     const runtimeDir = path.join(tempDir, 'runtime-output');
     Storage.setRuntimeBaseDir(runtimeDir);
     clearAutoMemoryRootCache();
@@ -160,7 +160,7 @@ describe('auto-memory storage scaffold', () => {
   });
 
   it('uses QWEN_RUNTIME_DIR for managed auto-memory', () => {
-    delete process.env['QWEN_CODE_MEMORY_LOCAL'];
+    delete process.env['HOPCODE_CODE_MEMORY_LOCAL'];
     const envRuntimeDir = path.join(tempDir, 'env-runtime-output');
     process.env['HOPCODE_RUNTIME_DIR'] = envRuntimeDir;
     Storage.setRuntimeBaseDir(path.join(tempDir, 'settings-runtime-output'));

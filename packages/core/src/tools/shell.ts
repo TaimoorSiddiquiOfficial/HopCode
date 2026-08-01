@@ -4988,7 +4988,7 @@ export class ShellTool extends BaseDeclarativeTool<
     // NOTE: Permission checks (read-only detection, PM rules) are handled at
     // L3 (getDefaultPermission) and L4 (PM override) in coreToolScheduler.
     // This method handles parameter validation plus non-overridable shell
-    // safety gates that must run before auto/YOLO execution.
+    // safety gates that must run before auto/IZN execution.
     if (!params.command.trim()) {
       return 'Command cannot be empty.';
     }

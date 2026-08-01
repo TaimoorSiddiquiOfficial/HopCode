@@ -1,0 +1,163 @@
+/**
+ * @license
+ * Copyright 2025 HopCode Team
+ * SPDX-License-Identifier: Apache-2.0
+ */
+import { FatalConfigError } from '../utils/errors.js';
+import { DEFAULT_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH, SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT, TelemetryTarget, isValidSensitiveSpanAttributeMaxLength, } from './index.js';
+import { coerceStringResourceAttributes, parseOtelResourceAttributes, stripReservedResourceAttributes, } from './resource-attributes.js';
+/**
+ * Parse a boolean environment flag. Accepts 'true'/'1' as true.
+ */
+export function parseBooleanEnvFlag(value) {
+    if (value === undefined)
+        return undefined;
+    return value === 'true' || value === '1';
+}
+/**
+ * Normalize a telemetry target value into TelemetryTarget or undefined.
+ */
+export function parseTelemetryTargetValue(value) {
+    if (value === undefined)
+        return undefined;
+    if (value === TelemetryTarget.LOCAL || value === 'local') {
+        return TelemetryTarget.LOCAL;
+    }
+    if (value === TelemetryTarget.GCP || value === 'gcp') {
+        return TelemetryTarget.GCP;
+    }
+    return undefined;
+}
+/**
+ * @throws FatalConfigError when the env var is set but invalid; telemetry
+ * config fails closed instead of silently falling back.
+ */
+function parseSensitiveSpanAttributeMaxLengthEnvValue(envName, value) {
+    if (value === undefined)
+        return undefined;
+    const trimmed = value.trim();
+    const parsed = Number(trimmed);
+    if (!/^\d+$/.test(trimmed) ||
+        !isValidSensitiveSpanAttributeMaxLength(parsed)) {
+        throw new FatalConfigError(`Invalid ${envName}: must be a positive integer no greater than ${SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT}, got '${value}'`);
+    }
+    return parsed;
+}
+function parseSensitiveSpanAttributeMaxLengthSetting(settingName, value) {
+    if (value === undefined)
+        return undefined;
+    if (typeof value !== 'number' ||
+        !isValidSensitiveSpanAttributeMaxLength(value)) {
+        throw new FatalConfigError(`Invalid ${settingName}: must be a positive integer no greater than ${SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH_LIMIT}, got ${String(value)}`);
+    }
+    return value;
+}
+/**
+ * Build TelemetrySettings by resolving from argv (highest), env, then settings.
+ */
+export async function resolveTelemetrySettings(options) {
+    const argv = options.argv ?? {};
+    const env = options.env ?? {};
+    const settings = options.settings ?? {};
+    const enabled = argv.telemetry ??
+        parseBooleanEnvFlag(env['HOPCODE_TELEMETRY_ENABLED'] ?? env['HOPCODE_TELEMETRY_ENABLED']) ??
+        settings.enabled;
+    const rawTarget = argv.telemetryTarget ??
+        env['HOPCODE_TELEMETRY_TARGET'] ??
+        env['HOPCODE_TELEMETRY_TARGET'] ??
+        settings.target;
+    const target = parseTelemetryTargetValue(rawTarget);
+    if (rawTarget !== undefined && target === undefined) {
+        throw new FatalConfigError(`Invalid telemetry target: ${String(rawTarget)}. Valid values are: local, gcp`);
+    }
+    const otlpEndpoint = argv.telemetryOtlpEndpoint ??
+        env['HOPCODE_TELEMETRY_OTLP_ENDPOINT'] ??
+        env['HOPCODE_TELEMETRY_OTLP_ENDPOINT'] ??
+        env['OTEL_EXPORTER_OTLP_ENDPOINT'] ??
+        settings.otlpEndpoint;
+    const rawProtocol = argv.telemetryOtlpProtocol ??
+        env['HOPCODE_TELEMETRY_OTLP_PROTOCOL'] ??
+        env['HOPCODE_TELEMETRY_OTLP_PROTOCOL'] ??
+        settings.otlpProtocol;
+    const otlpProtocol = ['grpc', 'http'].find((p) => p === rawProtocol);
+    if (rawProtocol !== undefined && otlpProtocol === undefined) {
+        throw new FatalConfigError(`Invalid telemetry OTLP protocol: ${String(rawProtocol)}. Valid values are: grpc, http`);
+    }
+    const logPrompts = argv.telemetryLogPrompts ??
+        parseBooleanEnvFlag(env['HOPCODE_TELEMETRY_LOG_PROMPTS'] ??
+            env['HOPCODE_TELEMETRY_LOG_PROMPTS']) ??
+        settings.logPrompts;
+    const includeSensitiveSpanAttributes = parseBooleanEnvFlag(env['HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES'] ??
+        env['HOPCODE_TELEMETRY_INCLUDE_SENSITIVE_SPAN_ATTRIBUTES']) ??
+        settings.includeSensitiveSpanAttributes ??
+        false;
+    const sensitiveSpanAttributeMaxLength = parseSensitiveSpanAttributeMaxLengthEnvValue('HOPCODE_TELEMETRY_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH', env['HOPCODE_TELEMETRY_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH']) ??
+        parseSensitiveSpanAttributeMaxLengthSetting('telemetry.sensitiveSpanAttributeMaxLength', settings.sensitiveSpanAttributeMaxLength) ??
+        DEFAULT_SENSITIVE_SPAN_ATTRIBUTE_MAX_LENGTH;
+    const outfile = argv.telemetryOutfile ??
+        env['HOPCODE_TELEMETRY_OUTFILE'] ??
+        env['HOPCODE_TELEMETRY_OUTFILE'] ??
+        settings.outfile;
+    // Per-signal endpoint overrides (HTTP only).
+    // Priority: HOPCODE_ env var > standard OTEL_ env var > settings.json
+    const otlpTracesEndpoint = argv.telemetryOtlpTracesEndpoint ??
+        env['HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT'] ??
+        env['HOPCODE_TELEMETRY_OTLP_TRACES_ENDPOINT'] ??
+        env['OTEL_EXPORTER_OTLP_TRACES_ENDPOINT'] ??
+        settings.otlpTracesEndpoint;
+    const otlpLogsEndpoint = argv.telemetryOtlpLogsEndpoint ??
+        env['HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT'] ??
+        env['HOPCODE_TELEMETRY_OTLP_LOGS_ENDPOINT'] ??
+        env['OTEL_EXPORTER_OTLP_LOGS_ENDPOINT'] ??
+        settings.otlpLogsEndpoint;
+    const otlpMetricsEndpoint = argv.telemetryOtlpMetricsEndpoint ??
+        env['HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT'] ??
+        env['HOPCODE_TELEMETRY_OTLP_METRICS_ENDPOINT'] ??
+        env['OTEL_EXPORTER_OTLP_METRICS_ENDPOINT'] ??
+        settings.otlpMetricsEndpoint;
+    // Resource attributes: merge OTEL_RESOURCE_ATTRIBUTES (lowest), then
+    // settings.resourceAttributes (settings wins on key conflict). RESERVED
+    // keys (`service.version`, `session.id`) are stripped from both sources
+    // with a `diag.warn`. OTEL_SERVICE_NAME is a standard escape hatch that
+    // overrides service.name from any other source. All drops/coercions are
+    // accumulated into `resourceAttributeWarnings` so the SDK can emit a
+    // one-time user-visible summary at telemetry init.
+    const resourceAttributeWarnings = [];
+    const envResourceAttrs = stripReservedResourceAttributes(parseOtelResourceAttributes(env['OTEL_RESOURCE_ATTRIBUTES'], resourceAttributeWarnings), 'OTEL_RESOURCE_ATTRIBUTES', resourceAttributeWarnings);
+    const settingsResourceAttrs = stripReservedResourceAttributes(coerceStringResourceAttributes(settings.resourceAttributes, resourceAttributeWarnings), 'settings.telemetry.resourceAttributes', resourceAttributeWarnings);
+    const mergedResourceAttrs = {
+        ...envResourceAttrs,
+        ...settingsResourceAttrs,
+    };
+    // Trim OTEL_SERVICE_NAME so a whitespace-only value (`' '`, `'\t'`) is
+    // treated as unset rather than producing a blank service name on Resource.
+    const otelServiceName = env['OTEL_SERVICE_NAME']?.trim();
+    if (otelServiceName) {
+        mergedResourceAttrs['service.name'] = otelServiceName;
+    }
+    const resourceAttributes = Object.keys(mergedResourceAttrs).length
+        ? mergedResourceAttrs
+        : undefined;
+    const metricsIncludeSessionId = parseBooleanEnvFlag(env['HOPCODE_TELEMETRY_METRICS_INCLUDE_SESSION_ID']) ??
+        settings.metrics?.includeSessionId ??
+        false;
+    return {
+        enabled,
+        target,
+        otlpEndpoint,
+        otlpProtocol,
+        otlpTracesEndpoint,
+        otlpLogsEndpoint,
+        otlpMetricsEndpoint,
+        logPrompts,
+        includeSensitiveSpanAttributes,
+        sensitiveSpanAttributeMaxLength,
+        outfile,
+        resourceAttributes,
+        metrics: { includeSessionId: metricsIncludeSessionId },
+        resourceAttributeWarnings: resourceAttributeWarnings.length
+            ? resourceAttributeWarnings
+            : undefined,
+    };
+}
+//# sourceMappingURL=config.js.map

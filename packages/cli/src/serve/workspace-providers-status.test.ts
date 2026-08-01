@@ -134,12 +134,12 @@ describe('createWorkspaceProvidersStatusProvider', () => {
   it('returns the workspace approval mode', async () => {
     const provider = createWorkspaceProvidersStatusProvider({ env: {} });
     await writeUserSettings({
-      tools: { approvalMode: 'yolo' },
+      tools: { approvalMode: 'izn' },
     });
 
     const result = await provider(workspace, false);
 
-    expect(result.approvalMode).toBe('yolo');
+    expect(result.approvalMode).toBe('izn');
   });
 
   it('falls back to auto when no approval mode is configured', async () => {
