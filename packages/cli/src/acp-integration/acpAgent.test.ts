@@ -163,6 +163,7 @@ vi.mock('node:stream', async (importOriginal) => {
 // Mock core dependencies
 vi.mock('@hoptrendy/hopcode-core', () => ({
   SESSION_ARTIFACT_PERSISTENCE_VERSION: 2,
+  getUserAutoMemoryRoot: vi.fn(() => '/tmp/qwen-global-test/memory/user'),
   normalizeEventPayload: vi.fn((payload: unknown) =>
     typeof payload === 'object' &&
     payload !== null &&
@@ -493,6 +494,8 @@ vi.mock('@hoptrendy/hopcode-core', () => ({
   SessionService: vi.fn(),
   Storage: {
     getGlobalHopCodeDir: vi.fn(() => '/tmp/qwen-global-test'),
+    getGlobalTempDir: vi.fn(() => '/tmp/qwen-global-test/tmp'),
+    getUserExtensionsDir: vi.fn(() => '/tmp/qwen-global-test/extensions'),
   },
   parseRule: vi.fn((raw: string) => {
     const trimmed = raw.trim();
@@ -3231,7 +3234,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       v: 1,
       workspaceCwd: '/work/status',
       initialized: true,
-      current: { authType: 'hopcode', modelId: 'qwen-plus(qwen)' },
+      current: { authType: 'hopcode', modelId: 'qwen-plus(hopcode)' },
       providers: [
         {
           kind: 'model_provider',
@@ -3240,7 +3243,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
           current: true,
           models: [
             {
-              modelId: 'qwen-plus(qwen)',
+              modelId: 'qwen-plus(hopcode)',
               baseModelId: 'qwen-plus',
               name: 'Qwen Plus',
               description: 'General coding model',
@@ -3711,18 +3714,18 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('extMethod preflight auth cell reports unknown for qwen-oauth even with placeholder apiKey', async () => {
+  it('extMethod preflight auth cell reports unknown for hopcode-oauth even with placeholder apiKey', async () => {
     mockConfig = {
       ...mockConfig,
       getTargetDir: vi.fn().mockReturnValue('/work/status'),
       getMcpServers: vi.fn().mockReturnValue({}),
-      getAuthType: vi.fn().mockReturnValue('qwen-oauth'),
+      getAuthType: vi.fn().mockReturnValue('hopcode-oauth'),
       getModel: vi.fn().mockReturnValue('qwen-plus'),
       getModelsConfig: vi.fn().mockReturnValue({
         getGenerationConfig: vi
           .fn()
           .mockReturnValue({ apiKey: 'HOPCODE_OAUTH_DYNAMIC_TOKEN' }),
-        getCurrentAuthType: vi.fn().mockReturnValue('qwen-oauth'),
+        getCurrentAuthType: vi.fn().mockReturnValue('hopcode-oauth'),
         syncAfterAuthRefresh: vi.fn(),
       }),
       getSkillManager: vi.fn().mockReturnValue({
@@ -3795,14 +3798,14 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await expect(
       agent.extMethod(SERVE_STATUS_EXT_METHODS.workspaceProviders, {}),
     ).resolves.toMatchObject({
-      current: { authType: 'hopcode', modelId: 'missing-model(qwen)' },
+      current: { authType: 'hopcode', modelId: 'missing-model(hopcode)' },
       providers: [
         {
           authType: 'hopcode',
           current: false,
           models: [
             {
-              modelId: 'qwen-plus(qwen)',
+              modelId: 'qwen-plus(hopcode)',
               baseModelId: 'qwen-plus',
               contextLimit: 128_000,
               isCurrent: false,
@@ -3866,7 +3869,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       (status['providers'] as Array<{ models: Array<{ modelId: string }> }>)
         .flatMap((provider) => provider.models)
         .map((model) => model.modelId),
-    ).toEqual(['qwen-plus(qwen)']);
+    ).toEqual(['qwen-plus(hopcode)']);
 
     mockConnectionState.resolve();
     await agentPromise;
@@ -3912,14 +3915,14 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await expect(
       agent.extMethod(SERVE_STATUS_EXT_METHODS.workspaceProviders, {}),
     ).resolves.toMatchObject({
-      current: { authType: 'hopcode', modelId: 'runtime-qwen-plus(qwen)' },
+      current: { authType: 'hopcode', modelId: 'runtime-qwen-plus(hopcode)' },
       providers: [
         {
           authType: 'hopcode',
           current: true,
           models: [
             {
-              modelId: 'runtime-qwen-plus(qwen)',
+              modelId: 'runtime-qwen-plus(hopcode)',
               baseModelId: 'runtime-qwen-plus',
               contextLimit: 128_000,
               isCurrent: true,
@@ -8302,7 +8305,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       },
     }) as AgentLike;
 
-    await expect(agent.extMethod('qwen/providers/list', {})).resolves.toEqual({
+    await expect(agent.extMethod('hopcode/providers/list', {})).resolves.toEqual({
       providers: [
         expect.objectContaining({
           id: 'deepseek',
@@ -8314,7 +8317,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     });
 
     await expect(
-      agent.extMethod('qwen/providers/connect', {
+      agent.extMethod('hopcode/providers/connect', {
         providerId: 'deepseek',
         apiKey: 'sk-test',
         modelIds: ['deepseek-chat'],
@@ -8344,7 +8347,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/providers/connect returns preserved model when adapter getValue returns a non-empty string', async () => {
+  it('hopcode/providers/connect returns preserved model when adapter getValue returns a non-empty string', async () => {
     vi.mocked(createLoadedSettingsAdapter).mockImplementationOnce(
       (settings: unknown) => {
         (settings as Record<string, unknown>)['getValue'] = vi.fn(
@@ -8368,7 +8371,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     }) as AgentLike;
 
     await expect(
-      agent.extMethod('qwen/providers/connect', {
+      agent.extMethod('hopcode/providers/connect', {
         providerId: 'deepseek',
         apiKey: 'sk-test',
         modelIds: ['deepseek-chat'],
@@ -8382,7 +8385,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/providers/list includes existing provider settings', async () => {
+  it('hopcode/providers/list includes existing provider settings', async () => {
     const settings = {
       ...makeSessionSettings(),
       merged: {
@@ -8414,7 +8417,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       },
     }) as AgentLike;
 
-    const providers = await agent.extMethod('qwen/providers/list', {});
+    const providers = await agent.extMethod('hopcode/providers/list', {});
     expect(providers).toEqual({
       providers: [
         expect.objectContaining({
@@ -8434,7 +8437,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/skills/install rejects http and non-GitHub source URLs', async () => {
+  it('hopcode/skills/install rejects http and non-GitHub source URLs', async () => {
     mockConfig.getSkillManager = vi.fn().mockReturnValue({
       parseSkillContent: vi.fn(),
       refreshCache: vi.fn().mockResolvedValue(undefined),
@@ -8448,7 +8451,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       'https://github.com.attacker.com/owner/repo/blob/main/SKILL.md',
     ]) {
       await expect(
-        agent.extMethod('qwen/skills/install', {
+        agent.extMethod('hopcode/skills/install', {
           skill: { id: 'x', slug: 'x', name: 'X', sourceUrl },
         }),
       ).rejects.toThrow();
@@ -8458,7 +8461,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/skills/install installs a GitHub directory skill through ACP', async () => {
+  it('hopcode/skills/install installs a GitHub directory skill through ACP', async () => {
     const tempHome = await fs.mkdtemp(path.join(os.tmpdir(), 'hopcode-skill-'));
     vi.mocked(Storage.getGlobalHopCodeDir).mockReturnValue(tempHome);
 
@@ -8556,7 +8559,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
 
       const installedPath = path.join(tempHome, 'skills', 'pptx', 'SKILL.md');
       await expect(
-        agent.extMethod('qwen/skills/install', {
+        agent.extMethod('hopcode/skills/install', {
           skill: {
             id: 'pptx',
             slug: 'pptx',
@@ -8655,7 +8658,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       }) as AgentLike;
 
       await expect(
-        agent.extMethod('qwen/skills/setEnabled', {
+        agent.extMethod('hopcode/skills/setEnabled', {
           skill: { slug: 'pptx', enabled: false },
         }),
       ).resolves.toMatchObject({
@@ -8668,7 +8671,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       );
 
       await expect(
-        agent.extMethod('qwen/skills/setEnabled', {
+        agent.extMethod('hopcode/skills/setEnabled', {
           skill: { slug: 'pptx', enabled: true },
         }),
       ).resolves.toMatchObject({
@@ -8680,7 +8683,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       );
 
       await expect(
-        agent.extMethod('qwen/skills/delete', {
+        agent.extMethod('hopcode/skills/delete', {
           skill: { slug: 'pptx' },
         }),
       ).resolves.toMatchObject({
@@ -8726,7 +8729,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
 
       for (const slug of ['..', '.']) {
         await expect(
-          agent.extMethod('qwen/skills/install', {
+          agent.extMethod('hopcode/skills/install', {
             skill: {
               slug,
               sourceUrl:
@@ -8735,10 +8738,10 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
           }),
         ).rejects.toThrow('Invalid skill.slug');
         await expect(
-          agent.extMethod('qwen/skills/delete', { skill: { slug } }),
+          agent.extMethod('hopcode/skills/delete', { skill: { slug } }),
         ).rejects.toThrow('Invalid skill.slug');
         await expect(
-          agent.extMethod('qwen/skills/setEnabled', {
+          agent.extMethod('hopcode/skills/setEnabled', {
             skill: { slug, enabled: false },
           }),
         ).rejects.toThrow('Invalid skill.slug');
@@ -8803,7 +8806,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
         },
       }) as AgentLike;
 
-      await agent.extMethod('qwen/skills/setEnabled', {
+      await agent.extMethod('hopcode/skills/setEnabled', {
         skill: { slug: 'pptx', enabled: false },
       });
       let content = await fs.readFile(skillFile, 'utf8');
@@ -8813,7 +8816,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       expect(content).toContain('command: echo hi');
       expect(content).toContain('disable-model-invocation: true');
 
-      await agent.extMethod('qwen/skills/setEnabled', {
+      await agent.extMethod('hopcode/skills/setEnabled', {
         skill: { slug: 'pptx', enabled: true },
       });
       content = await fs.readFile(skillFile, 'utf8');
@@ -8860,7 +8863,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/providers/connect reuses the stored apiKey when the client omits it', async () => {
+  it('hopcode/providers/connect reuses the stored apiKey when the client omits it', async () => {
     const settings = {
       ...makeSessionSettings(),
       merged: {
@@ -8888,7 +8891,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     }) as AgentLike;
 
     await expect(
-      agent.extMethod('qwen/providers/connect', {
+      agent.extMethod('hopcode/providers/connect', {
         providerId: 'deepseek',
         modelIds: ['deepseek-chat'],
       }),
@@ -8903,7 +8906,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     await agentPromise;
   });
 
-  it('qwen/providers/connect reuses the custom apiKey for the requested baseUrl only', async () => {
+  it('hopcode/providers/connect reuses the custom apiKey for the requested baseUrl only', async () => {
     const customEnvKey = (protocol: string, baseUrl: string) =>
       `HOPCODE_CUSTOM_API_KEY_${protocol}_${baseUrl.replace(
         /[^A-Za-z0-9]/g,
@@ -8948,7 +8951,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
     }) as AgentLike;
 
     await expect(
-      agent.extMethod('qwen/providers/connect', {
+      agent.extMethod('hopcode/providers/connect', {
         providerId: 'custom-openai-compatible',
         protocol: 'openai',
         baseUrl: secondBaseUrl,
@@ -9067,7 +9070,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       }) as AgentLike;
 
       await expect(
-        agent.extMethod('qwen/skills/setEnabled', {
+        agent.extMethod('hopcode/skills/setEnabled', {
           skill: { slug: 'course', enabled: false },
         }),
       ).resolves.toMatchObject({
@@ -9080,7 +9083,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       );
 
       await expect(
-        agent.extMethod('qwen/skills/setEnabled', {
+        agent.extMethod('hopcode/skills/setEnabled', {
           skill: {
             slug: 'project-course',
             enabled: false,
@@ -9097,7 +9100,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       ).resolves.toContain('disable-model-invocation: true');
 
       await expect(
-        agent.extMethod('qwen/skills/delete', {
+        agent.extMethod('hopcode/skills/delete', {
           skill: { slug: 'course' },
         }),
       ).resolves.toMatchObject({
@@ -9193,7 +9196,7 @@ describe('hopcodeagent MCP SSE/HTTP support', () => {
       }) as AgentLike;
 
       await expect(
-        agent.extMethod('qwen/skills/setEnabled', {
+        agent.extMethod('hopcode/skills/setEnabled', {
           cwd: tempProject,
           skill: { slug: 'bugfix', enabled: false, scope: 'project' },
         }),

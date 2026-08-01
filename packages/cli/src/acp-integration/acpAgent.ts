@@ -1809,7 +1809,7 @@ function readExistingProviderConfig(
 }
 
 // Resolves the raw, stored API key for a provider for server-side use only
-// (never serialized to the client). Used so `qwen/providers/connect` can keep
+// (never serialized to the client). Used so `hopcode/providers/connect` can keep
 // the existing key when the client updates other fields without resubmitting it.
 function resolveExistingProviderApiKey(
   config: ProviderConfig,
@@ -6111,7 +6111,7 @@ class hopcodeagent implements Agent {
           released: session.releaseTodoStopGuardQueuedPromptWait(),
         };
       }
-      case 'qwen/providers/list': {
+      case 'hopcode/providers/list': {
         return {
           providers: ALL_PROVIDERS.map((provider) =>
             serializeProviderConfig(provider, this.settings),

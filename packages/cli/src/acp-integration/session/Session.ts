@@ -763,20 +763,20 @@ export function isExistingFile(
 }
 
 export function resolveHomeLoopResolverRoots({
-  homehopcodeDir = Storage.getGlobalhopcodeDir(),
+  homeHopcodeDir = Storage.getGlobalHopCodeDir(),
   homeDir = os.homedir(),
   hopcodeHome = process.env['HOPCODE_HOME'],
 }: {
-  homehopcodeDir?: string;
+  homeHopcodeDir?: string;
   homeDir?: string;
   hopcodeHome?: string;
-} = {}): { homeConfineRoot: string; homehopcodeDir: string } {
+} = {}): { homeConfineRoot: string; homeHopcodeDir: string } {
   // hopcodeHome truthy → HOPCODE_HOME is itself the global dir, so confine within
-  // homehopcodeDir; the homeDir param is only consulted when hopcodeHome is unset.
+  // homeHopcodeDir; the homeDir param is only consulted when hopcodeHome is unset.
   return {
     homeConfineRoot:
-      (hopcodeHome ? homehopcodeDir : homeDir) || path.dirname(homehopcodeDir),
-    homehopcodeDir,
+      (hopcodeHome ? homeHopcodeDir : homeDir) || path.dirname(homeHopcodeDir),
+    homeHopcodeDir,
   };
 }
 
@@ -4174,11 +4174,11 @@ export class Session implements SessionContext {
       // Resolve the home/global loop.md from the HOPCODE_HOME-aware global dir (the
       // rest of hopcode honors HOPCODE_HOME for `.hopcode`); reading raw os.homedir() here
       // would always hit the real `~/.hopcode` and ignore a relocated config home.
-      const { homeConfineRoot, homehopcodeDir } = resolveHomeLoopResolverRoots();
+      const { homeConfineRoot, homeHopcodeDir } = resolveHomeLoopResolverRoots();
       this.loopTickResolver = new LoopTickResolver({
         projectRoot: root,
         homeDir: homeConfineRoot,
-        homehopcodeDir,
+        homeHopcodeDir,
         // The project `.hopcode/loop.md` is repo-controlled, so an untrusted folder
         // must not read it and feed it to the model (mirrors getProjectHooks()'s
         // trust gate). The home/global `~/.hopcode/loop.md` is user-owned and stays
