@@ -592,7 +592,7 @@ describe('parseChannelConfig', () => {
   });
 
   it('rejects webhook secretEnv refs when the environment variable is unset', async () => {
-    delete process.env['QWEN_MISSING_WEBHOOK_SECRET'];
+    delete process.env['HOPCODE_MISSING_WEBHOOK_SECRET'];
 
     await expect(
       parseChannelConfig('dingtalk-main', {
@@ -601,7 +601,7 @@ describe('parseChannelConfig', () => {
         webhooks: {
           sources: {
             custom: {
-              secretEnv: 'QWEN_MISSING_WEBHOOK_SECRET',
+              secretEnv: 'HOPCODE_MISSING_WEBHOOK_SECRET',
               targets: {
                 default: {
                   chatId: 'group-1',

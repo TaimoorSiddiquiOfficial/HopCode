@@ -21,7 +21,7 @@ import { ClientMcpWsConnection, } from './client-mcp-ws.js';
 import { createClientMcpServerProvider } from './client-mcp-sender-registry.js';
 import { isCdpInboundFrameType, } from '../cdp-tunnel/cdp-reverse-link.js';
 import { attachCdpClient } from '../cdp-tunnel/cdp-ws.js';
-import { QWEN_CDP_MCP_COMMAND_ENV, resolveCdpMcpCommand, } from '../cdp-mcp-command.js';
+import { HOPCODE_CDP_MCP_COMMAND_ENV, resolveCdpMcpCommand, } from '../cdp-mcp-command.js';
 import { safeWsSend } from './safe-ws-send.js';
 export const ACP_CONNECTION_HEADER = 'acp-connection-id';
 export const ACP_SESSION_HEADER = 'acp-session-id';
@@ -131,7 +131,7 @@ function buildChromeDevToolsMcpRuntimeConfig(localPort, hostname, env) {
     }
     const command = resolveCdpMcpCommand(env);
     if (!command) {
-        writeStderrLine(`qwen serve: set ${QWEN_CDP_MCP_COMMAND_ENV} to enable browser automation MCP (no adapter is bundled)`);
+        writeStderrLine(`qwen serve: set ${HOPCODE_CDP_MCP_COMMAND_ENV} to enable browser automation MCP (no adapter is bundled)`);
         return undefined;
     }
     return {

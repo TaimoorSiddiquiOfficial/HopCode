@@ -7458,7 +7458,7 @@ describe('ACP WebSocket transport security', () => {
   let previousCdpMcpCommand: string | undefined;
 
   beforeEach(() => {
-    previousCdpMcpCommand = process.env['QWEN_CDP_MCP_COMMAND'];
+    previousCdpMcpCommand = process.env['HOPCODE_CDP_MCP_COMMAND'];
   });
 
   async function yieldImmediate(): Promise<void> {
@@ -7510,14 +7510,14 @@ describe('ACP WebSocket transport security', () => {
     server?.closeAllConnections?.();
     await new Promise<void>((r) => server?.close(() => r()) ?? r());
     if (previousCdpMcpCommand === undefined) {
-      delete process.env['QWEN_CDP_MCP_COMMAND'];
+      delete process.env['HOPCODE_CDP_MCP_COMMAND'];
     } else {
-      process.env['QWEN_CDP_MCP_COMMAND'] = previousCdpMcpCommand;
+      process.env['HOPCODE_CDP_MCP_COMMAND'] = previousCdpMcpCommand;
     }
   });
 
   function enableCdpMcpCommand() {
-    process.env['QWEN_CDP_MCP_COMMAND'] = process.execPath;
+    process.env['HOPCODE_CDP_MCP_COMMAND'] = process.execPath;
   }
 
   function wsConnect(
@@ -7616,7 +7616,7 @@ describe('ACP WebSocket transport security', () => {
   });
 
   it('does not register chrome-devtools MCP without an explicit CDP MCP command', async () => {
-    delete process.env['QWEN_CDP_MCP_COMMAND'];
+    delete process.env['HOPCODE_CDP_MCP_COMMAND'];
     stdioMocks.writeStderrLine.mockClear();
     await startServer({ cdpTunnelOverWs: true });
     const ws = await wsConnect();
@@ -7626,7 +7626,7 @@ describe('ACP WebSocket transport security', () => {
     expect(bridge.runtimeMcpAdds).toHaveLength(0);
     expect(bridge.runtimeMcpRemoves).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
+      'qwen serve: set HOPCODE_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
     );
 
     ws.close();
@@ -7634,7 +7634,7 @@ describe('ACP WebSocket transport security', () => {
   });
 
   it('treats a whitespace-only CDP MCP command as unset', async () => {
-    process.env['QWEN_CDP_MCP_COMMAND'] = '   ';
+    process.env['HOPCODE_CDP_MCP_COMMAND'] = '   ';
     stdioMocks.writeStderrLine.mockClear();
     await startServer({ cdpTunnelOverWs: true });
     const ws = await wsConnect();
@@ -7643,7 +7643,7 @@ describe('ACP WebSocket transport security', () => {
     await yieldImmediate();
     expect(bridge.runtimeMcpAdds).toHaveLength(0);
     expect(stdioMocks.writeStderrLine).toHaveBeenCalledWith(
-      'qwen serve: set QWEN_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
+      'qwen serve: set HOPCODE_CDP_MCP_COMMAND to enable browser automation MCP (no adapter is bundled)',
     );
 
     ws.close();
@@ -7679,10 +7679,10 @@ describe('ACP WebSocket transport security', () => {
   });
 
   it('passes a custom CDP MCP command through to the runtime config', async () => {
-    process.env['QWEN_CDP_MCP_COMMAND'] = '/opt/process/cdp-adapter';
+    process.env['HOPCODE_CDP_MCP_COMMAND'] = '/opt/process/cdp-adapter';
     await startServer({
       cdpTunnelOverWs: true,
-      daemonEnv: { QWEN_CDP_MCP_COMMAND: '/opt/custom/cdp-adapter' },
+      daemonEnv: { HOPCODE_CDP_MCP_COMMAND: '/opt/custom/cdp-adapter' },
     });
     const ws = await wsConnect();
     await initializeCdpBridge(ws);

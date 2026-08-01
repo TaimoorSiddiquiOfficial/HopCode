@@ -327,7 +327,7 @@ export const SERVE_CAPABILITY_REGISTRY = {
     cdp_tunnel_over_ws: { since: 'v1' },
     // Browser automation MCP tools are available only when the CDP tunnel is on
     // and the operator has configured an external stdio adapter via
-    // QWEN_CDP_MCP_COMMAND. This is separate from `cdp_tunnel_over_ws`: a daemon
+    // HOPCODE_CDP_MCP_COMMAND. This is separate from `cdp_tunnel_over_ws`: a daemon
     // may expose the tunnel while intentionally not bundling/registering a
     // chrome-devtools MCP adapter.
     browser_automation_mcp: { since: 'v1' },

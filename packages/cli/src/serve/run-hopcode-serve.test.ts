@@ -1488,7 +1488,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
     const originalCdpTunnelOverWs =
       process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
-    const originalCdpMcpCommand = process.env['QWEN_CDP_MCP_COMMAND'];
+    const originalCdpMcpCommand = process.env['HOPCODE_CDP_MCP_COMMAND'];
     if (raw === undefined) {
       delete process.env['QWEN_SERVE_CLIENT_MCP_OVER_WS'];
       delete process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'];
@@ -1497,9 +1497,9 @@ describe('runHopCodeServe runtime startup failures', () => {
       process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'] = raw;
     }
     if (cdpMcpCommand === undefined) {
-      delete process.env['QWEN_CDP_MCP_COMMAND'];
+      delete process.env['HOPCODE_CDP_MCP_COMMAND'];
     } else {
-      process.env['QWEN_CDP_MCP_COMMAND'] = cdpMcpCommand;
+      process.env['HOPCODE_CDP_MCP_COMMAND'] = cdpMcpCommand;
     }
     vi.spyOn(acpBridge, 'createAcpSessionBridge').mockImplementation(() => {
       throw new Error('runtime boom');
@@ -1538,9 +1538,9 @@ describe('runHopCodeServe runtime startup failures', () => {
         process.env['QWEN_SERVE_CDP_TUNNEL_OVER_WS'] = originalCdpTunnelOverWs;
       }
       if (originalCdpMcpCommand === undefined) {
-        delete process.env['QWEN_CDP_MCP_COMMAND'];
+        delete process.env['HOPCODE_CDP_MCP_COMMAND'];
       } else {
-        process.env['QWEN_CDP_MCP_COMMAND'] = originalCdpMcpCommand;
+        process.env['HOPCODE_CDP_MCP_COMMAND'] = originalCdpMcpCommand;
       }
       await handle.close();
     }
@@ -3418,7 +3418,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-runtime-webhook-log-')),
     );
     const previousQwenHome = process.env['HOPCODE_HOME'];
-    const previousSecret = process.env['QWEN_MISSING_WEBHOOK_SECRET'];
+    const previousSecret = process.env['HOPCODE_MISSING_WEBHOOK_SECRET'];
     const tempHome = fs.mkdtempSync(
       path.join(os.tmpdir(), 'qws-runtime-webhook-home-'),
     );
@@ -3427,7 +3427,7 @@ describe('runHopCodeServe runtime startup failures', () => {
       stderrWrites.push(String(chunk));
       return true;
     });
-    delete process.env['QWEN_MISSING_WEBHOOK_SECRET'];
+    delete process.env['HOPCODE_MISSING_WEBHOOK_SECRET'];
     process.env['HOPCODE_HOME'] = tempHome;
     settingsRuntime.resetHomeEnvBootstrapForTesting();
     fs.writeFileSync(
@@ -3439,7 +3439,7 @@ describe('runHopCodeServe runtime startup failures', () => {
             webhooks: {
               sources: {
                 'github\nci': {
-                  secretEnv: 'QWEN_MISSING_WEBHOOK_SECRET',
+                  secretEnv: 'HOPCODE_MISSING_WEBHOOK_SECRET',
                   targets: {
                     default: {
                       chatId: 'group-1',
@@ -3511,9 +3511,9 @@ describe('runHopCodeServe runtime startup failures', () => {
       await handle.close();
       fs.rmSync(tempHome, { recursive: true, force: true });
       if (previousSecret === undefined) {
-        delete process.env['QWEN_MISSING_WEBHOOK_SECRET'];
+        delete process.env['HOPCODE_MISSING_WEBHOOK_SECRET'];
       } else {
-        process.env['QWEN_MISSING_WEBHOOK_SECRET'] = previousSecret;
+        process.env['HOPCODE_MISSING_WEBHOOK_SECRET'] = previousSecret;
       }
       if (previousQwenHome === undefined) {
         delete process.env['HOPCODE_HOME'];
@@ -5820,8 +5820,8 @@ describe('runHopCodeServe channel worker supervisor', () => {
   });
 
   it('orchestrates, persists, and hot-removes distinct workspace workers', async () => {
-    const previousSharedSecret = process.env['QWEN_SHARED_WEBHOOK_SECRET'];
-    process.env['QWEN_SHARED_WEBHOOK_SECRET'] = 'primary-secret';
+    const previousSharedSecret = process.env['HOPCODE_SHARED_WEBHOOK_SECRET'];
+    process.env['HOPCODE_SHARED_WEBHOOK_SECRET'] = 'primary-secret';
     tmpDir = fs.realpathSync(
       fs.mkdtempSync(path.join(os.tmpdir(), 'qws-channel-worker-groups-')),
     );
@@ -5836,7 +5836,7 @@ describe('runHopCodeServe channel worker supervisor', () => {
       webhooks: {
         sources: {
           'github-ci': {
-            secretEnv: 'QWEN_SHARED_WEBHOOK_SECRET',
+            secretEnv: 'HOPCODE_SHARED_WEBHOOK_SECRET',
             targets: {
               default: {
                 chatId: 'group-1',
@@ -5874,12 +5874,12 @@ describe('runHopCodeServe channel worker supervisor', () => {
       (_settings, workspace, baseEnv) => ({
         effectiveEnv: Object.freeze({
           ...baseEnv,
-          QWEN_SHARED_WEBHOOK_SECRET:
+          HOPCODE_SHARED_WEBHOOK_SECRET:
             canonicalizeWorkspace(workspace ?? process.cwd()) === secondaryCwd
               ? 'secondary-secret'
               : 'primary-secret',
         }),
-        overlayKeys: Object.freeze(['QWEN_SHARED_WEBHOOK_SECRET']),
+        overlayKeys: Object.freeze(['HOPCODE_SHARED_WEBHOOK_SECRET']),
         envFilePaths: Object.freeze([]),
         envFileReadFailed: false,
         envFileReadFailures: Object.freeze([]),
@@ -6227,9 +6227,9 @@ describe('runHopCodeServe channel worker supervisor', () => {
     } finally {
       await handle.close();
       if (previousSharedSecret === undefined) {
-        delete process.env['QWEN_SHARED_WEBHOOK_SECRET'];
+        delete process.env['HOPCODE_SHARED_WEBHOOK_SECRET'];
       } else {
-        process.env['QWEN_SHARED_WEBHOOK_SECRET'] = previousSharedSecret;
+        process.env['HOPCODE_SHARED_WEBHOOK_SECRET'] = previousSharedSecret;
       }
     }
   });

@@ -63,7 +63,7 @@ import {
 } from '../cdp-tunnel/cdp-reverse-link.js';
 import { attachCdpClient } from '../cdp-tunnel/cdp-ws.js';
 import {
-  QWEN_CDP_MCP_COMMAND_ENV,
+  HOPCODE_CDP_MCP_COMMAND_ENV,
   resolveCdpMcpCommand,
 } from '../cdp-mcp-command.js';
 import { safeWsSend } from './safe-ws-send.js';
@@ -214,7 +214,7 @@ function buildChromeDevToolsMcpRuntimeConfig(
   const command = resolveCdpMcpCommand(env);
   if (!command) {
     writeStderrLine(
-      `qwen serve: set ${QWEN_CDP_MCP_COMMAND_ENV} to enable browser automation MCP (no adapter is bundled)`,
+      `qwen serve: set ${HOPCODE_CDP_MCP_COMMAND_ENV} to enable browser automation MCP (no adapter is bundled)`,
     );
     return undefined;
   }
