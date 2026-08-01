@@ -70,10 +70,10 @@ const track = { stop: vi.fn() };
 let baseUrl = 'http://127.0.0.1:1234';
 let token: string | undefined;
 
-/** Decode a `qwen-bearer.<base64url>` subprotocol back to the raw token. */
+/** Decode a `hopcode-bearer.<base64url>` subprotocol back to the raw token. */
 function decodeBearerSubprotocol(proto: string): string {
   const b64 = proto
-    .slice('qwen-bearer.'.length)
+    .slice('hopcode-bearer.'.length)
     .replace(/-/g, '+')
     .replace(/_/g, '/');
   const binary = atob(b64);
@@ -167,8 +167,8 @@ describe('useVoiceCapture', () => {
     const list = protocols as string[];
     // Non-secret marker first (what the daemon selects), then the bearer token.
     expect(list).toHaveLength(2);
-    expect(list[0]).toBe('qwen-ws');
-    expect(list[1].startsWith('qwen-bearer.')).toBe(true);
+    expect(list[0]).toBe('hopcode-ws');
+    expect(list[1].startsWith('hopcode-bearer.')).toBe(true);
     // Round-trips back to the raw token (what the daemon decodes + hashes).
     expect(decodeBearerSubprotocol(list[1])).toBe('secret-token-123');
   });

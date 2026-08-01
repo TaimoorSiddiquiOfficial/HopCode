@@ -233,15 +233,15 @@ function buildChromeDevToolsMcpRuntimeConfig(
  * Browsers cannot set an `Authorization` header on a WebSocket, so the Web
  * Shell authenticates the `/voice/stream` (and `/acp`) upgrade by offering the
  * bearer token as a `Sec-WebSocket-Protocol` subprotocol of the form
- * `qwen-bearer.<base64url(token)>`. Kept in sync with the encoder in
+ * `hopcode-bearer.<base64url(token)>`. Kept in sync with the encoder in
  * `packages/web-shell/client/voice/useVoiceCapture.ts`.
  */
-export const WS_BEARER_SUBPROTOCOL_PREFIX = 'qwen-bearer.';
+export const WS_BEARER_SUBPROTOCOL_PREFIX = 'hopcode-bearer.';
 
 /**
  * Pull the bearer credential off a WS upgrade request. Prefer the standard
  * `Authorization: Bearer <token>` header (non-browser clients); fall back to
- * the `qwen-bearer.*` subprotocol (browser clients). Returns `undefined` when
+ * the `hopcode-bearer.*` subprotocol (browser clients). Returns `undefined` when
  * neither is present or parseable.
  */
 function extractUpgradeBearer(req: IncomingMessage): string | undefined {
@@ -1359,10 +1359,10 @@ export function mountAcpHttp(
       noServer: true,
       maxPayload: 10 * 1024 * 1024,
       // Browsers authenticate the upgrade by offering the bearer token as a
-      // `qwen-bearer.*` subprotocol (see extractUpgradeBearer). Never echo that
+      // `hopcode-bearer.*` subprotocol (see extractUpgradeBearer). Never echo that
       // secret-bearing value back in the handshake response — select the first
       // non-secret subprotocol instead. The web-shell offers a non-secret
-      // marker (`qwen-ws`) alongside the bearer one precisely so there is always
+      // marker (`hopcode-ws`) alongside the bearer one precisely so there is always
       // a safe value to select: selecting none would make strict WS clients
       // (e.g. the `ws` library) reject the handshake with "Server sent no
       // subprotocol". ACP clients offer no subprotocol, so this is a no-op for
@@ -1497,7 +1497,7 @@ export function mountAcpHttp(
       // loopback without token = allow; non-loopback/token-mismatch = reject.
       if (opts.token) {
         // Accept the token from `Authorization` (non-browser clients) or the
-        // `qwen-bearer.*` subprotocol (browsers, which can't set Authorization
+        // `hopcode-bearer.*` subprotocol (browsers, which can't set Authorization
         // on a WebSocket). Hash-compare in constant time, same posture as REST.
         const credentials = extractUpgradeBearer(req);
         const actual = credentials

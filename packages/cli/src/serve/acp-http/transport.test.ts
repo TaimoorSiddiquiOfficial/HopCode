@@ -7941,14 +7941,14 @@ describe('ACP WebSocket transport security', () => {
 
   // ── Bearer token via Sec-WebSocket-Protocol (browser clients) ──────
   // Browsers can't set an Authorization header on a WebSocket, so the token
-  // rides in a `qwen-bearer.<base64url(token)>` subprotocol that the upgrade
+  // rides in a `hopcode-bearer.<base64url(token)>` subprotocol that the upgrade
   // listener decodes (extractUpgradeBearer). Matches the web-shell encoder.
   function bearerProto(token: string): string {
-    return `qwen-bearer.${Buffer.from(token).toString('base64url')}`;
+    return `hopcode-bearer.${Buffer.from(token).toString('base64url')}`;
   }
   // Non-secret marker the web-shell offers alongside the bearer subprotocol so
   // the daemon can select it (never the secret) and the handshake completes.
-  const WS_AUTH_SUBPROTOCOL = 'qwen-ws';
+  const WS_AUTH_SUBPROTOCOL = 'hopcode-ws';
 
   function wsConnectWithSubprotocols(
     protocols: string[],
@@ -8010,7 +8010,7 @@ describe('ACP WebSocket transport security', () => {
     expect(result.code).toBe(101);
     // The daemon selects the non-secret marker, never the bearer value.
     expect(result.protocol).toBe(WS_AUTH_SUBPROTOCOL);
-    expect(result.protocol).not.toContain('qwen-bearer.');
+    expect(result.protocol).not.toContain('hopcode-bearer.');
   });
 
   it('selects a non-secret subprotocol, never the bearer one', async () => {
@@ -8038,7 +8038,7 @@ describe('ACP WebSocket transport security', () => {
     // token) — exercises the non-throwing decode + constant-time mismatch path.
     const result = await wsConnectWithSubprotocols([
       WS_AUTH_SUBPROTOCOL,
-      'qwen-bearer.----',
+      'hopcode-bearer.----',
     ]);
     expect(result.code).toBe(401);
   });

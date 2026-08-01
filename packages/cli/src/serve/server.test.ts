@@ -17501,7 +17501,7 @@ describe('createServeApp', () => {
         detail: 'summary',
       });
       // Voice is advertised even with a token configured: browsers authenticate
-      // the WS via the `qwen-bearer.*` subprotocol, so the token no longer
+      // the WS via the `hopcode-bearer.*` subprotocol, so the token no longer
       // suppresses the capability.
       expect(withAuth.body.capabilities.features).toContain('voice_transcribe');
     });

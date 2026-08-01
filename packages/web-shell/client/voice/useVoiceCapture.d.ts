@@ -12,7 +12,7 @@
  *
  * Note: browsers cannot set an `Authorization` header on a WebSocket. When a
  * bearer token is configured it rides in the `Sec-WebSocket-Protocol`
- * subprotocol as `qwen-bearer.<base64url(token)>` (see `bearerSubprotocol`),
+ * subprotocol as `hopcode-bearer.<base64url(token)>` (see `bearerSubprotocol`),
  * which the daemon's ACP upgrade listener verifies — so this works against both
  * no-token loopback and token-required deployments.
  */

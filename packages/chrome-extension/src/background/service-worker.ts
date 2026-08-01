@@ -30,12 +30,12 @@ const LOG_PREFIX = '[ServiceWorker]';
 // `Sec-WebSocket-Protocol` subprotocol (the WS handshake can't carry an
 // Authorization header). Kept in sync with WS_BEARER_SUBPROTOCOL_PREFIX in
 // `packages/cli/src/serve/acp-http/index.ts` and the web-shell encoder; the
-// daemon completes the handshake by selecting the non-secret `qwen-ws` marker
+// daemon completes the handshake by selecting the non-secret `hopcode-ws` marker
 // and never echoes the token.
-const WS_BEARER_SUBPROTOCOL_PREFIX = 'qwen-bearer.';
-const WS_AUTH_SUBPROTOCOL = 'qwen-ws';
+const WS_BEARER_SUBPROTOCOL_PREFIX = 'hopcode-bearer.';
+const WS_AUTH_SUBPROTOCOL = 'hopcode-ws';
 
-/** Encode a bearer token as a `qwen-bearer.<base64url(token)>` WS subprotocol. */
+/** Encode a bearer token as a `hopcode-bearer.<base64url(token)>` WS subprotocol. */
 function bearerSubprotocol(token: string): string {
   const bytes = new TextEncoder().encode(token);
   let binary = '';
@@ -171,7 +171,7 @@ async function connect(): Promise<void> {
   console.log(LOG_PREFIX, 'Connecting to', url);
   let ws: WebSocket;
   try {
-    // A token-gated daemon authenticates the handshake via the `qwen-bearer.*`
+    // A token-gated daemon authenticates the handshake via the `hopcode-bearer.*`
     // subprotocol (loopback daemons are auth-free → no subprotocol).
     ws = token
       ? new WebSocket(url, [WS_AUTH_SUBPROTOCOL, bearerSubprotocol(token)])
