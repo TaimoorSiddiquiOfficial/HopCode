@@ -31,7 +31,7 @@ export default tseslint.config(
       'demo/**/dist/**',
       'docs-site/.next/**',
       'docs-site/out/**',
-      '.hopcode/**',
+      '.qwen/**',
       'packages/desktop/**',
       'packages/cua-driver/**', // vendored trycua/cua driver (Rust + scripts); not hopcode TS
     ],
