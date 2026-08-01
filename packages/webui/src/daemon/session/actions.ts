@@ -25,7 +25,6 @@ import type {
 } from '@hoptrendy/sdk/daemon';
 import {
   isDaemonTurnError,
-  isNonBlockingAccepted,
   type PromptResult,
 } from '@hoptrendy/sdk/daemon';
 import { mapSupportedCommands } from './mappers.js';

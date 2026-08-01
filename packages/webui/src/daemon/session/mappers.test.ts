@@ -6,7 +6,44 @@
 
 import { describe, expect, it } from 'vitest';
 import type { DaemonEvent } from '@hoptrendy/sdk/daemon';
-import { getReplayTokenCount, getReplayTokenUsage } from './mappers.js';
+import type { DaemonWorkspaceSkillsStatus } from '@hoptrendy/sdk/daemon';
+import {
+  getReplayTokenCount,
+  getReplayTokenUsage,
+  mapWorkspaceSkills,
+  updateConnectionFromDaemonEvent,
+} from './mappers.js';
+import type { DaemonConnectionState } from './types.js';
+
+function applyEvent(
+  state: DaemonConnectionState,
+  event: DaemonEvent,
+): DaemonConnectionState {
+  let result = state;
+  updateConnectionFromDaemonEvent(event, (updater) => {
+    result = typeof updater === 'function' ? updater(result) : updater;
+  });
+  return result;
+}
+
+function availableCommandsEvent(
+  commands: { name: string; description?: string; input?: unknown }[],
+  skills: string[],
+): DaemonEvent {
+  return {
+    id: 0,
+    v: 1,
+    type: 'available_commands_update',
+    data: {
+      commands: commands.map((c) => ({
+        name: c.name,
+        description: c.description ?? '',
+        raw: { name: c.name, description: c.description ?? '', input: c.input ?? null },
+      })),
+      skills,
+    },
+  };
+}
 
 function usageEvent(
   id: number,
