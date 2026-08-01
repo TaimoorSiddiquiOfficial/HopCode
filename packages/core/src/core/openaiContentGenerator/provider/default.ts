@@ -190,7 +190,7 @@ export class DefaultOpenAICompatibleProvider
       // limits must not request the whole window; users who need more set
       // max_tokens explicitly).
       const envMaxTokens = parsePositiveIntegerEnvValue(
-        process.env['HOPCODE_MAX_OUTPUT_TOKENS'],
+        process.env['HOPCODE_CODE_MAX_OUTPUT_TOKENS'],
       );
       if (envMaxTokens !== undefined) {
         effectiveMaxTokens = isKnownModel
