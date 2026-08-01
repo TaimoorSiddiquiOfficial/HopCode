@@ -145,7 +145,7 @@ jobs:
           OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
           OPENAI_BASE_URL: '${{ secrets.OPENAI_BASE_URL }}'
           OPENAI_MODEL: '${{ secrets.OPENAI_MODEL }}'
-        run: 'npx cross-env VERBOSE=true KEEP_OUTPUT=true QWEN_SANDBOX=false vitest run --root ./integration-tests --exclude "**/interactive/cron-interactive.test.ts"'
+        run: 'npx cross-env VERBOSE=true KEEP_OUTPUT=true HOPCODE_SANDBOX=false vitest run --root ./integration-tests --exclude "**/interactive/cron-interactive.test.ts"'
 
   cron-interactive-nightly:
     name: 'cron-interactive E2E (nightly)'
@@ -194,7 +194,7 @@ jobs:
           OPENAI_MODEL: '${{ secrets.OPENAI_MODEL }}'
           KEEP_OUTPUT: 'true'
           VERBOSE: 'true'
-        run: 'npx cross-env QWEN_SANDBOX=false vitest run --root ./integration-tests interactive/cron-interactive.test.ts'
+        run: 'npx cross-env HOPCODE_SANDBOX=false vitest run --root ./integration-tests interactive/cron-interactive.test.ts'
 
   web-shell-browser-regression:
     name: 'web-shell Browser Regression'

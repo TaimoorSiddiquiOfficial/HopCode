@@ -30,7 +30,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
           registry-url: 'https://registry.npmjs.org'
-          scope: '@qwen-code'
+          scope: '@hoptrendy'
 
       - name: 'Determine version'
         id: 'version'
