@@ -44,7 +44,7 @@ describe('debugLogger', () => {
 
   const previousDebugLogFileEnv = process.env['HOPCODE_DEBUG_LOG_FILE'];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     process.env['HOPCODE_DEBUG_LOG_FILE'] = '1';
     Storage.setRuntimeBaseDir(null);
     vi.clearAllMocks();
