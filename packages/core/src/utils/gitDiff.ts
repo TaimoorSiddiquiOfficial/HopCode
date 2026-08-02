@@ -16,11 +16,11 @@ import * as nodeFs from 'node:fs';
 import { access, lstat, open, readFile, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
-import type { DiffDiffHunk } from './diff-types.js';
+import type { DiffHunk } from './diff-types.js';
 import { findGitRoot } from './gitUtils.js';
 
 /** Re-export so consumers don't need to depend on `diff` directly. */
-export type GitDiffDiffHunk = DiffDiffHunk;
+export type GitDiffHunk = DiffHunk;
 
 /**
  * A single file's diff hunks plus whether the per-file caps
@@ -113,7 +113,7 @@ function getUntrackedOpenFlags(): number {
 /**
  * Fetch numstat-based git diff stats (files changed, lines added/removed) and
  * per-file summaries comparing the working tree to HEAD. Structured hunks are
- * available separately via `fetchGitDiffDiffHunks`.
+ * available separately via `fetchGitDiffHunks`.
  *
  * Returns `null` when not inside a git repo, when git itself fails, or when
  * the working tree is in a transient state (merge, rebase, cherry-pick,
@@ -296,7 +296,7 @@ export async function fetchGitDiff(cwd: string): Promise<GitDiffResult | null> {
  * parser would let us terminate `git` early at `MAX_FILES`; that's a
  * reasonable follow-up but out of scope for this utility's first cut.
  */
-export async function fetchGitDiffDiffHunks(
+export async function fetchGitDiffHunks(
   cwd: string,
 ): Promise<Map<string, DiffHunk[]>> {
   // Walk ancestors once; reuse for the transient-state probe and the diff
@@ -322,7 +322,7 @@ export async function fetchGitDiffDiffHunks(
 
 /**
  * Fetch structured hunks for a single file (working tree vs HEAD). Cheaper than
- * `fetchGitDiffDiffHunks`, which diffs the whole tree — this is for on-demand
+ * `fetchGitDiffHunks`, which diffs the whole tree — this is for on-demand
  * rendering of one file in the diff viewer.
  *
  * `filePath` may be a repo-root-relative path or an absolute path inside the
@@ -340,7 +340,7 @@ export async function fetchGitDiffDiffHunks(
  * outside the repo, binary or unreadable untracked files, and tracked files
  * with no changes.
  */
-export async function fetchGitDiffDiffHunksForFile(
+export async function fetchGitDiffHunksForFile(
   cwd: string,
   filePath: string,
   oldPath?: string,
@@ -812,7 +812,7 @@ export function unquoteCStylePath(s: string): string {
  * appends after whitespace-containing paths) and `unquoteCStylePath`
  * (decode `"..."` C-quoted form for paths whose raw bytes include tabs,
  * newlines, quotes, or non-ASCII characters that core.quotepath does not
- * suppress). Without the unquote step, fetchGitDiffDiffHunks would silently
+ * suppress). Without the unquote step, fetchGitDiffHunks would silently
  * drop hunks for any tracked file whose name contains those characters.
  *
  * Returns `null` when the block has no hunks or no recognizable path line
@@ -1050,7 +1050,7 @@ export async function resolveGitDir(cwd: string): Promise<string | null> {
 /**
  * Same contract as `resolveGitDir`, but skips the ancestor walk when the
  * caller has already resolved the worktree root. Used by `fetchGitDiff` /
- * `fetchGitDiffDiffHunks` so they walk ancestors at most once per invocation.
+ * `fetchGitDiffHunks` so they walk ancestors at most once per invocation.
  */
 async function resolveGitDirFromRoot(gitRoot: string): Promise<string | null> {
   const dotGit = path.join(gitRoot, '.git');
