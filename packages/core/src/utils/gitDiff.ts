@@ -16,19 +16,19 @@ import * as nodeFs from 'node:fs';
 import { access, lstat, open, readFile, stat } from 'node:fs/promises';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
-import type { Hunk } from '@types/diff';
+import type { DiffDiffHunk } from './diff-types.js';
 import { findGitRoot } from './gitUtils.js';
 
 /** Re-export so consumers don't need to depend on `diff` directly. */
-export type GitDiffHunk = Hunk;
+export type GitDiffDiffHunk = DiffDiffHunk;
 
 /**
  * A single file's diff hunks plus whether the per-file caps
  * (`MAX_DIFF_SIZE_BYTES` / `MAX_LINES_PER_FILE`) actually cut content — so the
  * viewer can label the diff as incomplete instead of silently under-reporting.
  */
-export interface GitDiffFileHunks {
-  hunks: Hunk[];
+export interface GitDiffFileDiffHunks {
+  hunks: DiffHunk[];
   truncated: boolean;
 }
 
@@ -113,7 +113,7 @@ function getUntrackedOpenFlags(): number {
 /**
  * Fetch numstat-based git diff stats (files changed, lines added/removed) and
  * per-file summaries comparing the working tree to HEAD. Structured hunks are
- * available separately via `fetchGitDiffHunks`.
+ * available separately via `fetchGitDiffDiffHunks`.
  *
  * Returns `null` when not inside a git repo, when git itself fails, or when
  * the working tree is in a transient state (merge, rebase, cherry-pick,
@@ -296,9 +296,9 @@ export async function fetchGitDiff(cwd: string): Promise<GitDiffResult | null> {
  * parser would let us terminate `git` early at `MAX_FILES`; that's a
  * reasonable follow-up but out of scope for this utility's first cut.
  */
-export async function fetchGitDiffHunks(
+export async function fetchGitDiffDiffHunks(
   cwd: string,
-): Promise<Map<string, Hunk[]>> {
+): Promise<Map<string, DiffHunk[]>> {
   // Walk ancestors once; reuse for the transient-state probe and the diff
   // call. Running from the repo root also keeps hunk keys repo-root-relative
   // regardless of which subdirectory the caller is in.
@@ -322,7 +322,7 @@ export async function fetchGitDiffHunks(
 
 /**
  * Fetch structured hunks for a single file (working tree vs HEAD). Cheaper than
- * `fetchGitDiffHunks`, which diffs the whole tree — this is for on-demand
+ * `fetchGitDiffDiffHunks`, which diffs the whole tree — this is for on-demand
  * rendering of one file in the diff viewer.
  *
  * `filePath` may be a repo-root-relative path or an absolute path inside the
@@ -340,11 +340,11 @@ export async function fetchGitDiffHunks(
  * outside the repo, binary or unreadable untracked files, and tracked files
  * with no changes.
  */
-export async function fetchGitDiffHunksForFile(
+export async function fetchGitDiffDiffHunksForFile(
   cwd: string,
   filePath: string,
   oldPath?: string,
-): Promise<GitDiffFileHunks | null> {
+): Promise<GitDiffFileDiffHunks | null> {
   const gitRoot = findGitRoot(cwd);
   if (!gitRoot) return null;
   const relPath = toRepoRelativePath(gitRoot, filePath);
@@ -373,7 +373,7 @@ export async function fetchGitDiffHunksForFile(
   // A single-file diff yields at most one entry; return its hunks regardless of
   // the exact header key (which may carry rename / C-style-quote formatting).
   if (parsed.size > 0) {
-    const [key, hunks] = parsed.entries().next().value as [string, Hunk[]];
+    const [key, hunks] = parsed.entries().next().value as [string, DiffHunk[]];
     return { hunks: hunks ?? [], truncated: truncatedPaths.has(key) };
   }
 
@@ -393,7 +393,7 @@ export async function fetchGitDiffHunksForFile(
     gitRoot,
   );
   if (untrackedOut && untrackedOut.trim().length > 0) {
-    return synthesizeUntrackedHunk(gitRoot, relPath);
+    return synthesizeUntrackedDiffHunk(gitRoot, relPath);
   }
   return null;
 }
@@ -433,10 +433,10 @@ function toRepoRelativePath(gitRoot: string, filePath: string): string | null {
  * presenting a silently incomplete file. Binary or unreadable files return
  * `null` so the caller surfaces them without an inline diff.
  */
-async function synthesizeUntrackedHunk(
+async function synthesizeUntrackedDiffHunk(
   gitRoot: string,
   filePath: string,
-): Promise<GitDiffFileHunks | null> {
+): Promise<GitDiffFileDiffHunks | null> {
   const absPath = path.join(gitRoot, filePath);
   // lstat before open: `ls-files --others` can list FIFOs whose open() blocks
   // forever waiting on a writer. Gate on regular files (as countUntrackedLines
@@ -613,8 +613,8 @@ export function parseGitNumstat(stdout: string): GitDiffResult {
 export function parseGitDiff(
   stdout: string,
   truncatedPaths?: Set<string>,
-): Map<string, Hunk[]> {
-  const result = new Map<string, Hunk[]>();
+): Map<string, DiffHunk[]> {
+  const result = new Map<string, DiffHunk[]>();
   if (!stdout.trim()) return result;
 
   const fileDiffs = stdout.split(/^diff --git /m).filter(Boolean);
@@ -636,8 +636,8 @@ export function parseGitDiff(
     const filePath = extractFilePath(lines);
     if (filePath === null) continue;
 
-    const fileHunks: Hunk[] = [];
-    let currentHunk: Hunk | null = null;
+    const fileDiffHunks: DiffHunk[] = [];
+    let currentDiffHunk: DiffHunk | null = null;
     let lineCount = 0;
 
     for (let i = 1; i < lines.length; i++) {
@@ -646,8 +646,8 @@ export function parseGitDiff(
         /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/,
       );
       if (hunkMatch) {
-        if (currentHunk) fileHunks.push(currentHunk);
-        currentHunk = {
+        if (currentDiffHunk) fileDiffHunks.push(currentDiffHunk);
+        currentDiffHunk = {
           oldStart: parseInt(hunkMatch[1] ?? '0', 10),
           oldLines: parseInt(hunkMatch[2] ?? '1', 10),
           newStart: parseInt(hunkMatch[3] ?? '0', 10),
@@ -660,7 +660,7 @@ export function parseGitDiff(
       // Pre-hunk metadata is only skipped before the first `@@` header. Once
       // inside a hunk, a line like `---foo` is a removed source line whose
       // content happens to start with `---`, and must not be dropped.
-      if (!currentHunk) {
+      if (!currentDiffHunk) {
         continue;
       }
 
@@ -677,18 +677,18 @@ export function parseGitDiff(
         }
         // Force a flat string copy to break V8 sliced-string references so the
         // whole raw diff can be GC'd once parsing finishes.
-        currentHunk.lines.push('' + line);
+        currentDiffHunk.lines.push('' + line);
         lineCount++;
       } else if (line.startsWith('\\')) {
         // "\ No newline at end of file" — metadata the viewer renders as a
         // marker. Keep it so a trailing-newline-only edit isn't shown as
         // identical removed/added lines. Not counted against the content cap.
-        currentHunk.lines.push('' + line);
+        currentDiffHunk.lines.push('' + line);
       }
     }
 
-    if (currentHunk) fileHunks.push(currentHunk);
-    if (fileHunks.length > 0) result.set(filePath, fileHunks);
+    if (currentDiffHunk) fileDiffHunks.push(currentDiffHunk);
+    if (fileDiffHunks.length > 0) result.set(filePath, fileDiffHunks);
   }
 
   return result;
@@ -812,7 +812,7 @@ export function unquoteCStylePath(s: string): string {
  * appends after whitespace-containing paths) and `unquoteCStylePath`
  * (decode `"..."` C-quoted form for paths whose raw bytes include tabs,
  * newlines, quotes, or non-ASCII characters that core.quotepath does not
- * suppress). Without the unquote step, fetchGitDiffHunks would silently
+ * suppress). Without the unquote step, fetchGitDiffDiffHunks would silently
  * drop hunks for any tracked file whose name contains those characters.
  *
  * Returns `null` when the block has no hunks or no recognizable path line
@@ -1050,7 +1050,7 @@ export async function resolveGitDir(cwd: string): Promise<string | null> {
 /**
  * Same contract as `resolveGitDir`, but skips the ancestor walk when the
  * caller has already resolved the worktree root. Used by `fetchGitDiff` /
- * `fetchGitDiffHunks` so they walk ancestors at most once per invocation.
+ * `fetchGitDiffDiffHunks` so they walk ancestors at most once per invocation.
  */
 async function resolveGitDirFromRoot(gitRoot: string): Promise<string | null> {
   const dotGit = path.join(gitRoot, '.git');

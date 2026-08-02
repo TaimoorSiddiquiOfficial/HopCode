@@ -17,7 +17,7 @@ import {
 } from 'node:fs/promises';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { diffLines, structuredPatch } from 'diff';
-import type { Hunk } from '@types/diff';
+import type { DiffHunk } from '../utils/diff-types.js';
 import { Storage } from '../config/storage.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { MAX_DIFF_SIZE_BYTES } from '../utils/gitDiff.js';
@@ -65,7 +65,7 @@ export interface RewindResult {
 
 export interface TurnFileDiff {
   filePath: string;
-  hunks: Hunk[];
+  hunks: DiffHunk[];
   isNewFile: boolean;
   isDeleted: boolean;
   linesAdded: number;
@@ -75,7 +75,7 @@ export interface TurnFileDiff {
    *  remain a best-effort line-count delta. */
   oversized: boolean;
   /** True when either endpoint's content contains NUL bytes (the standard
-   *  binary sniff). Hunks are empty in that case — rendering them as text
+   *  binary sniff). DiffHunks are empty in that case — rendering them as text
    *  would corrupt the terminal or freeze the renderer. */
   isBinary: boolean;
 }

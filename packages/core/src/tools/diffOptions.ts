@@ -5,7 +5,7 @@
  */
 
 import * as Diff from 'diff';
-import type { PatchOptions, ParsedDiff, Hunk } from '@types/diff';
+import type { PatchOptions, ParsedDiff, DiffHunk } from '../utils/diff-types.js';
 import type { DiffStat } from './tools.js';
 
 export const DEFAULT_DIFF_OPTIONS: PatchOptions = {
@@ -101,7 +101,7 @@ export function getDiffStat(
     let addedChars = 0;
     let removedChars = 0;
 
-    patch.hunks.forEach((hunk: Hunk) => {
+    patch.hunks.forEach((hunk: DiffHunk) => {
       hunk.lines.forEach((line: string) => {
         if (line.startsWith('+')) {
           addedLines++;
