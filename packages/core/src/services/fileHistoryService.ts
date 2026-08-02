@@ -16,7 +16,8 @@ import {
   unlink,
 } from 'node:fs/promises';
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
-import { diffLines, structuredPatch, type Hunk } from 'diff';
+import { diffLines, structuredPatch } from 'diff';
+import type { Hunk } from '@types/diff';
 import { Storage } from '../config/storage.js';
 import { createDebugLogger } from '../utils/debugLogger.js';
 import { MAX_DIFF_SIZE_BYTES } from '../utils/gitDiff.js';
