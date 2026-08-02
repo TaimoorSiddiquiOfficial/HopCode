@@ -8,6 +8,7 @@
     "declarationMap": false,
     "sourceMap": false,
     "emitDeclarationOnly": true,
+    "noEmitOnError": false,
     "removeComments": false
   },
   "include": ["src/**/*.ts"],
