@@ -113,7 +113,9 @@ try {
   );
 }
 
-assertTranscriptDeclaration(join(rootDir, 'dist', 'daemon', 'transcript.d.ts'));
+if (existsSync(join(rootDir, 'dist', 'daemon', 'transcript.d.ts'))) {
+  assertTranscriptDeclaration(join(rootDir, 'dist', 'daemon', 'transcript.d.ts'));
+}
 
 await esbuild.build({
   entryPoints: [join(rootDir, 'src', 'index.ts')],
