@@ -1,0 +1,125 @@
+name: Upstream Rebrand Sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: upstream-rebrand-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out HopCode
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name 'hopcode-upstream-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/QwenLM/qwen-code.git 2>/dev/null || true
+          git fetch --prune upstream main
+
+      - name: Detect upstream updates
+        id: detect
+        shell: bash
+        run: |
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo 'updated=false' >> "$GITHUB_OUTPUT"
+            echo 'HopCode already contains the latest upstream commit.'
+          else
+            echo 'updated=true' >> "$GITHUB_OUTPUT"
+            echo "upstream_sha=$(git rev-parse upstream/main)" >> "$GITHUB_OUTPUT"
+            echo "short_sha=$(git rev-parse --short=12 upstream/main)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Merge upstream and apply white-label rules
+        if: steps.detect.outputs.updated == 'true'
+        shell: bash
+        run: |
+          branch="sync/upstream-${{ steps.detect.outputs.short_sha }}"
+          git checkout -b "$branch"
+
+          # Preserve HopCode's side for direct conflicts while importing all
+          # non-conflicting upstream files, directories, and content updates.
+          git merge --no-edit --no-ff -X ours upstream/main
+
+          python3 .github/scripts/enforce_branding.py --apply --report /tmp/branding-report.md
+          git add -A
+
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: enforce HopCode and IZN branding'
+          fi
+
+          echo "SYNC_BRANCH=$branch" >> "$GITHUB_ENV"
+
+      - name: Set up Node.js
+        if: steps.detect.outputs.updated == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Validate synchronized tree
+        if: steps.detect.outputs.updated == 'true'
+        run: |
+          npm ci
+          npm run build
+          npm run typecheck
+          python3 .github/scripts/enforce_branding.py --check --report branding-report.md
+
+      - name: Commit validation report
+        if: steps.detect.outputs.updated == 'true'
+        shell: bash
+        run: |
+          git add branding-report.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs: add upstream branding report'
+          fi
+
+      - name: Push synchronization branch
+        if: steps.detect.outputs.updated == 'true'
+        run: git push --force-with-lease origin "$SYNC_BRANCH"
+
+      - name: Open or update draft pull request
+        if: steps.detect.outputs.updated == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          existing="$(gh pr list --head "$SYNC_BRANCH" --base main --state open --json number --jq '.[0].number // empty')"
+          body_file="$(mktemp)"
+          cat > "$body_file" <<EOF
+          ## Automated upstream synchronization
+
+          - Upstream: `QwenLM/qwen-code@${{ steps.detect.outputs.upstream_sha }}`
+          - Imported new and updated upstream files recursively.
+          - Rebranded non-provider Qwen references to HopCode.
+          - Rebranded YOLO references to IZN.
+          - Preserved Qwen provider, model IDs, API endpoints, credentials, and provider-specific symbols.
+          - Ran build, typecheck, and branding validation.
+
+          Review the generated `branding-report.md` and functional changes before merging.
+          EOF
+
+          if [[ -n "$existing" ]]; then
+            gh pr edit "$existing" --title "chore: sync upstream ${{ steps.detect.outputs.short_sha }}" --body-file "$body_file"
+          else
+            gh pr create --draft --base main --head "$SYNC_BRANCH" \
+              --title "chore: sync upstream ${{ steps.detect.outputs.short_sha }}" \
+              --body-file "$body_file"
+          fi
